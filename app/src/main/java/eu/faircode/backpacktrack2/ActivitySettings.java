@@ -101,6 +101,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             public boolean onPreferenceClick(Preference preference) {
                 Intent shareIntent = new Intent(ActivitySettings.this, LocationService.class);
                 shareIntent.setAction(LocationService.ACTION_SHARE);
+                shareIntent.putExtra(LocationService.EXTRA_FROM, (long) 0);
+                shareIntent.putExtra(LocationService.EXTRA_TO, Long.MAX_VALUE);
                 startService(shareIntent);
                 return true;
             }
@@ -112,6 +114,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             public boolean onPreferenceClick(Preference preference) {
                 Intent uploadIntent = new Intent(ActivitySettings.this, LocationService.class);
                 uploadIntent.setAction(LocationService.ACTION_UPLOAD);
+                uploadIntent.putExtra(LocationService.EXTRA_FROM, (long) 0);
+                uploadIntent.putExtra(LocationService.EXTRA_TO, Long.MAX_VALUE);
                 startService(uploadIntent);
                 return true;
             }

@@ -59,6 +59,9 @@ public class LocationService extends IntentService {
     public static final String ACTION_SHARE = "Share";
     public static final String ACTION_UPLOAD = "Upload";
 
+    public static final String EXTRA_FROM = "From";
+    public static final String EXTRA_TO = "To";
+
     private static final int LOCATION_MIN_TIME = 1000; // milliseconds
     private static final int LOCATION_MIN_DISTANCE = 1; // meters
 
@@ -155,7 +158,9 @@ public class LocationService extends IntentService {
             try {
                 // Write GPX file
                 String trackName = "BackPackTrackII";
-                String gpxFileName = writeGPXFile(0, Long.MAX_VALUE, trackName);
+                long from = intent.getLongExtra(EXTRA_FROM, 0);
+                long to = intent.getLongExtra(EXTRA_TO, 0);
+                String gpxFileName = writeGPXFile(from, to, trackName);
 
                 // View file
                 Intent viewIntent = new Intent();
@@ -175,7 +180,9 @@ public class LocationService extends IntentService {
             try {
                 // Write GPX file
                 String trackName = "BackPackTrackII";
-                String gpxFileName = writeGPXFile(0, Long.MAX_VALUE, trackName);
+                long from = intent.getLongExtra(EXTRA_FROM, 0);
+                long to = intent.getLongExtra(EXTRA_TO, 0);
+                String gpxFileName = writeGPXFile(from, to, trackName);
 
                 // Get GPX file content
                 File gpx = new File(gpxFileName);
