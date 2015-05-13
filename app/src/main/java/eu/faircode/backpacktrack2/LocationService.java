@@ -93,7 +93,7 @@ public class LocationService extends IntentService {
                 prefs.edit().putBoolean(ActivitySettings.PREF_WAYPOINT, true).apply();
             }
             boolean activityRecognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
-            boolean activityStill = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) != DetectedActivity.STILL);
+            boolean activityStill = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
             if (!ACTION_ALARM.equals(intent.getAction()) || !activityRecognition || !activityStill)
                 startLocating();
             else
