@@ -29,6 +29,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_VERSION = "pref_version";
 
     public static final String PREF_ACTIVE = "pref_active";
+    public static final String PREF_WAYPOINT = "pref_waypoint";
     public static final String PREF_BEST_LOCATION = "pref_best_location";
     public static final String PREF_LAST_LOCATION = "pref_last_location";
 
@@ -116,6 +117,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 BootReceiver.setRepeatingAlarm(this);
             } else {
                 BootReceiver.cancelRepeatingAlarm(this);
+                LocationService.stopLocating(this);
                 LocationService.cancelNotification(this);
             }
 

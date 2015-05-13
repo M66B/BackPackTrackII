@@ -35,6 +35,7 @@ public class LocationService extends IntentService {
     public static final String ACTION_TIMEOUT = "TimeOut";
     public static final String ACTION_TRACKPOINT = "TrackPoint";
     public static final String ACTION_WAYPOINT = "WayPoint";
+    public static final String ACTION_GEOTAGGED = "Geotagged";
 
     private static final int LOCATION_MIN_TIME = 1000; // milliseconds
     private static final int LOCATION_MIN_DISTANCE = 1; // meters
@@ -52,8 +53,10 @@ public class LocationService extends IntentService {
                 ACTION_WAYPOINT.equals(intent.getAction()) ||
                 ACTION_ALARM.equals(intent.getAction())) {
             // Try to acquire new location
-            if (ACTION_WAYPOINT.equals((intent.getAction())))
+            if (ACTION_WAYPOINT.equals((intent.getAction()))) {
                 stopLocating(this);
+                prefs.edit().putBoolean(ActivitySettings.PREF_WAYPOINT, true).apply();
+            }
             startLocating();
 
         } else if (ACTION_LOCATION_FINE.equals(intent.getAction()) ||
@@ -90,6 +93,8 @@ public class LocationService extends IntentService {
                 return;
             }
 
+            stopLocating(this);
+
             // Process location
             handleLocation(location);
 
@@ -98,8 +103,14 @@ public class LocationService extends IntentService {
             Location bestLocation = deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
             Log.w(TAG, "Timeout best location=" + bestLocation);
 
+            stopLocating(this);
+
             // Process location
-            handleLocation(bestLocation);
+            if (bestLocation != null)
+                handleLocation(bestLocation);
+
+        } else if (ACTION_GEOTAGGED.equals(intent.getAction())) {
+
         }
     }
 
@@ -156,13 +167,7 @@ public class LocationService extends IntentService {
     }
 
     private void handleLocation(Location location) {
-        // Stop locating
-        stopLocating(this);
-        showNotification(getString(R.string.msg_idle), this);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.edit().remove(ActivitySettings.PREF_BEST_LOCATION).apply();
-        if (location == null)
-            return;
 
         // Filter close locations
         float pref_nearby = Float.parseFloat(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
@@ -209,6 +214,10 @@ public class LocationService extends IntentService {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         prefs.edit().remove(ActivitySettings.PREF_ACTIVE).apply();
+        prefs.edit().remove(ActivitySettings.PREF_WAYPOINT).apply();
+        prefs.edit().remove(ActivitySettings.PREF_BEST_LOCATION).apply();
+
+        showNotification(context.getString(R.string.msg_idle), context);
     }
 
     public static void showNotification(String text, Context context) {
