@@ -25,6 +25,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_ACCURACY = "pref_accuracy";
     public static final String PREF_TIMEOUT = "pref_timeout";
     public static final String PREF_NEARBY = "pref_nearby";
+    public static final String PREF_BLOGURL = "pref_blogurl";
+    public static final String PREF_BLOGID = "pref_blogid";
+    public static final String PREF_BLOGUSER = "pref_bloguser";
+    public static final String PREF_BLOGPWD = "pref_blogpwd";
     public static final String PREF_CHECK = "pref_check";
     public static final String PREF_VERSION = "pref_version";
 

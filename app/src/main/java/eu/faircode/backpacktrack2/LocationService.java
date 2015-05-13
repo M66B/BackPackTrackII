@@ -24,7 +24,16 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
+import org.xmlrpc.android.XMLRPCClient;
+import org.xmlrpc.android.XMLRPCException;
+
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.lang.reflect.Type;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LocationService extends IntentService {
     private static final String TAG = "BPT2.Service";
@@ -36,6 +45,8 @@ public class LocationService extends IntentService {
     public static final String ACTION_TRACKPOINT = "TrackPoint";
     public static final String ACTION_WAYPOINT = "WayPoint";
     public static final String ACTION_GEOTAGGED = "Geotagged";
+    public static final String ACTION_SHARE = "Share";
+    public static final String ACTION_UPLOAD = "Upload";
 
     private static final int LOCATION_MIN_TIME = 1000; // milliseconds
     private static final int LOCATION_MIN_DISTANCE = 1; // meters
@@ -111,6 +122,47 @@ public class LocationService extends IntentService {
 
         } else if (ACTION_GEOTAGGED.equals(intent.getAction())) {
 
+        } else if (ACTION_SHARE.equals(intent.getAction())) {
+            // Write GPX file
+            String gpxFileName = writeGPXFile(getTrackName());
+
+        } else if (ACTION_UPLOAD.equals(intent.getAction())) {
+            try {
+                // Write GPX file
+                String trackName = getTrackName();
+                String gpxFileName = writeGPXFile(trackName);
+
+                // Get GPX file content
+                File gpx = new File(gpxFileName);
+                byte[] bytes = new byte[(int) gpx.length()];
+                DataInputStream in = new DataInputStream(new FileInputStream(gpx));
+                in.readFully(bytes);
+                in.close();
+
+                // Create XML-RPC client
+                String blogUrl = prefs.getString(ActivitySettings.PREF_BLOGURL, "");
+                int blogId = Integer.parseInt(prefs.getString(ActivitySettings.PREF_BLOGID, "1"));
+                String userName = prefs.getString(ActivitySettings.PREF_BLOGUSER, "");
+                String passWord = prefs.getString(ActivitySettings.PREF_BLOGPWD, "");
+                URI uri = URI.create(blogUrl + "xmlrpc.php");
+                XMLRPCClient xmlrpc = new XMLRPCClient(uri, userName, passWord);
+
+                // Create upload parameters
+                Map<String, Object> args = new HashMap<String, Object>();
+                args.put("name", trackName + ".gpx");
+                args.put("type", "text/xml");
+                args.put("bits", bytes);
+                args.put("overwrite", true);
+                Object[] params = {blogId, userName, passWord, args};
+
+                // Upload file
+                HashMap<Object, Object> result = (HashMap<Object, Object>) xmlrpc.call("bpt.upload", params);
+
+                // Get result
+                String resultURL = result.get("url").toString();
+            } catch (Throwable ex) {
+
+            }
         }
     }
 
@@ -265,6 +317,14 @@ public class LocationService extends IntentService {
     public static void cancelNotification(Context context) {
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         nm.cancel(0);
+    }
+
+    private String getTrackName() {
+        return null;
+    }
+
+    private String writeGPXFile(String trackName) {
+        return trackName;
     }
 
     // Serialization
