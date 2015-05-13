@@ -17,6 +17,10 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.ActivityRecognition;
+import com.google.android.gms.location.ActivityRecognitionResult;
+import com.google.android.gms.location.DetectedActivity;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -45,6 +49,7 @@ public class LocationService extends IntentService {
     private static final String TAG = "BPT2.Service";
 
     public static final String ACTION_ALARM = "Alarm";
+    public static final String ACTION_ACTIVITY = "Activity";
     public static final String ACTION_LOCATION_FINE = "LocationFine";
     public static final String ACTION_LOCATION_COARSE = "LocationCoarse";
     public static final String ACTION_TIMEOUT = "TimeOut";
@@ -66,7 +71,14 @@ public class LocationService extends IntentService {
         Log.w(TAG, "Intent=" + intent);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if (ACTION_TRACKPOINT.equals(intent.getAction()) ||
+        if (ACTION_ACTIVITY.equals(intent.getAction())) {
+            ActivityRecognitionResult activityResult = ActivityRecognitionResult.extractResult(intent);
+            DetectedActivity activity = activityResult.getMostProbableActivity();
+            Log.w(TAG, "Activity=" + activity);
+            if (activity.getConfidence() >= 50)
+                prefs.edit().putInt(ActivitySettings.PREF_LAST_ACTIVITY, activity.getType()).apply();
+
+        } else if (ACTION_TRACKPOINT.equals(intent.getAction()) ||
                 ACTION_WAYPOINT.equals(intent.getAction()) ||
                 ACTION_ALARM.equals(intent.getAction())) {
             // Try to acquire new location
@@ -74,7 +86,12 @@ public class LocationService extends IntentService {
                 stopLocating(this);
                 prefs.edit().putBoolean(ActivitySettings.PREF_WAYPOINT, true).apply();
             }
-            startLocating();
+            boolean activityRecognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
+            boolean activityStill = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) != DetectedActivity.STILL);
+            if (!ACTION_ALARM.equals(intent.getAction()) || !activityRecognition || !activityStill)
+                startLocating();
+            else
+                Log.w(TAG, "Still");
 
         } else if (ACTION_LOCATION_FINE.equals(intent.getAction()) ||
                 ACTION_LOCATION_COARSE.equals(intent.getAction())) {
@@ -195,6 +212,73 @@ public class LocationService extends IntentService {
         }
     }
 
+    public static void startTracking(final Context context) {
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        // Check if enabled
+        if (!prefs.getBoolean(ActivitySettings.PREF_ENABLED, ActivitySettings.DEFAULT_ENABLED)) {
+            Log.w(TAG, "Disabled");
+            return;
+        }
+
+        int frequency = Integer.parseInt(prefs.getString(ActivitySettings.PREF_FREQUENCY, ActivitySettings.DEFAULT_FREQUENCY));
+
+        // Set repeating alarm
+        Intent alarmIntent = new Intent(context, LocationService.class);
+        alarmIntent.setAction(LocationService.ACTION_ALARM);
+        PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 1000, frequency * 60 * 1000, pi);
+        Log.w(TAG, "Set repeating alarm frequency=" + frequency + "m");
+
+        // Request activity updates
+        if (prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED))
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
+                    gac.blockingConnect();
+                    Log.w(TAG, "GoogleApiClient connected");
+                    Intent activityIntent = new Intent(context, LocationService.class);
+                    activityIntent.setAction(LocationService.ACTION_ACTIVITY);
+                    PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    int interval = Integer.parseInt(prefs.getString(ActivitySettings.PREF_RECOGNITION_INTERVAL, ActivitySettings.DEFAULT_RECOGNITION_INTERVAL));
+                    ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(gac, interval * 60 * 1000, pi);
+                    Log.w(TAG, "Activity updates frequency=" + interval + "m");
+                }
+            }).start();
+
+        LocationService.showNotification(context.getString(R.string.msg_idle), context);
+    }
+
+    public static void stopTracking(final Context context) {
+        // Cancel repeating alarm
+        Intent alarmIntent = new Intent(context, LocationService.class);
+        alarmIntent.setAction(LocationService.ACTION_ALARM);
+        PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        am.cancel(pi);
+        Log.w(TAG, "Canceled repeating alarm");
+
+        // Cancel activity updates
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
+                gac.blockingConnect();
+                Log.w(TAG, "GoogleApiClient connected");
+                Intent activityIntent = new Intent(context, LocationService.class);
+                activityIntent.setAction(LocationService.ACTION_ACTIVITY);
+                PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(gac, pi);
+                Log.w(TAG, "Canceled activity updates");
+            }
+        }).start();
+
+        stopLocating(context);
+        cancelNotification(context);
+    }
+
     private void startLocating() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -239,29 +323,6 @@ public class LocationService extends IntentService {
             Log.w(TAG, "No location providers");
     }
 
-    private boolean isBetterLocation(Location prev, Location current) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean pref_altitude = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE, ActivitySettings.DEFAULT_ALTITUDE);
-        return (prev == null ||
-                ((!pref_altitude || !prev.hasAltitude() || current.hasAltitude()) &&
-                        current.getAccuracy() < prev.getAccuracy()));
-    }
-
-    private void handleLocation(Location location, boolean waypoint) {
-        // Filter close locations
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        float pref_nearby = Float.parseFloat(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
-        Location lastLocation = deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
-        if (waypoint || lastLocation == null || lastLocation.distanceTo(location) > pref_nearby) {
-            // Store new location
-            Log.w(TAG, "New location=" + location + " waypoint=" + waypoint);
-            String waypointName = (waypoint ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) : null);
-            new DatabaseHelper(this).insertLocation(location, waypointName);
-            prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, serialize(location)).apply();
-        } else
-            Log.w(TAG, "Filtered location=" + location);
-    }
-
     public static void stopLocating(Context context) {
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
@@ -296,6 +357,29 @@ public class LocationService extends IntentService {
         prefs.edit().remove(ActivitySettings.PREF_BEST_LOCATION).apply();
 
         showNotification(context.getString(R.string.msg_idle), context);
+    }
+
+    private boolean isBetterLocation(Location prev, Location current) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean pref_altitude = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE, ActivitySettings.DEFAULT_ALTITUDE);
+        return (prev == null ||
+                ((!pref_altitude || !prev.hasAltitude() || current.hasAltitude()) &&
+                        current.getAccuracy() < prev.getAccuracy()));
+    }
+
+    private void handleLocation(Location location, boolean waypoint) {
+        // Filter close locations
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        float pref_nearby = Float.parseFloat(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
+        Location lastLocation = deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+        if (waypoint || lastLocation == null || lastLocation.distanceTo(location) > pref_nearby) {
+            // Store new location
+            Log.w(TAG, "New location=" + location + " waypoint=" + waypoint);
+            String waypointName = (waypoint ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) : null);
+            new DatabaseHelper(this).insertLocation(location, waypointName);
+            prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, serialize(location)).apply();
+        } else
+            Log.w(TAG, "Filtered location=" + location);
     }
 
     public static void showNotification(String text, Context context) {

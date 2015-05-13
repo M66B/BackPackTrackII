@@ -44,6 +44,16 @@
             android:key="pref_nearby"
             android:summary="@string/summary_nearby" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/title_recognition">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_recognition_enabled"
+            android:title="@string/title_recognition_enabled" />
+        <EditTextPreference
+            android:defaultValue="3"
+            android:inputType="number"
+            android:key="pref_recognition_interval" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_blog">
         <EditTextPreference
             android:key="pref_blogurl"

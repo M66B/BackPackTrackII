@@ -26,6 +26,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_TIMEOUT = "pref_timeout";
     public static final String PREF_NEARBY = "pref_nearby";
 
+    public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
+    public static final String PREF_RECOGNITION_INTERVAL = "pref_recognition_interval";
+
     public static final String PREF_BLOGURL = "pref_blogurl";
     public static final String PREF_BLOGID = "pref_blogid";
     public static final String PREF_BLOGUSER = "pref_bloguser";
@@ -35,6 +38,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     public static final String PREF_ACTIVE = "pref_active";
     public static final String PREF_WAYPOINT = "pref_waypoint";
+    public static final String PREF_LAST_ACTIVITY = "pref_last_activity";
     public static final String PREF_BEST_LOCATION = "pref_best_location";
     public static final String PREF_LAST_LOCATION = "pref_last_location";
     public static final String PREF_LAST_SHARE = "pref_last_share";
@@ -46,6 +50,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_ACCURACY = "50"; // meters
     public static final String DEFAULT_TIMEOUT = "60"; // seconds
     public static final String DEFAULT_NEARBY = "50"; // meters
+
+    public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
+    public static final String DEFAULT_RECOGNITION_INTERVAL = "3"; // minutes
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,18 +80,20 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         Preference pref_version = findPreference(PREF_VERSION);
 
         // Set titles/summaries
-        onSharedPreferenceChanged(prefs, PREF_SHARE);
-        onSharedPreferenceChanged(prefs, PREF_UPLOAD);
+        updateTitle(prefs, PREF_SHARE);
+        updateTitle(prefs, PREF_UPLOAD);
 
-        onSharedPreferenceChanged(prefs, PREF_FREQUENCY);
-        onSharedPreferenceChanged(prefs, PREF_ALTITUDE);
-        onSharedPreferenceChanged(prefs, PREF_ACCURACY);
-        onSharedPreferenceChanged(prefs, PREF_TIMEOUT);
-        onSharedPreferenceChanged(prefs, PREF_NEARBY);
+        updateTitle(prefs, PREF_FREQUENCY);
+        updateTitle(prefs, PREF_ALTITUDE);
+        updateTitle(prefs, PREF_ACCURACY);
+        updateTitle(prefs, PREF_TIMEOUT);
+        updateTitle(prefs, PREF_NEARBY);
 
-        onSharedPreferenceChanged(prefs, PREF_BLOGURL);
-        onSharedPreferenceChanged(prefs, PREF_BLOGID);
-        onSharedPreferenceChanged(prefs, PREF_BLOGUSER);
+        updateTitle(prefs, PREF_RECOGNITION_INTERVAL);
+
+        updateTitle(prefs, PREF_BLOGURL);
+        updateTitle(prefs, PREF_BLOGID);
+        updateTitle(prefs, PREF_BLOGUSER);
 
         // Share
         pref_share.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -152,6 +161,23 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 edit.apply();
             }
 
+        updateTitle(prefs, key);
+
+        if (PREF_FREQUENCY.equals(key) ||
+                PREF_ALTITUDE.equals(key) ||
+                PREF_ACCURACY.equals(key) ||
+                PREF_TIMEOUT.equals(key) ||
+                PREF_NEARBY.equals(key) ||
+                PREF_RECOGNITION_ENABLED.equals(key) ||
+                PREF_RECOGNITION_INTERVAL.equals(key)) {
+            LocationService.stopTracking(this);
+            LocationService.startTracking(this);
+        }
+    }
+
+    private void updateTitle(SharedPreferences prefs, String key) {
+        Preference pref = findPreference(key);
+
         if (PREF_SHARE.equals(key))
             pref.setSummary(getString(R.string.summary_share, prefs.getString(PREF_LAST_SHARE, getString(R.string.msg_never))));
         else if (PREF_UPLOAD.equals(key))
@@ -159,24 +185,23 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         else if (PREF_ENABLED.equals(key)) {
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            if (prefs.getBoolean(PREF_ENABLED, DEFAULT_ENABLED)) {
-                LocationService.showNotification(getString(R.string.msg_idle), this);
-                BootReceiver.setRepeatingAlarm(this);
-            } else {
-                BootReceiver.cancelRepeatingAlarm(this);
-                LocationService.stopLocating(this);
-                LocationService.cancelNotification(this);
-            }
-        } else if (PREF_ALTITUDE.equals(key))
-            pref.setSummary(prefs.getBoolean(PREF_ALTITUDE, true) ? getString(R.string.summary_altitude) : null);
-        else if (PREF_FREQUENCY.equals(key))
+            if (prefs.getBoolean(PREF_ENABLED, DEFAULT_ENABLED))
+                LocationService.startTracking(this);
+            else
+                LocationService.stopTracking(this);
+        } else if (PREF_FREQUENCY.equals(key))
             pref.setTitle(getString(R.string.title_frequency, prefs.getString(key, DEFAULT_FREQUENCY)));
+        else if (PREF_ALTITUDE.equals(key))
+            pref.setSummary(prefs.getBoolean(PREF_ALTITUDE, true) ? getString(R.string.summary_altitude) : null);
         else if (PREF_ACCURACY.equals(key))
             pref.setTitle(getString(R.string.title_accuracy, prefs.getString(key, DEFAULT_ACCURACY)));
         else if (PREF_TIMEOUT.equals(key))
             pref.setTitle(getString(R.string.title_timeout, prefs.getString(key, DEFAULT_TIMEOUT)));
         else if (PREF_NEARBY.equals(key))
             pref.setTitle(getString(R.string.title_nearby, prefs.getString(key, DEFAULT_NEARBY)));
+
+        else if (PREF_RECOGNITION_INTERVAL.equals(key))
+            pref.setTitle(getString(R.string.title_recognition_interval, prefs.getString(key, PREF_RECOGNITION_INTERVAL)));
 
         else if (PREF_BLOGURL.equals(key))
             pref.setTitle(getString(R.string.title_blogurl, prefs.getString(key, "")));

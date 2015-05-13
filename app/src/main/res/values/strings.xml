@@ -14,6 +14,10 @@
     <string name="title_timeout">Location time-out: %s seconds</string>
     <string name="title_nearby">Filter nearby locations: %s meters</string>
 
+    <string name="title_recognition">Activity recognition</string>
+    <string name="title_recognition_enabled">Activity recognition enabled</string>
+    <string name="title_recognition_interval">Activity recognition interval: %s minutes</string>
+
     <string name="title_blog">WordPress weblog</string>
     <string name="title_blogurl">URL: %s</string>
     <string name="title_blogid">ID: %s</string>
