@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">BackPackTrack II</string>
+
+    <string name="title_enabled">Tracking enabled</string>
+    <string name="title_frequency">Tracking frequency: %s minutes</string>
+    <string name="title_altitude">Altitude preferred</string>
+    <string name="title_accuracy">Preferred accuracy: %s meters</string>
+    <string name="title_timeout">Location time-out: %s seconds</string>
+    <string name="title_nearby">Filter nearby locations: %s meters</string>
+    <string name="title_check">Location settings</string>
+    <string name="title_version">Version</string>
+    <string name="title_author">Author</string>
+    <string name="title_license">License</string>
+
+    <string name="summary_frequency">Try to acquire a new location after the selected number of minutes</string>
+    <string name="summary_altitude">Prefer less accurate locations with altitude information over more accurate locations without altitude information</string>
+    <string name="summary_accuracy">Stop acquiring a location after a location with the selected accuracy has been acquired</string>
+    <string name="summary_timeout">Always stop acquiring the location after the selected time</string>
+    <string name="summary_nearby">Filter locations less than the selected number of meters from the last location</string>
+    <string name="summary_check">Tap to open the Android location settings</string>
+    <string name="summary_author">Marcel Bokhorst (M66B)\nTap for details (will start the browser)</string>
+    <string name="summary_license">GNU General Public License version 3\nTap for details (will start the browser)</string>
+
+    <string name="msg_geocoder">Geocoder:</string>
+    <string name="msg_yes">yes</string>
+    <string name="msg_no">no</string>
+
+    <string name="title_trackpoint">Trackpoint</string>
+    <string name="title_waypoint">Waypoint</string>
+
+    <string name="msg_idle">Idle</string>
+    <string name="msg_active">Active</string>
+    <string name="msg_location">%d meters</string>
+</resources>
