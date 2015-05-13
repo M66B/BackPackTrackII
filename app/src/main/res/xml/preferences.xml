@@ -3,9 +3,11 @@
     <PreferenceCategory android:title="@string/title_action">
         <Preference
             android:key="pref_share"
+            android:summary="@string/summary_share"
             android:title="@string/title_share" />
         <Preference
             android:key="pref_upload"
+            android:summary="@string/summary_upload"
             android:title="@string/title_upload" />
         <Preference
             android:key="pref_check"
@@ -45,16 +47,18 @@
     <PreferenceCategory android:title="@string/title_blog">
         <EditTextPreference
             android:key="pref_blogurl"
-            android:title="@string/title_blogurl" />
+            android:summary="@string/summary_blogurl" />
         <EditTextPreference
             android:inputType="number"
             android:key="pref_blogid"
-            android:title="@string/title_blogid" />
+            android:summary="@string/summary_blogid" />
         <EditTextPreference
             android:key="pref_bloguser"
-            android:title="@string/title_bloguser" />
+            android:summary="@string/summary_bloguser" />
         <EditTextPreference
+            android:inputType="textPassword"
             android:key="pref_blogpwd"
+            android:summary="@string/summary_blogpwd"
             android:title="@string/title_blogpwd" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_info">

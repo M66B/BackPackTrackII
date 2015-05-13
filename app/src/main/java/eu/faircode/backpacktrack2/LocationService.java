@@ -143,6 +143,8 @@ public class LocationService extends IntentService {
                 viewIntent.setDataAndType(Uri.fromFile(new File(gpxFileName)), "application/gpx+xml");
                 viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(viewIntent);
+
+                prefs.edit().putString(ActivitySettings.PREF_LAST_SHARE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())).apply();
             } catch (IOException ex) {
                 Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
@@ -183,6 +185,8 @@ public class LocationService extends IntentService {
                 // Get result
                 String url = result.get("url").toString();
                 Log.w(TAG, "GPX url=" + url);
+
+                prefs.edit().putString(ActivitySettings.PREF_LAST_UPLOAD, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())).apply();
             } catch (IOException ex) {
                 Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             } catch (XMLRPCException ex) {
