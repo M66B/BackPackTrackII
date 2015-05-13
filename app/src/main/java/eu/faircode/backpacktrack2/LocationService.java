@@ -35,6 +35,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -76,6 +78,7 @@ public class LocationService extends IntentService {
         } else if (ACTION_LOCATION_FINE.equals(intent.getAction()) ||
                 ACTION_LOCATION_COARSE.equals(intent.getAction())) {
             // Process location update
+            boolean waypoint = prefs.getBoolean(ActivitySettings.PREF_WAYPOINT, false);
             Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
             Log.w(TAG, "Update location=" + location);
             if (location == null ||
@@ -110,10 +113,11 @@ public class LocationService extends IntentService {
             stopLocating(this);
 
             // Process location
-            handleLocation(location);
+            handleLocation(location, waypoint);
 
         } else if (ACTION_TIMEOUT.equals(intent.getAction())) {
             // Process location time-out
+            boolean waypoint = prefs.getBoolean(ActivitySettings.PREF_WAYPOINT, false);
             Location bestLocation = deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
             Log.w(TAG, "Timeout best location=" + bestLocation);
 
@@ -121,7 +125,7 @@ public class LocationService extends IntentService {
 
             // Process location
             if (bestLocation != null)
-                handleLocation(bestLocation);
+                handleLocation(bestLocation, waypoint);
 
         } else if (ACTION_GEOTAGGED.equals(intent.getAction())) {
 
@@ -234,15 +238,16 @@ public class LocationService extends IntentService {
                         current.getAccuracy() < prev.getAccuracy()));
     }
 
-    private void handleLocation(Location location) {
+    private void handleLocation(Location location, boolean waypoint) {
         // Filter close locations
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         float pref_nearby = Float.parseFloat(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
         Location lastLocation = deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
-        if (lastLocation == null || lastLocation.distanceTo(location) > pref_nearby) {
+        if (waypoint || lastLocation == null || lastLocation.distanceTo(location) > pref_nearby) {
             // Store new location
-            Log.w(TAG, "New location=" + location);
-            new DatabaseHelper(this).insertLocation(location, null);
+            Log.w(TAG, "New location=" + location + " waypoint=" + waypoint);
+            String waypointName = (waypoint ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) : null);
+            new DatabaseHelper(this).insertLocation(location, waypointName);
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, serialize(location)).apply();
         } else
             Log.w(TAG, "Filtered location=" + location);
