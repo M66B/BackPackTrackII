@@ -52,6 +52,8 @@ public class LocationService extends IntentService {
                 ACTION_WAYPOINT.equals(intent.getAction()) ||
                 ACTION_ALARM.equals(intent.getAction())) {
             // Try to acquire new location
+            if (ACTION_WAYPOINT.equals((intent.getAction())))
+                stopLocating(this);
             startLocating();
 
         } else if (ACTION_LOCATION_FINE.equals(intent.getAction()) ||
