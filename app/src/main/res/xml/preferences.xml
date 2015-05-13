@@ -39,6 +39,11 @@
             android:key="pref_timeout"
             android:summary="@string/summary_timeout" />
         <EditTextPreference
+            android:defaultValue="500"
+            android:inputType="number"
+            android:key="pref_inaccurate"
+            android:summary="@string/summary_inaccurate" />
+        <EditTextPreference
             android:defaultValue="50"
             android:inputType="number"
             android:key="pref_nearby"

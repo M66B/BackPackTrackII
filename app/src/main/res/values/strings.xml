@@ -12,6 +12,7 @@
     <string name="title_altitude">Altitude preferred</string>
     <string name="title_accuracy">Preferred accuracy: %s meters</string>
     <string name="title_timeout">Location time-out: %s seconds</string>
+    <string name="title_inaccurate">Filter inaccurate locations: %s meters</string>
     <string name="title_nearby">Filter nearby locations: %s meters</string>
 
     <string name="title_recognition">Activity recognition</string>
@@ -37,7 +38,8 @@
     <string name="summary_altitude">Prefer less accurate locations with altitude information over more accurate locations without altitude information</string>
     <string name="summary_accuracy">Stop acquiring a location after a location with the selected accuracy has been acquired</string>
     <string name="summary_timeout">Always stop acquiring the location after the selected time</string>
-    <string name="summary_nearby">Filter locations less than the selected number of meters from the last location</string>
+    <string name="summary_inaccurate">Filter locations less accurate than the selected number of meters</string>
+    <string name="summary_nearby">Filter locations closer than the selected number of meter to the last location</string>
 
     <string name="summary_blogurl">WordPress URL with trailing slash</string>
     <string name="summary_blogid">WordPress ID; use 1 for single site installations</string>

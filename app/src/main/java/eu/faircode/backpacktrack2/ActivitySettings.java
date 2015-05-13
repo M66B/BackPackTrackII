@@ -24,6 +24,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_ALTITUDE = "pref_altitude";
     public static final String PREF_ACCURACY = "pref_accuracy";
     public static final String PREF_TIMEOUT = "pref_timeout";
+    public static final String PREF_INACCURATE = "pref_inaccurate";
     public static final String PREF_NEARBY = "pref_nearby";
 
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
@@ -49,6 +50,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final boolean DEFAULT_ALTITUDE = true;
     public static final String DEFAULT_ACCURACY = "50"; // meters
     public static final String DEFAULT_TIMEOUT = "60"; // seconds
+    public static final String DEFAULT_INACCURATE = "500"; // meters
     public static final String DEFAULT_NEARBY = "50"; // meters
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
@@ -87,6 +89,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_ALTITUDE);
         updateTitle(prefs, PREF_ACCURACY);
         updateTitle(prefs, PREF_TIMEOUT);
+        updateTitle(prefs, PREF_INACCURATE);
         updateTitle(prefs, PREF_NEARBY);
 
         updateTitle(prefs, PREF_RECOGNITION_INTERVAL);
@@ -171,6 +174,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 PREF_ALTITUDE.equals(key) ||
                 PREF_ACCURACY.equals(key) ||
                 PREF_TIMEOUT.equals(key) ||
+                PREF_INACCURATE.equals(key) ||
                 PREF_NEARBY.equals(key) ||
                 PREF_RECOGNITION_ENABLED.equals(key) ||
                 PREF_RECOGNITION_INTERVAL.equals(key)) {
@@ -201,6 +205,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref.setTitle(getString(R.string.title_accuracy, prefs.getString(key, DEFAULT_ACCURACY)));
         else if (PREF_TIMEOUT.equals(key))
             pref.setTitle(getString(R.string.title_timeout, prefs.getString(key, DEFAULT_TIMEOUT)));
+        else if (PREF_INACCURATE.equals(key))
+            pref.setTitle(getString(R.string.title_inaccurate, prefs.getString(key, DEFAULT_INACCURATE)));
         else if (PREF_NEARBY.equals(key))
             pref.setTitle(getString(R.string.title_nearby, prefs.getString(key, DEFAULT_NEARBY)));
 

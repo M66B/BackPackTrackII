@@ -112,13 +112,19 @@ public class LocationService extends IntentService {
             // Get location preferences
             boolean pref_altitude = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE, ActivitySettings.DEFAULT_ALTITUDE);
             float pref_accuracy = Float.parseFloat(prefs.getString(ActivitySettings.PREF_ACCURACY, ActivitySettings.DEFAULT_ACCURACY));
-            Log.w(TAG, "Prefer altitude=" + pref_altitude + " accuracy=" + pref_accuracy);
+            float pref_inaccurate = Float.parseFloat(prefs.getString(ActivitySettings.PREF_INACCURATE, ActivitySettings.DEFAULT_INACCURATE));
+            Log.w(TAG, "Prefer altitude=" + pref_altitude + " accuracy=" + pref_accuracy + " inaccurate=" + pref_inaccurate);
+
+            if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
+                Log.w(TAG, "Inaccurate");
+                return;
+            }
 
             // Persist better location
             Location bestLocation = deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
             if (isBetterLocation(bestLocation, location)) {
                 Log.w(TAG, "Better location=" + location);
-                showNotification(getString(R.string.msg_location, (int) location.getAccuracy()), this);
+                showNotification(getString(R.string.msg_location, location.hasAccuracy() ? (int) location.getAccuracy() : Integer.MAX_VALUE), this);
                 prefs.edit().putString(ActivitySettings.PREF_BEST_LOCATION, serialize(location)).apply();
             }
 
@@ -129,7 +135,7 @@ public class LocationService extends IntentService {
             }
 
             // Check accuracy
-            if (location.getAccuracy() > pref_accuracy) {
+            if (!location.hasAccuracy() || location.getAccuracy() > pref_accuracy) {
                 Log.w(TAG, "Inaccurate");
                 return;
             }
@@ -376,7 +382,8 @@ public class LocationService extends IntentService {
         boolean pref_altitude = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE, ActivitySettings.DEFAULT_ALTITUDE);
         return (prev == null ||
                 ((!pref_altitude || !prev.hasAltitude() || current.hasAltitude()) &&
-                        current.getAccuracy() < prev.getAccuracy()));
+                        (current.hasAccuracy() ? current.getAccuracy() : Float.MAX_VALUE) <
+                                (prev.hasAccuracy() ? prev.getAccuracy() : Float.MAX_VALUE)));
     }
 
     private void handleLocation(Location location, boolean waypoint) {
