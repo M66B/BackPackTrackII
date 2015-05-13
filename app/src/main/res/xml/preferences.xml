@@ -1,56 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="pref_enabled"
-        android:title="@string/title_enabled" />
-    <EditTextPreference
-        android:defaultValue="3"
-        android:dependency="pref_frequency"
-        android:inputType="number"
-        android:key="pref_frequency"
-        android:summary="@string/summary_frequency" />
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="pref_altitude"
-        android:title="@string/title_altitude" />
-    <EditTextPreference
-        android:defaultValue="50"
-        android:inputType="number"
-        android:key="pref_accuracy"
-        android:summary="@string/summary_accuracy" />
-    <EditTextPreference
-        android:defaultValue="60"
-        android:inputType="number"
-        android:key="pref_timeout"
-        android:summary="@string/summary_timeout" />
-    <EditTextPreference
-        android:defaultValue="50"
-        android:inputType="number"
-        android:key="pref_nearby"
-        android:summary="@string/summary_nearby" />
-    <Preference
-        android:key="pref_share"
-        android:title="@string/title_share" />
-    <Preference
-        android:key="pref_check"
-        android:summary="@string/summary_check"
-        android:title="@string/title_check" />
-    <Preference
-        android:key="pref_version"
-        android:title="@string/title_version" />
-    <Preference
-        android:summary="@string/summary_author"
-        android:title="@string/title_author">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="http://www.faircode.eu/" />
-    </Preference>
-    <Preference
-        android:summary="@string/summary_license"
-        android:title="@string/title_license">
-        <intent
-            android:action="android.intent.action.VIEW"
-            android:data="http://www.gnu.org/licenses/gpl.txt" />
-    </Preference>
+    <PreferenceCategory android:title="@string/title_action">
+        <Preference
+            android:key="pref_share"
+            android:title="@string/title_share" />
+        <Preference
+            android:key="pref_upload"
+            android:title="@string/title_upload" />
+        <Preference
+            android:key="pref_check"
+            android:summary="@string/summary_check"
+            android:title="@string/title_check" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/title_tracking">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_enabled"
+            android:title="@string/title_enabled" />
+        <EditTextPreference
+            android:defaultValue="3"
+            android:inputType="number"
+            android:key="pref_frequency"
+            android:summary="@string/summary_frequency" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_altitude"
+            android:title="@string/title_altitude" />
+        <EditTextPreference
+            android:defaultValue="50"
+            android:inputType="number"
+            android:key="pref_accuracy"
+            android:summary="@string/summary_accuracy" />
+        <EditTextPreference
+            android:defaultValue="60"
+            android:inputType="number"
+            android:key="pref_timeout"
+            android:summary="@string/summary_timeout" />
+        <EditTextPreference
+            android:defaultValue="50"
+            android:inputType="number"
+            android:key="pref_nearby"
+            android:summary="@string/summary_nearby" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/title_blog">
+        <EditTextPreference
+            android:key="pref_blogurl"
+            android:title="@string/title_blogurl" />
+        <EditTextPreference
+            android:inputType="number"
+            android:key="pref_blogid"
+            android:title="@string/title_blogid" />
+        <EditTextPreference
+            android:key="pref_bloguser"
+            android:title="@string/title_bloguser" />
+        <EditTextPreference
+            android:key="pref_blogpwd"
+            android:title="@string/title_blogpwd" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/title_info">
+        <Preference
+            android:key="pref_version"
+            android:title="@string/title_version" />
+        <Preference
+            android:summary="@string/summary_author"
+            android:title="@string/title_author">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://www.faircode.eu/" />
+        </Preference>
+        <Preference
+            android:summary="@string/summary_license"
+            android:title="@string/title_license">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://www.gnu.org/licenses/gpl.txt" />
+        </Preference>
+    </PreferenceCategory>
 </PreferenceScreen>

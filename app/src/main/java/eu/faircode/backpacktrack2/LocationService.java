@@ -28,6 +28,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import org.xmlrpc.android.XMLRPCClient;
+import org.xmlrpc.android.XMLRPCException;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -128,6 +129,7 @@ public class LocationService extends IntentService {
                 handleLocation(bestLocation, waypoint);
 
         } else if (ACTION_GEOTAGGED.equals(intent.getAction())) {
+            // TODO
 
         } else if (ACTION_SHARE.equals(intent.getAction())) {
             try {
@@ -179,9 +181,12 @@ public class LocationService extends IntentService {
                 HashMap<Object, Object> result = (HashMap<Object, Object>) xmlrpc.call("bpt.upload", params);
 
                 // Get result
-                String resultURL = result.get("url").toString();
-            } catch (Throwable ex) {
-
+                String url = result.get("url").toString();
+                Log.w(TAG, "GPX url=" + url);
+            } catch (IOException ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            } catch (XMLRPCException ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
         }
     }

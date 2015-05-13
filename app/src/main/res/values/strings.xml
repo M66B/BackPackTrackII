@@ -1,14 +1,23 @@
 <resources>
     <string name="app_name">BackPackTrack II</string>
 
+    <string name="title_action">Actions</string>
+    <string name="title_share">Share GPX file</string>
+    <string name="title_upload">Upload GPX file</string>
+    <string name="title_check">Location settings</string>
     <string name="title_enabled">Tracking enabled</string>
+    <string name="title_tracking">Tracking</string>
     <string name="title_frequency">Tracking frequency: %s minutes</string>
     <string name="title_altitude">Altitude preferred</string>
     <string name="title_accuracy">Preferred accuracy: %s meters</string>
     <string name="title_timeout">Location time-out: %s seconds</string>
     <string name="title_nearby">Filter nearby locations: %s meters</string>
-    <string name="title_share">Share GPX file</string>
-    <string name="title_check">Location settings</string>
+    <string name="title_blog">Weblog</string>
+    <string name="title_blogurl">URL</string>
+    <string name="title_blogid">ID</string>
+    <string name="title_bloguser">User</string>
+    <string name="title_blogpwd">Password</string>
+    <string name="title_info">Information</string>
     <string name="title_version">Version</string>
     <string name="title_author">Author</string>
     <string name="title_license">License</string>

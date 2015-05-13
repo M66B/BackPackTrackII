@@ -25,6 +25,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_BLOGUSER = "pref_bloguser";
     public static final String PREF_BLOGPWD = "pref_blogpwd";
     public static final String PREF_SHARE = "pref_share";
+    public static final String PREF_UPLOAD = "pref_upload";
     public static final String PREF_CHECK = "pref_check";
     public static final String PREF_VERSION = "pref_version";
 
@@ -61,6 +62,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Get preferences
         Preference pref_share = findPreference(PREF_SHARE);
+        Preference pref_upload = findPreference(PREF_UPLOAD);
         Preference pref_check = findPreference(PREF_CHECK);
         Preference pref_version = findPreference(PREF_VERSION);
 
@@ -78,6 +80,17 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 Intent shareIntent = new Intent(ActivitySettings.this, LocationService.class);
                 shareIntent.setAction(LocationService.ACTION_SHARE);
                 startService(shareIntent);
+                return true;
+            }
+        });
+
+        // Upload
+        pref_upload.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent uploadIntent = new Intent(ActivitySettings.this, LocationService.class);
+                uploadIntent.setAction(LocationService.ACTION_UPLOAD);
+                startService(uploadIntent);
                 return true;
             }
         });
