@@ -7,6 +7,7 @@
     <string name="title_accuracy">Preferred accuracy: %s meters</string>
     <string name="title_timeout">Location time-out: %s seconds</string>
     <string name="title_nearby">Filter nearby locations: %s meters</string>
+    <string name="title_share">Share GPX file</string>
     <string name="title_check">Location settings</string>
     <string name="title_version">Version</string>
     <string name="title_author">Author</string>

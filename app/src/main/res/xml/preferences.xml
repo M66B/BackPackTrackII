@@ -30,6 +30,9 @@
         android:key="pref_nearby"
         android:summary="@string/summary_nearby" />
     <Preference
+        android:key="pref_share"
+        android:title="@string/title_share" />
+    <Preference
         android:key="pref_check"
         android:summary="@string/summary_check"
         android:title="@string/title_check" />

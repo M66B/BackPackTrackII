@@ -8,8 +8,11 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -25,11 +28,11 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import org.xmlrpc.android.XMLRPCClient;
-import org.xmlrpc.android.XMLRPCException;
 
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.HashMap;
@@ -123,14 +126,27 @@ public class LocationService extends IntentService {
         } else if (ACTION_GEOTAGGED.equals(intent.getAction())) {
 
         } else if (ACTION_SHARE.equals(intent.getAction())) {
-            // Write GPX file
-            String gpxFileName = writeGPXFile(getTrackName());
+            try {
+                // Write GPX file
+                String trackName = "BackPackTrackII";
+                String gpxFileName = writeGPXFile(0, Long.MAX_VALUE, trackName);
+
+                // View file
+                Intent viewIntent = new Intent();
+                viewIntent.setAction(Intent.ACTION_VIEW);
+                viewIntent.setDataAndType(Uri.fromFile(new File(gpxFileName)), "application/gpx+xml");
+                viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(viewIntent);
+            } catch (IOException ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
+
 
         } else if (ACTION_UPLOAD.equals(intent.getAction())) {
             try {
                 // Write GPX file
-                String trackName = getTrackName();
-                String gpxFileName = writeGPXFile(trackName);
+                String trackName = "BackPackTrackII";
+                String gpxFileName = writeGPXFile(0, Long.MAX_VALUE, trackName);
 
                 // Get GPX file content
                 File gpx = new File(gpxFileName);
@@ -219,21 +235,17 @@ public class LocationService extends IntentService {
     }
 
     private void handleLocation(Location location) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
         // Filter close locations
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         float pref_nearby = Float.parseFloat(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
         Location lastLocation = deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
         if (lastLocation == null || lastLocation.distanceTo(location) > pref_nearby) {
-            if (lastLocation == null)
-                Log.w(TAG, "Brand new");
-            else
-                Log.w(TAG, "New dx=" + lastLocation.distanceTo(location));
-
-            // Store last location
+            // Store new location
+            Log.w(TAG, "New location=" + location);
+            new DatabaseHelper(this).insertLocation(location, null);
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, serialize(location)).apply();
         } else
-            Log.w(TAG, "Filtered");
+            Log.w(TAG, "Filtered location=" + location);
     }
 
     public static void stopLocating(Context context) {
@@ -319,12 +331,17 @@ public class LocationService extends IntentService {
         nm.cancel(0);
     }
 
-    private String getTrackName() {
-        return null;
-    }
-
-    private String writeGPXFile(String trackName) {
-        return trackName;
+    private String writeGPXFile(long from, long to, String trackName) throws IOException {
+        File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separatorChar + "BackPackTrackII");
+        folder.mkdirs();
+        String gpxFileName = folder.getAbsolutePath() + File.separatorChar + trackName + ".gpx";
+        Log.w(TAG, "Writing file=" + gpxFileName);
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);
+        Cursor trackPoints = databaseHelper.getLocationList(from, to, true);
+        Cursor wayPoints = databaseHelper.getLocationList(from, to, false);
+        GPXFileWriter.writeGpxFile(new File(gpxFileName), trackName, trackPoints, wayPoints);
+        databaseHelper.close();
+        return gpxFileName;
     }
 
     // Serialization
@@ -334,7 +351,7 @@ public class LocationService extends IntentService {
             JsonObject jObject = new JsonObject();
 
             jObject.addProperty("Provider", src.getProvider());
-
+            jObject.addProperty("Time", src.getTime());
             jObject.addProperty("Latitude", src.getLatitude());
             jObject.addProperty("Longitude", src.getLongitude());
 
@@ -347,7 +364,8 @@ public class LocationService extends IntentService {
             if (src.hasAccuracy())
                 jObject.addProperty("Accuracy", src.getAccuracy());
 
-            jObject.addProperty("Time", src.getTime());
+            if (src.hasBearing())
+                jObject.addProperty("Bearing", src.getBearing());
 
             return jObject;
         }
@@ -359,6 +377,7 @@ public class LocationService extends IntentService {
             JsonObject jObject = (JsonObject) json;
             Location location = new Location(jObject.get("Provider").getAsString());
 
+            location.setTime(jObject.get("Time").getAsLong());
             location.setLatitude(jObject.get("Latitude").getAsDouble());
             location.setLongitude(jObject.get("Longitude").getAsDouble());
 
@@ -368,10 +387,11 @@ public class LocationService extends IntentService {
             if (jObject.has("Speed"))
                 location.setSpeed(jObject.get("Speed").getAsFloat());
 
+            if (jObject.has("Bearing"))
+                location.setBearing(jObject.get("Bearing").getAsFloat());
+
             if (jObject.has("Accuracy"))
                 location.setAccuracy(jObject.get("Accuracy").getAsFloat());
-
-            location.setTime(jObject.get("Time").getAsLong());
 
             return location;
         }

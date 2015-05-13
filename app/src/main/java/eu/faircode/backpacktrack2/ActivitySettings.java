@@ -1,9 +1,6 @@
 package eu.faircode.backpacktrack2;
 
-import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -17,8 +14,6 @@ import android.preference.PreferenceActivity;
 import android.provider.Settings;
 
 public class ActivitySettings extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
-    private static final String TAG = "BPT2.Settings";
-
     public static final String PREF_ENABLED = "pref_enabled";
     public static final String PREF_FREQUENCY = "pref_frequency";
     public static final String PREF_ALTITUDE = "pref_altitude";
@@ -29,6 +24,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_BLOGID = "pref_blogid";
     public static final String PREF_BLOGUSER = "pref_bloguser";
     public static final String PREF_BLOGPWD = "pref_blogpwd";
+    public static final String PREF_SHARE = "pref_share";
     public static final String PREF_CHECK = "pref_check";
     public static final String PREF_VERSION = "pref_version";
 
@@ -64,6 +60,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         }
 
         // Get preferences
+        Preference pref_share = findPreference(PREF_SHARE);
         Preference pref_check = findPreference(PREF_CHECK);
         Preference pref_version = findPreference(PREF_VERSION);
 
@@ -73,6 +70,17 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         onSharedPreferenceChanged(prefs, PREF_ACCURACY);
         onSharedPreferenceChanged(prefs, PREF_TIMEOUT);
         onSharedPreferenceChanged(prefs, PREF_NEARBY);
+
+        // Share
+        pref_share.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent shareIntent = new Intent(ActivitySettings.this, LocationService.class);
+                shareIntent.setAction(LocationService.ACTION_SHARE);
+                startService(shareIntent);
+                return true;
+            }
+        });
 
         // Location settings
         Intent locationSettingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
