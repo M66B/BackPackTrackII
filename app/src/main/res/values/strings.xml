@@ -51,8 +51,8 @@
     <string name="title_waypoint">Waypoint</string>
 
     <string name="msg_idle">Idle</string>
-    <string name="msg_active">Active</string>
-    <string name="msg_location">%d meters</string>
+    <string name="msg_active">Acquiring location</string>
+    <string name="msg_location">Acquired location, %d meters</string>
     <string name="msg_never">Never</string>
 
     <string name="msg_geocoder">Geocoder:</string>

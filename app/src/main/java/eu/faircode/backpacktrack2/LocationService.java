@@ -72,8 +72,11 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         if (ACTION_ACTIVITY.equals(intent.getAction())) {
+            // Get detected activity
             ActivityRecognitionResult activityResult = ActivityRecognitionResult.extractResult(intent);
             DetectedActivity activity = activityResult.getMostProbableActivity();
+
+            // Persist probable activity
             Log.w(TAG, "Activity=" + activity);
             if (activity.getConfidence() >= 50)
                 prefs.edit().putInt(ActivitySettings.PREF_LAST_ACTIVITY, activity.getType()).apply();
@@ -161,6 +164,7 @@ public class LocationService extends IntentService {
                 viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(viewIntent);
 
+                // Persist last share time
                 prefs.edit().putString(ActivitySettings.PREF_LAST_SHARE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())).apply();
             } catch (IOException ex) {
                 Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
@@ -203,6 +207,7 @@ public class LocationService extends IntentService {
                 String url = result.get("url").toString();
                 Log.w(TAG, "GPX url=" + url);
 
+                // Persist last upload time
                 prefs.edit().putString(ActivitySettings.PREF_LAST_UPLOAD, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())).apply();
             } catch (IOException ex) {
                 Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
