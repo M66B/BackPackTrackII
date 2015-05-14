@@ -432,7 +432,8 @@ public class LocationService extends IntentService {
         notificationBuilder.setContentText(text);
         notificationBuilder.setContentIntent(piSettings);
         notificationBuilder.setWhen(System.currentTimeMillis());
-        notificationBuilder.setAutoCancel(true);
+        notificationBuilder.setAutoCancel(false);
+        notificationBuilder.setOngoing(true);
         notificationBuilder.addAction(android.R.drawable.ic_menu_mylocation, context.getString(R.string.title_trackpoint),
                 piTrackpoint);
         notificationBuilder.addAction(android.R.drawable.ic_menu_add, context.getString(R.string.title_waypoint),
