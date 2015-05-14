@@ -35,6 +35,13 @@
             </intent-filter>
         </receiver>
 
+        <receiver android:name=".PackageChangeReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <data android:scheme="package" />
+            </intent-filter>
+        </receiver>
+
         <receiver
             android:name=".GeotaggedReceiver"
             android:enabled="true">

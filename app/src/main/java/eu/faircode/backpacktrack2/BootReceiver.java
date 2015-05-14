@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.util.Log;
 
 public class BootReceiver extends BroadcastReceiver {
-    private static final String TAG = "BPT2.BootReceiver";
+    private static final String TAG = "BPT2.Boot";
 
     @Override
     public void onReceive(Context context, Intent intent) {
