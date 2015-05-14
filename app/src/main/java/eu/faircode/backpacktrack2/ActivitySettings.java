@@ -146,12 +146,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref_check.setEnabled(false);
 
         // Version
-        String self = ActivitySettings.class.getPackage().getName();
-        Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + self));
+        Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
         if (getPackageManager().queryIntentActivities(playStoreIntent, 0).size() > 0)
             pref_version.setIntent(playStoreIntent);
         try {
-            PackageInfo pInfo = getPackageManager().getPackageInfo(self, 0);
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             pref_version.setSummary(
                     pInfo.versionName + "/" + pInfo.versionCode + "\n" +
                             getString(R.string.msg_geocoder) + " " +
