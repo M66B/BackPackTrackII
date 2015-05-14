@@ -50,11 +50,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final boolean DEFAULT_ALTITUDE = true;
     public static final String DEFAULT_ACCURACY = "50"; // meters
     public static final String DEFAULT_TIMEOUT = "60"; // seconds
-    public static final String DEFAULT_INACCURATE = "500"; // meters
+    public static final String DEFAULT_INACCURATE = "1500"; // meters
     public static final String DEFAULT_NEARBY = "50"; // meters
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
-    public static final String DEFAULT_RECOGNITION_INTERVAL = "3"; // minutes
+    public static final String DEFAULT_RECOGNITION_INTERVAL = "1"; // minutes
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

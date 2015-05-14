@@ -76,16 +76,28 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         if (ACTION_ACTIVITY.equals(intent.getAction())) {
+            // Get last activity
+            boolean lastStill = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
+
             // Get detected activity
             ActivityRecognitionResult activityResult = ActivityRecognitionResult.extractResult(intent);
             DetectedActivity activity = activityResult.getMostProbableActivity();
 
-            // Persist probable activity
             Log.w(TAG, "Activity=" + activity);
             if (activity.getConfidence() >= 50) {
+                // Persist probable activity
                 prefs.edit().putInt(ActivitySettings.PREF_LAST_ACTIVITY, activity.getType()).apply();
                 if (!prefs.getBoolean(ActivitySettings.PREF_ACTIVE, false))
                     showIdle(this);
+
+                // Stop/start repeating alarm
+                boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
+                if (lastStill != still)
+                    if (still) {
+                        stopRepeatingAlarm(this);
+                        stopLocating(this);
+                    } else
+                        startRepeatingAlarm(this);
             }
 
         } else if (ACTION_TRACKPOINT.equals(intent.getAction()) ||
@@ -96,12 +108,7 @@ public class LocationService extends IntentService {
                 stopLocating(this);
                 prefs.edit().putBoolean(ActivitySettings.PREF_WAYPOINT, true).apply();
             }
-            boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
-            boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
-            if (!ACTION_ALARM.equals(intent.getAction()) || !recognition || !still)
-                startLocating();
-            else
-                Log.w(TAG, "Still");
+            startLocating();
 
         } else if (ACTION_LOCATION_FINE.equals(intent.getAction()) ||
                 ACTION_LOCATION_COARSE.equals(intent.getAction())) {
@@ -254,17 +261,14 @@ public class LocationService extends IntentService {
             return;
         }
 
-        // Set repeating alarm
-        Intent alarmIntent = new Intent(context, LocationService.class);
-        alarmIntent.setAction(LocationService.ACTION_ALARM);
-        PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        int frequency = Integer.parseInt(prefs.getString(ActivitySettings.PREF_FREQUENCY, ActivitySettings.DEFAULT_FREQUENCY));
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 1000, frequency * 60 * 1000, pi);
-        Log.w(TAG, "Set repeating alarm frequency=" + frequency + "m");
+        // Start repeating alarm
+        boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
+        boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
+        if (!recognition || !still)
+            startRepeatingAlarm(context);
 
         // Request activity updates
-        if (prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED))
+        if (recognition)
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -283,14 +287,20 @@ public class LocationService extends IntentService {
         showIdle(context);
     }
 
-    public static void stopTracking(final Context context) {
-        // Cancel repeating alarm
+    private static void startRepeatingAlarm(Context context) {
+        // Set repeating alarm
         Intent alarmIntent = new Intent(context, LocationService.class);
         alarmIntent.setAction(LocationService.ACTION_ALARM);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        am.cancel(pi);
-        Log.w(TAG, "Canceled repeating alarm");
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        int frequency = Integer.parseInt(prefs.getString(ActivitySettings.PREF_FREQUENCY, ActivitySettings.DEFAULT_FREQUENCY));
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 1000, frequency * 60 * 1000, pi);
+        Log.w(TAG, "Set repeating alarm frequency=" + frequency + "m");
+    }
+
+    public static void stopTracking(final Context context) {
+        stopRepeatingAlarm(context);
 
         // Cancel activity updates
         new Thread(new Runnable() {
@@ -309,6 +319,16 @@ public class LocationService extends IntentService {
 
         stopLocating(context);
         cancelNotification(context);
+    }
+
+    private static void stopRepeatingAlarm(Context context) {
+        // Cancel repeating alarm
+        Intent alarmIntent = new Intent(context, LocationService.class);
+        alarmIntent.setAction(LocationService.ACTION_ALARM);
+        PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        am.cancel(pi);
+        Log.w(TAG, "Canceled repeating alarm");
     }
 
     private void startLocating() {
@@ -355,7 +375,7 @@ public class LocationService extends IntentService {
             Log.w(TAG, "No location providers");
     }
 
-    public static void stopLocating(Context context) {
+    private static void stopLocating(Context context) {
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         // Cancel coarse location updates

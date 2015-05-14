@@ -39,7 +39,7 @@
             android:key="pref_timeout"
             android:summary="@string/summary_timeout" />
         <EditTextPreference
-            android:defaultValue="500"
+            android:defaultValue="1500"
             android:inputType="number"
             android:key="pref_inaccurate"
             android:summary="@string/summary_inaccurate" />
@@ -55,7 +55,7 @@
             android:key="pref_recognition_enabled"
             android:title="@string/title_recognition_enabled" />
         <EditTextPreference
-            android:defaultValue="3"
+            android:defaultValue="1"
             android:inputType="number"
             android:key="pref_recognition_interval" />
     </PreferenceCategory>
