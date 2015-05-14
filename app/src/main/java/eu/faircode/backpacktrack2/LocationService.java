@@ -14,6 +14,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -404,12 +405,18 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         float pref_nearby = Float.parseFloat(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
-        if (waypoint || lastLocation == null || lastLocation.distanceTo(location) > pref_nearby) {
+        if (waypoint || lastLocation == null || lastLocation.distanceTo(location) >= pref_nearby) {
             // Store new location
             Log.w(TAG, "New location=" + location + " waypoint=" + waypoint);
             String waypointName = (waypoint ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) : null);
             new DatabaseHelper(this).insertLocation(location, waypointName);
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
+
+            // Feedback
+            if (waypoint) {
+                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                vibrator.vibrate(500);
+            }
         } else
             Log.w(TAG, "Filtered location=" + location);
     }
