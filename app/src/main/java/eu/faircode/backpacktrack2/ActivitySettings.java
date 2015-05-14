@@ -1,6 +1,12 @@
 package eu.faircode.backpacktrack2;
 
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.NotificationManager;
+import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -12,6 +18,12 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.provider.Settings;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.TextView;
+import android.widget.TimePicker;
 
 public class ActivitySettings extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -102,10 +114,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         pref_share.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
+                long[] range = getRange();
                 Intent shareIntent = new Intent(ActivitySettings.this, LocationService.class);
                 shareIntent.setAction(LocationService.ACTION_SHARE);
-                shareIntent.putExtra(LocationService.EXTRA_FROM, (long) 0);
-                shareIntent.putExtra(LocationService.EXTRA_TO, Long.MAX_VALUE);
+                shareIntent.putExtra(LocationService.EXTRA_FROM, range[0]);
+                shareIntent.putExtra(LocationService.EXTRA_TO, range[1]);
                 startService(shareIntent);
                 return true;
             }
@@ -115,10 +128,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         pref_upload.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
+                long[] range = getRange();
                 Intent uploadIntent = new Intent(ActivitySettings.this, LocationService.class);
                 uploadIntent.setAction(LocationService.ACTION_UPLOAD);
-                uploadIntent.putExtra(LocationService.EXTRA_FROM, (long) 0);
-                uploadIntent.putExtra(LocationService.EXTRA_TO, Long.MAX_VALUE);
+                uploadIntent.putExtra(LocationService.EXTRA_FROM, range[0]);
+                uploadIntent.putExtra(LocationService.EXTRA_TO, range[1]);
                 startService(uploadIntent);
                 return true;
             }
@@ -219,5 +233,133 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref.setTitle(getString(R.string.title_blogid, prefs.getString(key, "1")));
         else if (PREF_BLOGUSER.equals(key))
             pref.setTitle(getString(R.string.title_bloguser, prefs.getString(key, "")));
+    }
+
+    private long[] getRange() {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View view = inflater.inflate(R.layout.export, null);
+
+        final Button btnDateFrom = (Button) view.findViewById(R.id.btnDateFrom);
+        final Button btnTimeFrom = (Button) view.findViewById(R.id.btnTimeFrom);
+        final Button btnDateTo = (Button) view.findViewById(R.id.btnDateTo);
+        final Button btnTimeTo = (Button) view.findViewById(R.id.btnTimeTo);
+        final TextView tvDateFrom = (TextView) view.findViewById(R.id.tvDateFrom);
+        final TextView tvTimeFrom = (TextView) view.findViewById(R.id.tvTimeFrom);
+        final TextView tvDateTo = (TextView) view.findViewById(R.id.tvDateTo);
+        final TextView tvTimeTo = (TextView) view.findViewById(R.id.tvTimeTo);
+
+        // Pick date from
+        btnDateFrom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogFragment newFragment = new DatePickerFragment();
+                Bundle b = new Bundle();
+                b.putInt("year", 1970);
+                b.putInt("month", 1);
+                b.putInt("day", 1);
+                newFragment.setArguments(b);
+                newFragment.show(getFragmentManager(), "datePicker");
+            }
+        });
+
+        // Pick time from
+        btnTimeFrom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogFragment newFragment = new TimePickerFragment();
+                Bundle b = new Bundle();
+                b.putInt("hour", 0);
+                b.putInt("minute", 0);
+                newFragment.setArguments(b);
+                newFragment.show(getFragmentManager(), "timePicker");
+            }
+        });
+
+        // Pick date to
+        btnDateTo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogFragment newFragment = new DatePickerFragment();
+                Bundle b = new Bundle();
+                b.putInt("year", 9999);
+                b.putInt("month", 12);
+                b.putInt("day", 31);
+                newFragment.setArguments(b);
+                newFragment.show(getFragmentManager(), "datePicker");
+            }
+        });
+
+        // Pick time to
+        btnTimeTo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogFragment newFragment = new TimePickerFragment();
+                Bundle b = new Bundle();
+                b.putInt("hour", 23);
+                b.putInt("minute", 59);
+                newFragment.setArguments(b);
+                newFragment.show(getFragmentManager(), "timePicker");
+            }
+        });
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setView(view);
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                            }
+                        })
+                .setNegativeButton(android.R.string.cancel,
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+        return new long[]{0, Long.MAX_VALUE};
+    }
+
+    public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
+        private int hour;
+        private int minute;
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            boolean ampm = android.text.format.DateFormat.is24HourFormat(getActivity());
+            this.hour = getArguments().getInt("hour");
+            this.minute = getArguments().getInt("minute");
+            return new TimePickerDialog(getActivity(), this, this.hour, this.minute, ampm);
+        }
+
+        public void onTimeSet(TimePicker view, int hour, int minute) {
+            this.hour = hour;
+            this.minute = minute;
+            //((TimePickerDialog.OnTimeSetListener) getActivity()).onTimeSet(hour, minute);
+        }
+    }
+
+    public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+        private int year;
+        private int month;
+        private int day;
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            this.year = getArguments().getInt("year");
+            this.month = getArguments().getInt("month");
+            this.day = getArguments().getInt("day");
+            return new DatePickerDialog(getActivity(), this, this.year, this.month, this.day);
+        }
+
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            this.year = year;
+            this.month = month;
+            this.day = day;
+            //((DatePickerDialog.OnDateSetListener) getActivity()).onDateSet(year, month, day);
+        }
     }
 }

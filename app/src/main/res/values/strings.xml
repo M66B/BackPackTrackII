@@ -52,6 +52,8 @@
     <string name="title_trackpoint">Trackpoint</string>
     <string name="title_waypoint">Waypoint</string>
 
+    <string name="title_pick">Pick</string>
+
     <string name="msg_never">Never</string>
     <string name="msg_geocoder">Geocoder:</string>
     <string name="msg_yes">yes</string>
