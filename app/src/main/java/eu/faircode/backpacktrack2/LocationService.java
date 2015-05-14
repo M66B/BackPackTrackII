@@ -81,8 +81,11 @@ public class LocationService extends IntentService {
 
             // Persist probable activity
             Log.w(TAG, "Activity=" + activity);
-            if (activity.getConfidence() >= 50)
+            if (activity.getConfidence() >= 50) {
                 prefs.edit().putInt(ActivitySettings.PREF_LAST_ACTIVITY, activity.getType()).apply();
+                if (!prefs.getBoolean(ActivitySettings.PREF_ACTIVE, false))
+                    showIdle(this);
+            }
 
         } else if (ACTION_TRACKPOINT.equals(intent.getAction()) ||
                 ACTION_WAYPOINT.equals(intent.getAction()) ||
@@ -92,9 +95,9 @@ public class LocationService extends IntentService {
                 stopLocating(this);
                 prefs.edit().putBoolean(ActivitySettings.PREF_WAYPOINT, true).apply();
             }
-            boolean activityRecognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
-            boolean activityStill = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
-            if (!ACTION_ALARM.equals(intent.getAction()) || !activityRecognition || !activityStill)
+            boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
+            boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
+            if (!ACTION_ALARM.equals(intent.getAction()) || !recognition || !still)
                 startLocating();
             else
                 Log.w(TAG, "Still");
@@ -121,11 +124,11 @@ public class LocationService extends IntentService {
             }
 
             // Persist better location
-            Location bestLocation = deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
+            Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
             if (isBetterLocation(bestLocation, location)) {
                 Log.w(TAG, "Better location=" + location);
                 showNotification(getString(R.string.msg_location, location.hasAccuracy() ? (int) location.getAccuracy() : Integer.MAX_VALUE), this);
-                prefs.edit().putString(ActivitySettings.PREF_BEST_LOCATION, serialize(location)).apply();
+                prefs.edit().putString(ActivitySettings.PREF_BEST_LOCATION, LocationSerializer.serialize(location)).apply();
             }
 
             // Check altitude
@@ -148,7 +151,7 @@ public class LocationService extends IntentService {
         } else if (ACTION_TIMEOUT.equals(intent.getAction())) {
             // Process location time-out
             boolean waypoint = prefs.getBoolean(ActivitySettings.PREF_WAYPOINT, false);
-            Location bestLocation = deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
+            Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
             Log.w(TAG, "Timeout best location=" + bestLocation);
 
             stopLocating(this);
@@ -230,6 +233,17 @@ public class LocationService extends IntentService {
         }
     }
 
+    private static void showIdle(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
+        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+
+        showNotification(context.getString(R.string.msg_idle,
+                        context.getString(still ? R.string.msg_still : R.string.msg_moving, context),
+                        (lastLocation == null ? "-" : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(lastLocation.getTime())))),
+                context);
+    }
+
     public static void startTracking(final Context context) {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -239,13 +253,12 @@ public class LocationService extends IntentService {
             return;
         }
 
-        int frequency = Integer.parseInt(prefs.getString(ActivitySettings.PREF_FREQUENCY, ActivitySettings.DEFAULT_FREQUENCY));
-
         // Set repeating alarm
         Intent alarmIntent = new Intent(context, LocationService.class);
         alarmIntent.setAction(LocationService.ACTION_ALARM);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        int frequency = Integer.parseInt(prefs.getString(ActivitySettings.PREF_FREQUENCY, ActivitySettings.DEFAULT_FREQUENCY));
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 1000, frequency * 60 * 1000, pi);
         Log.w(TAG, "Set repeating alarm frequency=" + frequency + "m");
 
@@ -266,7 +279,7 @@ public class LocationService extends IntentService {
                 }
             }).start();
 
-        LocationService.showNotification(context.getString(R.string.msg_idle), context);
+        showIdle(context);
     }
 
     public static void stopTracking(final Context context) {
@@ -374,7 +387,7 @@ public class LocationService extends IntentService {
         prefs.edit().remove(ActivitySettings.PREF_WAYPOINT).apply();
         prefs.edit().remove(ActivitySettings.PREF_BEST_LOCATION).apply();
 
-        showNotification(context.getString(R.string.msg_idle), context);
+        showIdle(context);
     }
 
     private boolean isBetterLocation(Location prev, Location current) {
@@ -390,13 +403,13 @@ public class LocationService extends IntentService {
         // Filter close locations
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         float pref_nearby = Float.parseFloat(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
-        Location lastLocation = deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
         if (waypoint || lastLocation == null || lastLocation.distanceTo(location) > pref_nearby) {
             // Store new location
             Log.w(TAG, "New location=" + location + " waypoint=" + waypoint);
             String waypointName = (waypoint ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) : null);
             new DatabaseHelper(this).insertLocation(location, waypointName);
-            prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, serialize(location)).apply();
+            prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
         } else
             Log.w(TAG, "Filtered location=" + location);
     }
@@ -464,7 +477,7 @@ public class LocationService extends IntentService {
 
     // Serialization
 
-    private class LocationSerializer implements JsonSerializer<Location> {
+    private static class LocationSerializer implements JsonSerializer<Location> {
         public JsonElement serialize(Location src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject jObject = new JsonObject();
 
@@ -487,9 +500,17 @@ public class LocationService extends IntentService {
 
             return jObject;
         }
+
+        public static String serialize(Location location) {
+            GsonBuilder builder = new GsonBuilder();
+            builder.registerTypeAdapter(Location.class, new LocationSerializer());
+            Gson gson = builder.create();
+            String json = gson.toJson(location);
+            return json;
+        }
     }
 
-    private class LocationDeserializer implements JsonDeserializer<Location> {
+    private static class LocationDeserializer implements JsonDeserializer<Location> {
         public Location deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {
             JsonObject jObject = (JsonObject) json;
@@ -513,21 +534,13 @@ public class LocationService extends IntentService {
 
             return location;
         }
-    }
 
-    private String serialize(Location location) {
-        GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(Location.class, new LocationSerializer());
-        Gson gson = builder.create();
-        String json = gson.toJson(location);
-        return json;
-    }
-
-    private Location deserialize(String json) {
-        GsonBuilder builder = new GsonBuilder();
-        builder.registerTypeAdapter(Location.class, new LocationDeserializer());
-        Gson gson = builder.create();
-        Location location = gson.fromJson(json, Location.class);
-        return location;
+        public static Location deserialize(String json) {
+            GsonBuilder builder = new GsonBuilder();
+            builder.registerTypeAdapter(Location.class, new LocationDeserializer());
+            Gson gson = builder.create();
+            Location location = gson.fromJson(json, Location.class);
+            return location;
+        }
     }
 }
