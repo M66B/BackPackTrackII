@@ -53,11 +53,13 @@
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="pref_recognition_enabled"
+            android:summary="@string/summary_recognition_enabled"
             android:title="@string/title_recognition_enabled" />
         <EditTextPreference
             android:defaultValue="1"
             android:inputType="number"
-            android:key="pref_recognition_interval" />
+            android:key="pref_recognition_interval"
+            android:summary="@string/summary_recognition_interval" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_blog">
         <EditTextPreference
