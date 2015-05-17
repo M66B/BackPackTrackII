@@ -132,7 +132,7 @@ public class LocationService extends IntentService {
             Log.w(TAG, "Prefer altitude=" + pref_altitude + " accuracy=" + pref_accuracy + " inaccurate=" + pref_inaccurate);
 
             if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
-                Log.w(TAG, "Inaccurate");
+                Log.w(TAG, "Filtering inaccurate location");
                 return;
             }
 
@@ -146,13 +146,13 @@ public class LocationService extends IntentService {
 
             // Check altitude
             if (!location.hasAltitude() && pref_altitude) {
-                Log.w(TAG, "No altitude");
+                Log.w(TAG, "No altitude, but preferred");
                 return;
             }
 
             // Check accuracy
             if (!location.hasAccuracy() || location.getAccuracy() > pref_accuracy) {
-                Log.w(TAG, "Inaccurate");
+                Log.w(TAG, "Accuracy not reached");
                 return;
             }
 
