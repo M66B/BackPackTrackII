@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -16,6 +18,7 @@ import android.os.Environment;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -42,8 +45,10 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LocationService extends IntentService {
@@ -142,7 +147,10 @@ public class LocationService extends IntentService {
             Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
             if (isBetterLocation(bestLocation, location)) {
                 Log.w(TAG, "Better location=" + location);
-                showNotification(getString(R.string.msg_location, location.hasAccuracy() ? (int) location.getAccuracy() : Integer.MAX_VALUE), this);
+                showNotification(
+                        getString(R.string.msg_location, location.hasAccuracy() ? (int) location.getAccuracy() : Integer.MAX_VALUE),
+                        null,
+                        this);
                 prefs.edit().putString(ActivitySettings.PREF_BEST_LOCATION, LocationSerializer.serialize(location)).apply();
             }
 
@@ -249,17 +257,6 @@ public class LocationService extends IntentService {
                 Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
         }
-    }
-
-    private static void showIdle(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
-        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
-
-        showNotification(context.getString(R.string.msg_idle,
-                        context.getString(still ? R.string.msg_still : R.string.msg_moving, context),
-                        (lastLocation == null ? "-" : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(lastLocation.getTime())))),
-                context);
     }
 
     public static void startTracking(final Context context) {
@@ -380,7 +377,10 @@ public class LocationService extends IntentService {
             am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + timeout * 1000, pi);
             Log.w(TAG, "Set timeout=" + timeout + "s");
 
-            showNotification(getString(R.string.msg_active), this);
+            showNotification(
+                    getString(R.string.msg_active),
+                    null,
+                    this);
         } else
             Log.w(TAG, "No location providers");
     }
@@ -458,7 +458,34 @@ public class LocationService extends IntentService {
             Log.w(TAG, "Filtered location=" + location);
     }
 
-    public static void showNotification(String text, Context context) {
+    private static void showIdle(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
+        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+
+        showNotification(context.getString(R.string.msg_idle,
+                        context.getString(still ? R.string.msg_still : R.string.msg_moving, context),
+                        (lastLocation == null ? "-" : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(lastLocation.getTime())))),
+                TextUtils.join(", ", reverseGeocode(lastLocation, context)),
+                context);
+    }
+
+    private static List<String> reverseGeocode(Location location, Context context) {
+        List<String> listline = new ArrayList<>();
+        if (location != null && Geocoder.isPresent())
+            try {
+                Geocoder geocoder = new Geocoder(context);
+                List<Address> listPlace = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                if (listPlace != null && listPlace.size() > 0) {
+                    for (int l = 0; l < listPlace.get(0).getMaxAddressLineIndex(); l++)
+                        listline.add(listPlace.get(0).getAddressLine(l));
+                }
+            } catch (IOException ignored) {
+            }
+        return listline;
+    }
+
+    public static void showNotification(String text, String subText, Context context) {
         // Build intent
         Intent riSettings = new Intent(context, ActivitySettings.class);
         riSettings.setAction("android.intent.action.MAIN");
@@ -488,6 +515,7 @@ public class LocationService extends IntentService {
         notificationBuilder.setContentTitle(context.getString(R.string.app_name));
         notificationBuilder.setContentText(text);
         notificationBuilder.setContentIntent(piSettings);
+        notificationBuilder.setSubText(subText);
         notificationBuilder.setWhen(System.currentTimeMillis());
         notificationBuilder.setAutoCancel(false);
         notificationBuilder.setOngoing(true);
