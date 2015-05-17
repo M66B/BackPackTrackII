@@ -63,6 +63,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_LAST_SHARE = "pref_last_share";
     public static final String PREF_LAST_UPLOAD = "pref_last_upload";
 
+    public static final String PREF_LAST_TRACK = "pref_last_track";
     public static final String PREF_LAST_FROM = "pref_last_from";
     public static final String PREF_LAST_TO = "pref_last_to";
 
@@ -245,6 +246,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.export, null);
 
+        final TextView tvTrackName = (TextView) view.findViewById(R.id.tvTrackName);
         final Button btnDateFrom = (Button) view.findViewById(R.id.btnDateFrom);
         final Button btnTimeFrom = (Button) view.findViewById(R.id.btnTimeFrom);
         final Button btnDateTo = (Button) view.findViewById(R.id.btnDateTo);
@@ -254,6 +256,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         final TextView tvDateTo = (TextView) view.findViewById(R.id.tvDateTo);
         final TextView tvTimeTo = (TextView) view.findViewById(R.id.tvTimeTo);
         final boolean ampm = android.text.format.DateFormat.is24HourFormat(this);
+
+        tvTrackName.setText(prefs.getString(PREF_LAST_TRACK, "BackPackTrack"));
 
         final Calendar from = GregorianCalendar.getInstance();
         final Calendar to = GregorianCalendar.getInstance();
@@ -368,8 +372,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 .setPositiveButton(android.R.string.ok,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
+                                prefs.edit().putString(PREF_LAST_TRACK, tvTrackName.getText().toString()).apply();
                                 prefs.edit().putLong(PREF_LAST_FROM, from.getTimeInMillis()).apply();
                                 prefs.edit().putLong(PREF_LAST_TO, to.getTimeInMillis()).apply();
+                                intent.putExtra(LocationService.EXTRA_TRACK, tvTrackName.getText().toString());
                                 intent.putExtra(LocationService.EXTRA_FROM, from.getTimeInMillis());
                                 intent.putExtra(LocationService.EXTRA_TO, to.getTimeInMillis());
                                 startService(intent);

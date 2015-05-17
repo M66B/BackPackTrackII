@@ -55,6 +55,10 @@
     <string name="title_trackpoint">Trackpoint</string>
     <string name="title_waypoint">Waypoint</string>
 
+    <string name="title_export">Export GPX file</string>
+    <string name="title_track">Track name:</string>
+    <string name="title_from">From date/time:</string>
+    <string name="title_to">To date/time:</string>
     <string name="title_pick">Pick</string>
 
     <string name="msg_never">Never</string>
