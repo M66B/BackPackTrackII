@@ -6,11 +6,14 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.NotificationManager;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
+import android.database.Cursor;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,10 +21,16 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.provider.Settings;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CursorAdapter;
 import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -32,6 +41,7 @@ import java.util.GregorianCalendar;
 
 public class ActivitySettings extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
+    public static final String PREF_EDIT = "pref_edit";
     public static final String PREF_SHARE = "pref_share";
     public static final String PREF_UPLOAD = "pref_upload";
     public static final String PREF_CHECK = "pref_check";
@@ -98,10 +108,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         }
 
         // Get preferences
-        final Preference pref_share = findPreference(PREF_SHARE);
-        final Preference pref_upload = findPreference(PREF_UPLOAD);
-        final Preference pref_check = findPreference(PREF_CHECK);
-        final Preference pref_version = findPreference(PREF_VERSION);
+        Preference pref_edit = findPreference(PREF_EDIT);
+        Preference pref_share = findPreference(PREF_SHARE);
+        Preference pref_upload = findPreference(PREF_UPLOAD);
+        Preference pref_check = findPreference(PREF_CHECK);
+        Preference pref_version = findPreference(PREF_VERSION);
 
         // Set titles/summaries
         updateTitle(prefs, PREF_SHARE);
@@ -119,6 +130,32 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_BLOGURL);
         updateTitle(prefs, PREF_BLOGID);
         updateTitle(prefs, PREF_BLOGUSER);
+
+        // Edit
+        pref_edit.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
+                View view = inflater.inflate(R.layout.edit, null);
+
+                ListView lv = (ListView) view.findViewById(R.id.lvEdit);
+                lv.setAdapter(new WaypointAdapter(ActivitySettings.this, new DatabaseHelper(ActivitySettings.this).getLocationList(0, Long.MAX_VALUE, false)));
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+                alertDialogBuilder.setTitle(R.string.title_edit);
+                alertDialogBuilder.setView(view);
+                alertDialogBuilder
+                        .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Ignore
+                            }
+                        });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+                return true;
+            }
+        });
 
         // Share
         pref_share.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -143,14 +180,14 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         });
 
         // Location settings
-        final Intent locationSettingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        Intent locationSettingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         if (getPackageManager().queryIntentActivities(locationSettingsIntent, 0).size() > 0)
             pref_check.setIntent(locationSettingsIntent);
         else
             pref_check.setEnabled(false);
 
         // Version
-        final Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
+        Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
         if (getPackageManager().queryIntentActivities(playStoreIntent, 0).size() > 0)
             pref_version.setIntent(playStoreIntent);
         try {
@@ -163,10 +200,50 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         }
     }
 
+    public static float convertPixelsToDp(float px, Context context) {
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float dp = px / (metrics.densityDpi / 160f);
+        return dp;
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    public class WaypointAdapter extends CursorAdapter {
+        public WaypointAdapter(Context context, Cursor cursor) {
+            super(context, cursor, 0);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            return LayoutInflater.from(context).inflate(R.layout.waypoint, parent, false);
+        }
+
+        @Override
+        public void bindView(View view, Context context, final Cursor cursor) {
+            final int id = cursor.getInt(cursor.getColumnIndex("ID"));
+            final String name = cursor.getString(cursor.getColumnIndex("name"));
+            EditText etName = (EditText) view.findViewById(R.id.etName);
+            etName.setText(name);
+
+            ImageView ivSave = (ImageView) view.findViewById(R.id.ivSave);
+            ivSave.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                }
+            });
+
+            ImageView ivDelete = (ImageView) view.findViewById(R.id.ivDelete);
+            ivDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                }
+            });
+        }
     }
 
     @Override
@@ -247,10 +324,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         View view = inflater.inflate(R.layout.export, null);
 
         final TextView tvTrackName = (TextView) view.findViewById(R.id.tvTrackName);
-        final Button btnDateFrom = (Button) view.findViewById(R.id.btnDateFrom);
-        final Button btnTimeFrom = (Button) view.findViewById(R.id.btnTimeFrom);
-        final Button btnDateTo = (Button) view.findViewById(R.id.btnDateTo);
-        final Button btnTimeTo = (Button) view.findViewById(R.id.btnTimeTo);
+        Button btnDateFrom = (Button) view.findViewById(R.id.btnDateFrom);
+        Button btnTimeFrom = (Button) view.findViewById(R.id.btnTimeFrom);
+        Button btnDateTo = (Button) view.findViewById(R.id.btnDateTo);
+        Button btnTimeTo = (Button) view.findViewById(R.id.btnTimeTo);
         final TextView tvDateFrom = (TextView) view.findViewById(R.id.tvDateFrom);
         final TextView tvTimeFrom = (TextView) view.findViewById(R.id.tvTimeFrom);
         final TextView tvDateTo = (TextView) view.findViewById(R.id.tvDateTo);
@@ -366,9 +443,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         });
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle(R.string.title_export);
         alertDialogBuilder.setView(view);
         alertDialogBuilder
-                .setCancelable(false)
                 .setPositiveButton(android.R.string.ok,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
@@ -387,7 +464,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                                 dialog.cancel();
                             }
                         });
-
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }

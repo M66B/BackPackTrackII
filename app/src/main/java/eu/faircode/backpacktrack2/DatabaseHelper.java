@@ -74,7 +74,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getLocationList(long from, long to, boolean trackpoints) {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery(
-                "SELECT * FROM location" +
+                "SELECT *, ID AS _id FROM location" +
                         (trackpoints ? " WHERE name IS NULL" : " WHERE NOT name IS NULL")
                         + " AND time >= " + from + " AND time <= " + to, new String[0]);
     }

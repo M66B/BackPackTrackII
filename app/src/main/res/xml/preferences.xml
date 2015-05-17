@@ -2,6 +2,10 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory android:title="@string/title_action">
         <Preference
+            android:key="pref_edit"
+            android:summary="@string/summary_edit"
+            android:title="@string/title_edit" />
+        <Preference
             android:key="pref_share"
             android:summary="@string/summary_share"
             android:title="@string/title_share" />
