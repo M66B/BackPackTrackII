@@ -103,17 +103,22 @@ public class LocationService extends IntentService {
         } else if (ACTION_TRACKPOINT.equals(intent.getAction()) ||
                 ACTION_WAYPOINT.equals(intent.getAction()) ||
                 ACTION_ALARM.equals(intent.getAction())) {
-            // Try to acquire new location
-            if (ACTION_WAYPOINT.equals((intent.getAction()))) {
+            // Persist location type
+            if (ACTION_TRACKPOINT.equals(intent.getAction()))
+                prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_TRACKPOINT).apply();
+            else if (ACTION_WAYPOINT.equals((intent.getAction()))) {
                 stopLocating(this);
-                prefs.edit().putBoolean(ActivitySettings.PREF_WAYPOINT, true).apply();
-            }
+                prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_WAYPOINT).apply();
+            } else if (ACTION_ALARM.equals(intent.getAction()))
+                prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_PERIODIC).apply();
+
+            // Try to acquire a new location
             startLocating();
 
         } else if (ACTION_LOCATION_FINE.equals(intent.getAction()) ||
                 ACTION_LOCATION_COARSE.equals(intent.getAction())) {
             // Process location update
-            boolean waypoint = prefs.getBoolean(ActivitySettings.PREF_WAYPOINT, false);
+            int locationType = prefs.getInt(ActivitySettings.PREF_LOCATION_TYPE, -1);
             Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
             Log.w(TAG, "Update location=" + location);
             if (location == null ||
@@ -154,11 +159,11 @@ public class LocationService extends IntentService {
             stopLocating(this);
 
             // Process location
-            handleLocation(location, waypoint);
+            handleLocation(locationType, location);
 
         } else if (ACTION_TIMEOUT.equals(intent.getAction())) {
             // Process location time-out
-            boolean waypoint = prefs.getBoolean(ActivitySettings.PREF_WAYPOINT, false);
+            int locationType = prefs.getInt(ActivitySettings.PREF_LOCATION_TYPE, -1);
             Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
             Log.w(TAG, "Timeout best location=" + bestLocation);
 
@@ -166,10 +171,13 @@ public class LocationService extends IntentService {
 
             // Process location
             if (bestLocation != null)
-                handleLocation(bestLocation, waypoint);
+                handleLocation(locationType, bestLocation);
 
         } else if (ACTION_GEOTAGGED.equals(intent.getAction())) {
-            // TODO
+            // Process photo location
+            Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
+            if (location != null)
+                handleLocation(LOCATION_TRACKPOINT, location);
 
         } else if (ACTION_SHARE.equals(intent.getAction())) {
             try {
@@ -405,10 +413,8 @@ public class LocationService extends IntentService {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         prefs.edit().remove(ActivitySettings.PREF_ACTIVE).apply();
-        prefs.edit().remove(ActivitySettings.PREF_WAYPOINT).apply();
+        prefs.edit().remove(ActivitySettings.PREF_LOCATION_TYPE).apply();
         prefs.edit().remove(ActivitySettings.PREF_BEST_LOCATION).apply();
-
-        showIdle(context);
     }
 
     private boolean isBetterLocation(Location prev, Location current) {
@@ -420,23 +426,32 @@ public class LocationService extends IntentService {
                                 (prev.hasAccuracy() ? prev.getAccuracy() : Float.MAX_VALUE)));
     }
 
-    private void handleLocation(Location location, boolean waypoint) {
+    private static final int LOCATION_TRACKPOINT = 1;
+    private static final int LOCATION_WAYPOINT = 2;
+    private static final int LOCATION_PERIODIC = 3;
+
+    private void handleLocation(int locationType, Location location) {
         // Filter close locations
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         float pref_nearby = Float.parseFloat(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
-        if (waypoint || lastLocation == null || lastLocation.distanceTo(location) >= pref_nearby) {
+        if (locationType == LOCATION_TRACKPOINT ||
+                locationType == LOCATION_WAYPOINT ||
+                lastLocation == null || lastLocation.distanceTo(location) >= pref_nearby) {
             // Store new location
-            Log.w(TAG, "New location=" + location + " waypoint=" + waypoint);
-            String waypointName = (waypoint ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) : null);
+            Log.w(TAG, "New location=" + location + " type=" + locationType);
+            String waypointName = (locationType == LOCATION_WAYPOINT ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) : null);
             new DatabaseHelper(this).insertLocation(location, waypointName);
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
 
             // Feedback
-            if (waypoint) {
+            if (locationType == LOCATION_WAYPOINT) {
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(500);
             }
+
+            if (!prefs.getBoolean(ActivitySettings.PREF_ACTIVE, false))
+                showIdle(this);
         } else
             Log.w(TAG, "Filtered location=" + location);
     }

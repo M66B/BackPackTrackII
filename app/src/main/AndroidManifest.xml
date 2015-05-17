@@ -35,7 +35,9 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".PackageChangeReceiver">
+        <receiver
+            android:name=".PackageChangeReceiver"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
                 <data android:scheme="package" />
@@ -47,7 +49,7 @@
             android:enabled="true">
             <intent-filter>
                 <action android:name="eu.faircode.action.GEOTAGGED" />
-                <data android:mimeType="image/jpeg" />
+                <data android:scheme="file" />
             </intent-filter>
         </receiver>
 
