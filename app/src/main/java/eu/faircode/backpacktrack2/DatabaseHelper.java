@@ -78,4 +78,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         (trackpoints ? " WHERE name IS NULL" : " WHERE NOT name IS NULL")
                         + " AND time >= " + from + " AND time <= " + to, new String[0]);
     }
+
+    public void update(int id, String name) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("name", name);
+        db.update("location", cv, "ID = ?", new String[]{Integer.toString(id)});
+    }
+
+    public void delete(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("location", "ID = ?", new String[]{Integer.toString(id)});
+    }
 }

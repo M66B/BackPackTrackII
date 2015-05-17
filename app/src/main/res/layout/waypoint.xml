@@ -12,13 +12,14 @@
         android:layout_gravity="center_vertical"
         android:layout_weight="1"
         android:gravity="center_vertical"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:textAppearance="?android:attr/textAppearance" />
 
     <ImageView
         android:id="@+id/ivSave"
         android:layout_width="32dip"
         android:layout_height="?android:attr/listPreferredItemHeightSmall"
         android:layout_gravity="center_vertical"
+        android:layout_marginLeft="12dp"
         android:src="@android:drawable/ic_menu_save" />
 
     <ImageView
@@ -26,5 +27,6 @@
         android:layout_width="32dip"
         android:layout_height="?android:attr/listPreferredItemHeightSmall"
         android:layout_gravity="center_vertical"
+        android:layout_marginLeft="12dp"
         android:src="@android:drawable/ic_menu_delete" />
 </LinearLayout>

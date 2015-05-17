@@ -15,11 +15,14 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
@@ -248,7 +251,7 @@ public class LocationService extends IntentService {
 
                 // Get result
                 String url = result.get("url").toString();
-                Log.w(TAG, "GPX url=" + url);
+                notify(getString(R.string.msg_uploaded, url));
 
                 // Persist last upload time
                 prefs.edit().putString(ActivitySettings.PREF_LAST_UPLOAD, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())).apply();
@@ -256,6 +259,7 @@ public class LocationService extends IntentService {
                 Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             } catch (XMLRPCException ex) {
                 Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                notify(ex.toString());
             }
         }
     }
@@ -549,6 +553,14 @@ public class LocationService extends IntentService {
         return gpxFileName;
     }
 
+    private void notify(final String text) {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(LocationService.this, text, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
     // Serialization
 
     private static class LocationSerializer implements JsonSerializer<Location> {

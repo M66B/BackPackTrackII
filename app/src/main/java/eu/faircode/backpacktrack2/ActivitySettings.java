@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.location.Geocoder;
 import android.net.Uri;
@@ -21,10 +20,10 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.provider.Settings;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CursorAdapter;
 import android.widget.DatePicker;
@@ -33,6 +32,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -139,20 +139,23 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 View view = inflater.inflate(R.layout.edit, null);
 
                 ListView lv = (ListView) view.findViewById(R.id.lvEdit);
-                lv.setAdapter(new WaypointAdapter(ActivitySettings.this, new DatabaseHelper(ActivitySettings.this).getLocationList(0, Long.MAX_VALUE, false)));
+                Cursor cursor = new DatabaseHelper(ActivitySettings.this).getLocationList(0, Long.MAX_VALUE, false);
+                lv.setAdapter(new WaypointAdapter(ActivitySettings.this, cursor));
 
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
                 alertDialogBuilder.setTitle(R.string.title_edit);
                 alertDialogBuilder.setView(view);
                 alertDialogBuilder
-                        .setNeutralButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                // Ignore
+                                // Do nothing
                             }
                         });
                 AlertDialog alertDialog = alertDialogBuilder.create();
                 alertDialog.show();
+                // Fix keyboard input
+                alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
                 return true;
             }
         });
@@ -200,13 +203,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         }
     }
 
-    public static float convertPixelsToDp(float px, Context context) {
-        Resources resources = context.getResources();
-        DisplayMetrics metrics = resources.getDisplayMetrics();
-        float dp = px / (metrics.densityDpi / 160f);
-        return dp;
-    }
-
     @Override
     protected void onPause() {
         super.onPause();
@@ -227,13 +223,16 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         public void bindView(View view, Context context, final Cursor cursor) {
             final int id = cursor.getInt(cursor.getColumnIndex("ID"));
             final String name = cursor.getString(cursor.getColumnIndex("name"));
-            EditText etName = (EditText) view.findViewById(R.id.etName);
+            final EditText etName = (EditText) view.findViewById(R.id.etName);
             etName.setText(name);
 
             ImageView ivSave = (ImageView) view.findViewById(R.id.ivSave);
             ivSave.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    String newName = etName.getText().toString();
+                    new DatabaseHelper(ActivitySettings.this).update(id, newName);
+                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_saved, newName), Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -241,6 +240,26 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             ivDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+                    alertDialogBuilder.setTitle(getString(R.string.msg_delete, name));
+                    alertDialogBuilder
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    new DatabaseHelper(ActivitySettings.this).delete(id);
+                                    Cursor cursor = new DatabaseHelper(ActivitySettings.this).getLocationList(0, Long.MAX_VALUE, false);
+                                    changeCursor(cursor);
+                                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_deleted, name), Toast.LENGTH_LONG).show();
+                                }
+                            })
+                            .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Ignore
+                                }
+                            });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
                 }
             });
         }
