@@ -96,6 +96,7 @@ public class LocationService extends IntentService {
                     if (still) {
                         stopRepeatingAlarm(this);
                         stopLocating(this);
+                        // Continue activity recognition
                     } else
                         startRepeatingAlarm(this);
             }
@@ -104,10 +105,11 @@ public class LocationService extends IntentService {
                 ACTION_WAYPOINT.equals(intent.getAction()) ||
                 ACTION_ALARM.equals(intent.getAction())) {
             // Persist location type
-            if (ACTION_TRACKPOINT.equals(intent.getAction()))
+            if (ACTION_TRACKPOINT.equals(intent.getAction())) {
+                stopLocating(this); // Guarantee fresh location
                 prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_TRACKPOINT).apply();
-            else if (ACTION_WAYPOINT.equals((intent.getAction()))) {
-                stopLocating(this);
+            } else if (ACTION_WAYPOINT.equals((intent.getAction()))) {
+                stopLocating(this); // Guarantee fresh location
                 prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_WAYPOINT).apply();
             } else if (ACTION_ALARM.equals(intent.getAction()))
                 prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_PERIODIC).apply();
