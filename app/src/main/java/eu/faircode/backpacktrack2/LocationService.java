@@ -535,6 +535,7 @@ public class LocationService extends IntentService {
     }
 
     private String writeGPXFile(long from, long to, String trackName) throws IOException {
+        Log.w(TAG, "Writing track=" + trackName + " from=" + from + "to=" + to);
         File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separatorChar + "BackPackTrackII");
         folder.mkdirs();
         String gpxFileName = folder.getAbsolutePath() + File.separatorChar + trackName + ".gpx";

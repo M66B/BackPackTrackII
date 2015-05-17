@@ -25,6 +25,11 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 public class ActivitySettings extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public static final String PREF_SHARE = "pref_share";
@@ -58,6 +63,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_LAST_SHARE = "pref_last_share";
     public static final String PREF_LAST_UPLOAD = "pref_last_upload";
 
+    public static final String PREF_LAST_FROM = "pref_last_from";
+    public static final String PREF_LAST_TO = "pref_last_to";
+
     public static final boolean DEFAULT_ENABLED = true;
     public static final String DEFAULT_FREQUENCY = "3"; // minutes
     public static final boolean DEFAULT_ALTITUDE = true;
@@ -80,7 +88,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         super.onResume();
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
-        SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+        final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
         // First run
         if (!prefs.contains(PREF_ENABLED)) {
@@ -89,10 +97,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         }
 
         // Get preferences
-        Preference pref_share = findPreference(PREF_SHARE);
-        Preference pref_upload = findPreference(PREF_UPLOAD);
-        Preference pref_check = findPreference(PREF_CHECK);
-        Preference pref_version = findPreference(PREF_VERSION);
+        final Preference pref_share = findPreference(PREF_SHARE);
+        final Preference pref_upload = findPreference(PREF_UPLOAD);
+        final Preference pref_check = findPreference(PREF_CHECK);
+        final Preference pref_version = findPreference(PREF_VERSION);
 
         // Set titles/summaries
         updateTitle(prefs, PREF_SHARE);
@@ -115,12 +123,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         pref_share.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                long[] range = getRange();
                 Intent shareIntent = new Intent(ActivitySettings.this, LocationService.class);
                 shareIntent.setAction(LocationService.ACTION_SHARE);
-                shareIntent.putExtra(LocationService.EXTRA_FROM, range[0]);
-                shareIntent.putExtra(LocationService.EXTRA_TO, range[1]);
-                startService(shareIntent);
+                getRange(shareIntent, prefs);
                 return true;
             }
         });
@@ -129,25 +134,22 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         pref_upload.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                long[] range = getRange();
                 Intent uploadIntent = new Intent(ActivitySettings.this, LocationService.class);
                 uploadIntent.setAction(LocationService.ACTION_UPLOAD);
-                uploadIntent.putExtra(LocationService.EXTRA_FROM, range[0]);
-                uploadIntent.putExtra(LocationService.EXTRA_TO, range[1]);
-                startService(uploadIntent);
+                getRange(uploadIntent, prefs);
                 return true;
             }
         });
 
         // Location settings
-        Intent locationSettingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        final Intent locationSettingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         if (getPackageManager().queryIntentActivities(locationSettingsIntent, 0).size() > 0)
             pref_check.setIntent(locationSettingsIntent);
         else
             pref_check.setEnabled(false);
 
         // Version
-        Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
+        final Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
         if (getPackageManager().queryIntentActivities(playStoreIntent, 0).size() > 0)
             pref_version.setIntent(playStoreIntent);
         try {
@@ -239,7 +241,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref.setTitle(getString(R.string.title_bloguser, prefs.getString(key, "")));
     }
 
-    private long[] getRange() {
+    private void getRange(final Intent intent, final SharedPreferences prefs) {
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.export, null);
 
@@ -251,18 +253,52 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         final TextView tvTimeFrom = (TextView) view.findViewById(R.id.tvTimeFrom);
         final TextView tvDateTo = (TextView) view.findViewById(R.id.tvDateTo);
         final TextView tvTimeTo = (TextView) view.findViewById(R.id.tvTimeTo);
+        final boolean ampm = android.text.format.DateFormat.is24HourFormat(this);
+
+        final Calendar from = GregorianCalendar.getInstance();
+        final Calendar to = GregorianCalendar.getInstance();
+
+        Calendar defaultFrom = Calendar.getInstance();
+        defaultFrom.set(Calendar.YEAR, 1970);
+        defaultFrom.set(Calendar.MONTH, Calendar.JANUARY);
+        defaultFrom.set(Calendar.DAY_OF_MONTH, 1);
+        defaultFrom.set(Calendar.HOUR_OF_DAY, 0);
+        defaultFrom.set(Calendar.MINUTE, 0);
+
+        Calendar defaultTo = Calendar.getInstance();
+        defaultTo.set(Calendar.YEAR, 2100);
+        defaultTo.set(Calendar.MONTH, Calendar.JANUARY);
+        defaultTo.set(Calendar.DAY_OF_MONTH, 1);
+        defaultTo.set(Calendar.HOUR_OF_DAY, 0);
+        defaultTo.set(Calendar.MINUTE, 0);
+
+        from.setTime(new Date(prefs.getLong(PREF_LAST_FROM, defaultFrom.getTimeInMillis())));
+        to.setTime(new Date(prefs.getLong(PREF_LAST_TO, defaultTo.getTimeInMillis())));
+
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+
+        tvDateFrom.setText(dateFormat.format(from.getTime()));
+        tvTimeFrom.setText(timeFormat.format(from.getTime()));
+        tvDateTo.setText(dateFormat.format(to.getTime()));
+        tvTimeTo.setText(timeFormat.format(to.getTime()));
 
         // Pick date from
         btnDateFrom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogFragment newFragment = new DatePickerFragment();
-                Bundle b = new Bundle();
-                b.putInt("year", 1970);
-                b.putInt("month", 1);
-                b.putInt("day", 1);
-                newFragment.setArguments(b);
-                newFragment.show(getFragmentManager(), "datePicker");
+                new DialogFragment() {
+                    @Override
+                    public Dialog onCreateDialog(Bundle savedInstanceState) {
+                        return new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                                from.set(year, month, day);
+                                tvDateFrom.setText(dateFormat.format(from.getTime()));
+                            }
+                        }, from.get(Calendar.YEAR), from.get(Calendar.MONTH), from.get(Calendar.DAY_OF_MONTH));
+                    }
+                }.show(getFragmentManager(), "datePicker");
             }
         });
 
@@ -270,12 +306,19 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         btnTimeFrom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogFragment newFragment = new TimePickerFragment();
-                Bundle b = new Bundle();
-                b.putInt("hour", 0);
-                b.putInt("minute", 0);
-                newFragment.setArguments(b);
-                newFragment.show(getFragmentManager(), "timePicker");
+                new DialogFragment() {
+                    @Override
+                    public Dialog onCreateDialog(Bundle savedInstanceState) {
+                        return new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePicker view, int hour, int minute) {
+                                from.set(Calendar.HOUR_OF_DAY, hour);
+                                from.set(Calendar.MINUTE, minute);
+                                tvTimeFrom.setText(timeFormat.format(from.getTime()));
+                            }
+                        }, from.get(Calendar.HOUR_OF_DAY), from.get(Calendar.MINUTE), ampm);
+                    }
+                }.show(getFragmentManager(), "datePicker");
             }
         });
 
@@ -283,13 +326,18 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         btnDateTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogFragment newFragment = new DatePickerFragment();
-                Bundle b = new Bundle();
-                b.putInt("year", 9999);
-                b.putInt("month", 12);
-                b.putInt("day", 31);
-                newFragment.setArguments(b);
-                newFragment.show(getFragmentManager(), "datePicker");
+                new DialogFragment() {
+                    @Override
+                    public Dialog onCreateDialog(Bundle savedInstanceState) {
+                        return new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                                to.set(year, month, day);
+                                tvDateTo.setText(dateFormat.format(to.getTime()));
+                            }
+                        }, to.get(Calendar.YEAR), to.get(Calendar.MONTH), to.get(Calendar.DAY_OF_MONTH));
+                    }
+                }.show(getFragmentManager(), "datePicker");
             }
         });
 
@@ -297,12 +345,19 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         btnTimeTo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogFragment newFragment = new TimePickerFragment();
-                Bundle b = new Bundle();
-                b.putInt("hour", 23);
-                b.putInt("minute", 59);
-                newFragment.setArguments(b);
-                newFragment.show(getFragmentManager(), "timePicker");
+                new DialogFragment() {
+                    @Override
+                    public Dialog onCreateDialog(Bundle savedInstanceState) {
+                        return new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+                            @Override
+                            public void onTimeSet(TimePicker view, int hour, int minute) {
+                                to.set(Calendar.HOUR_OF_DAY, hour);
+                                to.set(Calendar.MINUTE, minute);
+                                tvTimeTo.setText(timeFormat.format(to.getTime()));
+                            }
+                        }, to.get(Calendar.HOUR_OF_DAY), to.get(Calendar.MINUTE), ampm);
+                    }
+                }.show(getFragmentManager(), "datePicker");
             }
         });
 
@@ -313,6 +368,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 .setPositiveButton(android.R.string.ok,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
+                                prefs.edit().putLong(PREF_LAST_FROM, from.getTimeInMillis()).apply();
+                                prefs.edit().putLong(PREF_LAST_TO, to.getTimeInMillis()).apply();
+                                intent.putExtra(LocationService.EXTRA_FROM, from.getTimeInMillis());
+                                intent.putExtra(LocationService.EXTRA_TO, to.getTimeInMillis());
+                                startService(intent);
                             }
                         })
                 .setNegativeButton(android.R.string.cancel,
@@ -324,46 +384,5 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
-        return new long[]{0, Long.MAX_VALUE};
-    }
-
-    public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
-        private int hour;
-        private int minute;
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            boolean ampm = android.text.format.DateFormat.is24HourFormat(getActivity());
-            this.hour = getArguments().getInt("hour");
-            this.minute = getArguments().getInt("minute");
-            return new TimePickerDialog(getActivity(), this, this.hour, this.minute, ampm);
-        }
-
-        public void onTimeSet(TimePicker view, int hour, int minute) {
-            this.hour = hour;
-            this.minute = minute;
-            //((TimePickerDialog.OnTimeSetListener) getActivity()).onTimeSet(hour, minute);
-        }
-    }
-
-    public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
-        private int year;
-        private int month;
-        private int day;
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            this.year = getArguments().getInt("year");
-            this.month = getArguments().getInt("month");
-            this.day = getArguments().getInt("day");
-            return new DatePickerDialog(getActivity(), this, this.year, this.month, this.day);
-        }
-
-        public void onDateSet(DatePicker view, int year, int month, int day) {
-            this.year = year;
-            this.month = month;
-            this.day = day;
-            //((DatePickerDialog.OnDateSetListener) getActivity()).onDateSet(year, month, day);
-        }
     }
 }
