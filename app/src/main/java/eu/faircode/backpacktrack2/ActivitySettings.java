@@ -176,11 +176,15 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Remove empty string settings
         if (pref instanceof EditTextPreference)
-            if ("".equals(prefs.getString(key, null))) {
-                SharedPreferences.Editor edit = prefs.edit();
-                edit.remove(key);
-                edit.apply();
-            }
+            if ("".equals(prefs.getString(key, null)))
+                prefs.edit().remove(key).apply();
+
+        // Add traling slash to blog URL
+        if (PREF_BLOGURL.equals(key)) {
+            String blogurl = prefs.getString(key, null);
+            if (blogurl != null && blogurl.length() > 0 && !blogurl.endsWith("/"))
+                prefs.edit().putString(key, blogurl + "/").apply();
+        }
 
         updateTitle(prefs, key);
 
