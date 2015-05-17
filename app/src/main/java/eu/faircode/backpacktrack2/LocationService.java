@@ -84,7 +84,7 @@ public class LocationService extends IntentService {
             DetectedActivity activity = activityResult.getMostProbableActivity();
 
             Log.w(TAG, "Activity=" + activity);
-            if (activity.getConfidence() >= 50) {
+            if (activity.getConfidence() >= 50 && activity.getType() != DetectedActivity.TILTING) {
                 // Persist probable activity
                 prefs.edit().putInt(ActivitySettings.PREF_LAST_ACTIVITY, activity.getType()).apply();
                 if (!prefs.getBoolean(ActivitySettings.PREF_ACTIVE, false))
