@@ -5,6 +5,7 @@
     <string name="title_edit">Edit waypoints</string>
     <string name="title_share">Share GPX file</string>
     <string name="title_upload">Upload GPX file</string>
+    <string name="title_download">Download geoid correction file</string>
     <string name="title_check">Location settings</string>
 
     <string name="title_geocode">Geocode address</string>
@@ -36,6 +37,7 @@
     <string name="summary_edit">Add, change or delete waypoints</string>
     <string name="summary_share">Tap to write and share a GPX file\nLast share: %s</string>
     <string name="summary_upload">Tap to write and upload a GPX file\nLast upload: %s</string>
+    <string name="summary_download">Tap to download EGM96 geoid height correction file (2,076,480 bytes)</string>
     <string name="summary_check">Tap to open the Android location settings</string>
 
     <string name="summary_frequency">Try to acquire a new location every selected number of minutes</string>
@@ -70,9 +72,9 @@
     <string name="msg_yes">yes</string>
     <string name="msg_no">no</string>
 
-    <string name="msg_idle">%1$s, last location: %2$s</string>
-    <string name="msg_active">Acquiring location</string>
-    <string name="msg_location">Acquired location, accuracy %d meters</string>
+    <string name="msg_idle">%1$s, last location: %2$s @%3$dm</string>
+    <string name="msg_acquiring">Acquiring location</string>
+    <string name="msg_acquired">Acquired location: &#177;%1$dm @%2$dm</string>
     <string name="msg_still">Still</string>
     <string name="msg_moving">Moving</string>
 

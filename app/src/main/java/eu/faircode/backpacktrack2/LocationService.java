@@ -53,6 +53,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import de.timroes.axmlrpc.XMLRPCClient;
+import gov.nasa.worldwind.geom.Angle;
+import gov.nasa.worldwind.geom.LatLon;
+import gov.nasa.worldwind.util.EGM96;
 
 public class LocationService extends IntentService {
     private static final String TAG = "BPT2.Service";
@@ -174,6 +177,22 @@ public class LocationService extends IntentService {
         if (location == null || (location.getLatitude() == 0.0 && location.getLongitude() == 0.0))
             return;
 
+        // Correct altitude
+        String egm96FileName = Environment.getExternalStorageDirectory() + "/Download/" + "/WW15MGH.txt";
+        Log.w(TAG, "egm96=" + egm96FileName);
+        if (location.hasAltitude() && new File(egm96FileName).exists())
+            try {
+                // http://earth-info.nga.mil/GandG/wgs84/gravitymod/egm96/binary/binarygeoid.html
+                EGM96 egm96 = new EGM96(egm96FileName);
+                LatLon latlon = LatLon.fromDegrees(location.getLatitude(), location.getLongitude());
+                double offset = egm96.getOffset(latlon.getLatitude(), latlon.getLongitude());
+                Log.w(TAG, "Offset=" + offset);
+                location.setAltitude(location.getAltitude() - offset);
+                Log.w(TAG, "Corrected location=" + location + " type=" + locationType);
+            } catch (IOException ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
+
         // Get location preferences
         boolean pref_altitude = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE, ActivitySettings.DEFAULT_ALTITUDE);
         float pref_accuracy = Float.parseFloat(prefs.getString(ActivitySettings.PREF_ACCURACY, ActivitySettings.DEFAULT_ACCURACY));
@@ -189,7 +208,10 @@ public class LocationService extends IntentService {
         Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
         if (isBetterLocation(bestLocation, location)) {
             Log.w(TAG, "Better location=" + location);
-            showNotification(getString(R.string.msg_location, location.hasAccuracy() ? Math.round(location.getAccuracy()) : -1), this);
+            showNotification(getString(R.string.msg_acquired,
+                            location.hasAccuracy() ? Math.round(location.getAccuracy()) : 0,
+                            location.hasAltitude() ? Math.round(location.getAltitude()) : 0),
+                    this);
             prefs.edit().putString(ActivitySettings.PREF_BEST_LOCATION, LocationSerializer.serialize(location)).apply();
         }
 
@@ -431,7 +453,7 @@ public class LocationService extends IntentService {
             am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + timeout * 1000, pi);
             Log.w(TAG, "Set timeout=" + timeout + "s");
 
-            showNotification(context.getString(R.string.msg_active), context);
+            showNotification(context.getString(R.string.msg_acquiring), context);
         } else
             Log.w(TAG, "No location providers");
     }
@@ -542,7 +564,8 @@ public class LocationService extends IntentService {
 
         showNotification(context.getString(R.string.msg_idle,
                         context.getString(still ? R.string.msg_still : R.string.msg_moving, context),
-                        (lastLocation == null ? "-" : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(lastLocation.getTime())))),
+                        (lastLocation == null ? "-" : new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(new Date(lastLocation.getTime()))),
+                        (lastLocation == null || !lastLocation.hasAltitude() ? 0 : Math.round(lastLocation.getAltitude()))),
                 context);
     }
 

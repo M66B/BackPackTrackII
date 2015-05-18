@@ -15,3 +15,6 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-dontwarn gov.nasa.worldwind.**
+-dontwarn com.zebraimaging.ZebraInputHandler

@@ -52,6 +52,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_EDIT = "pref_edit";
     public static final String PREF_SHARE = "pref_share";
     public static final String PREF_UPLOAD = "pref_upload";
+    public static final String PREF_DOWNLOAD = "pref_download";
     public static final String PREF_CHECK = "pref_check";
 
     public static final String PREF_ENABLED = "pref_enabled";
@@ -122,6 +123,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         Preference pref_edit = findPreference(PREF_EDIT);
         Preference pref_share = findPreference(PREF_SHARE);
         Preference pref_upload = findPreference(PREF_UPLOAD);
+        Preference pref_download = findPreference(PREF_DOWNLOAD);
         Preference pref_check = findPreference(PREF_CHECK);
         Preference pref_version = findPreference(PREF_VERSION);
 
@@ -172,6 +174,12 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 return true;
             }
         });
+
+        Intent downloadIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://earth-info.nga.mil/GandG/wgs84/gravitymod/egm96/binary/WW15MGH.DAC"));
+        if (getPackageManager().queryIntentActivities(downloadIntent, 0).size() > 0)
+            pref_download.setIntent(downloadIntent);
+        else
+            pref_download.setEnabled(false);
 
         // Handle location settings
         Intent locationSettingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
