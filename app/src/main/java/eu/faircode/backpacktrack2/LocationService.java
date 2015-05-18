@@ -291,12 +291,14 @@ public class LocationService extends IntentService {
             // Upload file
             HashMap<Object, Object> result = (HashMap<Object, Object>) xmlrpc.call("bpt.upload", params);
 
-            // Get result
-            String url = result.get("url").toString();
-            notify(getString(R.string.msg_uploaded, url), this);
-
             // Persist last upload time
             prefs.edit().putString(ActivitySettings.PREF_LAST_UPLOAD, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date())).apply();
+
+            // Feedback
+            String url = result.get("url").toString();
+            notify(getString(R.string.msg_uploaded, url), this);
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(500);
         } catch (Throwable ex) {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             notify(ex.toString(), this);
