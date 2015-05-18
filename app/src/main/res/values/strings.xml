@@ -7,6 +7,8 @@
     <string name="title_upload">Upload GPX file</string>
     <string name="title_check">Location settings</string>
 
+    <string name="title_geocode">Geocode</string>
+
     <string name="title_tracking">Tracking</string>
     <string name="title_enabled">Tracking enabled</string>
     <string name="title_frequency">Tracking frequency: %s minutes</string>
@@ -31,7 +33,7 @@
     <string name="title_author">Author</string>
     <string name="title_license">License</string>
 
-    <string name="summary_edit">Edit waypoint names or delete waypoints</string>
+    <string name="summary_edit">Add, change or delete waypoints</string>
     <string name="summary_share">Tap to write and share a GPX file\nLast share: %s</string>
     <string name="summary_upload">Tap to write and upload a GPX file\nLast upload: %s</string>
     <string name="summary_check">Tap to open the Android location settings</string>
@@ -74,7 +76,8 @@
     <string name="msg_still">Still</string>
     <string name="msg_moving">Moving</string>
 
-    <string name="msg_saved">Saved \'%s\'</string>
+    <string name="msg_added">Added \'%s\'</string>
+    <string name="msg_updated">Updated \'%s\'</string>
     <string name="msg_delete">Delete \'%s\' ?</string>
     <string name="msg_deleted">Deleted \'%s\'</string>
     <string name="msg_uploaded">Uploaded \'%s\'</string>

@@ -35,7 +35,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
 
-    public void insertLocation(Location location, String name) {
+    public void insert(Location location, String name) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues cv = new ContentValues();
@@ -71,12 +71,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert("location", null, cv);
     }
 
-    public Cursor getLocationList(long from, long to, boolean trackpoints) {
+    public Cursor getList(long from, long to, boolean trackpoints) {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.rawQuery(
                 "SELECT *, ID AS _id FROM location" +
                         (trackpoints ? " WHERE name IS NULL" : " WHERE NOT name IS NULL")
-                        + " AND time >= " + from + " AND time <= " + to, new String[0]);
+                        + " AND time >= ? AND time <= ?"
+                        + " ORDER BY time DESC",
+                new String[]{Long.toString(from), Long.toString(to)});
     }
 
     public void update(int id, String name) {

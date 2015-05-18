@@ -448,7 +448,7 @@ public class LocationService extends IntentService {
             // Store new location
             Log.w(TAG, "New location=" + location + " type=" + locationType);
             String waypointName = (locationType == LOCATION_WAYPOINT ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) : null);
-            new DatabaseHelper(this).insertLocation(location, waypointName);
+            new DatabaseHelper(this).insert(location, waypointName);
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
 
             // Feedback
@@ -546,8 +546,8 @@ public class LocationService extends IntentService {
         String gpxFileName = folder.getAbsolutePath() + File.separatorChar + trackName + ".gpx";
         Log.w(TAG, "Writing file=" + gpxFileName);
         DatabaseHelper databaseHelper = new DatabaseHelper(this);
-        Cursor trackPoints = databaseHelper.getLocationList(from, to, true);
-        Cursor wayPoints = databaseHelper.getLocationList(from, to, false);
+        Cursor trackPoints = databaseHelper.getList(from, to, true);
+        Cursor wayPoints = databaseHelper.getList(from, to, false);
         GPXFileWriter.writeGpxFile(new File(gpxFileName), trackName, trackPoints, wayPoints);
         databaseHelper.close();
         return gpxFileName;

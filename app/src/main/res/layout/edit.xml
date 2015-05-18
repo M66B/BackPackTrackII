@@ -8,7 +8,14 @@
     <ListView
         android:id="@+id/lvEdit"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
 
-    </ListView>
+    <ImageView
+        android:id="@+id/ivAdd"
+        android:layout_width="32dip"
+        android:layout_height="?android:attr/listPreferredItemHeightSmall"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="0"
+        android:src="@android:drawable/ic_menu_add" />
 </LinearLayout>
