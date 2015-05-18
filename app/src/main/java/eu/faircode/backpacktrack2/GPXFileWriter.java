@@ -36,7 +36,7 @@ public class GPXFileWriter {
         fw.write("\t\t" + "<trkseg>" + "\n");
 
         while (c.moveToNext()) {
-            StringBuffer out = new StringBuffer();
+            StringBuilder out = new StringBuilder();
             out.append("\t\t\t" + "<trkpt lat=\"" + c.getDouble(c.getColumnIndex("latitude")) + "\" " + "lon=\""
                     + c.getDouble(c.getColumnIndex("longitude")) + "\">" + "\n");
 
@@ -69,7 +69,7 @@ public class GPXFileWriter {
 
     private static void writeWayPoints(FileWriter fw, Cursor c) throws IOException {
         while (c.moveToNext()) {
-            StringBuffer out = new StringBuffer();
+            StringBuilder out = new StringBuilder();
             out.append("\t" + "<wpt lat=\"" + c.getDouble(c.getColumnIndex("latitude")) + "\" " + "lon=\""
                     + c.getDouble(c.getColumnIndex("longitude")) + "\">" + "\n");
 

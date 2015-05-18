@@ -39,7 +39,6 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import org.xmlrpc.android.XMLRPCClient;
-import org.xmlrpc.android.XMLRPCException;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -52,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class LocationService extends IntentService {
@@ -75,6 +75,10 @@ public class LocationService extends IntentService {
     private static final int LOCATION_MIN_TIME = 1000; // milliseconds
     private static final int LOCATION_MIN_DISTANCE = 1; // meters
 
+    private static final int LOCATION_TRACKPOINT = 1;
+    private static final int LOCATION_WAYPOINT = 2;
+    private static final int LOCATION_PERIODIC = 3;
+
     public LocationService() {
         super(TAG);
     }
@@ -82,198 +86,235 @@ public class LocationService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         Log.w(TAG, "Intent=" + intent);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if (ACTION_ACTIVITY.equals(intent.getAction())) {
-            // Get last activity
-            boolean lastStill = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
+        if (ACTION_ACTIVITY.equals(intent.getAction()))
+            handleActivity(intent);
 
-            // Get detected activity
-            ActivityRecognitionResult activityResult = ActivityRecognitionResult.extractResult(intent);
-            DetectedActivity activity = activityResult.getMostProbableActivity();
-
-            Log.w(TAG, "Activity=" + activity);
-            if (activity.getConfidence() >= 50 && activity.getType() != DetectedActivity.TILTING) {
-                // Persist probable activity
-                prefs.edit().putInt(ActivitySettings.PREF_LAST_ACTIVITY, activity.getType()).apply();
-                if (!prefs.getBoolean(ActivitySettings.PREF_ACTIVE, false))
-                    showIdle(this);
-
-                // Stop/start repeating alarm
-                boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
-                if (lastStill != still)
-                    if (still) {
-                        stopRepeatingAlarm(this);
-                        stopLocating(this);
-                        // Continue activity recognition
-                    } else
-                        startRepeatingAlarm(this);
-            }
-
-        } else if (ACTION_TRACKPOINT.equals(intent.getAction()) ||
+        else if (ACTION_TRACKPOINT.equals(intent.getAction()) ||
                 ACTION_WAYPOINT.equals(intent.getAction()) ||
-                ACTION_ALARM.equals(intent.getAction())) {
-            // Persist location type
-            if (ACTION_TRACKPOINT.equals(intent.getAction())) {
-                stopLocating(this); // Guarantee fresh location
-                prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_TRACKPOINT).apply();
-            } else if (ACTION_WAYPOINT.equals((intent.getAction()))) {
-                stopLocating(this); // Guarantee fresh location
-                prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_WAYPOINT).apply();
-            } else if (ACTION_ALARM.equals(intent.getAction()))
-                prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_PERIODIC).apply();
+                ACTION_ALARM.equals(intent.getAction()))
+            handleLocationRequest(intent);
 
-            // Try to acquire a new location
-            startLocating();
+        else if (ACTION_LOCATION_FINE.equals(intent.getAction()) ||
+                ACTION_LOCATION_COARSE.equals(intent.getAction()))
+            handleLocationUpdate(intent);
 
-        } else if (ACTION_LOCATION_FINE.equals(intent.getAction()) ||
-                ACTION_LOCATION_COARSE.equals(intent.getAction())) {
-            // Process location update
-            int locationType = prefs.getInt(ActivitySettings.PREF_LOCATION_TYPE, -1);
-            Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
-            Log.w(TAG, "Update location=" + location);
-            if (location == null ||
-                    (location.getLatitude() == 0.0 && location.getLongitude() == 0.0))
-                return;
+        else if (ACTION_TIMEOUT.equals(intent.getAction()))
+            handleLocationTimeout(intent);
 
-            // Get location preferences
-            boolean pref_altitude = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE, ActivitySettings.DEFAULT_ALTITUDE);
-            float pref_accuracy = Float.parseFloat(prefs.getString(ActivitySettings.PREF_ACCURACY, ActivitySettings.DEFAULT_ACCURACY));
-            float pref_inaccurate = Float.parseFloat(prefs.getString(ActivitySettings.PREF_INACCURATE, ActivitySettings.DEFAULT_INACCURATE));
-            Log.w(TAG, "Prefer altitude=" + pref_altitude + " accuracy=" + pref_accuracy + " inaccurate=" + pref_inaccurate);
+        else if (ACTION_GEOTAGGED.equals(intent.getAction()))
+            handleGeotagged(intent);
 
-            if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
-                Log.w(TAG, "Filtering inaccurate location");
-                return;
-            }
+        else if (ACTION_SHARE.equals(intent.getAction()))
+            handleShare(intent);
 
-            // Persist better location
-            Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
-            if (isBetterLocation(bestLocation, location)) {
-                Log.w(TAG, "Better location=" + location);
-                showNotification(
-                        getString(R.string.msg_location, location.hasAccuracy() ? (int) location.getAccuracy() : Integer.MAX_VALUE),
-                        null,
-                        this);
-                prefs.edit().putString(ActivitySettings.PREF_BEST_LOCATION, LocationSerializer.serialize(location)).apply();
-            }
+        else if (ACTION_UPLOAD.equals(intent.getAction()))
+            handleUpload(intent);
+    }
 
-            // Check altitude
-            if (!location.hasAltitude() && pref_altitude) {
-                Log.w(TAG, "No altitude, but preferred");
-                return;
-            }
+    // Handle intents
 
-            // Check accuracy
-            if (!location.hasAccuracy() || location.getAccuracy() > pref_accuracy) {
-                Log.w(TAG, "Accuracy not reached");
-                return;
-            }
+    private void handleActivity(Intent intent) {
+        // Get last activity
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean lastStill = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
 
-            stopLocating(this);
+        // Get detected activity
+        ActivityRecognitionResult activityResult = ActivityRecognitionResult.extractResult(intent);
+        DetectedActivity activity = activityResult.getMostProbableActivity();
 
-            // Process location
-            handleLocation(locationType, location);
+        Log.w(TAG, "Activity=" + activity);
+        if (activity.getConfidence() >= 50 && activity.getType() != DetectedActivity.TILTING) {
+            // Persist probable activity
+            prefs.edit().putInt(ActivitySettings.PREF_LAST_ACTIVITY, activity.getType()).apply();
 
-        } else if (ACTION_TIMEOUT.equals(intent.getAction())) {
-            // Process location time-out
-            int locationType = prefs.getInt(ActivitySettings.PREF_LOCATION_TYPE, -1);
-            Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
-            Log.w(TAG, "Timeout best location=" + bestLocation);
+            // Update still/moving
+            if (!prefs.getBoolean(ActivitySettings.PREF_ACTIVE, false))
+                showIdle(this);
 
-            stopLocating(this);
-
-            // Process location
-            if (bestLocation != null)
-                handleLocation(locationType, bestLocation);
-
-        } else if (ACTION_GEOTAGGED.equals(intent.getAction())) {
-            // Process photo location
-            Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
-            if (location != null)
-                handleLocation(LOCATION_TRACKPOINT, location);
-
-        } else if (ACTION_SHARE.equals(intent.getAction())) {
-            try {
-                // Write GPX file
-                String trackName = intent.getStringExtra(EXTRA_TRACK);
-                long from = intent.getLongExtra(EXTRA_FROM, 0);
-                long to = intent.getLongExtra(EXTRA_TO, 0);
-                String gpxFileName = writeGPXFile(from, to, trackName);
-
-                // View file
-                Intent viewIntent = new Intent();
-                viewIntent.setAction(Intent.ACTION_VIEW);
-                viewIntent.setDataAndType(Uri.fromFile(new File(gpxFileName)), "application/gpx+xml");
-                viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(viewIntent);
-
-                // Persist last share time
-                prefs.edit().putString(ActivitySettings.PREF_LAST_SHARE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())).apply();
-            } catch (IOException ex) {
-                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            }
-
-
-        } else if (ACTION_UPLOAD.equals(intent.getAction())) {
-            try {
-                // Write GPX file
-                String trackName = intent.getStringExtra(EXTRA_TRACK);
-                long from = intent.getLongExtra(EXTRA_FROM, 0);
-                long to = intent.getLongExtra(EXTRA_TO, 0);
-                String gpxFileName = writeGPXFile(from, to, trackName);
-
-                // Get GPX file content
-                File gpx = new File(gpxFileName);
-                byte[] bytes = new byte[(int) gpx.length()];
-                DataInputStream in = new DataInputStream(new FileInputStream(gpx));
-                in.readFully(bytes);
-                in.close();
-
-                // Create XML-RPC client
-                String blogUrl = prefs.getString(ActivitySettings.PREF_BLOGURL, "");
-                int blogId = Integer.parseInt(prefs.getString(ActivitySettings.PREF_BLOGID, "1"));
-                String userName = prefs.getString(ActivitySettings.PREF_BLOGUSER, "");
-                String passWord = prefs.getString(ActivitySettings.PREF_BLOGPWD, "");
-                URI uri = URI.create(blogUrl + "xmlrpc.php");
-                XMLRPCClient xmlrpc = new XMLRPCClient(uri, userName, passWord);
-
-                // Create upload parameters
-                Map<String, Object> args = new HashMap<String, Object>();
-                args.put("name", trackName + ".gpx");
-                args.put("type", "text/xml");
-                args.put("bits", bytes);
-                args.put("overwrite", true);
-                Object[] params = {blogId, userName, passWord, args};
-
-                // Upload file
-                HashMap<Object, Object> result = (HashMap<Object, Object>) xmlrpc.call("bpt.upload", params);
-
-                // Get result
-                String url = result.get("url").toString();
-                notify(getString(R.string.msg_uploaded, url));
-
-                // Persist last upload time
-                prefs.edit().putString(ActivitySettings.PREF_LAST_UPLOAD, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date())).apply();
-            } catch (IOException ex) {
-                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            } catch (XMLRPCException ex) {
-                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                notify(ex.toString());
-            }
+            // Stop/start repeating alarm
+            boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
+            if (lastStill != still)
+                if (still) {
+                    // Continue activity recognition
+                    stopRepeatingAlarm(this);
+                    stopLocating(this);
+                } else
+                    startRepeatingAlarm(this);
         }
     }
+
+    private void handleLocationRequest(Intent intent) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Persist location type
+        if (ACTION_TRACKPOINT.equals(intent.getAction()))
+            prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_TRACKPOINT).apply();
+        else if (ACTION_WAYPOINT.equals((intent.getAction())))
+            prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_WAYPOINT).apply();
+        else if (ACTION_ALARM.equals(intent.getAction()))
+            prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_PERIODIC).apply();
+
+        // Try to acquire a new location
+        if (ACTION_TRACKPOINT.equals(intent.getAction()) || ACTION_WAYPOINT.equals((intent.getAction())))
+            stopLocating(this); // Guarantee fresh location
+        startLocating(this);
+    }
+
+    private void handleLocationUpdate(Intent intent) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Process location update
+        int locationType = prefs.getInt(ActivitySettings.PREF_LOCATION_TYPE, -1);
+        Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
+        Log.w(TAG, "Update location=" + location + " type=" + locationType);
+        if (location == null || (location.getLatitude() == 0.0 && location.getLongitude() == 0.0))
+            return;
+
+        // Get location preferences
+        boolean pref_altitude = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE, ActivitySettings.DEFAULT_ALTITUDE);
+        float pref_accuracy = Float.parseFloat(prefs.getString(ActivitySettings.PREF_ACCURACY, ActivitySettings.DEFAULT_ACCURACY));
+        float pref_inaccurate = Float.parseFloat(prefs.getString(ActivitySettings.PREF_INACCURATE, ActivitySettings.DEFAULT_INACCURATE));
+        Log.w(TAG, "Prefer altitude=" + pref_altitude + " accuracy=" + pref_accuracy + " inaccurate=" + pref_inaccurate);
+
+        if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
+            Log.w(TAG, "Filtering inaccurate location=" + location);
+            return;
+        }
+
+        // Persist better location
+        Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
+        if (isBetterLocation(bestLocation, location)) {
+            Log.w(TAG, "Better location=" + location);
+            showNotification(
+                    getString(R.string.msg_location, location.hasAccuracy() ? Math.round(location.getAccuracy()) : -1),
+                    null,
+                    this);
+            prefs.edit().putString(ActivitySettings.PREF_BEST_LOCATION, LocationSerializer.serialize(location)).apply();
+        }
+
+        // Check altitude
+        if (!location.hasAltitude() && pref_altitude) {
+            Log.w(TAG, "No altitude, but preferred, location=" + location);
+            return;
+        }
+
+        // Check accuracy
+        if (!location.hasAccuracy() || location.getAccuracy() > pref_accuracy) {
+            Log.w(TAG, "Accuracy not reached, location=" + location);
+            return;
+        }
+
+        stopLocating(this);
+
+        // Process location
+        handleLocation(locationType, location);
+    }
+
+    private void handleLocationTimeout(Intent intent) {
+        // Process location time-out
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int locationType = prefs.getInt(ActivitySettings.PREF_LOCATION_TYPE, -1);
+        Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
+        Log.w(TAG, "Timeout best location=" + bestLocation + " type=" + locationType);
+
+        stopLocating(this);
+
+        // Process location
+        if (bestLocation != null)
+            handleLocation(locationType, bestLocation);
+    }
+
+    private void handleGeotagged(Intent intent) {
+        // Process photo location
+        Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
+        if (location != null)
+            handleLocation(LOCATION_TRACKPOINT, location);
+    }
+
+    private void handleShare(Intent intent) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        try {
+            // Write GPX file
+            String trackName = intent.getStringExtra(EXTRA_TRACK);
+            long from = intent.getLongExtra(EXTRA_FROM, 0);
+            long to = intent.getLongExtra(EXTRA_TO, 0);
+            String gpxFileName = writeGPXFile(from, to, trackName, this);
+
+            // View file
+            Intent viewIntent = new Intent();
+            viewIntent.setAction(Intent.ACTION_VIEW);
+            viewIntent.setDataAndType(Uri.fromFile(new File(gpxFileName)), "application/gpx+xml");
+            viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(viewIntent);
+
+            // Persist last share time
+            prefs.edit().putString(ActivitySettings.PREF_LAST_SHARE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date())).apply();
+        } catch (Throwable ex) {
+            Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            notify(ex.toString(), this);
+        }
+    }
+
+    private void handleUpload(Intent intent) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        try {
+            // Write GPX file
+            String trackName = intent.getStringExtra(EXTRA_TRACK);
+            long from = intent.getLongExtra(EXTRA_FROM, 0);
+            long to = intent.getLongExtra(EXTRA_TO, 0);
+            String gpxFileName = writeGPXFile(from, to, trackName, this);
+
+            // Get GPX file content
+            File gpx = new File(gpxFileName);
+            byte[] bytes = new byte[(int) gpx.length()];
+            DataInputStream in = new DataInputStream(new FileInputStream(gpx));
+            in.readFully(bytes);
+            in.close();
+
+            // Create XML-RPC client
+            String blogUrl = prefs.getString(ActivitySettings.PREF_BLOGURL, "");
+            int blogId = Integer.parseInt(prefs.getString(ActivitySettings.PREF_BLOGID, "1"));
+            String userName = prefs.getString(ActivitySettings.PREF_BLOGUSER, "");
+            String passWord = prefs.getString(ActivitySettings.PREF_BLOGPWD, "");
+            URI uri = URI.create(blogUrl + "xmlrpc.php");
+            XMLRPCClient xmlrpc = new XMLRPCClient(uri, userName, passWord);
+
+            // Create upload parameters
+            Map<String, Object> args = new HashMap<>();
+            args.put("name", trackName + ".gpx");
+            args.put("type", "text/xml");
+            args.put("bits", bytes);
+            args.put("overwrite", true);
+            Object[] params = {blogId, userName, passWord, args};
+
+            // Upload file
+            HashMap<Object, Object> result = (HashMap<Object, Object>) xmlrpc.call("bpt.upload", params);
+
+            // Get result
+            String url = result.get("url").toString();
+            notify(getString(R.string.msg_uploaded, url), this);
+
+            // Persist last upload time
+            prefs.edit().putString(ActivitySettings.PREF_LAST_UPLOAD, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date())).apply();
+        } catch (Throwable ex) {
+            Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            notify(ex.toString(), this);
+        }
+    }
+
+    // Start/stop
 
     public static void startTracking(final Context context) {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         // Check if enabled
         if (!prefs.getBoolean(ActivitySettings.PREF_ENABLED, ActivitySettings.DEFAULT_ENABLED)) {
-            Log.w(TAG, "Disabled");
+            Log.w(TAG, "Tracking disabled");
             return;
         }
 
-        // Start repeating alarm
+        // Conditionally start repeating alarm
         boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
         boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
         if (!recognition || !still)
@@ -299,18 +340,6 @@ public class LocationService extends IntentService {
         showIdle(context);
     }
 
-    private static void startRepeatingAlarm(Context context) {
-        // Set repeating alarm
-        Intent alarmIntent = new Intent(context, LocationService.class);
-        alarmIntent.setAction(LocationService.ACTION_ALARM);
-        PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        int frequency = Integer.parseInt(prefs.getString(ActivitySettings.PREF_FREQUENCY, ActivitySettings.DEFAULT_FREQUENCY));
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 1000, frequency * 60 * 1000, pi);
-        Log.w(TAG, "Set repeating alarm frequency=" + frequency + "m");
-    }
-
     public static void stopTracking(final Context context) {
         stopRepeatingAlarm(context);
 
@@ -333,6 +362,18 @@ public class LocationService extends IntentService {
         cancelNotification(context);
     }
 
+    private static void startRepeatingAlarm(Context context) {
+        // Set repeating alarm
+        Intent alarmIntent = new Intent(context, LocationService.class);
+        alarmIntent.setAction(LocationService.ACTION_ALARM);
+        PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        int frequency = Integer.parseInt(prefs.getString(ActivitySettings.PREF_FREQUENCY, ActivitySettings.DEFAULT_FREQUENCY));
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 1000, frequency * 60 * 1000, pi);
+        Log.w(TAG, "Set repeating alarm frequency=" + frequency + "m");
+    }
+
     private static void stopRepeatingAlarm(Context context) {
         // Cancel repeating alarm
         Intent alarmIntent = new Intent(context, LocationService.class);
@@ -343,9 +384,9 @@ public class LocationService extends IntentService {
         Log.w(TAG, "Canceled repeating alarm");
     }
 
-    private void startLocating() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+    private static void startLocating(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         // Mark active
         if (prefs.getBoolean(ActivitySettings.PREF_ACTIVE, false)) {
@@ -356,18 +397,18 @@ public class LocationService extends IntentService {
 
         // Request coarse location
         if (lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            Intent locationIntent = new Intent(this, LocationService.class);
+            Intent locationIntent = new Intent(context, LocationService.class);
             locationIntent.setAction(LocationService.ACTION_LOCATION_COARSE);
-            PendingIntent pi = PendingIntent.getService(this, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_MIN_TIME, LOCATION_MIN_DISTANCE, pi);
             Log.w(TAG, "Requested network locations");
         }
 
         // Request fine location
         if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            Intent locationIntent = new Intent(this, LocationService.class);
+            Intent locationIntent = new Intent(context, LocationService.class);
             locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
-            PendingIntent pi = PendingIntent.getService(this, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_MIN_TIME, LOCATION_MIN_DISTANCE, pi);
             Log.w(TAG, "Requested GPS locations");
         }
@@ -375,17 +416,14 @@ public class LocationService extends IntentService {
         // Set location timeout
         if (lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER) || lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             int timeout = Integer.parseInt(prefs.getString(ActivitySettings.PREF_TIMEOUT, ActivitySettings.DEFAULT_TIMEOUT));
-            Intent alarmIntent = new Intent(this, LocationService.class);
+            Intent alarmIntent = new Intent(context, LocationService.class);
             alarmIntent.setAction(LocationService.ACTION_TIMEOUT);
-            PendingIntent pi = PendingIntent.getService(this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            AlarmManager am = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+            PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + timeout * 1000, pi);
             Log.w(TAG, "Set timeout=" + timeout + "s");
 
-            showNotification(
-                    getString(R.string.msg_active),
-                    null,
-                    this);
+            showNotification(context.getString(R.string.msg_active), null, context);
         } else
             Log.w(TAG, "No location providers");
     }
@@ -424,6 +462,8 @@ public class LocationService extends IntentService {
         prefs.edit().remove(ActivitySettings.PREF_BEST_LOCATION).apply();
     }
 
+    // Helper methods
+
     private boolean isBetterLocation(Location prev, Location current) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         boolean pref_altitude = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE, ActivitySettings.DEFAULT_ALTITUDE);
@@ -432,10 +472,6 @@ public class LocationService extends IntentService {
                         (current.hasAccuracy() ? current.getAccuracy() : Float.MAX_VALUE) <
                                 (prev.hasAccuracy() ? prev.getAccuracy() : Float.MAX_VALUE)));
     }
-
-    private static final int LOCATION_TRACKPOINT = 1;
-    private static final int LOCATION_WAYPOINT = 2;
-    private static final int LOCATION_PERIODIC = 3;
 
     private void handleLocation(int locationType, Location location) {
         // Filter close locations
@@ -447,7 +483,16 @@ public class LocationService extends IntentService {
                 lastLocation == null || lastLocation.distanceTo(location) >= pref_nearby) {
             // Store new location
             Log.w(TAG, "New location=" + location + " type=" + locationType);
-            String waypointName = (locationType == LOCATION_WAYPOINT ? new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()) : null);
+
+            String waypointName = null;
+            if (locationType == LOCATION_WAYPOINT) {
+                List<String> listAddress = reverseGeocode(location, this);
+                if (listAddress == null || listAddress.size() == 0)
+                    waypointName = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+                else
+                    waypointName = listAddress.get(0);
+            }
+
             new DatabaseHelper(this).insert(location, waypointName);
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
 
@@ -470,7 +515,7 @@ public class LocationService extends IntentService {
 
         showNotification(context.getString(R.string.msg_idle,
                         context.getString(still ? R.string.msg_still : R.string.msg_moving, context),
-                        (lastLocation == null ? "-" : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(lastLocation.getTime())))),
+                        (lastLocation == null ? "-" : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(lastLocation.getTime())))),
                 TextUtils.join(", ", reverseGeocode(lastLocation, context)),
                 context);
     }
@@ -490,7 +535,7 @@ public class LocationService extends IntentService {
         return listline;
     }
 
-    public static void showNotification(String text, String subText, Context context) {
+    private static void showNotification(String text, String subText, Context context) {
         // Build intent
         Intent riSettings = new Intent(context, ActivitySettings.class);
         riSettings.setAction("android.intent.action.MAIN");
@@ -534,18 +579,18 @@ public class LocationService extends IntentService {
         nm.notify(0, notification);
     }
 
-    public static void cancelNotification(Context context) {
+    private static void cancelNotification(Context context) {
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         nm.cancel(0);
     }
 
-    private String writeGPXFile(long from, long to, String trackName) throws IOException {
+    private static String writeGPXFile(long from, long to, String trackName, Context context) throws IOException {
         Log.w(TAG, "Writing track=" + trackName + " from=" + from + "to=" + to);
         File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separatorChar + "BackPackTrackII");
         folder.mkdirs();
         String gpxFileName = folder.getAbsolutePath() + File.separatorChar + trackName + ".gpx";
         Log.w(TAG, "Writing file=" + gpxFileName);
-        DatabaseHelper databaseHelper = new DatabaseHelper(this);
+        DatabaseHelper databaseHelper = new DatabaseHelper(context);
         Cursor trackPoints = databaseHelper.getList(from, to, true);
         Cursor wayPoints = databaseHelper.getList(from, to, false);
         GPXFileWriter.writeGpxFile(new File(gpxFileName), trackName, trackPoints, wayPoints);
@@ -553,14 +598,15 @@ public class LocationService extends IntentService {
         return gpxFileName;
     }
 
-    private void notify(final String text) {
+    private static void notify(final String text, final Context context) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(LocationService.this, text, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, text, Toast.LENGTH_LONG).show();
             }
         });
     }
+
     // Serialization
 
     private static class LocationSerializer implements JsonSerializer<Location> {
@@ -591,8 +637,7 @@ public class LocationService extends IntentService {
             GsonBuilder builder = new GsonBuilder();
             builder.registerTypeAdapter(Location.class, new LocationSerializer());
             Gson gson = builder.create();
-            String json = gson.toJson(location);
-            return json;
+            return gson.toJson(location);
         }
     }
 
@@ -625,8 +670,7 @@ public class LocationService extends IntentService {
             GsonBuilder builder = new GsonBuilder();
             builder.registerTypeAdapter(Location.class, new LocationDeserializer());
             Gson gson = builder.create();
-            Location location = gson.fromJson(json, Location.class);
-            return location;
+            return gson.fromJson(json, Location.class);
         }
     }
 }

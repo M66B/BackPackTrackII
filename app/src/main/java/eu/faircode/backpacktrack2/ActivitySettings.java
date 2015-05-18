@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.NotificationManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -47,6 +46,7 @@ import java.util.List;
 public class ActivitySettings extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "BPT2.Settings";
 
+    // Preference names
     public static final String PREF_EDIT = "pref_edit";
     public static final String PREF_SHARE = "pref_share";
     public static final String PREF_UPLOAD = "pref_upload";
@@ -70,6 +70,18 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     public static final String PREF_VERSION = "pref_version";
 
+    // Preference defaults
+    public static final boolean DEFAULT_ENABLED = true;
+    public static final String DEFAULT_FREQUENCY = "3"; // minutes
+    public static final boolean DEFAULT_ALTITUDE = true;
+    public static final String DEFAULT_ACCURACY = "25"; // meters
+    public static final String DEFAULT_TIMEOUT = "60"; // seconds
+    public static final String DEFAULT_INACCURATE = "100"; // meters
+    public static final String DEFAULT_NEARBY = "50"; // meters
+
+    public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
+    public static final String DEFAULT_RECOGNITION_INTERVAL = "1"; // minutes
+
     // Transient
     public static final String PREF_ACTIVE = "pref_active";
     public static final String PREF_LOCATION_TYPE = "pref_location_type";
@@ -79,20 +91,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_LAST_SHARE = "pref_last_share";
     public static final String PREF_LAST_UPLOAD = "pref_last_upload";
 
+    // Remember
     public static final String PREF_LAST_TRACK = "pref_last_track";
     public static final String PREF_LAST_FROM = "pref_last_from";
     public static final String PREF_LAST_TO = "pref_last_to";
-
-    public static final boolean DEFAULT_ENABLED = true;
-    public static final String DEFAULT_FREQUENCY = "3"; // minutes
-    public static final boolean DEFAULT_ALTITUDE = true;
-    public static final String DEFAULT_ACCURACY = "50"; // meters
-    public static final String DEFAULT_TIMEOUT = "60"; // seconds
-    public static final String DEFAULT_INACCURATE = "1500"; // meters
-    public static final String DEFAULT_NEARBY = "50"; // meters
-
-    public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
-    public static final String DEFAULT_RECOGNITION_INTERVAL = "1"; // minutes
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -105,7 +107,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         super.onResume();
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
-        final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+        SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
         // First run
         if (!prefs.contains(PREF_ENABLED)) {
@@ -137,111 +139,33 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_BLOGID);
         updateTitle(prefs, PREF_BLOGUSER);
 
-        // Edit
+        // Edit waypoints
         pref_edit.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                final LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
-                final View viewEdit = inflater.inflate(R.layout.edit, null);
-
-                ListView lv = (ListView) viewEdit.findViewById(R.id.lvEdit);
-                Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false);
-                final WaypointAdapter adapter = new WaypointAdapter(ActivitySettings.this, cursor);
-                lv.setAdapter(adapter);
-
-                ImageView ivAdd = (ImageView) viewEdit.findViewById(R.id.ivAdd);
-                ivAdd.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        final View viewEdit = inflater.inflate(R.layout.add, null);
-                        final EditText address = (EditText) viewEdit.findViewById(R.id.etAdd);
-
-                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
-                        alertDialogBuilder.setTitle(R.string.title_geocode);
-                        alertDialogBuilder.setView(viewEdit);
-                        alertDialogBuilder
-                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        try {
-                                            String name = address.getText().toString();
-                                            Geocoder geocoder = new Geocoder(ActivitySettings.this);
-                                            final List<Address> listAddress = geocoder.getFromLocationName(name, 3);
-                                            if (listAddress != null && listAddress.size() > 0) {
-                                                final CharSequence[] address = getAddressLines(listAddress);
-                                                AlertDialog.Builder b = new AlertDialog.Builder(ActivitySettings.this);
-                                                b.setTitle(getString(R.string.title_geocode));
-                                                b.setItems(address, new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int item) {
-                                                        if (listAddress.get(item).hasLatitude() && listAddress.get(item).hasLongitude()) {
-                                                            // Build location
-                                                            String name = (String) address[item];
-                                                            Location location = new Location("Geocoded");
-                                                            location.setLatitude(listAddress.get(item).getLatitude());
-                                                            location.setLongitude(listAddress.get(item).getLongitude());
-                                                            location.setTime(System.currentTimeMillis());
-                                                            new DatabaseHelper(ActivitySettings.this).insert(location, name);
-                                                            Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false);
-                                                            adapter.changeCursor(cursor);
-                                                            Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, name), Toast.LENGTH_LONG).show();
-                                                        }
-                                                    }
-                                                });
-                                                b.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        // Do nothing
-                                                    }
-                                                });
-                                                b.show();
-                                            }
-                                        } catch (IOException ex) {
-                                            Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                                            Toast.makeText(ActivitySettings.this, ex.toString(), Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-                                });
-                        AlertDialog alertDialog = alertDialogBuilder.create();
-                        alertDialog.show();
-                    }
-                });
-
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
-                alertDialogBuilder.setTitle(R.string.title_edit);
-                alertDialogBuilder.setView(viewEdit);
-                alertDialogBuilder
-                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Do nothing
-                            }
-                        });
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
-                // Fix keyboard input
-                alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+                edit();
                 return true;
             }
         });
 
-        // Share
+        // Share GPX
         pref_share.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Intent shareIntent = new Intent(ActivitySettings.this, LocationService.class);
-                shareIntent.setAction(LocationService.ACTION_SHARE);
-                getRange(shareIntent, prefs);
+                Intent intent = new Intent(ActivitySettings.this, LocationService.class);
+                intent.setAction(LocationService.ACTION_SHARE);
+                export(intent);
                 return true;
             }
         });
 
-        // Upload
+        // Upload GPX
         pref_upload.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Intent uploadIntent = new Intent(ActivitySettings.this, LocationService.class);
-                uploadIntent.setAction(LocationService.ACTION_UPLOAD);
-                getRange(uploadIntent, prefs);
+                Intent intent = new Intent(ActivitySettings.this, LocationService.class);
+                intent.setAction(LocationService.ACTION_UPLOAD);
+                export(intent);
                 return true;
             }
         });
@@ -263,7 +187,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                     pInfo.versionName + "/" + pInfo.versionCode + "\n" +
                             getString(R.string.msg_geocoder) + " " +
                             getString(Geocoder.isPresent() ? R.string.msg_yes : R.string.msg_no));
-        } catch (PackageManager.NameNotFoundException ignored) {
+        } catch (PackageManager.NameNotFoundException ex) {
+            pref_version.setSummary(ex.toString());
         }
     }
 
@@ -271,77 +196,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     protected void onPause() {
         super.onPause();
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
-    }
-
-    public class WaypointAdapter extends CursorAdapter {
-        public WaypointAdapter(Context context, Cursor cursor) {
-            super(context, cursor, 0);
-        }
-
-        @Override
-        public View newView(Context context, Cursor cursor, ViewGroup parent) {
-            return LayoutInflater.from(context).inflate(R.layout.waypoint, parent, false);
-        }
-
-        @Override
-        public void bindView(View view, Context context, final Cursor cursor) {
-            final int id = cursor.getInt(cursor.getColumnIndex("ID"));
-            final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
-            final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
-            final String name = cursor.getString(cursor.getColumnIndex("name"));
-            final EditText etName = (EditText) view.findViewById(R.id.etName);
-
-            etName.setText(name);
-
-            ImageView ivShare = (ImageView) view.findViewById(R.id.ivShare);
-            ivShare.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    try {
-                        String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude;
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
-                    } catch (Throwable ignored) {
-                    }
-                }
-            });
-
-            ImageView ivSave = (ImageView) view.findViewById(R.id.ivSave);
-            ivSave.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    String newName = etName.getText().toString();
-                    new DatabaseHelper(ActivitySettings.this).update(id, newName);
-                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_updated, newName), Toast.LENGTH_LONG).show();
-                }
-            });
-
-            ImageView ivDelete = (ImageView) view.findViewById(R.id.ivDelete);
-            ivDelete.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
-                    alertDialogBuilder.setTitle(getString(R.string.msg_delete, name));
-                    alertDialogBuilder
-                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    new DatabaseHelper(ActivitySettings.this).delete(id);
-                                    Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false);
-                                    changeCursor(cursor);
-                                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_deleted, name), Toast.LENGTH_LONG).show();
-                                }
-                            })
-                            .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Ignore
-                                }
-                            });
-                    AlertDialog alertDialog = alertDialogBuilder.create();
-                    alertDialog.show();
-                }
-            });
-        }
     }
 
     @Override
@@ -357,16 +211,19 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             if ("".equals(prefs.getString(key, null)))
                 prefs.edit().remove(key).apply();
 
-        // Add traling slash to blog URL
+        // Add trailing slash to blog URL
         if (PREF_BLOGURL.equals(key)) {
             String blogurl = prefs.getString(key, null);
             if (blogurl != null && blogurl.length() > 0 && !blogurl.endsWith("/"))
                 prefs.edit().putString(key, blogurl + "/").apply();
         }
 
+        // Update preference titles
         updateTitle(prefs, key);
 
-        if (PREF_FREQUENCY.equals(key) ||
+        // Restart tracking when needed
+        if (PREF_ENABLED.equals(key) ||
+                PREF_FREQUENCY.equals(key) ||
                 PREF_ALTITUDE.equals(key) ||
                 PREF_ACCURACY.equals(key) ||
                 PREF_TIMEOUT.equals(key) ||
@@ -379,45 +236,97 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         }
     }
 
-    private void updateTitle(SharedPreferences prefs, String key) {
-        Preference pref = findPreference(key);
+    // Helper methods
 
-        if (PREF_SHARE.equals(key))
-            pref.setSummary(getString(R.string.summary_share, prefs.getString(PREF_LAST_SHARE, getString(R.string.msg_never))));
-        else if (PREF_UPLOAD.equals(key))
-            pref.setSummary(getString(R.string.summary_upload, prefs.getString(PREF_LAST_UPLOAD, getString(R.string.msg_never))));
+    private void edit() {
+        final LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
+        final View viewEdit = inflater.inflate(R.layout.edit, null);
 
-        else if (PREF_ENABLED.equals(key)) {
-            NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            if (prefs.getBoolean(PREF_ENABLED, DEFAULT_ENABLED))
-                LocationService.startTracking(this);
-            else
-                LocationService.stopTracking(this);
-        } else if (PREF_FREQUENCY.equals(key))
-            pref.setTitle(getString(R.string.title_frequency, prefs.getString(key, DEFAULT_FREQUENCY)));
-        else if (PREF_ALTITUDE.equals(key))
-            pref.setSummary(prefs.getBoolean(PREF_ALTITUDE, true) ? getString(R.string.summary_altitude) : null);
-        else if (PREF_ACCURACY.equals(key))
-            pref.setTitle(getString(R.string.title_accuracy, prefs.getString(key, DEFAULT_ACCURACY)));
-        else if (PREF_TIMEOUT.equals(key))
-            pref.setTitle(getString(R.string.title_timeout, prefs.getString(key, DEFAULT_TIMEOUT)));
-        else if (PREF_INACCURATE.equals(key))
-            pref.setTitle(getString(R.string.title_inaccurate, prefs.getString(key, DEFAULT_INACCURATE)));
-        else if (PREF_NEARBY.equals(key))
-            pref.setTitle(getString(R.string.title_nearby, prefs.getString(key, DEFAULT_NEARBY)));
+        ListView lv = (ListView) viewEdit.findViewById(R.id.lvEdit);
+        Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false);
+        final WaypointAdapter adapter = new WaypointAdapter(ActivitySettings.this, cursor);
+        lv.setAdapter(adapter);
 
-        else if (PREF_RECOGNITION_INTERVAL.equals(key))
-            pref.setTitle(getString(R.string.title_recognition_interval, prefs.getString(key, PREF_RECOGNITION_INTERVAL)));
+        ImageView ivAdd = (ImageView) viewEdit.findViewById(R.id.ivAdd);
+        ivAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final View viewEdit = inflater.inflate(R.layout.add, null);
+                final EditText address = (EditText) viewEdit.findViewById(R.id.etAdd);
 
-        else if (PREF_BLOGURL.equals(key))
-            pref.setTitle(getString(R.string.title_blogurl, prefs.getString(key, "")));
-        else if (PREF_BLOGID.equals(key))
-            pref.setTitle(getString(R.string.title_blogid, prefs.getString(key, "1")));
-        else if (PREF_BLOGUSER.equals(key))
-            pref.setTitle(getString(R.string.title_bloguser, prefs.getString(key, "")));
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+                alertDialogBuilder.setTitle(R.string.title_geocode);
+                alertDialogBuilder.setView(viewEdit);
+                alertDialogBuilder
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                add(address.getText().toString(), adapter);
+                            }
+                        });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+            }
+        });
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+        alertDialogBuilder.setTitle(R.string.title_edit);
+        alertDialogBuilder.setView(viewEdit);
+        alertDialogBuilder
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+        // Fix keyboard input
+        alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
     }
 
-    private void getRange(final Intent intent, final SharedPreferences prefs) {
+    private void add(String name, final WaypointAdapter adapter) {
+        try {
+            Geocoder geocoder = new Geocoder(ActivitySettings.this);
+            final List<Address> listAddress = geocoder.getFromLocationName(name, 3);
+            if (listAddress != null && listAddress.size() > 0) {
+                final CharSequence[] address = getAddressLines(listAddress);
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+                alertDialogBuilder.setTitle(getString(R.string.title_geocode));
+                alertDialogBuilder.setItems(address, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int item) {
+                        if (listAddress.get(item).hasLatitude() && listAddress.get(item).hasLongitude()) {
+                            // Build location
+                            String name = (String) address[item];
+                            Location location = new Location("Geocoded");
+                            location.setLatitude(listAddress.get(item).getLatitude());
+                            location.setLongitude(listAddress.get(item).getLongitude());
+                            location.setTime(System.currentTimeMillis());
+                            new DatabaseHelper(ActivitySettings.this).insert(location, name);
+                            Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false);
+                            adapter.changeCursor(cursor);
+                            Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, name), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing
+                    }
+                });
+                alertDialogBuilder.show();
+            }
+        } catch (IOException ex) {
+            Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            Toast.makeText(ActivitySettings.this, ex.toString(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void export(final Intent intent) {
+        final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.export, null);
 
@@ -566,6 +475,38 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         alertDialog.show();
     }
 
+    private void updateTitle(SharedPreferences prefs, String key) {
+        Preference pref = findPreference(key);
+
+        if (PREF_SHARE.equals(key))
+            pref.setSummary(getString(R.string.summary_share, prefs.getString(PREF_LAST_SHARE, getString(R.string.msg_never))));
+        else if (PREF_UPLOAD.equals(key))
+            pref.setSummary(getString(R.string.summary_upload, prefs.getString(PREF_LAST_UPLOAD, getString(R.string.msg_never))));
+
+        else if (PREF_FREQUENCY.equals(key))
+            pref.setTitle(getString(R.string.title_frequency, prefs.getString(key, DEFAULT_FREQUENCY)));
+        else if (PREF_ALTITUDE.equals(key))
+            pref.setSummary(prefs.getBoolean(PREF_ALTITUDE, true) ? getString(R.string.summary_altitude) : null);
+        else if (PREF_ACCURACY.equals(key))
+            pref.setTitle(getString(R.string.title_accuracy, prefs.getString(key, DEFAULT_ACCURACY)));
+        else if (PREF_TIMEOUT.equals(key))
+            pref.setTitle(getString(R.string.title_timeout, prefs.getString(key, DEFAULT_TIMEOUT)));
+        else if (PREF_INACCURATE.equals(key))
+            pref.setTitle(getString(R.string.title_inaccurate, prefs.getString(key, DEFAULT_INACCURATE)));
+        else if (PREF_NEARBY.equals(key))
+            pref.setTitle(getString(R.string.title_nearby, prefs.getString(key, DEFAULT_NEARBY)));
+
+        else if (PREF_RECOGNITION_INTERVAL.equals(key))
+            pref.setTitle(getString(R.string.title_recognition_interval, prefs.getString(key, PREF_RECOGNITION_INTERVAL)));
+
+        else if (PREF_BLOGURL.equals(key))
+            pref.setTitle(getString(R.string.title_blogurl, prefs.getString(key, "")));
+        else if (PREF_BLOGID.equals(key))
+            pref.setTitle(getString(R.string.title_blogid, prefs.getString(key, "1")));
+        else if (PREF_BLOGUSER.equals(key))
+            pref.setTitle(getString(R.string.title_bloguser, prefs.getString(key, "")));
+    }
+
     private CharSequence[] getAddressLines(final List<Address> lstAddress) {
         final CharSequence[] address = new CharSequence[lstAddress.size()];
         for (int i = 0; i < lstAddress.size(); i++) {
@@ -584,5 +525,83 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             } while (line != null);
         }
         return address;
+    }
+
+    // Help classes
+
+    private class WaypointAdapter extends CursorAdapter {
+        public WaypointAdapter(Context context, Cursor cursor) {
+            super(context, cursor, 0);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            return LayoutInflater.from(context).inflate(R.layout.waypoint, parent, false);
+        }
+
+        @Override
+        public void bindView(View view, Context context, final Cursor cursor) {
+            final int id = cursor.getInt(cursor.getColumnIndex("ID"));
+            final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
+            final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
+            final String name = cursor.getString(cursor.getColumnIndex("name"));
+            final EditText etName = (EditText) view.findViewById(R.id.etName);
+
+            // Set waypoint name
+            etName.setText(name);
+
+            // Handle share location
+            ImageView ivShare = (ImageView) view.findViewById(R.id.ivShare);
+            ivShare.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude;
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
+                    } catch (Throwable ex) {
+                        Toast.makeText(ActivitySettings.this, ex.toString(), Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+
+            // Handle update name
+            ImageView ivSave = (ImageView) view.findViewById(R.id.ivSave);
+            ivSave.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String newName = etName.getText().toString();
+                    new DatabaseHelper(ActivitySettings.this).update(id, newName);
+                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_updated, newName), Toast.LENGTH_LONG).show();
+                }
+            });
+
+            // Handle delete waypoint
+            ImageView ivDelete = (ImageView) view.findViewById(R.id.ivDelete);
+            ivDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+                    alertDialogBuilder.setTitle(getString(R.string.msg_delete, name));
+                    alertDialogBuilder
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    new DatabaseHelper(ActivitySettings.this).delete(id);
+                                    Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false);
+                                    changeCursor(cursor);
+                                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_deleted, name), Toast.LENGTH_LONG).show();
+                                }
+                            })
+                            .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Ignore
+                                }
+                            });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                }
+            });
+        }
     }
 }

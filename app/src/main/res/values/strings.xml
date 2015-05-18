@@ -7,7 +7,7 @@
     <string name="title_upload">Upload GPX file</string>
     <string name="title_check">Location settings</string>
 
-    <string name="title_geocode">Geocode</string>
+    <string name="title_geocode">Geocode address</string>
 
     <string name="title_tracking">Tracking</string>
     <string name="title_enabled">Tracking enabled</string>
