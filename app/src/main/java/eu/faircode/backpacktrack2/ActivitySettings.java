@@ -175,7 +175,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             }
         });
 
-        Intent downloadIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://earth-info.nga.mil/GandG/wgs84/gravitymod/egm96/binary/WW15MGH.DAC"));
+        Intent downloadIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://earth-info.nga.mil/GandG/wgs84/gravitymod/egm96/binary/binarygeoid.html"));
         if (getPackageManager().queryIntentActivities(downloadIntent, 0).size() > 0)
             pref_download.setIntent(downloadIntent);
         else

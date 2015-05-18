@@ -178,7 +178,7 @@ public class LocationService extends IntentService {
             return;
 
         // Correct altitude
-        String egm96FileName = Environment.getExternalStorageDirectory() + "/Download/" + "/WW15MGH.txt";
+        String egm96FileName = Environment.getExternalStorageDirectory() + "/Download/" + "/WW15MGH.DAC";
         Log.w(TAG, "egm96=" + egm96FileName);
         if (location.hasAltitude() && new File(egm96FileName).exists())
             try {
