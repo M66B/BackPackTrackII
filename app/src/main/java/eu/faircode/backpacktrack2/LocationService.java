@@ -43,7 +43,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -190,10 +189,7 @@ public class LocationService extends IntentService {
         Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
         if (isBetterLocation(bestLocation, location)) {
             Log.w(TAG, "Better location=" + location);
-            showNotification(
-                    getString(R.string.msg_location, location.hasAccuracy() ? Math.round(location.getAccuracy()) : -1),
-                    null,
-                    this);
+            showNotification(getString(R.string.msg_location, location.hasAccuracy() ? Math.round(location.getAccuracy()) : -1), this);
             prefs.edit().putString(ActivitySettings.PREF_BEST_LOCATION, LocationSerializer.serialize(location)).apply();
         }
 
@@ -435,7 +431,7 @@ public class LocationService extends IntentService {
             am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + timeout * 1000, pi);
             Log.w(TAG, "Set timeout=" + timeout + "s");
 
-            showNotification(context.getString(R.string.msg_active), null, context);
+            showNotification(context.getString(R.string.msg_active), context);
         } else
             Log.w(TAG, "No location providers");
     }
@@ -524,18 +520,6 @@ public class LocationService extends IntentService {
             Log.w(TAG, "Filtered location=" + location);
     }
 
-    private static void showIdle(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
-        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
-
-        showNotification(context.getString(R.string.msg_idle,
-                        context.getString(still ? R.string.msg_still : R.string.msg_moving, context),
-                        (lastLocation == null ? "-" : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(lastLocation.getTime())))),
-                TextUtils.join(", ", reverseGeocode(lastLocation, context)),
-                context);
-    }
-
     private static List<String> reverseGeocode(Location location, Context context) {
         List<String> listline = new ArrayList<>();
         if (location != null && Geocoder.isPresent())
@@ -551,7 +535,18 @@ public class LocationService extends IntentService {
         return listline;
     }
 
-    private static void showNotification(String text, String subText, Context context) {
+    private static void showIdle(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
+        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+
+        showNotification(context.getString(R.string.msg_idle,
+                        context.getString(still ? R.string.msg_still : R.string.msg_moving, context),
+                        (lastLocation == null ? "-" : new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(lastLocation.getTime())))),
+                context);
+    }
+
+    private static void showNotification(String text, Context context) {
         // Build intent
         Intent riSettings = new Intent(context, ActivitySettings.class);
         riSettings.setAction("android.intent.action.MAIN");
@@ -581,7 +576,6 @@ public class LocationService extends IntentService {
         notificationBuilder.setContentTitle(context.getString(R.string.app_name));
         notificationBuilder.setContentText(text);
         notificationBuilder.setContentIntent(piSettings);
-        notificationBuilder.setSubText(subText);
         notificationBuilder.setWhen(System.currentTimeMillis());
         notificationBuilder.setAutoCancel(false);
         notificationBuilder.setOngoing(true);
