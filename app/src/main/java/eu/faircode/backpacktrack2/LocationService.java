@@ -85,6 +85,8 @@ public class LocationService extends IntentService {
     private static final int LOCATION_WAYPOINT = 2;
     private static final int LOCATION_PERIODIC = 3;
 
+    private static EGM96 egm96 = null;
+
     public LocationService() {
         super(TAG);
     }
@@ -182,8 +184,8 @@ public class LocationService extends IntentService {
         Log.w(TAG, "egm96=" + egm96FileName);
         if (location.hasAltitude() && new File(egm96FileName).exists())
             try {
-                // http://earth-info.nga.mil/GandG/wgs84/gravitymod/egm96/binary/binarygeoid.html
-                EGM96 egm96 = new EGM96(egm96FileName);
+                if (egm96 == null)
+                    egm96 = new EGM96(egm96FileName);
                 LatLon latlon = LatLon.fromDegrees(location.getLatitude(), location.getLongitude());
                 double offset = egm96.getOffset(latlon.getLatitude(), latlon.getLongitude());
                 Log.w(TAG, "Offset=" + offset);
