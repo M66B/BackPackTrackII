@@ -20,6 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE location (" +
                 " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
                 ", time INTEGER NOT NULL" +
+                ", provider INTEGER NOT NULL" +
                 ", latitude REAL NOT NULL" +
                 ", longitude REAL NOT NULL" +
                 ", altitude REAL NULL" +
@@ -40,6 +41,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         ContentValues cv = new ContentValues();
         cv.put("time", location.getTime());
+        cv.put("provider", location.getProvider());
         cv.put("latitude", location.getLatitude());
         cv.put("longitude", location.getLongitude());
 

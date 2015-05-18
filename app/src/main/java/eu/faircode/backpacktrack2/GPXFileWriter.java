@@ -48,6 +48,8 @@ public class GPXFileWriter {
 
             out.append("\t\t\t\t" + "<extensions>\n");
 
+            if (!c.isNull(c.getColumnIndex("provider")))
+                out.append("\t\t\t\t\t" + "<provider>" + c.getString(c.getColumnIndex("provider")) + "</provider>" + "\n");
             if (!c.isNull(c.getColumnIndex("speed")))
                 out.append("\t\t\t\t\t" + "<speed>" + c.getString(c.getColumnIndex("speed")) + "</speed>" + "\n");
             if (!c.isNull(c.getColumnIndex("bearing")))
@@ -80,6 +82,9 @@ public class GPXFileWriter {
             out.append("\t\t" + "<name>" + c.getString(c.getColumnIndex("name")) + "</name>" + "\n");
 
             out.append("\t\t\t" + "<extensions>\n");
+
+            if (!c.isNull(c.getColumnIndex("provider")))
+                out.append("\t\t\t\t" + "<provider>" + c.getString(c.getColumnIndex("provider")) + "</provider>" + "\n");
 
             if (!c.isNull(c.getColumnIndex("speed")))
                 out.append("\t\t\t\t" + "<speed>" + c.getString(c.getColumnIndex("speed")) + "</speed>" + "\n");

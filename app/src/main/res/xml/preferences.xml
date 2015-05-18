@@ -33,7 +33,7 @@
             android:key="pref_altitude"
             android:title="@string/title_altitude" />
         <EditTextPreference
-            android:defaultValue="50"
+            android:defaultValue="25"
             android:inputType="number"
             android:key="pref_accuracy"
             android:summary="@string/summary_accuracy" />
@@ -43,7 +43,7 @@
             android:key="pref_timeout"
             android:summary="@string/summary_timeout" />
         <EditTextPreference
-            android:defaultValue="1500"
+            android:defaultValue="100"
             android:inputType="number"
             android:key="pref_inaccurate"
             android:summary="@string/summary_inaccurate" />

@@ -307,7 +307,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                     public void onClick(DialogInterface dialog, int item) {
                         // Build location
                         String name = (String) listAddressLine.get(item);
-                        Location location = new Location("Geocoded");
+                        Location location = new Location("geocoder");
                         location.setLatitude(listAddress.get(item).getLatitude());
                         location.setLongitude(listAddress.get(item).getLongitude());
                         location.setTime(System.currentTimeMillis());
