@@ -112,7 +112,7 @@ public class LocationService extends IntentService {
             handleUpload(intent);
     }
 
-    // Handle intents
+    // Handle intents methods
 
     private void handleActivity(Intent intent) {
         // Get last activity
@@ -145,9 +145,12 @@ public class LocationService extends IntentService {
     }
 
     private void handleLocationRequest(Intent intent) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // Guarantee fresh location
+        if (ACTION_TRACKPOINT.equals(intent.getAction()) || ACTION_WAYPOINT.equals((intent.getAction())))
+            stopLocating(this);
 
         // Persist location type
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (ACTION_TRACKPOINT.equals(intent.getAction()))
             prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_TRACKPOINT).apply();
         else if (ACTION_WAYPOINT.equals((intent.getAction())))
@@ -156,15 +159,12 @@ public class LocationService extends IntentService {
             prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_PERIODIC).apply();
 
         // Try to acquire a new location
-        if (ACTION_TRACKPOINT.equals(intent.getAction()) || ACTION_WAYPOINT.equals((intent.getAction())))
-            stopLocating(this); // Guarantee fresh location
         startLocating(this);
     }
 
     private void handleLocationUpdate(Intent intent) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-
         // Process location update
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         int locationType = prefs.getInt(ActivitySettings.PREF_LOCATION_TYPE, -1);
         Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
         Log.w(TAG, "Update location=" + location + " type=" + locationType);
@@ -233,7 +233,6 @@ public class LocationService extends IntentService {
     }
 
     private void handleShare(Intent intent) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         try {
             // Write GPX file
             String trackName = intent.getStringExtra(EXTRA_TRACK);
@@ -249,6 +248,7 @@ public class LocationService extends IntentService {
             startActivity(viewIntent);
 
             // Persist last share time
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
             prefs.edit().putString(ActivitySettings.PREF_LAST_SHARE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date())).apply();
         } catch (Throwable ex) {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
@@ -257,7 +257,6 @@ public class LocationService extends IntentService {
     }
 
     private void handleUpload(Intent intent) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         try {
             // Write GPX file
             String trackName = intent.getStringExtra(EXTRA_TRACK);
@@ -273,6 +272,7 @@ public class LocationService extends IntentService {
             in.close();
 
             // Create XML-RPC client
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
             String blogUrl = prefs.getString(ActivitySettings.PREF_BLOGURL, "");
             int blogId = Integer.parseInt(prefs.getString(ActivitySettings.PREF_BLOGID, "1"));
             String userName = prefs.getString(ActivitySettings.PREF_BLOGUSER, "");
@@ -303,7 +303,7 @@ public class LocationService extends IntentService {
         }
     }
 
-    // Start/stop
+    // Start/stop methods
 
     public static void startTracking(final Context context) {
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -478,26 +478,28 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         float pref_nearby = Float.parseFloat(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
-        if (locationType == LOCATION_TRACKPOINT ||
-                locationType == LOCATION_WAYPOINT ||
+        if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT ||
                 lastLocation == null || lastLocation.distanceTo(location) >= pref_nearby) {
-            // Store new location
+            // New location
             Log.w(TAG, "New location=" + location + " type=" + locationType);
 
+            // Get waypoint name
             String waypointName = null;
             if (locationType == LOCATION_WAYPOINT) {
                 List<String> listAddress = reverseGeocode(location, this);
                 if (listAddress == null || listAddress.size() == 0)
                     waypointName = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
                 else
-                    waypointName = listAddress.get(0);
+                    waypointName = TextUtils.join(", ", listAddress);
             }
 
+            // Persist new location
             new DatabaseHelper(this).insert(location, waypointName);
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
 
             // Feedback
             if (locationType == LOCATION_WAYPOINT) {
+                notify(waypointName, this);
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(500);
             }
