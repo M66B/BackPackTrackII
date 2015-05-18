@@ -84,16 +84,17 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
     public static final String DEFAULT_RECOGNITION_INTERVAL = "1"; // minutes
 
-    // Transient
+    // Transient values
     public static final String PREF_ACTIVE = "pref_active";
     public static final String PREF_LOCATION_TYPE = "pref_location_type";
-    public static final String PREF_LAST_ACTIVITY = "pref_last_activity";
     public static final String PREF_BEST_LOCATION = "pref_best_location";
+
+    // Remember last values
+    public static final String PREF_LAST_ACTIVITY = "pref_last_activity";
     public static final String PREF_LAST_LOCATION = "pref_last_location";
     public static final String PREF_LAST_SHARE = "pref_last_share";
     public static final String PREF_LAST_UPLOAD = "pref_last_upload";
 
-    // Remember
     public static final String PREF_LAST_TRACK = "pref_last_track";
     public static final String PREF_LAST_FROM = "pref_last_from";
     public static final String PREF_LAST_TO = "pref_last_to";
@@ -141,7 +142,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_BLOGID);
         updateTitle(prefs, PREF_BLOGUSER);
 
-        // Edit waypoints
+        // Handle edit waypoints
         pref_edit.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -150,7 +151,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             }
         });
 
-        // Share GPX
+        // Handle share GPX
         pref_share.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -161,7 +162,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             }
         });
 
-        // Upload GPX
+        // Handle upload GPX
         pref_upload.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -172,14 +173,14 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             }
         });
 
-        // Location settings
+        // Handle location settings
         Intent locationSettingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         if (getPackageManager().queryIntentActivities(locationSettingsIntent, 0).size() > 0)
             pref_check.setIntent(locationSettingsIntent);
         else
             pref_check.setEnabled(false);
 
-        // Version
+        // Handle version
         Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
         if (getPackageManager().queryIntentActivities(playStoreIntent, 0).size() > 0)
             pref_version.setIntent(playStoreIntent);
@@ -228,7 +229,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Update preference titles
         updateTitle(prefs, key);
 
-        // Restart tracking when needed
+        // Restart tracking if needed
         if (PREF_ENABLED.equals(key) ||
                 PREF_FREQUENCY.equals(key) ||
                 PREF_ALTITUDE.equals(key) ||
@@ -246,14 +247,17 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     // Helper methods
 
     private void edit() {
+        // Get layout
         final LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
         final View viewEdit = inflater.inflate(R.layout.edit, null);
 
+        // Fill list
         ListView lv = (ListView) viewEdit.findViewById(R.id.lvEdit);
         Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false);
         final WaypointAdapter adapter = new WaypointAdapter(ActivitySettings.this, cursor);
         lv.setAdapter(adapter);
 
+        // Handle add
         ImageView ivAdd = (ImageView) viewEdit.findViewById(R.id.ivAdd);
         ivAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -276,6 +280,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             }
         });
 
+        // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
         alertDialogBuilder.setTitle(R.string.title_edit);
         alertDialogBuilder.setView(viewEdit);
@@ -294,8 +299,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     private void add(String name, final WaypointAdapter adapter) {
         try {
+            // Geocode name
             Geocoder geocoder = new Geocoder(ActivitySettings.this);
             final List<Address> listAddress = geocoder.getFromLocationName(name, 3);
+
+            // Get address lines
             if (listAddress != null && listAddress.size() > 0) {
                 final List<CharSequence> listAddressLine = new ArrayList<>();
                 for (Address address : listAddress)
@@ -306,24 +314,25 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                         listAddressLine.add(TextUtils.join(", ", listLine));
                     }
 
+                // Show address selector
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
                 alertDialogBuilder.setTitle(getString(R.string.title_geocode));
                 alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int item) {
                         // Build location
-                        String name = (String) listAddressLine.get(item);
+                        String geocodedName = (String) listAddressLine.get(item);
                         Location location = new Location("geocoder");
                         location.setLatitude(listAddress.get(item).getLatitude());
                         location.setLongitude(listAddress.get(item).getLongitude());
                         location.setTime(System.currentTimeMillis());
 
                         // Persist location
-                        new DatabaseHelper(ActivitySettings.this).insert(location, name);
+                        new DatabaseHelper(ActivitySettings.this).insert(location, geocodedName);
 
                         // Feedback
                         Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false);
                         adapter.changeCursor(cursor);
-                        Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, name), Toast.LENGTH_LONG).show();
+                        Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, geocodedName), Toast.LENGTH_LONG).show();
                     }
                 });
                 alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -333,7 +342,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                     }
                 });
                 alertDialogBuilder.show();
-            }
+            } else
+                Toast.makeText(ActivitySettings.this, getString(R.string.msg_noaddress, name), Toast.LENGTH_LONG).show();
         } catch (IOException ex) {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             Toast.makeText(ActivitySettings.this, ex.toString(), Toast.LENGTH_LONG).show();
@@ -343,9 +353,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     private void export(final Intent intent) {
         final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
+        // Get layout
         LayoutInflater inflater = LayoutInflater.from(this);
         View view = inflater.inflate(R.layout.export, null);
 
+        // Reference controls
         final TextView tvTrackName = (TextView) view.findViewById(R.id.tvTrackName);
         Button btnDateFrom = (Button) view.findViewById(R.id.btnDateFrom);
         Button btnTimeFrom = (Button) view.findViewById(R.id.btnTimeFrom);
@@ -357,12 +369,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         final TextView tvTimeTo = (TextView) view.findViewById(R.id.tvTimeTo);
         final boolean ampm = android.text.format.DateFormat.is24HourFormat(this);
 
+        // Set last track name
         tvTrackName.setText(prefs.getString(PREF_LAST_TRACK, "BackPackTrack"));
 
-        final Calendar from = GregorianCalendar.getInstance();
-        final Calendar to = GregorianCalendar.getInstance();
-
-        // Default from
+        // Get default from
         Calendar defaultFrom = Calendar.getInstance();
         defaultFrom.set(Calendar.YEAR, 1970);
         defaultFrom.set(Calendar.MONTH, Calendar.JANUARY);
@@ -370,7 +380,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         defaultFrom.set(Calendar.HOUR_OF_DAY, 0);
         defaultFrom.set(Calendar.MINUTE, 0);
 
-        // Default to
+        // Get default to
         Calendar defaultTo = Calendar.getInstance();
         defaultTo.set(Calendar.YEAR, 2100);
         defaultTo.set(Calendar.MONTH, Calendar.JANUARY);
@@ -378,9 +388,14 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         defaultTo.set(Calendar.HOUR_OF_DAY, 0);
         defaultTo.set(Calendar.MINUTE, 0);
 
+        // Get range
+        final Calendar from = GregorianCalendar.getInstance();
+        final Calendar to = GregorianCalendar.getInstance();
+
         from.setTime(new Date(prefs.getLong(PREF_LAST_FROM, defaultFrom.getTimeInMillis())));
         to.setTime(new Date(prefs.getLong(PREF_LAST_TO, defaultTo.getTimeInMillis())));
 
+        // Show range
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
 
@@ -467,6 +482,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             }
         });
 
+        // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         alertDialogBuilder.setTitle(R.string.title_export);
         alertDialogBuilder.setView(view);

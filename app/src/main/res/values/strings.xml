@@ -81,4 +81,5 @@
     <string name="msg_delete">Delete \'%s\' ?</string>
     <string name="msg_deleted">Deleted \'%s\'</string>
     <string name="msg_uploaded">Uploaded \'%s\'</string>
+    <string name="msg_noaddress">Address \'%s\' not found</string>
 </resources>
