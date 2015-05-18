@@ -38,14 +38,13 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import org.xmlrpc.android.XMLRPCClient;
-
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -53,6 +52,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import de.timroes.axmlrpc.XMLRPCClient;
 
 public class LocationService extends IntentService {
     private static final String TAG = "BPT2.Service";
@@ -274,14 +275,15 @@ public class LocationService extends IntentService {
             in.readFully(bytes);
             in.close();
 
-            // Create XML-RPC client
+            // Get parameters
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
             String blogUrl = prefs.getString(ActivitySettings.PREF_BLOGURL, "");
             int blogId = Integer.parseInt(prefs.getString(ActivitySettings.PREF_BLOGID, "1"));
             String userName = prefs.getString(ActivitySettings.PREF_BLOGUSER, "");
             String passWord = prefs.getString(ActivitySettings.PREF_BLOGPWD, "");
-            URI uri = URI.create(blogUrl + "xmlrpc.php");
-            XMLRPCClient xmlrpc = new XMLRPCClient(uri, userName, passWord);
+
+            // Create XML-RPC client
+            XMLRPCClient client = new XMLRPCClient(new URL(blogUrl + "xmlrpc.php"));
 
             // Create upload parameters
             Map<String, Object> args = new HashMap<>();
@@ -291,14 +293,15 @@ public class LocationService extends IntentService {
             args.put("overwrite", true);
             Object[] params = {blogId, userName, passWord, args};
 
-            // Upload file
-            HashMap<Object, Object> result = (HashMap<Object, Object>) xmlrpc.call("bpt.upload", params);
+            // Call
+            HashMap<Object, Object> result = (HashMap<Object, Object>) client.call("bpt.upload", params);
+            String url = result.get("url").toString();
+            Log.w(TAG, "Uploaded url=" + url);
 
             // Persist last upload time
             prefs.edit().putString(ActivitySettings.PREF_LAST_UPLOAD, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date())).apply();
 
             // Feedback
-            String url = result.get("url").toString();
             toast(getString(R.string.msg_uploaded, url), this);
             Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(500);
