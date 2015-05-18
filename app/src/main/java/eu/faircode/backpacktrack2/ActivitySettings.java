@@ -217,7 +217,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Update blog URL
         if (PREF_BLOGURL.equals(key)) {
             String blogurl = prefs.getString(key, null);
-            if (blogurl != null && blogurl.length() > 0) {
+            if (blogurl != null) {
                 if (!blogurl.startsWith("http://") && !blogurl.startsWith("https://"))
                     blogurl = "http://" + blogurl;
                 if (!blogurl.endsWith("/"))
@@ -533,9 +533,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         else if (PREF_RECOGNITION_INTERVAL.equals(key))
             pref.setTitle(getString(R.string.title_recognition_interval, prefs.getString(key, PREF_RECOGNITION_INTERVAL)));
 
-        else if (PREF_BLOGURL.equals(key))
+        else if (PREF_BLOGURL.equals(key)) {
             pref.setTitle(getString(R.string.title_blogurl, prefs.getString(key, "-")));
-        else if (PREF_BLOGID.equals(key))
+            Preference pref_upload = findPreference(PREF_UPLOAD);
+            pref_upload.setEnabled(prefs.getString(key, null) != null);
+        } else if (PREF_BLOGID.equals(key))
             pref.setTitle(getString(R.string.title_blogid, prefs.getString(key, "1")));
         else if (PREF_BLOGUSER.equals(key))
             pref.setTitle(getString(R.string.title_bloguser, prefs.getString(key, "-")));
