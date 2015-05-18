@@ -57,6 +57,7 @@ import java.util.Map;
 public class LocationService extends IntentService {
     private static final String TAG = "BPT2.Service";
 
+    // Actions
     public static final String ACTION_ALARM = "Alarm";
     public static final String ACTION_ACTIVITY = "Activity";
     public static final String ACTION_LOCATION_FINE = "LocationFine";
@@ -68,10 +69,12 @@ public class LocationService extends IntentService {
     public static final String ACTION_SHARE = "Share";
     public static final String ACTION_UPLOAD = "Upload";
 
+    // Extras
     public static final String EXTRA_TRACK = "Track";
     public static final String EXTRA_FROM = "From";
     public static final String EXTRA_TO = "To";
 
+    // Constants
     private static final int LOCATION_MIN_TIME = 1000; // milliseconds
     private static final int LOCATION_MIN_DISTANCE = 1; // meters
 
@@ -252,7 +255,7 @@ public class LocationService extends IntentService {
             prefs.edit().putString(ActivitySettings.PREF_LAST_SHARE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date())).apply();
         } catch (Throwable ex) {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            notify(ex.toString(), this);
+            toast(ex.toString(), this);
         }
     }
 
@@ -296,12 +299,12 @@ public class LocationService extends IntentService {
 
             // Feedback
             String url = result.get("url").toString();
-            notify(getString(R.string.msg_uploaded, url), this);
+            toast(getString(R.string.msg_uploaded, url), this);
             Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(500);
         } catch (Throwable ex) {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            notify(ex.toString(), this);
+            toast(ex.toString(), this);
         }
     }
 
@@ -507,7 +510,7 @@ public class LocationService extends IntentService {
 
             // Feedback
             if (locationType == LOCATION_WAYPOINT) {
-                notify(waypointName, this);
+                toast(waypointName, this);
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(500);
             }
@@ -608,7 +611,7 @@ public class LocationService extends IntentService {
         return gpxFileName;
     }
 
-    private static void notify(final String text, final Context context) {
+    private static void toast(final String text, final Context context) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
