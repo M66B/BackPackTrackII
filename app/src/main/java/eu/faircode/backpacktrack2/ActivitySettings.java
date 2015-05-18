@@ -21,6 +21,7 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,6 +39,7 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -290,24 +292,33 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             Geocoder geocoder = new Geocoder(ActivitySettings.this);
             final List<Address> listAddress = geocoder.getFromLocationName(name, 3);
             if (listAddress != null && listAddress.size() > 0) {
-                final CharSequence[] address = getAddressLines(listAddress);
+                final List<CharSequence> listAddressLine = new ArrayList<>();
+                for (Address address : listAddress)
+                    if (address.hasLatitude() && address.hasLongitude()) {
+                        List<String> listLine = new ArrayList<>();
+                        for (int l = 0; l < address.getMaxAddressLineIndex(); l++)
+                            listLine.add(address.getAddressLine(l));
+                        listAddressLine.add(TextUtils.join(", ", listLine));
+                    }
 
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
                 alertDialogBuilder.setTitle(getString(R.string.title_geocode));
-                alertDialogBuilder.setItems(address, new DialogInterface.OnClickListener() {
+                alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int item) {
-                        if (listAddress.get(item).hasLatitude() && listAddress.get(item).hasLongitude()) {
-                            // Build location
-                            String name = (String) address[item];
-                            Location location = new Location("Geocoded");
-                            location.setLatitude(listAddress.get(item).getLatitude());
-                            location.setLongitude(listAddress.get(item).getLongitude());
-                            location.setTime(System.currentTimeMillis());
-                            new DatabaseHelper(ActivitySettings.this).insert(location, name);
-                            Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false);
-                            adapter.changeCursor(cursor);
-                            Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, name), Toast.LENGTH_LONG).show();
-                        }
+                        // Build location
+                        String name = (String) listAddressLine.get(item);
+                        Location location = new Location("Geocoded");
+                        location.setLatitude(listAddress.get(item).getLatitude());
+                        location.setLongitude(listAddress.get(item).getLongitude());
+                        location.setTime(System.currentTimeMillis());
+
+                        // Persist location
+                        new DatabaseHelper(ActivitySettings.this).insert(location, name);
+
+                        // Feedback
+                        Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false);
+                        adapter.changeCursor(cursor);
+                        Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, name), Toast.LENGTH_LONG).show();
                     }
                 });
                 alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -346,6 +357,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         final Calendar from = GregorianCalendar.getInstance();
         final Calendar to = GregorianCalendar.getInstance();
 
+        // Default from
         Calendar defaultFrom = Calendar.getInstance();
         defaultFrom.set(Calendar.YEAR, 1970);
         defaultFrom.set(Calendar.MONTH, Calendar.JANUARY);
@@ -353,6 +365,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         defaultFrom.set(Calendar.HOUR_OF_DAY, 0);
         defaultFrom.set(Calendar.MINUTE, 0);
 
+        // Default to
         Calendar defaultTo = Calendar.getInstance();
         defaultTo.set(Calendar.YEAR, 2100);
         defaultTo.set(Calendar.MONTH, Calendar.JANUARY);
@@ -505,26 +518,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref.setTitle(getString(R.string.title_blogid, prefs.getString(key, "1")));
         else if (PREF_BLOGUSER.equals(key))
             pref.setTitle(getString(R.string.title_bloguser, prefs.getString(key, "")));
-    }
-
-    private CharSequence[] getAddressLines(final List<Address> lstAddress) {
-        final CharSequence[] address = new CharSequence[lstAddress.size()];
-        for (int i = 0; i < lstAddress.size(); i++) {
-            int j = 0;
-            String line = null;
-            do {
-                line = lstAddress.get(i).getAddressLine(j);
-                if (line == null) {
-                    if (j == 0)
-                        address[i] = lstAddress.get(i).toString();
-                } else if (j == 0)
-                    address[i] = line;
-                else
-                    address[i] = address[i] + ", " + line;
-                j++;
-            } while (line != null);
-        }
-        return address;
     }
 
     // Help classes
