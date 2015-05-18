@@ -306,9 +306,10 @@ public class LocationService extends IntentService {
     // Start/stop methods
 
     public static void startTracking(final Context context) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Log.w(TAG, "Start tracking");
 
         // Check if enabled
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         if (!prefs.getBoolean(ActivitySettings.PREF_ENABLED, ActivitySettings.DEFAULT_ENABLED)) {
             Log.w(TAG, "Tracking disabled");
             return;
@@ -319,6 +320,8 @@ public class LocationService extends IntentService {
         boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
         if (!recognition || !still)
             startRepeatingAlarm(context);
+
+        showIdle(context);
 
         // Request activity updates
         if (recognition)
@@ -336,12 +339,14 @@ public class LocationService extends IntentService {
                     Log.w(TAG, "Activity updates frequency=" + interval + "m");
                 }
             }).start();
-
-        showIdle(context);
     }
 
     public static void stopTracking(final Context context) {
+        Log.w(TAG, "Stop tracking");
+
         stopRepeatingAlarm(context);
+        stopLocating(context);
+        cancelNotification(context);
 
         // Cancel activity updates
         new Thread(new Runnable() {
@@ -357,9 +362,6 @@ public class LocationService extends IntentService {
                 Log.w(TAG, "Canceled activity updates");
             }
         }).start();
-
-        stopLocating(context);
-        cancelNotification(context);
     }
 
     private static void startRepeatingAlarm(Context context) {
@@ -371,7 +373,7 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int frequency = Integer.parseInt(prefs.getString(ActivitySettings.PREF_FREQUENCY, ActivitySettings.DEFAULT_FREQUENCY));
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 1000, frequency * 60 * 1000, pi);
-        Log.w(TAG, "Set repeating alarm frequency=" + frequency + "m");
+        Log.w(TAG, "Start repeating alarm frequency=" + frequency + "m");
     }
 
     private static void stopRepeatingAlarm(Context context) {
@@ -381,10 +383,12 @@ public class LocationService extends IntentService {
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
-        Log.w(TAG, "Canceled repeating alarm");
+        Log.w(TAG, "Stop repeating alarm");
     }
 
     private static void startLocating(Context context) {
+        Log.w(TAG, "Start locating");
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
@@ -429,6 +433,9 @@ public class LocationService extends IntentService {
     }
 
     private static void stopLocating(Context context) {
+        Log.w(TAG, "Stop locating");
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         // Cancel coarse location updates
@@ -456,7 +463,6 @@ public class LocationService extends IntentService {
             am.cancel(pi);
         }
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         prefs.edit().remove(ActivitySettings.PREF_ACTIVE).apply();
         prefs.edit().remove(ActivitySettings.PREF_LOCATION_TYPE).apply();
         prefs.edit().remove(ActivitySettings.PREF_BEST_LOCATION).apply();

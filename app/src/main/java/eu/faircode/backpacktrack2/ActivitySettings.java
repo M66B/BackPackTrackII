@@ -213,11 +213,16 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             if ("".equals(prefs.getString(key, null)))
                 prefs.edit().remove(key).apply();
 
-        // Add trailing slash to blog URL
+        // Update blog URL
         if (PREF_BLOGURL.equals(key)) {
             String blogurl = prefs.getString(key, null);
-            if (blogurl != null && blogurl.length() > 0 && !blogurl.endsWith("/"))
-                prefs.edit().putString(key, blogurl + "/").apply();
+            if (blogurl != null && blogurl.length() > 0) {
+                if (!blogurl.startsWith("http://") && !blogurl.startsWith("https://"))
+                    blogurl = "http://" + blogurl;
+                if (!blogurl.endsWith("/"))
+                    blogurl += "/";
+                prefs.edit().putString(key, blogurl).apply();
+            }
         }
 
         // Update preference titles
@@ -513,11 +518,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref.setTitle(getString(R.string.title_recognition_interval, prefs.getString(key, PREF_RECOGNITION_INTERVAL)));
 
         else if (PREF_BLOGURL.equals(key))
-            pref.setTitle(getString(R.string.title_blogurl, prefs.getString(key, "")));
+            pref.setTitle(getString(R.string.title_blogurl, prefs.getString(key, "-")));
         else if (PREF_BLOGID.equals(key))
             pref.setTitle(getString(R.string.title_blogid, prefs.getString(key, "1")));
         else if (PREF_BLOGUSER.equals(key))
-            pref.setTitle(getString(R.string.title_bloguser, prefs.getString(key, "")));
+            pref.setTitle(getString(R.string.title_bloguser, prefs.getString(key, "-")));
     }
 
     // Help classes
