@@ -24,5 +24,4 @@ dependencies {
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.google.android.gms:play-services-location:7.3.0'
     compile 'de.timroes:aXMLRPC:1.8.0'
-    compile 'gov.nasa:worldwind:2.0.0-986'
 }
