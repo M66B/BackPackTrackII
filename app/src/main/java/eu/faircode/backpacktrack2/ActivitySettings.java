@@ -274,7 +274,16 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                add(address.getText().toString(), adapter);
+                                String name = address.getText().toString();
+                                if (!TextUtils.isEmpty(name))
+                                    add(name, adapter);
+                            }
+                        });
+                alertDialogBuilder
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Do nothing
                             }
                         });
                 AlertDialog alertDialog = alertDialogBuilder.create();
@@ -301,7 +310,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     private void add(final String name, final WaypointAdapter adapter) {
         // Geocode name
-        Toast.makeText(this, getString(R.string.msg_rgeocoding, name), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getString(R.string.msg_geocoding, name), Toast.LENGTH_LONG).show();
 
         new AsyncTask<String, Object, List<Address>>() {
             protected List<Address> doInBackground(String... params) {
