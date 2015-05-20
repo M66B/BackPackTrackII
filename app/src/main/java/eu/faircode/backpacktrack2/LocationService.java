@@ -594,7 +594,7 @@ public class LocationService extends IntentService {
         }
     }
 
-    private static List<String> reverseGeocode(Location location, Context context) {
+    public static List<String> reverseGeocode(Location location, Context context) {
         List<String> listline = new ArrayList<>();
         if (location != null && Geocoder.isPresent())
             try {

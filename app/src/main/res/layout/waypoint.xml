@@ -23,6 +23,14 @@
         android:textAppearance="?android:attr/textAppearance" />
 
     <ImageView
+        android:id="@+id/ivGeocode"
+        android:layout_width="32dip"
+        android:layout_height="?android:attr/listPreferredItemHeightSmall"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="12dp"
+        android:src="@android:drawable/ic_menu_mylocation" />
+
+    <ImageView
         android:id="@+id/ivSave"
         android:layout_width="32dip"
         android:layout_height="?android:attr/listPreferredItemHeightSmall"

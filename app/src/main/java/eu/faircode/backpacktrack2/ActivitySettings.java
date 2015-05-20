@@ -44,6 +44,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 public class ActivitySettings extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "BPT2.Settings";
@@ -343,7 +344,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 });
                 alertDialogBuilder.show();
             } else
-                Toast.makeText(ActivitySettings.this, getString(R.string.msg_noaddress, name), Toast.LENGTH_LONG).show();
+                Toast.makeText(ActivitySettings.this, getString(R.string.msg_nolocation, name), Toast.LENGTH_LONG).show();
         } catch (IOException ex) {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             Toast.makeText(ActivitySettings.this, ex.toString(), Toast.LENGTH_LONG).show();
@@ -556,7 +557,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         }
 
         @Override
-        public void bindView(View view, Context context, final Cursor cursor) {
+        public void bindView(final View view, final Context context, final Cursor cursor) {
             final int id = cursor.getInt(cursor.getColumnIndex("ID"));
             final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
             final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
@@ -575,8 +576,24 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                         String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude;
                         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
                     } catch (Throwable ex) {
-                        Toast.makeText(ActivitySettings.this, ex.toString(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG).show();
                     }
+                }
+            });
+
+            // Handle reverse geocode
+            ImageView ivGeocode = (ImageView) view.findViewById(R.id.ivGeocode);
+            ivGeocode.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Location location = new Location("Geocoded");
+                    location.setLatitude(latitude);
+                    location.setLongitude(longitude);
+                    List<String> listAddress = LocationService.reverseGeocode(location, context);
+                    if (listAddress != null && listAddress.size() > 0)
+                        etName.setText(TextUtils.join(", ", listAddress));
+                    else
+                        Toast.makeText(context, getString(R.string.msg_noaddress), Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -586,8 +603,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 @Override
                 public void onClick(View view) {
                     String newName = etName.getText().toString();
-                    new DatabaseHelper(ActivitySettings.this).update(id, newName);
-                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_updated, newName), Toast.LENGTH_LONG).show();
+                    new DatabaseHelper(context).update(id, newName);
+                    Toast.makeText(context, getString(R.string.msg_updated, newName), Toast.LENGTH_LONG).show();
                 }
             });
 
@@ -596,16 +613,16 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             ivDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
                     alertDialogBuilder.setTitle(getString(R.string.msg_delete, name));
                     alertDialogBuilder
                             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    new DatabaseHelper(ActivitySettings.this).delete(id);
-                                    Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false);
+                                    new DatabaseHelper(context).delete(id);
+                                    Cursor cursor = new DatabaseHelper(context).getList(0, Long.MAX_VALUE, false);
                                     changeCursor(cursor);
-                                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_deleted, name), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(context, getString(R.string.msg_deleted, name), Toast.LENGTH_LONG).show();
                                 }
                             })
                             .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
