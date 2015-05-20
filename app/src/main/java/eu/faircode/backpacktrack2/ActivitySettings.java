@@ -16,6 +16,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -298,57 +299,65 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
     }
 
-    private void add(String name, final WaypointAdapter adapter) {
-        try {
-            // Geocode name
-            Geocoder geocoder = new Geocoder(ActivitySettings.this);
-            final List<Address> listAddress = geocoder.getFromLocationName(name, 3);
+    private void add(final String name, final WaypointAdapter adapter) {
+        // Geocode name
+        Toast.makeText(this, getString(R.string.msg_rgeocoding, name), Toast.LENGTH_LONG).show();
 
-            // Get address lines
-            if (listAddress != null && listAddress.size() > 0) {
-                final List<CharSequence> listAddressLine = new ArrayList<>();
-                for (Address address : listAddress)
-                    if (address.hasLatitude() && address.hasLongitude()) {
-                        List<String> listLine = new ArrayList<>();
-                        for (int l = 0; l < address.getMaxAddressLineIndex(); l++)
-                            listLine.add(address.getAddressLine(l));
-                        listAddressLine.add(TextUtils.join(", ", listLine));
-                    }
+        new AsyncTask<String, Object, List<Address>>() {
+            protected List<Address> doInBackground(String... params) {
+                try {
+                    Geocoder geocoder = new Geocoder(ActivitySettings.this);
+                    return geocoder.getFromLocationName(params[0], 3);
+                } catch (IOException ex) {
+                    Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    return null;
+                }
+            }
 
-                // Show address selector
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
-                alertDialogBuilder.setTitle(getString(R.string.title_geocode));
-                alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int item) {
-                        // Build location
-                        String geocodedName = (String) listAddressLine.get(item);
-                        Location location = new Location("geocoder");
-                        location.setLatitude(listAddress.get(item).getLatitude());
-                        location.setLongitude(listAddress.get(item).getLongitude());
-                        location.setTime(System.currentTimeMillis());
+            protected void onPostExecute(final List<Address> listAddress) {
+                // Get address lines
+                if (listAddress != null && listAddress.size() > 0) {
+                    final List<CharSequence> listAddressLine = new ArrayList<>();
+                    for (Address address : listAddress)
+                        if (address.hasLatitude() && address.hasLongitude()) {
+                            List<String> listLine = new ArrayList<>();
+                            for (int l = 0; l < address.getMaxAddressLineIndex(); l++)
+                                listLine.add(address.getAddressLine(l));
+                            listAddressLine.add(TextUtils.join(", ", listLine));
+                        }
 
-                        // Persist location
-                        new DatabaseHelper(ActivitySettings.this).insert(location, geocodedName);
+                    // Show address selector
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+                    alertDialogBuilder.setTitle(getString(R.string.title_geocode));
+                    alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int item) {
+                            // Build location
+                            String geocodedName = (String) listAddressLine.get(item);
+                            Location location = new Location("geocoder");
+                            location.setLatitude(listAddress.get(item).getLatitude());
+                            location.setLongitude(listAddress.get(item).getLongitude());
+                            location.setTime(System.currentTimeMillis());
 
-                        // Feedback
-                        Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false);
-                        adapter.changeCursor(cursor);
-                        Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, geocodedName), Toast.LENGTH_LONG).show();
-                    }
-                });
-                alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                });
-                alertDialogBuilder.show();
-            } else
-                Toast.makeText(ActivitySettings.this, getString(R.string.msg_nolocation, name), Toast.LENGTH_LONG).show();
-        } catch (IOException ex) {
-            Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            Toast.makeText(ActivitySettings.this, ex.toString(), Toast.LENGTH_LONG).show();
-        }
+                            // Persist location
+                            new DatabaseHelper(ActivitySettings.this).insert(location, geocodedName);
+
+                            // Feedback
+                            Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false);
+                            adapter.changeCursor(cursor);
+                            Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, geocodedName), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                    alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Do nothing
+                        }
+                    });
+                    alertDialogBuilder.show();
+                } else
+                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_nolocation, name), Toast.LENGTH_LONG).show();
+            }
+        }.execute(name);
     }
 
     private void export(final Intent intent) {
@@ -586,14 +595,25 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             ivGeocode.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    Toast.makeText(context, getString(R.string.msg_rgeocoding), Toast.LENGTH_LONG).show();
+
                     Location location = new Location("Geocoded");
                     location.setLatitude(latitude);
                     location.setLongitude(longitude);
-                    List<String> listAddress = LocationService.reverseGeocode(location, context);
-                    if (listAddress != null && listAddress.size() > 0)
-                        etName.setText(TextUtils.join(", ", listAddress));
-                    else
-                        Toast.makeText(context, getString(R.string.msg_noaddress), Toast.LENGTH_LONG).show();
+
+                    new AsyncTask<Location, Object, List<String>>() {
+                        protected List<String> doInBackground(Location... params) {
+                            return LocationService.reverseGeocode(params[0], context);
+                        }
+
+                        @Override
+                        protected void onPostExecute(List<String> listAddress) {
+                            if (listAddress != null && listAddress.size() > 0)
+                                etName.setText(TextUtils.join(", ", listAddress));
+                            else
+                                Toast.makeText(context, getString(R.string.msg_noaddress), Toast.LENGTH_LONG).show();
+                        }
+                    }.execute(location);
                 }
             });
 
@@ -602,9 +622,19 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             ivSave.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    String newName = etName.getText().toString();
-                    new DatabaseHelper(context).update(id, newName);
-                    Toast.makeText(context, getString(R.string.msg_updated, newName), Toast.LENGTH_LONG).show();
+                    final String newName = etName.getText().toString();
+
+                    new AsyncTask<String, Object, Object>() {
+                        protected String doInBackground(String... params) {
+                            new DatabaseHelper(context).update(id, params[0]);
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Object result) {
+                            Toast.makeText(context, getString(R.string.msg_updated, newName), Toast.LENGTH_LONG).show();
+                        }
+                    }.execute(newName);
                 }
             });
 
@@ -619,10 +649,19 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    new DatabaseHelper(context).delete(id);
-                                    Cursor cursor = new DatabaseHelper(context).getList(0, Long.MAX_VALUE, false);
-                                    changeCursor(cursor);
-                                    Toast.makeText(context, getString(R.string.msg_deleted, name), Toast.LENGTH_LONG).show();
+                                    new AsyncTask<Integer, Object, Object>() {
+                                        protected String doInBackground(Integer... params) {
+                                            new DatabaseHelper(context).delete(params[0]);
+                                            return null;
+                                        }
+
+                                        @Override
+                                        protected void onPostExecute(Object result) {
+                                            Cursor cursor = new DatabaseHelper(context).getList(0, Long.MAX_VALUE, false);
+                                            changeCursor(cursor);
+                                            Toast.makeText(context, getString(R.string.msg_deleted, name), Toast.LENGTH_LONG).show();
+                                        }
+                                    }.execute(id);
                                 }
                             })
                             .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {

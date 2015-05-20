@@ -83,4 +83,6 @@
     <string name="msg_uploaded">Uploaded \'%s\'</string>
     <string name="msg_nolocation">Address \'%s\' not found</string>
     <string name="msg_noaddress">No address found</string>
+    <string name="msg_geocoding">Geocoding \'%s\' ...</string>
+    <string name="msg_rgeocoding">Reverse geocoding ...</string>
 </resources>
