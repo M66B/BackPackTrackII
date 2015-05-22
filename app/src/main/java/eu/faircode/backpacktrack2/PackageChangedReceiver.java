@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 
-public class PackageChangeReceiver extends BroadcastReceiver {
-    private static final String TAG = "BPT2.PackageChange";
+public class PackageChangedReceiver extends BroadcastReceiver {
+    private static final String TAG = "BPT2.PackageChanged";
 
     @Override
     public void onReceive(final Context context, Intent intent) {

@@ -8,7 +8,7 @@ import android.location.LocationManager;
 import android.util.Log;
 
 public class GeotaggedReceiver extends BroadcastReceiver {
-    private static final String TAG = "BPT2.GeotaggedReceiver";
+    private static final String TAG = "BPT2.Geotagged";
 
     @Override
     public void onReceive(Context context, Intent intent) {

@@ -8,7 +8,7 @@ import android.location.LocationManager;
 import android.util.Log;
 
 public class ProvidersChangedReceiver extends BroadcastReceiver {
-    private static final String TAG = "BPT2.ProvidersChangedReceiver";
+    private static final String TAG = "BPT2.ProvidersChanged";
 
     @Override
     public void onReceive(Context context, Intent intent) {

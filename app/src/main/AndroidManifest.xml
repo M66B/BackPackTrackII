@@ -36,7 +36,7 @@
         </receiver>
 
         <receiver
-            android:name=".PackageChangeReceiver"
+            android:name=".PackageChangedReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.intent.action.PACKAGE_REPLACED" />
