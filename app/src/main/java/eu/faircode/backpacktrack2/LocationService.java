@@ -73,6 +73,7 @@ public class LocationService extends IntentService {
 
     // Extras
     public static final String EXTRA_TRACK = "Track";
+    public static final String EXTRA_EXTENSIONS = "Extensions";
     public static final String EXTRA_FROM = "From";
     public static final String EXTRA_TO = "To";
 
@@ -255,9 +256,10 @@ public class LocationService extends IntentService {
         try {
             // Write GPX file
             String trackName = intent.getStringExtra(EXTRA_TRACK);
+            boolean extensions = intent.getBooleanExtra(EXTRA_EXTENSIONS, false);
             long from = intent.getLongExtra(EXTRA_FROM, 0);
             long to = intent.getLongExtra(EXTRA_TO, 0);
-            String gpxFileName = writeGPXFile(from, to, trackName, this);
+            String gpxFileName = writeGPXFile(trackName, extensions, from, to, this);
 
             // View file
             Intent viewIntent = new Intent();
@@ -279,9 +281,10 @@ public class LocationService extends IntentService {
         try {
             // Write GPX file
             String trackName = intent.getStringExtra(EXTRA_TRACK);
+            boolean extensions = intent.getBooleanExtra(EXTRA_EXTENSIONS, false);
             long from = intent.getLongExtra(EXTRA_FROM, 0);
             long to = intent.getLongExtra(EXTRA_TO, 0);
-            String gpxFileName = writeGPXFile(from, to, trackName, this);
+            String gpxFileName = writeGPXFile(trackName, extensions, from, to, this);
 
             // Get GPX file content
             File gpx = new File(gpxFileName);
@@ -669,7 +672,7 @@ public class LocationService extends IntentService {
         nm.cancel(0);
     }
 
-    private static String writeGPXFile(long from, long to, String trackName, Context context) throws IOException {
+    private static String writeGPXFile(String trackName, boolean extensions, long from, long to, Context context) throws IOException {
         Log.w(TAG, "Writing track=" + trackName + " from=" + from + "to=" + to);
         File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separatorChar + "BackPackTrackII");
         folder.mkdirs();
@@ -678,7 +681,7 @@ public class LocationService extends IntentService {
         DatabaseHelper databaseHelper = new DatabaseHelper(context);
         Cursor trackPoints = databaseHelper.getList(from, to, true);
         Cursor wayPoints = databaseHelper.getList(from, to, false);
-        GPXFileWriter.writeGpxFile(new File(gpxFileName), trackName, trackPoints, wayPoints);
+        GPXFileWriter.writeGpxFile(new File(gpxFileName), trackName, extensions, trackPoints, wayPoints);
         databaseHelper.close();
         return gpxFileName;
     }

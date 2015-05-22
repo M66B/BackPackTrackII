@@ -29,6 +29,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CursorAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -98,6 +99,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_LAST_UPLOAD = "pref_last_upload";
 
     public static final String PREF_LAST_TRACK = "pref_last_track";
+    public static final String PREF_LAST_EXTENSIONS = "pref_last_extensions";
     public static final String PREF_LAST_FROM = "pref_last_from";
     public static final String PREF_LAST_TO = "pref_last_to";
 
@@ -378,6 +380,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Reference controls
         final TextView tvTrackName = (TextView) view.findViewById(R.id.tvTrackName);
+        final CheckBox cbExtensions = (CheckBox) view.findViewById(R.id.cbExtensions);
         Button btnDateFrom = (Button) view.findViewById(R.id.btnDateFrom);
         Button btnTimeFrom = (Button) view.findViewById(R.id.btnTimeFrom);
         Button btnDateTo = (Button) view.findViewById(R.id.btnDateTo);
@@ -388,8 +391,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         final TextView tvTimeTo = (TextView) view.findViewById(R.id.tvTimeTo);
         final boolean ampm = android.text.format.DateFormat.is24HourFormat(this);
 
-        // Set last track name
+        // Set last track name/extensions
         tvTrackName.setText(prefs.getString(PREF_LAST_TRACK, "BackPackTrack"));
+        cbExtensions.setChecked(prefs.getBoolean(PREF_LAST_EXTENSIONS, false));
 
         // Get default from
         Calendar defaultFrom = Calendar.getInstance();
@@ -510,9 +514,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 prefs.edit().putString(PREF_LAST_TRACK, tvTrackName.getText().toString()).apply();
+                                prefs.edit().putBoolean(PREF_LAST_EXTENSIONS, cbExtensions.isChecked()).apply();
                                 prefs.edit().putLong(PREF_LAST_FROM, from.getTimeInMillis()).apply();
                                 prefs.edit().putLong(PREF_LAST_TO, to.getTimeInMillis()).apply();
                                 intent.putExtra(LocationService.EXTRA_TRACK, tvTrackName.getText().toString());
+                                intent.putExtra(LocationService.EXTRA_EXTENSIONS, cbExtensions.isChecked());
                                 intent.putExtra(LocationService.EXTRA_FROM, from.getTimeInMillis());
                                 intent.putExtra(LocationService.EXTRA_TO, to.getTimeInMillis());
                                 startService(intent);

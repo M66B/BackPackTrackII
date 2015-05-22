@@ -61,6 +61,7 @@
 
     <string name="title_export">Export GPX file</string>
     <string name="title_track">Track name:</string>
+    <string name="title_extensions">Write extensions</string>
     <string name="title_from">From date/time:</string>
     <string name="title_to">To date/time:</string>
     <string name="title_pick">Pick</string>
