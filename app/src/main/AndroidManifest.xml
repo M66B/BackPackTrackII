@@ -45,6 +45,14 @@
         </receiver>
 
         <receiver
+            android:name=".ProvidersChangedReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.location.PROVIDERS_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
             android:name=".GeotaggedReceiver"
             android:enabled="true">
             <intent-filter>
