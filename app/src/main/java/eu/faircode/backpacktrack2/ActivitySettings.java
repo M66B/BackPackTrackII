@@ -88,7 +88,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_RECOGNITION_INTERVAL = "1"; // minutes
 
     // Transient values
-    public static final String PREF_ACTIVE = "pref_active";
+    public static final String PREF_STATE = "pref_state";
     public static final String PREF_LOCATION_TYPE = "pref_location_type";
     public static final String PREF_BEST_LOCATION = "pref_best_location";
 

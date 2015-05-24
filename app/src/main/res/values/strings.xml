@@ -65,17 +65,16 @@
     <string name="title_from">From date/time:</string>
     <string name="title_to">To date/time:</string>
     <string name="title_pick">Pick</string>
-    ck*
+
     <string name="msg_never">Never</string>
     <string name="msg_geocoder">Geocoder:</string>
     <string name="msg_yes">yes</string>
     <string name="msg_no">no</string>
 
-    <string name="msg_idle">%1$s, last location: %2$s @%3$dm</string>
+    <string name="msg_notification">BackPackTrack II - %1$s</string>
+    <string name="msg_idle">Idle, last location: %1$s @%2$dm</string>
     <string name="msg_acquiring">Acquiring location</string>
-    <string name="msg_acquired">Acquired location: &#177;%1$dm @%2$dm</string>
-    <string name="msg_still">Still</string>
-    <string name="msg_moving">Moving</string>
+    <string name="msg_acquired">Acquired %1$s location: &#177;%2$dm @%3$dm</string>
 
     <string name="msg_added">Added \'%s\'</string>
     <string name="msg_updated">Updated \'%s\'</string>
@@ -86,4 +85,14 @@
     <string name="msg_noaddress">No address found</string>
     <string name="msg_geocoding">Geocoding \'%s\' ...</string>
     <string name="msg_rgeocoding">Reverse geocoding ...</string>
+
+    <string name="still">Still</string>
+    <string name="tilting">Tilting</string>
+    <string name="on_foot">On foot</string>
+    <string name="walking">Walking</string>
+    <string name="running">Running</string>
+    <string name="on_bicycle">On bicycle</string>
+    <string name="in_vehicle">In vehicle</string>
+    <string name="unknown">Unknown</string>
+    <string name="undefined">Undefined</string>
 </resources>

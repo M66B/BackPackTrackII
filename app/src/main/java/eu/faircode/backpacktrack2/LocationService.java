@@ -38,7 +38,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -80,6 +79,10 @@ public class LocationService extends IntentService {
     // Constants
     private static final int LOCATION_MIN_TIME = 1000; // milliseconds
     private static final int LOCATION_MIN_DISTANCE = 1; // meters
+
+    private static final int STATE_IDLE = 1;
+    private static final int STATE_ACQUIRING = 2;
+    private static final int STATE_ACQUIRED = 3;
 
     private static final int LOCATION_TRACKPOINT = 1;
     private static final int LOCATION_WAYPOINT = 2;
@@ -137,10 +140,7 @@ public class LocationService extends IntentService {
         if (activity.getConfidence() >= 50 && activity.getType() != DetectedActivity.TILTING) {
             // Persist probable activity
             prefs.edit().putInt(ActivitySettings.PREF_LAST_ACTIVITY, activity.getType()).apply();
-
-            // Update still/moving
-            if (!prefs.getBoolean(ActivitySettings.PREF_ACTIVE, false))
-                showIdle(this);
+            updateState(this);
 
             // Stop/start repeating alarm
             boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
@@ -206,11 +206,9 @@ public class LocationService extends IntentService {
         Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
         if (isBetterLocation(bestLocation, location)) {
             Log.w(TAG, "Better location=" + location);
-            showNotification(getString(R.string.msg_acquired,
-                            location.hasAccuracy() ? Math.round(location.getAccuracy()) : 0,
-                            location.hasAltitude() ? Math.round(location.getAltitude()) : 0),
-                    this);
+            prefs.edit().putInt(ActivitySettings.PREF_STATE, STATE_ACQUIRED).apply();
             prefs.edit().putString(ActivitySettings.PREF_BEST_LOCATION, LocationSerializer.serialize(location)).apply();
+            updateState(this);
         }
 
         // Check altitude
@@ -248,8 +246,10 @@ public class LocationService extends IntentService {
     private void handleGeotagged(Intent intent) {
         // Process photo location
         Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
-        if (location != null)
+        if (location != null) {
             handleLocation(LOCATION_TRACKPOINT, location);
+            updateState(this);
+        }
     }
 
     private void handleShare(Intent intent) {
@@ -347,7 +347,7 @@ public class LocationService extends IntentService {
         if (!recognition || !still)
             startRepeatingAlarm(context);
 
-        showIdle(context);
+        updateState(context);
 
         // Request activity updates
         if (recognition)
@@ -419,11 +419,10 @@ public class LocationService extends IntentService {
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         // Mark active
-        if (prefs.getBoolean(ActivitySettings.PREF_ACTIVE, false)) {
+        if (prefs.getInt(ActivitySettings.PREF_STATE, STATE_IDLE) != STATE_IDLE) {
             Log.w(TAG, "Already active");
             return;
         }
-        prefs.edit().putBoolean(ActivitySettings.PREF_ACTIVE, true).apply();
 
         // Request coarse location
         if (lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
@@ -453,7 +452,8 @@ public class LocationService extends IntentService {
             am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + timeout * 1000, pi);
             Log.w(TAG, "Set timeout=" + timeout + "s");
 
-            showNotification(context.getString(R.string.msg_acquiring), context);
+            prefs.edit().putInt(ActivitySettings.PREF_STATE, STATE_ACQUIRING).apply();
+            updateState(context);
         } else
             Log.w(TAG, "No location providers");
     }
@@ -489,7 +489,7 @@ public class LocationService extends IntentService {
             am.cancel(pi);
         }
 
-        prefs.edit().remove(ActivitySettings.PREF_ACTIVE).apply();
+        prefs.edit().putInt(ActivitySettings.PREF_STATE, STATE_IDLE).apply();
         prefs.edit().remove(ActivitySettings.PREF_LOCATION_TYPE).apply();
         prefs.edit().remove(ActivitySettings.PREF_BEST_LOCATION).apply();
     }
@@ -535,9 +535,6 @@ public class LocationService extends IntentService {
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(500);
             }
-
-            if (!prefs.getBoolean(ActivitySettings.PREF_ACTIVE, false))
-                showIdle(this);
         } else
             Log.w(TAG, "Filtered location=" + location);
     }
@@ -612,19 +609,31 @@ public class LocationService extends IntentService {
         return listline;
     }
 
-    private static void showIdle(Context context) {
+    private static void updateState(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
-        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+        int state = prefs.getInt(ActivitySettings.PREF_STATE, STATE_IDLE);
 
-        showNotification(context.getString(R.string.msg_idle,
-                        context.getString(still ? R.string.msg_still : R.string.msg_moving, context),
-                        (lastLocation == null ? "-" : new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(new Date(lastLocation.getTime()))),
-                        (lastLocation == null || !lastLocation.hasAltitude() ? 0 : Math.round(lastLocation.getAltitude()))),
-                context);
-    }
+        int activity = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN);
+        String title = context.getString(R.string.msg_notification, getNameFromActivityType(activity, context));
 
-    private static void showNotification(String text, Context context) {
+        String text = null;
+        if (state == STATE_IDLE) {
+            Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+            text = context.getString(R.string.msg_idle,
+                    (lastLocation == null ? "-" : new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(new Date(lastLocation.getTime()))),
+                    (lastLocation == null || !lastLocation.hasAltitude() ? 0 : Math.round(lastLocation.getAltitude())));
+
+        } else if (state == STATE_ACQUIRING) {
+            text = context.getString(R.string.msg_acquiring);
+
+        } else if (state == STATE_ACQUIRED) {
+            Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
+            text = context.getString(R.string.msg_acquired,
+                    bestLocation.getProvider(),
+                    bestLocation.hasAccuracy() ? Math.round(bestLocation.getAccuracy()) : 0,
+                    bestLocation.hasAltitude() ? Math.round(bestLocation.getAltitude()) : 0);
+        }
+
         // Build intent
         Intent riSettings = new Intent(context, ActivitySettings.class);
         riSettings.setAction("android.intent.action.MAIN");
@@ -651,7 +660,7 @@ public class LocationService extends IntentService {
         // Build notification
         Notification.Builder notificationBuilder = new Notification.Builder(context);
         notificationBuilder.setSmallIcon(R.mipmap.ic_launcher);
-        notificationBuilder.setContentTitle(context.getString(R.string.app_name));
+        notificationBuilder.setContentTitle(title);
         notificationBuilder.setContentText(text);
         notificationBuilder.setContentIntent(piSettings);
         notificationBuilder.setWhen(System.currentTimeMillis());
@@ -666,6 +675,29 @@ public class LocationService extends IntentService {
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         nm.notify(0, notification);
     }
+
+    private static String getNameFromActivityType(int activityType, Context context) {
+        switch (activityType) {
+            case DetectedActivity.STILL:
+                return context.getString(R.string.still);
+            case DetectedActivity.TILTING:
+                return context.getString(R.string.tilting);
+            case DetectedActivity.ON_FOOT:
+                return context.getString(R.string.on_foot);
+            case DetectedActivity.WALKING:
+                return context.getString(R.string.walking);
+            case DetectedActivity.RUNNING:
+                return context.getString(R.string.running);
+            case DetectedActivity.ON_BICYCLE:
+                return context.getString(R.string.on_bicycle);
+            case DetectedActivity.IN_VEHICLE:
+                return context.getString(R.string.in_vehicle);
+            case DetectedActivity.UNKNOWN:
+                return context.getString(R.string.unknown);
+        }
+        return context.getString(R.string.undefined);
+    }
+
 
     private static void cancelNotification(Context context) {
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
