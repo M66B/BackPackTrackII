@@ -64,6 +64,7 @@ public class LocationService extends IntentService {
     public static final String ACTION_LOCATION_FINE = "LocationFine";
     public static final String ACTION_LOCATION_COARSE = "LocationCoarse";
     public static final String ACTION_TIMEOUT = "TimeOut";
+    public static final String ACTION_STOP = "Stop";
     public static final String ACTION_TRACKPOINT = "TrackPoint";
     public static final String ACTION_WAYPOINT = "WayPoint";
     public static final String ACTION_GEOTAGGED = "Geotagged";
@@ -114,6 +115,9 @@ public class LocationService extends IntentService {
 
         else if (ACTION_TIMEOUT.equals(intent.getAction()))
             handleLocationTimeout(intent);
+
+        else if (ACTION_STOP.equals(intent.getAction()))
+            handleStop(intent);
 
         else if (ACTION_GEOTAGGED.equals(intent.getAction()))
             handleGeotagged(intent);
@@ -241,6 +245,10 @@ public class LocationService extends IntentService {
         // Process location
         if (bestLocation != null)
             handleLocation(locationType, bestLocation);
+    }
+
+    private void handleStop(Intent intent) {
+        stopLocating(this);
     }
 
     private void handleGeotagged(Intent intent) {
@@ -635,28 +643,12 @@ public class LocationService extends IntentService {
                     bestLocation.hasAltitude() ? Math.round(bestLocation.getAltitude()) : 0);
         }
 
-        // Build intent
+        // Build main intent
         Intent riSettings = new Intent(context, ActivitySettings.class);
         riSettings.setAction("android.intent.action.MAIN");
         riSettings.addCategory("android.intent.category.LAUNCHER");
         riSettings.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-        // Build pending intent
         PendingIntent piSettings = PendingIntent.getActivity(context, 1, riSettings, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Build result intent update
-        Intent riTrackpoint = new Intent(context, LocationService.class);
-        riTrackpoint.setAction(LocationService.ACTION_TRACKPOINT);
-
-        // Build pending intent waypoint
-        PendingIntent piTrackpoint = PendingIntent.getService(context, 2, riTrackpoint, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Build result intent waypoint
-        Intent riWaypoint = new Intent(context, LocationService.class);
-        riWaypoint.setAction(LocationService.ACTION_WAYPOINT);
-
-        // Build pending intent waypoint
-        PendingIntent piWaypoint = PendingIntent.getService(context, 3, riWaypoint, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Build notification
         Notification.Builder notificationBuilder = new Notification.Builder(context);
@@ -667,12 +659,33 @@ public class LocationService extends IntentService {
         notificationBuilder.setWhen(System.currentTimeMillis());
         notificationBuilder.setAutoCancel(false);
         notificationBuilder.setOngoing(true);
-        notificationBuilder.addAction(android.R.drawable.ic_menu_mylocation, context.getString(R.string.title_trackpoint),
-                piTrackpoint);
-        notificationBuilder.addAction(android.R.drawable.ic_menu_add, context.getString(R.string.title_waypoint),
-                piWaypoint);
-        Notification notification = notificationBuilder.build();
 
+        if (state == STATE_IDLE) {
+            // Build trackpoint intent
+            Intent riTrackpoint = new Intent(context, LocationService.class);
+            riTrackpoint.setAction(LocationService.ACTION_TRACKPOINT);
+            PendingIntent piTrackpoint = PendingIntent.getService(context, 2, riTrackpoint, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            // Build waypoint intent
+            Intent riWaypoint = new Intent(context, LocationService.class);
+            riWaypoint.setAction(LocationService.ACTION_WAYPOINT);
+            PendingIntent piWaypoint = PendingIntent.getService(context, 3, riWaypoint, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            notificationBuilder.addAction(android.R.drawable.ic_menu_mylocation, context.getString(R.string.title_trackpoint),
+                    piTrackpoint);
+            notificationBuilder.addAction(android.R.drawable.ic_menu_add, context.getString(R.string.title_waypoint),
+                    piWaypoint);
+        } else {
+            // Build stop intent
+            Intent riStop = new Intent(context, LocationService.class);
+            riStop.setAction(LocationService.ACTION_STOP);
+            PendingIntent piStop = PendingIntent.getService(context, 4, riStop, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            notificationBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(android.R.string.cancel),
+                    piStop);
+        }
+
+        Notification notification = notificationBuilder.build();
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         nm.notify(0, notification);
     }
