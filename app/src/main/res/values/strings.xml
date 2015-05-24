@@ -71,10 +71,10 @@
     <string name="msg_yes">yes</string>
     <string name="msg_no">no</string>
 
-    <string name="msg_notification">BackPackTrack II - %1$s</string>
-    <string name="msg_idle">Idle, last location: %1$s @%2$dm</string>
-    <string name="msg_acquiring">Acquiring location</string>
-    <string name="msg_acquired">Acquired %1$s location: &#177;%2$dm @%3$dm</string>
+    <string name="msg_notification">%1$s @%2$dm &#177;%3$dm %4$s</string>
+    <string name="msg_idle">Last location @%1$s</string>
+    <string name="msg_acquiring">Acquiring location ...</string>
+    <string name="msg_acquired">Current location @%1$s</string>
 
     <string name="msg_added">Added \'%s\'</string>
     <string name="msg_updated">Updated \'%s\'</string>

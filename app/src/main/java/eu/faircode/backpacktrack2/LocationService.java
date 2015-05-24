@@ -186,14 +186,15 @@ public class LocationService extends IntentService {
             return;
 
         // Correct altitude
-        try {
-            double offset = getEGM96Offset(location, this);
-            Log.w(TAG, "Offset=" + offset);
-            location.setAltitude(location.getAltitude() - offset);
-            Log.w(TAG, "Corrected location=" + location + " type=" + locationType);
-        } catch (IOException ex) {
-            Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-        }
+        if (LocationManager.GPS_PROVIDER.equals(location.getProvider()))
+            try {
+                double offset = getEGM96Offset(location, this);
+                Log.w(TAG, "Offset=" + offset);
+                location.setAltitude(location.getAltitude() - offset);
+                Log.w(TAG, "Corrected location=" + location + " type=" + locationType);
+            } catch (IOException ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
 
         // Get location preferences
         boolean pref_altitude = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE, ActivitySettings.DEFAULT_ALTITUDE);
@@ -622,26 +623,40 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int state = prefs.getInt(ActivitySettings.PREF_STATE, STATE_IDLE);
 
-        int activity = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN);
-        String title = context.getString(R.string.msg_notification, getNameFromActivityType(activity, context));
-
         String text = null;
+        Location lastLocation = null;
         if (state == STATE_IDLE) {
-            Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
-            text = context.getString(R.string.msg_idle,
-                    (lastLocation == null ? "-" : new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(new Date(lastLocation.getTime()))),
-                    (lastLocation == null || !lastLocation.hasAltitude() ? 0 : Math.round(lastLocation.getAltitude())));
+            lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+            if (lastLocation == null)
+                text = context.getString(R.string.msg_idle, "-");
+            else
+                text = context.getString(R.string.msg_idle,
+                        new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(new Date(lastLocation.getTime())));
 
         } else if (state == STATE_ACQUIRING) {
+            lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
             text = context.getString(R.string.msg_acquiring);
 
         } else if (state == STATE_ACQUIRED) {
             Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
+            lastLocation = bestLocation;
             text = context.getString(R.string.msg_acquired,
-                    bestLocation.getProvider(),
-                    bestLocation.hasAccuracy() ? Math.round(bestLocation.getAccuracy()) : 0,
-                    bestLocation.hasAltitude() ? Math.round(bestLocation.getAltitude()) : 0);
+                    new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(new Date(lastLocation.getTime())));
         }
+
+        String activity = getActivityName(prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN), context);
+        long altitude = 0;
+        long accuracy = 0;
+        String provider = "";
+        if (lastLocation != null) {
+            provider = lastLocation.getProvider();
+            if (lastLocation.hasAltitude())
+                altitude = Math.round(lastLocation.getAltitude());
+            if (lastLocation.hasAccuracy())
+                accuracy = Math.round(lastLocation.getAccuracy());
+        }
+
+        String title = context.getString(R.string.msg_notification, activity, altitude, accuracy, provider);
 
         // Build main intent
         Intent riSettings = new Intent(context, ActivitySettings.class);
@@ -671,6 +686,7 @@ public class LocationService extends IntentService {
             riWaypoint.setAction(LocationService.ACTION_WAYPOINT);
             PendingIntent piWaypoint = PendingIntent.getService(context, 3, riWaypoint, PendingIntent.FLAG_UPDATE_CURRENT);
 
+            // Add actions
             notificationBuilder.addAction(android.R.drawable.ic_menu_mylocation, context.getString(R.string.title_trackpoint),
                     piTrackpoint);
             notificationBuilder.addAction(android.R.drawable.ic_menu_add, context.getString(R.string.title_waypoint),
@@ -681,16 +697,16 @@ public class LocationService extends IntentService {
             riStop.setAction(LocationService.ACTION_STOP);
             PendingIntent piStop = PendingIntent.getService(context, 4, riStop, PendingIntent.FLAG_UPDATE_CURRENT);
 
+            // Add action
             notificationBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(android.R.string.cancel),
                     piStop);
         }
 
-        Notification notification = notificationBuilder.build();
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        nm.notify(0, notification);
+        nm.notify(0, notificationBuilder.build());
     }
 
-    private static String getNameFromActivityType(int activityType, Context context) {
+    private static String getActivityName(int activityType, Context context) {
         switch (activityType) {
             case DetectedActivity.STILL:
                 return context.getString(R.string.still);
