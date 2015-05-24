@@ -78,7 +78,7 @@ public class LocationService extends IntentService {
 
     // Constants
     private static final int LOCATION_MIN_TIME = 1000; // milliseconds
-    private static final int LOCATION_MIN_DISTANCE = 1; // meters
+    private static final int LOCATION_MIN_DISTANCE = 0; // meters
 
     private static final int STATE_IDLE = 1;
     private static final int STATE_ACQUIRING = 2;
@@ -492,6 +492,7 @@ public class LocationService extends IntentService {
         prefs.edit().putInt(ActivitySettings.PREF_STATE, STATE_IDLE).apply();
         prefs.edit().remove(ActivitySettings.PREF_LOCATION_TYPE).apply();
         prefs.edit().remove(ActivitySettings.PREF_BEST_LOCATION).apply();
+        updateState(context);
     }
 
     // Helper methods
