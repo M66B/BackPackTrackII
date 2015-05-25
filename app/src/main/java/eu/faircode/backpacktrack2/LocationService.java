@@ -257,10 +257,8 @@ public class LocationService extends IntentService {
     private void handleGeotagged(Intent intent) {
         // Process photo location
         Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
-        if (location != null) {
+        if (location != null)
             handleLocation(LOCATION_TRACKPOINT, location);
-            updateState(this);
-        }
     }
 
     private void handleShare(Intent intent) {
@@ -543,6 +541,7 @@ public class LocationService extends IntentService {
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
 
             // Feedback
+            updateState(this);
             if (locationType == LOCATION_WAYPOINT) {
                 toast(waypointName, this);
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
