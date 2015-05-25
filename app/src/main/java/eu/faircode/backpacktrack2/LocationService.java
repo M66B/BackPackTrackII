@@ -741,8 +741,8 @@ public class LocationService extends IntentService {
         String gpxFileName = folder.getAbsolutePath() + File.separatorChar + trackName + ".gpx";
         Log.w(TAG, "Writing file=" + gpxFileName);
         DatabaseHelper databaseHelper = new DatabaseHelper(context);
-        Cursor trackPoints = databaseHelper.getList(from, to, true);
-        Cursor wayPoints = databaseHelper.getList(from, to, false);
+        Cursor trackPoints = databaseHelper.getList(from, to, true, false);
+        Cursor wayPoints = databaseHelper.getList(from, to, false, true);
         GPXFileWriter.writeGpxFile(new File(gpxFileName), trackName, extensions, trackPoints, wayPoints);
         databaseHelper.close();
         return gpxFileName;

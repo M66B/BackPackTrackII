@@ -2,6 +2,7 @@
     <string name="app_name">BackPackTrack II</string>
 
     <string name="title_action">Actions</string>
+    <string name="title_history">History</string>
     <string name="title_edit">Edit waypoints</string>
     <string name="title_share">Share GPX file</string>
     <string name="title_upload">Upload GPX file</string>
@@ -33,6 +34,7 @@
     <string name="title_author">Author</string>
     <string name="title_license">License</string>
 
+    <string name="summary_history">Show location history</string>
     <string name="summary_edit">Add, change or delete waypoints</string>
     <string name="summary_share">Tap to write and share a GPX file\nLast share: %s</string>
     <string name="summary_upload">Tap to write and upload a GPX file\nLast upload: %s</string>
@@ -65,6 +67,9 @@
     <string name="title_from">From date/time:</string>
     <string name="title_to">To date/time:</string>
     <string name="title_pick">Pick</string>
+
+    <string name="header_altitude">Alt (m)</string>
+    <string name="header_accuracy">Acc (m)</string>
 
     <string name="msg_never">Never</string>
     <string name="msg_geocoder">Geocoder:</string>

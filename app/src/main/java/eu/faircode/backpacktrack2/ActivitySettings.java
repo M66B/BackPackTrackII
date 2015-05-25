@@ -52,6 +52,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     private static final String TAG = "BPT2.Settings";
 
     // Preference names
+    public static final String PREF_HISTORY = "pref_history";
     public static final String PREF_EDIT = "pref_edit";
     public static final String PREF_SHARE = "pref_share";
     public static final String PREF_UPLOAD = "pref_upload";
@@ -123,6 +124,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         }
 
         // Get preferences
+        Preference pref_history = findPreference(PREF_HISTORY);
         Preference pref_edit = findPreference(PREF_EDIT);
         Preference pref_share = findPreference(PREF_SHARE);
         Preference pref_upload = findPreference(PREF_UPLOAD);
@@ -145,6 +147,15 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_BLOGURL);
         updateTitle(prefs, PREF_BLOGID);
         updateTitle(prefs, PREF_BLOGUSER);
+
+        // Handle location history
+        pref_history.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                history();
+                return true;
+            }
+        });
 
         // Handle edit waypoints
         pref_edit.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -250,14 +261,42 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     // Helper methods
 
+    private void history() {
+        // Get layout
+        LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
+        View viewEdit = inflater.inflate(R.layout.history, null);
+
+        // Fill list
+        ListView lv = (ListView) viewEdit.findViewById(R.id.lvHistory);
+        Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, true, true);
+        LocationAdapter adapter = new LocationAdapter(ActivitySettings.this, cursor);
+        lv.setAdapter(adapter);
+
+        // Show layout
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+        alertDialogBuilder.setTitle(R.string.title_history);
+        alertDialogBuilder.setView(viewEdit);
+        alertDialogBuilder
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+        // Fix keyboard input
+        alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+    }
+
     private void edit() {
         // Get layout
         final LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
-        final View viewEdit = inflater.inflate(R.layout.edit, null);
+        View viewEdit = inflater.inflate(R.layout.edit, null);
 
         // Fill list
         ListView lv = (ListView) viewEdit.findViewById(R.id.lvEdit);
-        Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false);
+        Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false, true);
         final WaypointAdapter adapter = new WaypointAdapter(ActivitySettings.this, cursor);
         lv.setAdapter(adapter);
 
@@ -353,7 +392,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                             new DatabaseHelper(ActivitySettings.this).insert(location, geocodedName);
 
                             // Feedback
-                            Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false);
+                            Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false, true);
                             adapter.changeCursor(cursor);
                             Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, geocodedName), Toast.LENGTH_LONG).show();
                         }
@@ -582,17 +621,23 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         @Override
         public void bindView(final View view, final Context context, final Cursor cursor) {
+            // Get values
             final int id = cursor.getInt(cursor.getColumnIndex("ID"));
             final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
             final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
             final String name = cursor.getString(cursor.getColumnIndex("name"));
+
+            // Get views
+            ImageView ivShare = (ImageView) view.findViewById(R.id.ivShare);
             final EditText etName = (EditText) view.findViewById(R.id.etName);
+            ImageView ivGeocode = (ImageView) view.findViewById(R.id.ivGeocode);
+            ImageView ivSave = (ImageView) view.findViewById(R.id.ivSave);
+            ImageView ivDelete = (ImageView) view.findViewById(R.id.ivDelete);
 
             // Set waypoint name
             etName.setText(name);
 
             // Handle share location
-            ImageView ivShare = (ImageView) view.findViewById(R.id.ivShare);
             ivShare.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -606,10 +651,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             });
 
             // Handle reverse geocode
-            ImageView ivGeocode = (ImageView) view.findViewById(R.id.ivGeocode);
             ivGeocode.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    etName.setText("");
                     Toast.makeText(context, getString(R.string.msg_rgeocoding), Toast.LENGTH_LONG).show();
 
                     Location location = new Location("Geocoded");
@@ -633,7 +678,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             });
 
             // Handle update name
-            ImageView ivSave = (ImageView) view.findViewById(R.id.ivSave);
             ivSave.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -654,7 +698,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             });
 
             // Handle delete waypoint
-            ImageView ivDelete = (ImageView) view.findViewById(R.id.ivDelete);
             ivDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -672,7 +715,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
                                         @Override
                                         protected void onPostExecute(Object result) {
-                                            Cursor cursor = new DatabaseHelper(context).getList(0, Long.MAX_VALUE, false);
+                                            Cursor cursor = new DatabaseHelper(context).getList(0, Long.MAX_VALUE, false, true);
                                             changeCursor(cursor);
                                             Toast.makeText(context, getString(R.string.msg_deleted, name), Toast.LENGTH_LONG).show();
                                         }
@@ -687,6 +730,56 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                             });
                     AlertDialog alertDialog = alertDialogBuilder.create();
                     alertDialog.show();
+                }
+            });
+        }
+    }
+
+    private class LocationAdapter extends CursorAdapter {
+        public LocationAdapter(Context context, Cursor cursor) {
+            super(context, cursor, 0);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            return LayoutInflater.from(context).inflate(R.layout.location, parent, false);
+        }
+
+        @Override
+        public void bindView(final View view, final Context context, final Cursor cursor) {
+            // Get values
+            long time = cursor.getLong(cursor.getColumnIndex("time"));
+            String provider = cursor.getString(cursor.getColumnIndex("provider"));
+            final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
+            final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
+            boolean hasAltitude = !cursor.isNull(cursor.getColumnIndex("altitude"));
+            boolean hasAccuracy = !cursor.isNull(cursor.getColumnIndex("accuracy"));
+            double altitude = cursor.getDouble(cursor.getColumnIndex("altitude"));
+            double accuracy = cursor.getDouble(cursor.getColumnIndex("accuracy"));
+
+            // Get views
+            ImageView ivShare = (ImageView) view.findViewById(R.id.ivShare);
+            TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
+            TextView tvProvider = (TextView) view.findViewById(R.id.tvProvider);
+            TextView tvAltitude = (TextView) view.findViewById(R.id.tvAltitude);
+            TextView tvAccuracy = (TextView) view.findViewById(R.id.tvAccuracy);
+
+            // Set values
+            tvTime.setText(new SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(time)));
+            tvProvider.setText(provider.substring(0, 3));
+            tvAltitude.setText(hasAltitude ? Long.toString(Math.round(altitude)) : "-");
+            tvAccuracy.setText(hasAccuracy ? Long.toString(Math.round(accuracy)) : "-");
+
+            // Handle share location
+            ivShare.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude;
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
+                    } catch (Throwable ex) {
+                        Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG).show();
+                    }
                 }
             });
         }

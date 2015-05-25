@@ -73,14 +73,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.insert("location", null, cv);
     }
 
-    public Cursor getList(long from, long to, boolean trackpoints) {
+    public Cursor getList(long from, long to, boolean trackpoints, boolean waypoints) {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery(
-                "SELECT *, ID AS _id FROM location" +
-                        (trackpoints ? " WHERE name IS NULL" : " WHERE NOT name IS NULL")
-                        + " AND time >= ? AND time <= ?"
-                        + " ORDER BY time DESC",
-                new String[]{Long.toString(from), Long.toString(to)});
+        String query = "SELECT *, ID AS _id FROM location";
+        query += " WHERE time >= ? AND time <= ?";
+        if (trackpoints && !waypoints)
+            query += " AND name IS NULL";
+        if (!trackpoints && waypoints)
+            query += " AND NOT name IS NULL";
+        query += " ORDER BY time DESC";
+        return db.rawQuery(query, new String[]{Long.toString(from), Long.toString(to)});
     }
 
     public void update(int id, String name) {
