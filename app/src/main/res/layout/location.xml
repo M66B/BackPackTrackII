@@ -20,6 +20,14 @@
         android:gravity="center_vertical"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
+    <ImageView
+        android:id="@+id/ivPin"
+        android:layout_width="24dip"
+        android:layout_height="?android:attr/listPreferredItemHeightSmall"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="3dp"
+        android:src="@android:drawable/ic_menu_myplaces" />
+
     <TextView
         android:id="@+id/tvProvider"
         android:layout_width="25dp"
@@ -31,7 +39,7 @@
 
     <TextView
         android:id="@+id/tvAltitude"
-        android:layout_width="50dp"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="3dp"
@@ -40,7 +48,7 @@
 
     <TextView
         android:id="@+id/tvAccuracy"
-        android:layout_width="50dp"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="3dp"

@@ -689,7 +689,7 @@ public class LocationService extends IntentService {
             // Add actions
             notificationBuilder.addAction(android.R.drawable.ic_menu_mylocation, context.getString(R.string.title_trackpoint),
                     piTrackpoint);
-            notificationBuilder.addAction(android.R.drawable.ic_menu_add, context.getString(R.string.title_waypoint),
+            notificationBuilder.addAction(android.R.drawable.ic_menu_myplaces, context.getString(R.string.title_waypoint),
                     piWaypoint);
         } else {
             // Build stop intent
@@ -752,7 +752,7 @@ public class LocationService extends IntentService {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(context, text, Toast.LENGTH_LONG).show();
+                Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
             }
         });
     }

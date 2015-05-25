@@ -351,7 +351,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     private void add(final String name, final WaypointAdapter adapter) {
         // Geocode name
-        Toast.makeText(this, getString(R.string.msg_geocoding, name), Toast.LENGTH_LONG).show();
+        Toast.makeText(this, getString(R.string.msg_geocoding, name), Toast.LENGTH_SHORT).show();
 
         new AsyncTask<String, Object, List<Address>>() {
             protected List<Address> doInBackground(String... params) {
@@ -394,7 +394,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                             // Feedback
                             Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false, true);
                             adapter.changeCursor(cursor);
-                            Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, geocodedName), Toast.LENGTH_LONG).show();
+                            Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, geocodedName), Toast.LENGTH_SHORT).show();
                         }
                     });
                     alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -405,7 +405,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                     });
                     alertDialogBuilder.show();
                 } else
-                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_nolocation, name), Toast.LENGTH_LONG).show();
+                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
             }
         }.execute(name);
     }
@@ -645,7 +645,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                         String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude;
                         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
                     } catch (Throwable ex) {
-                        Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -655,7 +655,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 @Override
                 public void onClick(View view) {
                     etName.setText("");
-                    Toast.makeText(context, getString(R.string.msg_rgeocoding), Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, getString(R.string.msg_rgeocoding), Toast.LENGTH_SHORT).show();
 
                     Location location = new Location("Geocoded");
                     location.setLatitude(latitude);
@@ -671,7 +671,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                             if (listAddress != null && listAddress.size() > 0)
                                 etName.setText(TextUtils.join(", ", listAddress));
                             else
-                                Toast.makeText(context, getString(R.string.msg_noaddress), Toast.LENGTH_LONG).show();
+                                Toast.makeText(context, getString(R.string.msg_noaddress), Toast.LENGTH_SHORT).show();
                         }
                     }.execute(location);
                 }
@@ -691,7 +691,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
                         @Override
                         protected void onPostExecute(Object result) {
-                            Toast.makeText(context, getString(R.string.msg_updated, newName), Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, getString(R.string.msg_updated, newName), Toast.LENGTH_SHORT).show();
                         }
                     }.execute(newName);
                 }
@@ -717,7 +717,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                                         protected void onPostExecute(Object result) {
                                             Cursor cursor = new DatabaseHelper(context).getList(0, Long.MAX_VALUE, false, true);
                                             changeCursor(cursor);
-                                            Toast.makeText(context, getString(R.string.msg_deleted, name), Toast.LENGTH_LONG).show();
+                                            Toast.makeText(context, getString(R.string.msg_deleted, name), Toast.LENGTH_SHORT).show();
                                         }
                                     }.execute(id);
                                 }
@@ -756,19 +756,32 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             boolean hasAccuracy = !cursor.isNull(cursor.getColumnIndex("accuracy"));
             double altitude = cursor.getDouble(cursor.getColumnIndex("altitude"));
             double accuracy = cursor.getDouble(cursor.getColumnIndex("accuracy"));
+            final String name = cursor.getString(cursor.getColumnIndex("name"));
 
             // Get views
             ImageView ivShare = (ImageView) view.findViewById(R.id.ivShare);
             TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
+            ImageView ivPin = (ImageView) view.findViewById(R.id.ivPin);
             TextView tvProvider = (TextView) view.findViewById(R.id.tvProvider);
             TextView tvAltitude = (TextView) view.findViewById(R.id.tvAltitude);
             TextView tvAccuracy = (TextView) view.findViewById(R.id.tvAccuracy);
 
             // Set values
             tvTime.setText(new SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(time)));
+            ivPin.setVisibility(name == null ? View.INVISIBLE : View.VISIBLE);
             tvProvider.setText(provider.substring(0, 3));
             tvAltitude.setText(hasAltitude ? Long.toString(Math.round(altitude)) : "-");
             tvAccuracy.setText(hasAccuracy ? Long.toString(Math.round(accuracy)) : "-");
+
+            if (name == null)
+                view.setClickable(false);
+            else
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
+                    }
+                });
 
             // Handle share location
             ivShare.setOnClickListener(new View.OnClickListener() {
@@ -778,7 +791,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                         String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude;
                         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
                     } catch (Throwable ex) {
-                        Toast.makeText(context, ex.toString(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
                     }
                 }
             });
