@@ -71,6 +71,7 @@
     <string name="header_altitude">Alt (m)</string>
     <string name="header_accuracy">Acc (m)</string>
 
+    <string name="msg_noproviders">No usable location providers enabled; this can be changed with the Android location settings</string>
     <string name="msg_never">Never</string>
     <string name="msg_geocoder">Geocoder:</string>
     <string name="msg_yes">yes</string>

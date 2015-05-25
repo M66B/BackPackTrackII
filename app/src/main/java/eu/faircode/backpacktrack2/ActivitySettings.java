@@ -15,6 +15,7 @@ import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -131,6 +132,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         Preference pref_edit = findPreference(PREF_EDIT);
         Preference pref_share = findPreference(PREF_SHARE);
         Preference pref_upload = findPreference(PREF_UPLOAD);
+        Preference pref_enabled = findPreference(PREF_ENABLED);
         Preference pref_check = findPreference(PREF_CHECK);
         Preference pref_version = findPreference(PREF_VERSION);
 
@@ -191,6 +193,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             }
         });
 
+        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        boolean hasProviders = (lm.isProviderEnabled(LocationManager.GPS_PROVIDER) || lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
+        pref_enabled.setEnabled(hasProviders);
+        pref_enabled.setSummary(hasProviders ? null : getString(R.string.msg_noproviders));
+
         // Handle location settings
         Intent locationSettingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         if (getPackageManager().queryIntentActivities(locationSettingsIntent, 0).size() > 0)
@@ -199,10 +206,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref_check.setEnabled(false);
 
         // Check for Play services
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) != ConnectionResult.SUCCESS) {
-            findPreference(PREF_RECOGNITION_ENABLED).setEnabled(false);
-            findPreference(PREF_RECOGNITION_INTERVAL).setEnabled(false);
-        }
+        boolean playServices = (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) != ConnectionResult.SUCCESS);
+        findPreference(PREF_RECOGNITION_ENABLED).setEnabled(!playServices);
+        findPreference(PREF_RECOGNITION_INTERVAL).setEnabled(!playServices);
 
         // Handle version
         Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
