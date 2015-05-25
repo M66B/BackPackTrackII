@@ -630,7 +630,7 @@ public class LocationService extends IntentService {
         if (state == STATE_IDLE) {
             lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
             if (lastLocation == null)
-                text = context.getString(R.string.msg_idle, "-");
+                text = context.getString(R.string.msg_idle, context.getString(R.string.msg_none));
             else
                 text = context.getString(R.string.msg_idle,
                         new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(new Date(lastLocation.getTime())));
@@ -647,15 +647,15 @@ public class LocationService extends IntentService {
         }
 
         String activity = getActivityName(prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN), context);
-        long altitude = 0;
-        long accuracy = 0;
+        String altitude = "?";
+        String accuracy = "?";
         String provider = "";
         if (lastLocation != null) {
             provider = lastLocation.getProvider();
             if (lastLocation.hasAltitude())
-                altitude = Math.round(lastLocation.getAltitude());
+                altitude = Long.toString(Math.round(lastLocation.getAltitude()));
             if (lastLocation.hasAccuracy())
-                accuracy = Math.round(lastLocation.getAccuracy());
+                accuracy = Long.toString(Math.round(lastLocation.getAccuracy()));
         }
 
         String title = context.getString(R.string.msg_notification, activity, altitude, accuracy, provider);

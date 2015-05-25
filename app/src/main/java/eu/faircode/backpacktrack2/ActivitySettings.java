@@ -84,7 +84,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final boolean DEFAULT_ENABLED = true;
     public static final String DEFAULT_FREQUENCY = "3"; // minutes
     public static final boolean DEFAULT_ALTITUDE = true;
-    public static final String DEFAULT_ACCURACY = "25"; // meters
+    public static final String DEFAULT_ACCURACY = "20"; // meters
     public static final String DEFAULT_TIMEOUT = "60"; // seconds
     public static final String DEFAULT_INACCURATE = "100"; // meters
     public static final String DEFAULT_NEARBY = "50"; // meters
@@ -154,6 +154,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_BLOGURL);
         updateTitle(prefs, PREF_BLOGID);
         updateTitle(prefs, PREF_BLOGUSER);
+        updateTitle(prefs, PREF_BLOGPWD);
 
         // Handle location history
         pref_history.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -614,11 +615,16 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref.setTitle(getString(R.string.title_recognition_interval, prefs.getString(key, PREF_RECOGNITION_INTERVAL)));
 
         else if (PREF_BLOGURL.equals(key))
-            pref.setTitle(getString(R.string.title_blogurl, prefs.getString(key, "-")));
+            pref.setTitle(getString(R.string.title_blogurl, prefs.getString(key, getString(R.string.msg_notset))));
         else if (PREF_BLOGID.equals(key))
             pref.setTitle(getString(R.string.title_blogid, prefs.getString(key, "1")));
         else if (PREF_BLOGUSER.equals(key))
-            pref.setTitle(getString(R.string.title_bloguser, prefs.getString(key, "-")));
+            pref.setTitle(getString(R.string.title_bloguser, prefs.getString(key, getString(R.string.msg_notset))));
+        else if (PREF_BLOGPWD.equals(key))
+            if (prefs.getString(key, null) == null)
+                pref.setTitle(getString(R.string.title_blogpwd, getString(R.string.msg_notset)));
+            else
+                pref.setTitle(getString(R.string.title_blogpwd, "********"));
     }
 
     // Help classes
@@ -784,8 +790,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             tvTime.setText(new SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(time)));
             ivPin.setVisibility(name == null ? View.INVISIBLE : View.VISIBLE);
             tvProvider.setText(provider.substring(0, 3));
-            tvAltitude.setText(hasAltitude ? Long.toString(Math.round(altitude)) : "-");
-            tvAccuracy.setText(hasAccuracy ? Long.toString(Math.round(accuracy)) : "-");
+            tvAltitude.setText(hasAltitude ? Long.toString(Math.round(altitude)) : "?");
+            tvAccuracy.setText(hasAccuracy ? Long.toString(Math.round(accuracy)) : "?");
 
             if (name == null)
                 view.setClickable(false);

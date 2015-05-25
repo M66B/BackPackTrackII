@@ -27,7 +27,7 @@
     <string name="title_blogurl">URL: %s</string>
     <string name="title_blogid">ID: %s</string>
     <string name="title_bloguser">User name: %s</string>
-    <string name="title_blogpwd">Password</string>
+    <string name="title_blogpwd">Password: %s</string>
 
     <string name="title_info">Information</string>
     <string name="title_version">Version</string>
@@ -72,12 +72,14 @@
     <string name="header_accuracy">Acc (m)</string>
 
     <string name="msg_noproviders">Enable a location provider in the Android location settings to use this application</string>
-    <string name="msg_never">Never</string>
+    <string name="msg_never">never</string>
+    <string name="msg_none">none</string>
+    <string name="msg_notset">not set</string>
     <string name="msg_geocoder">Geocoder:</string>
     <string name="msg_yes">yes</string>
     <string name="msg_no">no</string>
 
-    <string name="msg_notification">%1$s @%2$dm &#177;%3$dm %4$s</string>
+    <string name="msg_notification">%1$s @%2$sm &#177;%3$sm %4$s</string>
     <string name="msg_idle">Last location %1$s</string>
     <string name="msg_acquiring">Acquiring location ...</string>
     <string name="msg_acquired">Acquired location %1$s</string>

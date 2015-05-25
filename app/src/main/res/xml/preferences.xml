@@ -43,7 +43,7 @@
             android:summary="@string/summary_altitude"
             android:title="@string/title_altitude" />
         <EditTextPreference
-            android:defaultValue="25"
+            android:defaultValue="20"
             android:inputType="number"
             android:key="pref_accuracy"
             android:summary="@string/summary_accuracy" />
@@ -89,8 +89,7 @@
         <EditTextPreference
             android:inputType="textPassword"
             android:key="pref_blogpwd"
-            android:summary="@string/summary_blogpwd"
-            android:title="@string/title_blogpwd" />
+            android:summary="@string/summary_blogpwd" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_info">
         <Preference
