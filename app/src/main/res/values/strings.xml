@@ -34,7 +34,7 @@
     <string name="title_author">Author</string>
     <string name="title_license">License</string>
 
-    <string name="summary_history">Show location history</string>
+    <string name="summary_history">Show the location history to verify everything works</string>
     <string name="summary_edit">Add, change or delete waypoints</string>
     <string name="summary_share">Tap to write and share a GPX file\nLast share: %s</string>
     <string name="summary_upload">Tap to write and upload a GPX file\nLast upload: %s</string>

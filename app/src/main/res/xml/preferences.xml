@@ -40,6 +40,7 @@
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="pref_altitude"
+            android:summary="@string/summary_altitude"
             android:title="@string/title_altitude" />
         <EditTextPreference
             android:defaultValue="25"

@@ -592,8 +592,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         else if (PREF_FREQUENCY.equals(key))
             pref.setTitle(getString(R.string.title_frequency, prefs.getString(key, DEFAULT_FREQUENCY)));
-        else if (PREF_ALTITUDE.equals(key))
-            pref.setSummary(prefs.getBoolean(PREF_ALTITUDE, true) ? getString(R.string.summary_altitude) : null);
         else if (PREF_ACCURACY.equals(key))
             pref.setTitle(getString(R.string.title_accuracy, prefs.getString(key, DEFAULT_ACCURACY)));
         else if (PREF_TIMEOUT.equals(key))
