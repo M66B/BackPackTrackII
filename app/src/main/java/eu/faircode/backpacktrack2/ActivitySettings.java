@@ -185,7 +185,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         });
 
         // Handle upload GPX
-        pref_upload.setEnabled(prefs.getString(PREF_BLOGURL, null) != null);
         pref_upload.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -257,6 +256,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                     blogurl += "/";
                 prefs.edit().putString(key, blogurl).apply();
             }
+            findPreference(PREF_UPLOAD).setEnabled(blogurl != null);
         }
 
         // Update preference titles

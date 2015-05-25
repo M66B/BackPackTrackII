@@ -350,13 +350,13 @@ public class LocationService extends IntentService {
             return;
         }
 
+        updateState(context);
+
         // Conditionally start repeating alarm
         boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
         boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
         if (!recognition || !still)
             startRepeatingAlarm(context);
-
-        updateState(context);
 
         // Request activity updates
         if (recognition && GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS)
