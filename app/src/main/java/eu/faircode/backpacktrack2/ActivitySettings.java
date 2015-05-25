@@ -39,6 +39,9 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -194,6 +197,12 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref_check.setIntent(locationSettingsIntent);
         else
             pref_check.setEnabled(false);
+
+        // Check for Play services
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) != ConnectionResult.SUCCESS) {
+            findPreference(PREF_RECOGNITION_ENABLED).setEnabled(false);
+            findPreference(PREF_RECOGNITION_INTERVAL).setEnabled(false);
+        }
 
         // Handle version
         Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));

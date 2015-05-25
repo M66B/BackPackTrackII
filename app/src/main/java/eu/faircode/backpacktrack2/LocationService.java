@@ -24,6 +24,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.ActivityRecognitionResult;
@@ -359,7 +361,7 @@ public class LocationService extends IntentService {
         updateState(context);
 
         // Request activity updates
-        if (recognition)
+        if (recognition && GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS)
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -384,19 +386,20 @@ public class LocationService extends IntentService {
         cancelNotification(context);
 
         // Cancel activity updates
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
-                gac.blockingConnect();
-                Log.w(TAG, "GoogleApiClient connected");
-                Intent activityIntent = new Intent(context, LocationService.class);
-                activityIntent.setAction(LocationService.ACTION_ACTIVITY);
-                PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(gac, pi);
-                Log.w(TAG, "Canceled activity updates");
-            }
-        }).start();
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS)
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
+                    gac.blockingConnect();
+                    Log.w(TAG, "GoogleApiClient connected");
+                    Intent activityIntent = new Intent(context, LocationService.class);
+                    activityIntent.setAction(LocationService.ACTION_ACTIVITY);
+                    PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                    ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(gac, pi);
+                    Log.w(TAG, "Canceled activity updates");
+                }
+            }).start();
     }
 
     private static void startRepeatingAlarm(Context context) {
