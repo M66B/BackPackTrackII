@@ -93,6 +93,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_RECOGNITION_INTERVAL = "1"; // minutes
 
     // Transient values
+    public static final String PREF_FIRST = "pref_first";
     public static final String PREF_STATE = "pref_state";
     public static final String PREF_LOCATION_TYPE = "pref_location_type";
     public static final String PREF_BEST_LOCATION = "pref_best_location";
@@ -122,9 +123,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
         // First run
-        if (!prefs.contains(PREF_ENABLED)) {
-            prefs.edit().putBoolean(PREF_ENABLED, true).apply();
-            onSharedPreferenceChanged(prefs, PREF_ENABLED);
+        if (prefs.getBoolean(PREF_FIRST, true)) {
+            Log.w(TAG, "First run");
+            prefs.edit().putBoolean(PREF_FIRST, false).apply();
+            LocationService.startTracking(this);
         }
 
         // Get preferences

@@ -80,7 +80,7 @@
     <string name="msg_notification">%1$s @%2$dm &#177;%3$dm %4$s</string>
     <string name="msg_idle">Last location @%1$s</string>
     <string name="msg_acquiring">Acquiring location ...</string>
-    <string name="msg_acquired">Current location @%1$s</string>
+    <string name="msg_acquired">Acquired location @%1$s</string>
 
     <string name="msg_added">Added \'%s\'</string>
     <string name="msg_updated">Updated \'%s\'</string>
