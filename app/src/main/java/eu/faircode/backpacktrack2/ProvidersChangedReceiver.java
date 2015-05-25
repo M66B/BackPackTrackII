@@ -3,8 +3,6 @@ package eu.faircode.backpacktrack2;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
-import android.location.LocationManager;
 import android.util.Log;
 
 public class ProvidersChangedReceiver extends BroadcastReceiver {

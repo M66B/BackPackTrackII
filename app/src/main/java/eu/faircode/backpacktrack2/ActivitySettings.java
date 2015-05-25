@@ -185,6 +185,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         });
 
         // Handle upload GPX
+        pref_upload.setEnabled(prefs.getString(PREF_BLOGURL, null) != null);
         pref_upload.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -612,11 +613,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         else if (PREF_RECOGNITION_INTERVAL.equals(key))
             pref.setTitle(getString(R.string.title_recognition_interval, prefs.getString(key, PREF_RECOGNITION_INTERVAL)));
 
-        else if (PREF_BLOGURL.equals(key)) {
+        else if (PREF_BLOGURL.equals(key))
             pref.setTitle(getString(R.string.title_blogurl, prefs.getString(key, "-")));
-            Preference pref_upload = findPreference(PREF_UPLOAD);
-            pref_upload.setEnabled(prefs.getString(key, null) != null);
-        } else if (PREF_BLOGID.equals(key))
+        else if (PREF_BLOGID.equals(key))
             pref.setTitle(getString(R.string.title_blogid, prefs.getString(key, "1")));
         else if (PREF_BLOGUSER.equals(key))
             pref.setTitle(getString(R.string.title_bloguser, prefs.getString(key, "-")));
