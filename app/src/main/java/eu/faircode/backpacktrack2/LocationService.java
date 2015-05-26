@@ -542,10 +542,10 @@ public class LocationService extends IntentService {
 
             // Feedback
             updateState(this);
-            if (locationType == LOCATION_WAYPOINT) {
+            if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT) {
                 toast(waypointName, this);
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                vibrator.vibrate(500);
+                vibrator.vibrate(locationType == LOCATION_TRACKPOINT ? 250 : 500);
             }
         } else
             Log.w(TAG, "Filtered location=" + location);
