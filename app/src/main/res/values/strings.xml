@@ -48,7 +48,7 @@
     <string name="summary_nearby">Filter locations closer than the selected number of meters to the last location</string>
 
     <string name="summary_recognition_enabled">Recognize if you are still or moving and disable tracking when you are still</string>
-    <string name="summary_recognition_interval">Recognize your activity every selected number of minutes</string>
+    <string name="summary_recognition_interval">Recognize your activity every selected number of minutes (the interval will be reduced automatically when you are not moving)</string>
 
     <string name="summary_blogurl">WordPress weblog address</string>
     <string name="summary_blogid">WordPress weblog identification\nUse 1 for single site installations</string>
