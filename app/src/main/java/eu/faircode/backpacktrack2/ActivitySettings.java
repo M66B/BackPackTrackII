@@ -120,9 +120,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         super.onResume();
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
-        SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
-
         // First run
+        SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
         if (prefs.getBoolean(PREF_FIRST, true)) {
             Log.w(TAG, "First run");
             prefs.edit().putBoolean(PREF_FIRST, false).apply();

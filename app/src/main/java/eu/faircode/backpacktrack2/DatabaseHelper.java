@@ -96,4 +96,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("location", "ID = ?", new String[]{Integer.toString(id)});
     }
+
+    public void delete(long from, long to) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("location", "time >= ? AND time <= ?", new String[]{Long.toString(from),Long.toString(to) });
+    }
 }
