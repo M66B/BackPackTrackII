@@ -756,6 +756,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
                         @Override
                         protected void onPostExecute(Object result) {
+                            Cursor cursor = new DatabaseHelper(context).getList(0, Long.MAX_VALUE, false, true);
+                            changeCursor(cursor);
                             Toast.makeText(context, getString(R.string.msg_updated, newName), Toast.LENGTH_SHORT).show();
                         }
                     }.execute(newName);
