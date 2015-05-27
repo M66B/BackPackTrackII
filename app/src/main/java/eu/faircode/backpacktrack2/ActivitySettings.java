@@ -87,7 +87,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_ACCURACY = "20"; // meters
     public static final String DEFAULT_TIMEOUT = "60"; // seconds
     public static final String DEFAULT_INACCURATE = "100"; // meters
-    public static final String DEFAULT_NEARBY = "50"; // meters
+    public static final String DEFAULT_NEARBY = "100"; // meters
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
     public static final String DEFAULT_RECOGNITION_INTERVAL = "1"; // minutes
