@@ -667,7 +667,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 @Override
                 public void onClick(View view) {
                     try {
-                        String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude;
+                        String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude + "(" + Uri.encode(name) + ")";
                         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
                     } catch (Throwable ex) {
                         Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
@@ -859,6 +859,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 public void onClick(View view) {
                     try {
                         String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude;
+                        if (name != null)
+                            uri += "(" + Uri.encode(name) + ")";
                         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
                     } catch (Throwable ex) {
                         Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
