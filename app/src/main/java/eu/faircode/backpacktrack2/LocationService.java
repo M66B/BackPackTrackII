@@ -766,7 +766,7 @@ public class LocationService extends IntentService {
 
     // Serialization
 
-    private static class LocationSerializer implements JsonSerializer<Location> {
+    public static class LocationSerializer implements JsonSerializer<Location> {
         public JsonElement serialize(Location src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject jObject = new JsonObject();
 
@@ -798,7 +798,7 @@ public class LocationService extends IntentService {
         }
     }
 
-    private static class LocationDeserializer implements JsonDeserializer<Location> {
+    public static class LocationDeserializer implements JsonDeserializer<Location> {
         public Location deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {
             JsonObject jObject = (JsonObject) json;

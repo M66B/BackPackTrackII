@@ -833,6 +833,13 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             double accuracy = cursor.getDouble(cursor.getColumnIndex("accuracy"));
             final String name = cursor.getString(cursor.getColumnIndex("name"));
 
+            SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+            Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+            Location dest = new Location("");
+            dest.setLatitude(latitude);
+            dest.setLongitude(longitude);
+            double distance = (lastLocation == null ? 0 : lastLocation.distanceTo(dest));
+
             // Get views
             ImageView ivShare = (ImageView) view.findViewById(R.id.ivShare);
             TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
@@ -840,9 +847,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             TextView tvProvider = (TextView) view.findViewById(R.id.tvProvider);
             TextView tvAltitude = (TextView) view.findViewById(R.id.tvAltitude);
             TextView tvAccuracy = (TextView) view.findViewById(R.id.tvAccuracy);
+            TextView tvDistance = (TextView) view.findViewById(R.id.tvDistance);
 
             // Set values
-            tvTime.setText(new SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(time)));
+            tvTime.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(time)));
             ivPin.setVisibility(name == null ? View.INVISIBLE : View.VISIBLE);
             if (LocationManager.GPS_PROVIDER.equals(provider))
                 tvProvider.setText("G");
@@ -852,6 +860,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 tvProvider.setText("-");
             tvAltitude.setText(hasAltitude ? Long.toString(Math.round(altitude)) : "?");
             tvAccuracy.setText(hasAccuracy ? Long.toString(Math.round(accuracy)) : "?");
+            if (lastLocation != null && distance > 10000)
+                tvDistance.setText(Long.toString(Math.round(distance / 1000)) + "k");
+            else
+                tvDistance.setText(lastLocation == null ? "?" : Long.toString(Math.round(distance)));
 
             if (name == null)
                 view.setClickable(false);

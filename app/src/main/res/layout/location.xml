@@ -13,7 +13,7 @@
 
     <TextView
         android:id="@+id/tvTime"
-        android:layout_width="100dp"
+        android:layout_width="75dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="6dp"
@@ -49,6 +49,15 @@
     <TextView
         android:id="@+id/tvAccuracy"
         android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="3dp"
+        android:gravity="center_vertical|right"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/tvDistance"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="3dp"
