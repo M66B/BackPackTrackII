@@ -377,11 +377,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Geocode name
         Toast.makeText(this, getString(R.string.msg_geocoding, name), Toast.LENGTH_SHORT).show();
 
-        new AsyncTask<String, Object, List<Address>>() {
-            protected List<Address> doInBackground(String... params) {
+        new AsyncTask<Object, Object, List<Address>>() {
+            protected List<Address> doInBackground(Object... params) {
                 try {
                     Geocoder geocoder = new Geocoder(ActivitySettings.this);
-                    return geocoder.getFromLocationName(params[0], GEOCODER_RESULTS);
+                    return geocoder.getFromLocationName(name, GEOCODER_RESULTS);
                 } catch (IOException ex) {
                     Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                     return null;
@@ -406,19 +406,25 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                     alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int item) {
                             // Build location
-                            String geocodedName = (String) listAddressLine.get(item);
-                            Location location = new Location("geocoder");
+                            final String geocodedName = (String) listAddressLine.get(item);
+                            final Location location = new Location("geocoder");
                             location.setLatitude(listAddress.get(item).getLatitude());
                             location.setLongitude(listAddress.get(item).getLongitude());
                             location.setTime(System.currentTimeMillis());
 
-                            // Persist location
-                            new DatabaseHelper(ActivitySettings.this).insert(location, geocodedName);
+                            new AsyncTask<Object, Object, Object>() {
+                                protected Object doInBackground(Object... params) {
+                                    new DatabaseHelper(ActivitySettings.this).insert(location, geocodedName);
+                                    return null;
+                                }
 
-                            // Feedback
-                            Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false, true);
-                            adapter.changeCursor(cursor);
-                            Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, geocodedName), Toast.LENGTH_SHORT).show();
+                                @Override
+                                protected void onPostExecute(Object result) {
+                                    Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false, true);
+                                    adapter.changeCursor(cursor);
+                                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, geocodedName), Toast.LENGTH_SHORT).show();
+                                }
+                            }.execute();
                         }
                     });
                     alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -431,7 +437,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 } else
                     Toast.makeText(ActivitySettings.this, getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
             }
-        }.execute(name);
+        }.execute();
     }
 
     private void export(final Intent intent) {
@@ -682,8 +688,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                     public void onClick(View view) {
                         Toast.makeText(context, getString(R.string.msg_rgeocoding), Toast.LENGTH_SHORT).show();
 
-                        new AsyncTask<Location, Object, List<Address>>() {
-                            protected List<Address> doInBackground(Location... params) {
+                        new AsyncTask<Object, Object, List<Address>>() {
+                            protected List<Address> doInBackground(Object... params) {
                                 try {
                                     Geocoder geocoder = new Geocoder(ActivitySettings.this);
                                     return geocoder.getFromLocation(latitude, longitude, GEOCODER_RESULTS);
@@ -711,19 +717,21 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                                     alertDialogBuilder.setTitle(getString(R.string.title_rgeocode));
                                     alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int item) {
-                                            // Build location
-                                            String geocodedName = (String) listAddressLine.get(item);
-                                            Location location = new Location("geocoder");
-                                            location.setLatitude(listAddress.get(item).getLatitude());
-                                            location.setLongitude(listAddress.get(item).getLongitude());
-                                            location.setTime(System.currentTimeMillis());
+                                            final String geocodedName = (String) listAddressLine.get(item);
 
-                                            // Persist location
-                                            new DatabaseHelper(context).update(id, geocodedName);
+                                            new AsyncTask<Object, Object, Object>() {
+                                                protected Object doInBackground(Object... params) {
+                                                    new DatabaseHelper(context).update(id, geocodedName);
+                                                    return null;
+                                                }
 
-                                            // Feedback
-                                            etName.setText(geocodedName);
-                                            Toast.makeText(ActivitySettings.this, getString(R.string.msg_updated, geocodedName), Toast.LENGTH_SHORT).show();
+                                                @Override
+                                                protected void onPostExecute(Object result) {
+                                                    Cursor cursor = new DatabaseHelper(context).getList(0, Long.MAX_VALUE, false, true);
+                                                    changeCursor(cursor);
+                                                    Toast.makeText(context, getString(R.string.msg_updated, geocodedName), Toast.LENGTH_SHORT).show();
+                                                }
+                                            }.execute();
                                         }
                                     });
                                     alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -748,9 +756,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 public void onClick(View view) {
                     final String newName = etName.getText().toString();
 
-                    new AsyncTask<String, Object, Object>() {
-                        protected String doInBackground(String... params) {
-                            new DatabaseHelper(context).update(id, params[0]);
+                    new AsyncTask<Object, Object, Object>() {
+                        protected Object doInBackground(Object... params) {
+                            new DatabaseHelper(context).update(id, newName);
                             return null;
                         }
 
@@ -760,7 +768,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                             changeCursor(cursor);
                             Toast.makeText(context, getString(R.string.msg_updated, newName), Toast.LENGTH_SHORT).show();
                         }
-                    }.execute(newName);
+                    }.execute();
                 }
             });
 
@@ -774,9 +782,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    new AsyncTask<Integer, Object, Object>() {
-                                        protected String doInBackground(Integer... params) {
-                                            new DatabaseHelper(context).delete(params[0]);
+                                    new AsyncTask<Object, Object, Object>() {
+                                        protected Object doInBackground(Object... params) {
+                                            new DatabaseHelper(context).delete(id);
                                             return null;
                                         }
 
@@ -786,7 +794,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                                             changeCursor(cursor);
                                             Toast.makeText(context, getString(R.string.msg_deleted, name), Toast.LENGTH_SHORT).show();
                                         }
-                                    }.execute(id);
+                                    }.execute();
                                 }
                             })
                             .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
