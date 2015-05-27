@@ -323,35 +323,38 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Handle add
         ImageView ivAdd = (ImageView) viewEdit.findViewById(R.id.ivAdd);
-        ivAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final View viewEdit = inflater.inflate(R.layout.add, null);
-                final EditText address = (EditText) viewEdit.findViewById(R.id.etAdd);
+        if (Geocoder.isPresent())
+            ivAdd.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final View viewEdit = inflater.inflate(R.layout.add, null);
+                    final EditText address = (EditText) viewEdit.findViewById(R.id.etAdd);
 
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
-                alertDialogBuilder.setTitle(R.string.title_geocode);
-                alertDialogBuilder.setView(viewEdit);
-                alertDialogBuilder
-                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String name = address.getText().toString();
-                                if (!TextUtils.isEmpty(name))
-                                    add(name, adapter);
-                            }
-                        });
-                alertDialogBuilder
-                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Do nothing
-                            }
-                        });
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
-            }
-        });
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+                    alertDialogBuilder.setTitle(R.string.title_geocode);
+                    alertDialogBuilder.setView(viewEdit);
+                    alertDialogBuilder
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    String name = address.getText().toString();
+                                    if (!TextUtils.isEmpty(name))
+                                        add(name, adapter);
+                                }
+                            });
+                    alertDialogBuilder
+                            .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Do nothing
+                                }
+                            });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                }
+            });
+        else
+            ivAdd.setVisibility(View.GONE);
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
@@ -673,68 +676,71 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             });
 
             // Handle reverse geocode
-            ivGeocode.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Toast.makeText(context, getString(R.string.msg_rgeocoding), Toast.LENGTH_SHORT).show();
+            if (Geocoder.isPresent())
+                ivGeocode.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Toast.makeText(context, getString(R.string.msg_rgeocoding), Toast.LENGTH_SHORT).show();
 
-                    new AsyncTask<Location, Object, List<Address>>() {
-                        protected List<Address> doInBackground(Location... params) {
-                            try {
-                                Geocoder geocoder = new Geocoder(ActivitySettings.this);
-                                return geocoder.getFromLocation(latitude, longitude, GEOCODER_RESULTS);
-                            } catch (IOException ex) {
-                                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                                return null;
+                        new AsyncTask<Location, Object, List<Address>>() {
+                            protected List<Address> doInBackground(Location... params) {
+                                try {
+                                    Geocoder geocoder = new Geocoder(ActivitySettings.this);
+                                    return geocoder.getFromLocation(latitude, longitude, GEOCODER_RESULTS);
+                                } catch (IOException ex) {
+                                    Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                    return null;
+                                }
                             }
-                        }
 
-                        @Override
-                        protected void onPostExecute(final List<Address> listAddress) {
-                            // Get address lines
-                            if (listAddress != null && listAddress.size() > 0) {
-                                final List<CharSequence> listAddressLine = new ArrayList<>();
-                                for (Address address : listAddress)
-                                    if (address.hasLatitude() && address.hasLongitude()) {
-                                        List<String> listLine = new ArrayList<>();
-                                        for (int l = 0; l < address.getMaxAddressLineIndex(); l++)
-                                            listLine.add(address.getAddressLine(l));
-                                        listAddressLine.add(TextUtils.join(", ", listLine));
-                                    }
+                            @Override
+                            protected void onPostExecute(final List<Address> listAddress) {
+                                // Get address lines
+                                if (listAddress != null && listAddress.size() > 0) {
+                                    final List<CharSequence> listAddressLine = new ArrayList<>();
+                                    for (Address address : listAddress)
+                                        if (address.hasLatitude() && address.hasLongitude()) {
+                                            List<String> listLine = new ArrayList<>();
+                                            for (int l = 0; l < address.getMaxAddressLineIndex(); l++)
+                                                listLine.add(address.getAddressLine(l));
+                                            listAddressLine.add(TextUtils.join(", ", listLine));
+                                        }
 
-                                // Show address selector
-                                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
-                                alertDialogBuilder.setTitle(getString(R.string.title_rgeocode));
-                                alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int item) {
-                                        // Build location
-                                        String geocodedName = (String) listAddressLine.get(item);
-                                        Location location = new Location("geocoder");
-                                        location.setLatitude(listAddress.get(item).getLatitude());
-                                        location.setLongitude(listAddress.get(item).getLongitude());
-                                        location.setTime(System.currentTimeMillis());
+                                    // Show address selector
+                                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+                                    alertDialogBuilder.setTitle(getString(R.string.title_rgeocode));
+                                    alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int item) {
+                                            // Build location
+                                            String geocodedName = (String) listAddressLine.get(item);
+                                            Location location = new Location("geocoder");
+                                            location.setLatitude(listAddress.get(item).getLatitude());
+                                            location.setLongitude(listAddress.get(item).getLongitude());
+                                            location.setTime(System.currentTimeMillis());
 
-                                        // Persist location
-                                        new DatabaseHelper(context).update(id, geocodedName);
+                                            // Persist location
+                                            new DatabaseHelper(context).update(id, geocodedName);
 
-                                        // Feedback
-                                        etName.setText(geocodedName);
-                                        Toast.makeText(ActivitySettings.this, getString(R.string.msg_updated, geocodedName), Toast.LENGTH_SHORT).show();
-                                    }
-                                });
-                                alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        // Do nothing
-                                    }
-                                });
-                                alertDialogBuilder.show();
-                            } else
-                                Toast.makeText(ActivitySettings.this, getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
-                        }
-                    }.execute();
-                }
-            });
+                                            // Feedback
+                                            etName.setText(geocodedName);
+                                            Toast.makeText(ActivitySettings.this, getString(R.string.msg_updated, geocodedName), Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                                    alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // Do nothing
+                                        }
+                                    });
+                                    alertDialogBuilder.show();
+                                } else
+                                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
+                            }
+                        }.execute();
+                    }
+                });
+            else
+                ivGeocode.setVisibility(View.GONE);
 
             // Handle update name
             ivSave.setOnClickListener(new View.OnClickListener() {
