@@ -612,7 +612,7 @@ public class LocationService extends IntentService {
         }
     }
 
-    public static List<String> reverseGeocode(Location location, Context context) {
+    private static List<String> reverseGeocode(Location location, Context context) {
         List<String> listline = new ArrayList<>();
         if (location != null && Geocoder.isPresent())
             try {
@@ -735,7 +735,6 @@ public class LocationService extends IntentService {
         }
         return context.getString(R.string.undefined);
     }
-
 
     private static void cancelNotification(Context context) {
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
