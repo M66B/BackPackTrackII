@@ -834,7 +834,12 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             // Set values
             tvTime.setText(new SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(time)));
             ivPin.setVisibility(name == null ? View.INVISIBLE : View.VISIBLE);
-            tvProvider.setText(provider.substring(0, 3));
+            if (LocationManager.GPS_PROVIDER.equals(provider))
+                tvProvider.setText("G");
+            else if (LocationManager.NETWORK_PROVIDER.equals(provider))
+                tvProvider.setText("N");
+            else
+                tvProvider.setText("-");
             tvAltitude.setText(hasAltitude ? Long.toString(Math.round(altitude)) : "?");
             tvAccuracy.setText(hasAccuracy ? Long.toString(Math.round(accuracy)) : "?");
 
