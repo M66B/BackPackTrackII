@@ -102,33 +102,39 @@ public class LocationService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         Log.w(TAG, "Intent=" + intent);
+        try {
+            if (ACTION_ACTIVITY.equals(intent.getAction()))
+                handleActivity(intent);
 
-        if (ACTION_ACTIVITY.equals(intent.getAction()))
-            handleActivity(intent);
+            else if (ACTION_TRACKPOINT.equals(intent.getAction()) ||
+                    ACTION_WAYPOINT.equals(intent.getAction()) ||
+                    ACTION_ALARM.equals(intent.getAction()))
+                handleLocationRequest(intent);
 
-        else if (ACTION_TRACKPOINT.equals(intent.getAction()) ||
-                ACTION_WAYPOINT.equals(intent.getAction()) ||
-                ACTION_ALARM.equals(intent.getAction()))
-            handleLocationRequest(intent);
+            else if (ACTION_LOCATION_FINE.equals(intent.getAction()) ||
+                    ACTION_LOCATION_COARSE.equals(intent.getAction()))
+                handleLocationUpdate(intent);
 
-        else if (ACTION_LOCATION_FINE.equals(intent.getAction()) ||
-                ACTION_LOCATION_COARSE.equals(intent.getAction()))
-            handleLocationUpdate(intent);
+            else if (ACTION_TIMEOUT.equals(intent.getAction()))
+                handleLocationTimeout(intent);
 
-        else if (ACTION_TIMEOUT.equals(intent.getAction()))
-            handleLocationTimeout(intent);
+            else if (ACTION_STOP.equals(intent.getAction()))
+                handleStop(intent);
 
-        else if (ACTION_STOP.equals(intent.getAction()))
-            handleStop(intent);
+            else if (ACTION_GEOTAGGED.equals(intent.getAction()))
+                handleGeotagged(intent);
 
-        else if (ACTION_GEOTAGGED.equals(intent.getAction()))
-            handleGeotagged(intent);
+            else if (ACTION_SHARE.equals(intent.getAction()))
+                handleShare(intent);
 
-        else if (ACTION_SHARE.equals(intent.getAction()))
-            handleShare(intent);
+            else if (ACTION_UPLOAD.equals(intent.getAction()))
+                handleUpload(intent);
 
-        else if (ACTION_UPLOAD.equals(intent.getAction()))
-            handleUpload(intent);
+            else
+                Log.w(TAG, "Unknown action");
+        } catch (Throwable ex) {
+            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+        }
     }
 
     // Handle intents methods
