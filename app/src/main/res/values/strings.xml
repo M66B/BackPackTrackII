@@ -9,6 +9,7 @@
     <string name="title_check">Location settings</string>
 
     <string name="title_geocode">Geocode address</string>
+    <string name="title_rgeocode">Reverse geocode location</string>
 
     <string name="title_tracking">Tracking</string>
     <string name="title_enabled">Tracking enabled</string>

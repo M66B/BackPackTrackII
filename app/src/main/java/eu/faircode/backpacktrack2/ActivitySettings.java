@@ -704,7 +704,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
                                 // Show address selector
                                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
-                                alertDialogBuilder.setTitle(getString(R.string.title_geocode));
+                                alertDialogBuilder.setTitle(getString(R.string.title_rgeocode));
                                 alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int item) {
                                         // Build location
