@@ -528,7 +528,9 @@ public class LocationService extends IntentService {
         float pref_nearby = Float.parseFloat(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
         if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT ||
-                lastLocation == null || lastLocation.distanceTo(location) >= pref_nearby) {
+                lastLocation == null || lastLocation.distanceTo(location) >= pref_nearby ||
+                (lastLocation.hasAccuracy() ? lastLocation.getAccuracy() : Float.MAX_VALUE) >
+                        (location.hasAccuracy() ? location.getAccuracy() : Float.MAX_VALUE)) {
             // New location
             Log.w(TAG, "New location=" + location + " type=" + locationType);
 
