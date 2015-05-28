@@ -103,6 +103,6 @@
     <string name="running">Running</string>
     <string name="on_bicycle">On bicycle</string>
     <string name="in_vehicle">In vehicle</string>
-    <string name="unknown">Unknown</string>
-    <string name="undefined">Undefined</string>
+    <string name="unknown">Unknown activity</string>
+    <string name="undefined">Undefined activity</string>
 </resources>
