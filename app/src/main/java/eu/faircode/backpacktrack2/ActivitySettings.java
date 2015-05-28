@@ -42,6 +42,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.location.DetectedActivity;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -248,6 +249,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         if (pref instanceof EditTextPreference)
             if ("".equals(prefs.getString(key, null)))
                 prefs.edit().remove(key).apply();
+
+        // Reset activity
+        if (PREF_RECOGNITION_ENABLED.equals(key))
+            prefs.edit().putInt(PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN).apply();
 
         // Update blog URL
         if (PREF_BLOGURL.equals(key)) {
