@@ -1,6 +1,6 @@
 === BackPackTrack for Android ===
 Contributors: Marcel Bokhorst, M66B
-Tags: android, gpx, route, track, geocode, travel, journey
+Tags: Android, track, trackpoint, waypoint, geocode, travel, journey, GPX
 Requires at least: 3.1
 Tested up to: 4.2.2
 Stable tag: 0.8
@@ -9,7 +9,7 @@ WordPress plugin and open source Android application to track your journeys
 
 == Description ==
 
-...
+Companion plugin for the Android application [BackPackTrack II](https://github.com/M66B/BackPackTrackII/)
 
 == Installation ==
 
@@ -24,7 +24,7 @@ To be able to upload GPX files, you should fill in your weblog address (URL), yo
 == Changelog ==
 
 = 0.8 =
-* Rewritten Android application
+* Completely rewritten Android application
 
 = 0.6 =
 * Improvement: using alarm manager instead of wakelocks to save battery
