@@ -38,7 +38,7 @@
     <string name="summary_history">Show the location history to verify everything works</string>
     <string name="summary_edit">Add, change or delete waypoints</string>
     <string name="summary_share">Tap to write and share a GPX file\nLast share: %s</string>
-    <string name="summary_upload">Tap to write and upload a GPX file\nLast upload: %s</string>
+    <string name="summary_upload">Tap to write and upload a GPX file to a WordPress weblog\nLast upload: %s</string>
     <string name="summary_check">Tap to open the Android location settings</string>
 
     <string name="summary_frequency">Try to acquire a new location every selected number of minutes</string>
