@@ -3,7 +3,7 @@
 Description
 -----------
 
-BackPackTrack II is an utility application meant to continuously record your location, without draining your battery.
+BackPackTrack II is an open source utility application meant to continuously record your location, without draining your battery.
 
 The GPS will be switched on every 3 minutes for a maximum of 60 seconds (configurable) to acquire a location, but only if you are moving.
 When the GPS cannot get a fix, a network location will be used as backup.
@@ -14,7 +14,7 @@ The default is to filter locations within 100 meter of the last location and loc
 From the status bar notification you can make an extra trackpoint or a new waypoint.
 Waypoints will be automatically reverse geocoded if there is an internet connection, otherwise this can be done later using the waypoint editor.
 
-You can export your location history as GPX file for visualization in another application.
+You can export your location history as a GPX file for visualization in another application.
 You could use [OsmAnd](https://play.google.com/store/apps/details?id=net.osmand) for this purpose.
 
 You can upload your location history to a WordPress weblog using a small [WordPress plugin](https://wordpress.org/plugins/backpacktrack-for-android/).
