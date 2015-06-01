@@ -29,6 +29,7 @@
     <string name="title_blogid">ID: %s</string>
     <string name="title_bloguser">User name: %s</string>
     <string name="title_blogpwd">Password: %s</string>
+    <string name="title_plugin">Plugin</string>
 
     <string name="title_info">Information</string>
     <string name="title_version">Version</string>
@@ -56,6 +57,7 @@
     <string name="summary_blogid">WordPress weblog identification\nUse 1 for single site installations</string>
     <string name="summary_bloguser">WordPress user name</string>
     <string name="summary_blogpwd">WordPress password</string>
+    <string name="summary_plugin">Tap to open the WordPress plugin page (will start the browser)</string>
 
     <string name="summary_author">Marcel Bokhorst (M66B)\nTap for details (will start the browser)</string>
     <string name="summary_license">GNU General Public License version 3\nTap for details (will start the browser)</string>

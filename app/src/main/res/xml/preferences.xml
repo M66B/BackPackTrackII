@@ -90,6 +90,13 @@
             android:inputType="textPassword"
             android:key="pref_blogpwd"
             android:summary="@string/summary_blogpwd" />
+        <Preference
+            android:summary="@string/summary_plugin"
+            android:title="@string/title_plugin">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="https://wordpress.org/plugins/backpacktrack-for-android/" />
+        </Preference>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_info">
         <Preference
