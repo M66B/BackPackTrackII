@@ -212,9 +212,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref_check.setEnabled(false);
 
         // Check for Play services
-        boolean playServices = (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) != ConnectionResult.SUCCESS);
-        findPreference(PREF_RECOGNITION_ENABLED).setEnabled(!playServices);
-        findPreference(PREF_RECOGNITION_INTERVAL).setEnabled(!playServices);
+        boolean playServices = (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS);
+        findPreference(PREF_RECOGNITION_ENABLED).setEnabled(playServices);
+        findPreference(PREF_RECOGNITION_INTERVAL).setEnabled(playServices);
 
         // Handle version
         Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
@@ -225,7 +225,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref_version.setSummary(
                     pInfo.versionName + "/" + pInfo.versionCode + "\n" +
                             getString(R.string.msg_geocoder) + " " +
-                            getString(Geocoder.isPresent() ? R.string.msg_yes : R.string.msg_no));
+                            getString(Geocoder.isPresent() ? R.string.msg_yes : R.string.msg_no) + "\n" +
+                            getString(R.string.msg_playservices) + " " +
+                            getString(playServices ? R.string.msg_yes : R.string.msg_no));
         } catch (PackageManager.NameNotFoundException ex) {
             pref_version.setSummary(ex.toString());
         }
