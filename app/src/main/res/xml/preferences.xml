@@ -109,5 +109,12 @@
                 android:action="android.intent.action.VIEW"
                 android:data="http://www.gnu.org/licenses/gpl.txt" />
         </Preference>
+        <Preference
+            android:summary="@string/summary_egm96"
+            android:title="@string/title_egm96">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://worldwind.arc.nasa.gov/worldwind-nosa-1.3.html" />
+        </Preference>
     </PreferenceCategory>
 </PreferenceScreen>

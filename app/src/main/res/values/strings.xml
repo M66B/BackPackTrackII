@@ -34,6 +34,7 @@
     <string name="title_version">Version</string>
     <string name="title_author">Author</string>
     <string name="title_license">License</string>
+    <string name="title_egm96">EGM96</string>
 
     <string name="summary_history">Show the location history to verify everything works</string>
     <string name="summary_edit">Add, change or delete waypoints</string>
@@ -58,6 +59,7 @@
 
     <string name="summary_author">Marcel Bokhorst (M66B)\nTap for details (will start the browser)</string>
     <string name="summary_license">GNU General Public License version 3\nTap for details (will start the browser)</string>
+    <string name="summary_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nTap for more information (will start the browser)</string>
 
     <string name="title_trackpoint">Trackpoint</string>
     <string name="title_waypoint">Waypoint</string>
