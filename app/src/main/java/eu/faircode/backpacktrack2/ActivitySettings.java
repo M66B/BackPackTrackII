@@ -71,6 +71,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_TIMEOUT = "pref_timeout";
     public static final String PREF_INACCURATE = "pref_inaccurate";
     public static final String PREF_NEARBY = "pref_nearby";
+    public static final String PREF_BEARING_CHANGE = "pref_bearing_change";
+    public static final String PREF_ALTITUDE_CHANGE = "pref_altitude_change";
 
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
     public static final String PREF_RECOGNITION_INTERVAL = "pref_recognition_interval";
@@ -90,6 +92,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_TIMEOUT = "60"; // seconds
     public static final String DEFAULT_INACCURATE = "100"; // meters
     public static final String DEFAULT_NEARBY = "100"; // meters
+    public static final String DEFAULT_BEARING_CHANGE = "30"; // degrees
+    public static final String DEFAULT_ALTITUDE_CHANGE = "20"; // meters
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
     public static final String DEFAULT_RECOGNITION_INTERVAL = "1"; // minutes

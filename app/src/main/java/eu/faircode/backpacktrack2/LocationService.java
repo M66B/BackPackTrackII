@@ -65,6 +65,7 @@ public class LocationService extends IntentService {
     public static final String ACTION_ACTIVITY = "Activity";
     public static final String ACTION_LOCATION_FINE = "LocationFine";
     public static final String ACTION_LOCATION_COARSE = "LocationCoarse";
+    public static final String ACTION_LOCATION_PASSIVE = "LocationPassive";
     public static final String ACTION_TIMEOUT = "TimeOut";
     public static final String ACTION_STOP = "Stop";
     public static final String ACTION_TRACKPOINT = "TrackPoint";
@@ -115,6 +116,9 @@ public class LocationService extends IntentService {
             else if (ACTION_LOCATION_FINE.equals(intent.getAction()) ||
                     ACTION_LOCATION_COARSE.equals(intent.getAction()))
                 handleLocationUpdate(intent);
+
+            else if (ACTION_LOCATION_PASSIVE.equals(intent.getAction()))
+                handlePassiveLocationUpdate(intent);
 
             else if (ACTION_TIMEOUT.equals(intent.getAction()))
                 handleLocationTimeout(intent);
@@ -241,6 +245,57 @@ public class LocationService extends IntentService {
 
         // Process location
         handleLocation(locationType, location);
+    }
+
+    private void handlePassiveLocationUpdate(Intent intent) {
+        // Process location update
+        Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
+        Log.w(TAG, "Update passive location=" + location);
+        if (location == null || (location.getLatitude() == 0.0 && location.getLongitude() == 0.0))
+            return;
+
+        if (!location.hasBearing() && !location.hasAltitude())
+            Log.w(TAG, "Passive location without bearing/altitude");
+
+        // Correct altitude
+        if (LocationManager.GPS_PROVIDER.equals(location.getProvider()))
+            try {
+                double offset = getEGM96Offset(location, this);
+                Log.w(TAG, "Offset=" + offset);
+                location.setAltitude(location.getAltitude() - offset);
+                Log.w(TAG, "Corrected location=" + location);
+            } catch (IOException ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
+
+        // Get last location
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+
+        // Handle bearing change
+        if (location.hasBearing()) {
+            float pref_bearing_change = Float.parseFloat(prefs.getString(ActivitySettings.PREF_BEARING_CHANGE, ActivitySettings.DEFAULT_BEARING_CHANGE));
+            float delta = Math.abs(lastLocation.getBearing() - location.getBearing());
+            if (delta > 180)
+                delta = 360 - delta;
+            if (lastLocation == null || !lastLocation.hasBearing() || delta >= pref_bearing_change) {
+                Log.w(TAG, "Bearing changed to " + location.getBearing());
+                new DatabaseHelper(this).insert(location, null);
+                prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
+            }
+        }
+
+        // Handle altitude change
+        if (location.hasAltitude()) {
+            double pref_altitude_change = Double.parseDouble(prefs.getString(ActivitySettings.PREF_ALTITUDE_CHANGE, ActivitySettings.DEFAULT_ALTITUDE_CHANGE));
+            double delta = Math.abs(lastLocation.getAltitude() - location.getAltitude());
+            float accuracy = (lastLocation.getAccuracy() + location.getAccuracy()) * 1.5f; // vertical accuracy ~ 1.5 x horizontal accuracy
+            if (lastLocation == null || !lastLocation.hasAltitude() || delta >= pref_altitude_change + accuracy) {
+                Log.w(TAG, "Altitude changed to " + location.getAltitude());
+                new DatabaseHelper(this).insert(location, null);
+                prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
+            }
+        }
     }
 
     private void handleLocationTimeout(Intent intent) {
@@ -381,6 +436,14 @@ public class LocationService extends IntentService {
                     Log.w(TAG, "Activity updates frequency=" + interval + "m");
                 }
             }).start();
+
+        // Request passive location updates
+        Intent locationIntent = new Intent(context, LocationService.class);
+        locationIntent.setAction(LocationService.ACTION_LOCATION_PASSIVE);
+        PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, LOCATION_MIN_TIME, LOCATION_MIN_DISTANCE, pi);
+        Log.w(TAG, "Requested passive location updates");
     }
 
     public static void stopTracking(final Context context) {
@@ -405,6 +468,13 @@ public class LocationService extends IntentService {
                     Log.w(TAG, "Canceled activity updates");
                 }
             }).start();
+
+        // Cancel passive location updates
+        Intent locationIntent = new Intent(context, LocationService.class);
+        locationIntent.setAction(LocationService.ACTION_LOCATION_PASSIVE);
+        PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        lm.removeUpdates(pi);
     }
 
     private static void startRepeatingAlarm(Context context) {
@@ -447,7 +517,7 @@ public class LocationService extends IntentService {
             locationIntent.setAction(LocationService.ACTION_LOCATION_COARSE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_MIN_TIME, LOCATION_MIN_DISTANCE, pi);
-            Log.w(TAG, "Requested network locations");
+            Log.w(TAG, "Requested network location updates");
         }
 
         // Request fine location
@@ -456,7 +526,7 @@ public class LocationService extends IntentService {
             locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_MIN_TIME, LOCATION_MIN_DISTANCE, pi);
-            Log.w(TAG, "Requested GPS locations");
+            Log.w(TAG, "Requested GPS location updates");
         }
 
         // Set location timeout
