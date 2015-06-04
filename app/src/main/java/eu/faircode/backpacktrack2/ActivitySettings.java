@@ -24,6 +24,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -857,7 +858,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             TextView tvDistance = (TextView) view.findViewById(R.id.tvDistance);
 
             // Set values
-            tvTime.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date(time)));
+            CharSequence relativeTime = DateUtils.getRelativeTimeSpanString(time, new Date().getTime(),
+                    DateUtils.SECOND_IN_MILLIS, 0);
+            tvTime.setText(relativeTime);
             ivPin.setVisibility(name == null ? View.INVISIBLE : View.VISIBLE);
             if (LocationManager.GPS_PROVIDER.equals(provider))
                 tvProvider.setText("G");
