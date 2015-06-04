@@ -27,6 +27,15 @@ BackPackTrack II is a complete rewrite of [BackPackTrack](https://github.com/M66
 
 You can download the latest version of the application [here](https://github.com/M66B/BackPackTrackII/releases).
 
+Frequently asked questions
+--------------------------
+
+<a name="FAQ1"></a>
+**(1) Are Google Play services required?**
+
+No, but acquiring locations will not stop if you are still (not moving),
+since there are no open source libraries available to detect user activity (what you are doing).
+
 Acknowledgements
 ----------------
 
