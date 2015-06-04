@@ -76,6 +76,7 @@
     <string name="header_altitude">Alt.</string>
     <string name="header_accuracy">Acc.</string>
     <string name="header_distance">Dist.</string>
+    <string name="header_bearing">&#176;</string>
 
     <string name="msg_noproviders">Enable a location provider in the Android location settings to use this application</string>
     <string name="msg_never">never</string>

@@ -840,8 +840,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
             final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
             boolean hasAltitude = !cursor.isNull(cursor.getColumnIndex("altitude"));
+            boolean hasBearing = !cursor.isNull(cursor.getColumnIndex("bearing"));
             boolean hasAccuracy = !cursor.isNull(cursor.getColumnIndex("accuracy"));
             double altitude = cursor.getDouble(cursor.getColumnIndex("altitude"));
+            double bearing = cursor.getDouble(cursor.getColumnIndex("bearing"));
             double accuracy = cursor.getDouble(cursor.getColumnIndex("accuracy"));
             final String name = cursor.getString(cursor.getColumnIndex("name"));
 
@@ -858,6 +860,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             ImageView ivPin = (ImageView) view.findViewById(R.id.ivPin);
             TextView tvProvider = (TextView) view.findViewById(R.id.tvProvider);
             TextView tvAltitude = (TextView) view.findViewById(R.id.tvAltitude);
+            TextView tvBearing = (TextView) view.findViewById(R.id.tvBearing);
             TextView tvAccuracy = (TextView) view.findViewById(R.id.tvAccuracy);
             TextView tvDistance = (TextView) view.findViewById(R.id.tvDistance);
 
@@ -873,6 +876,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             else
                 tvProvider.setText("-");
             tvAltitude.setText(hasAltitude ? Long.toString(Math.round(altitude)) : "?");
+            tvBearing.setText(hasBearing ? Long.toString(Math.round(bearing)) : "?");
             tvAccuracy.setText(hasAccuracy ? Long.toString(Math.round(accuracy)) : "?");
             if (lastLocation != null && distance > 10000)
                 tvDistance.setText(Long.toString(Math.round(distance / 1000)) + "k");
