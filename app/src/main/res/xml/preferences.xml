@@ -63,6 +63,18 @@
             android:key="pref_nearby"
             android:summary="@string/summary_nearby" />
     </PreferenceCategory>
+    <PreferenceCategory android:title="@string/title_passive">
+        <EditTextPreference
+            android:defaultValue="30"
+            android:inputType="number"
+            android:key="pref_passive_bearing"
+            android:summary="@string/summary_passive_bearing" />
+        <EditTextPreference
+            android:defaultValue="20"
+            android:inputType="number"
+            android:key="pref_passive_altitude"
+            android:summary="@string/summary_passive_altitude" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_recognition">
         <CheckBoxPreference
             android:defaultValue="true"

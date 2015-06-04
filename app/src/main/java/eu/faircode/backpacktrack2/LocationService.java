@@ -274,7 +274,7 @@ public class LocationService extends IntentService {
 
         // Handle bearing change
         if (location.hasBearing()) {
-            float pref_bearing_change = Float.parseFloat(prefs.getString(ActivitySettings.PREF_BEARING_CHANGE, ActivitySettings.DEFAULT_BEARING_CHANGE));
+            float pref_bearing_change = Float.parseFloat(prefs.getString(ActivitySettings.PREF_PASSIVE_BEARING, ActivitySettings.DEFAULT_PASSIVE_BEARING));
             float delta = Math.abs(lastLocation.getBearing() - location.getBearing());
             if (delta > 180)
                 delta = 360 - delta;
@@ -287,7 +287,7 @@ public class LocationService extends IntentService {
 
         // Handle altitude change
         if (location.hasAltitude()) {
-            double pref_altitude_change = Double.parseDouble(prefs.getString(ActivitySettings.PREF_ALTITUDE_CHANGE, ActivitySettings.DEFAULT_ALTITUDE_CHANGE));
+            double pref_altitude_change = Double.parseDouble(prefs.getString(ActivitySettings.PREF_PASSIVE_ALTITUDE, ActivitySettings.DEFAULT_PASSIVE_ALTITUDE));
             double delta = Math.abs(lastLocation.getAltitude() - location.getAltitude());
             float accuracy = (lastLocation.getAccuracy() + location.getAccuracy()) * 1.5f; // vertical accuracy ~ 1.5 x horizontal accuracy
             if (lastLocation == null || !lastLocation.hasAltitude() || delta >= pref_altitude_change + accuracy) {

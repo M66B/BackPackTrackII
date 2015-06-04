@@ -71,8 +71,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_TIMEOUT = "pref_timeout";
     public static final String PREF_INACCURATE = "pref_inaccurate";
     public static final String PREF_NEARBY = "pref_nearby";
-    public static final String PREF_BEARING_CHANGE = "pref_bearing_change";
-    public static final String PREF_ALTITUDE_CHANGE = "pref_altitude_change";
+    public static final String PREF_PASSIVE_BEARING = "pref_passive_bearing";
+    public static final String PREF_PASSIVE_ALTITUDE = "pref_passive_altitude";
 
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
     public static final String PREF_RECOGNITION_INTERVAL = "pref_recognition_interval";
@@ -92,8 +92,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_TIMEOUT = "60"; // seconds
     public static final String DEFAULT_INACCURATE = "100"; // meters
     public static final String DEFAULT_NEARBY = "100"; // meters
-    public static final String DEFAULT_BEARING_CHANGE = "30"; // degrees
-    public static final String DEFAULT_ALTITUDE_CHANGE = "20"; // meters
+    public static final String DEFAULT_PASSIVE_BEARING = "30"; // degrees
+    public static final String DEFAULT_PASSIVE_ALTITUDE = "20"; // meters
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
     public static final String DEFAULT_RECOGNITION_INTERVAL = "1"; // minutes
@@ -155,6 +155,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_TIMEOUT);
         updateTitle(prefs, PREF_INACCURATE);
         updateTitle(prefs, PREF_NEARBY);
+
+        updateTitle(prefs, PREF_PASSIVE_BEARING);
+        updateTitle(prefs, PREF_PASSIVE_ALTITUDE);
 
         updateTitle(prefs, PREF_RECOGNITION_INTERVAL);
 
@@ -633,6 +636,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref.setTitle(getString(R.string.title_inaccurate, prefs.getString(key, DEFAULT_INACCURATE)));
         else if (PREF_NEARBY.equals(key))
             pref.setTitle(getString(R.string.title_nearby, prefs.getString(key, DEFAULT_NEARBY)));
+
+        else if (PREF_PASSIVE_BEARING.equals(key))
+            pref.setTitle(getString(R.string.title_passive_bearing, prefs.getString(key, DEFAULT_PASSIVE_BEARING)));
+        else if (PREF_PASSIVE_ALTITUDE.equals(key))
+            pref.setTitle(getString(R.string.title_passive_altitude, prefs.getString(key, DEFAULT_PASSIVE_ALTITUDE)));
 
         else if (PREF_RECOGNITION_INTERVAL.equals(key))
             pref.setTitle(getString(R.string.title_recognition_interval, prefs.getString(key, PREF_RECOGNITION_INTERVAL)));
