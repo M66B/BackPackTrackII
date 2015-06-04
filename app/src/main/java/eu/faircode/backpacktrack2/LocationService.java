@@ -90,6 +90,7 @@ public class LocationService extends IntentService {
     private static final int LOCATION_TRACKPOINT = 1;
     private static final int LOCATION_WAYPOINT = 2;
     private static final int LOCATION_PERIODIC = 3;
+    private static final int LOCATION_GEOTAG = 4;
 
     private static double EGM96_INTERVAL = 15d / 60d; // 15' angle delta
     private static int EGM96_ROWS = 721;
@@ -264,7 +265,7 @@ public class LocationService extends IntentService {
         // Process photo location
         Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
         if (location != null)
-            handleLocation(LOCATION_TRACKPOINT, location);
+            handleLocation(LOCATION_GEOTAG, location);
     }
 
     private void handleShare(Intent intent) {
@@ -527,7 +528,7 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         float pref_nearby = Float.parseFloat(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
-        if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT ||
+        if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT || locationType == LOCATION_GEOTAG ||
                 lastLocation == null || lastLocation.distanceTo(location) >= pref_nearby ||
                 (lastLocation.hasAccuracy() ? lastLocation.getAccuracy() : Float.MAX_VALUE) >
                         (location.hasAccuracy() ? location.getAccuracy() : Float.MAX_VALUE)) {
@@ -551,7 +552,8 @@ public class LocationService extends IntentService {
             // Feedback
             updateState(this);
             if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT) {
-                toast(waypointName, this);
+                if (locationType == LOCATION_WAYPOINT)
+                    toast(waypointName, this);
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(locationType == LOCATION_TRACKPOINT ? 250 : 500);
             }
