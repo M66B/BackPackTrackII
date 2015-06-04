@@ -70,6 +70,7 @@ public class LocationService extends IntentService {
     public static final String ACTION_STOP = "Stop";
     public static final String ACTION_TRACKPOINT = "TrackPoint";
     public static final String ACTION_WAYPOINT = "WayPoint";
+    public static final String ACTION_GEOPOINT = "Geopoint";
     public static final String ACTION_GEOTAGGED = "Geotagged";
     public static final String ACTION_SHARE = "Share";
     public static final String ACTION_UPLOAD = "Upload";
@@ -79,6 +80,7 @@ public class LocationService extends IntentService {
     public static final String EXTRA_EXTENSIONS = "Extensions";
     public static final String EXTRA_FROM = "From";
     public static final String EXTRA_TO = "To";
+    public static final String EXTRA_GEOURI = "Geopoint";
 
     // Constants
     private static final int LOCATION_MIN_TIME = 1000; // milliseconds
@@ -125,6 +127,9 @@ public class LocationService extends IntentService {
 
             else if (ACTION_STOP.equals(intent.getAction()))
                 handleStop(intent);
+
+            else if (ACTION_GEOPOINT.equals(intent.getAction()))
+                handleGeopoint(intent);
 
             else if (ACTION_GEOTAGGED.equals(intent.getAction()))
                 handleGeotagged(intent);
@@ -314,6 +319,30 @@ public class LocationService extends IntentService {
 
     private void handleStop(Intent intent) {
         stopLocating(this);
+    }
+
+    private void handleGeopoint(Intent intent) {
+        // geo:51.805702,4.721146?z=17
+        // geo:0,0?q=latitude,longitude(label)
+        Uri data = (Uri) intent.getExtras().get(EXTRA_GEOURI);
+        Log.w(TAG, "Received geopoint query=" + data.toString());
+        String[] query = data.getSchemeSpecificPart().split("\\?");
+        if (query.length > 0) {
+            String[] loc = query[0].split(",");
+            if (loc.length == 2) {
+                double lat = Double.parseDouble(loc[0]);
+                double lon = Double.parseDouble(loc[1]);
+                if (lat != 0 || lon != 0) {
+                    Location location = new Location("Point");
+                    location.setTime(System.currentTimeMillis());
+                    location.setLatitude(lat);
+                    location.setLongitude(lon);
+                    String waypointName = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+                    new DatabaseHelper(this).insert(location, waypointName);
+                    toast(getString(R.string.msg_added, waypointName), this);
+                }
+            }
+        }
     }
 
     private void handleGeotagged(Intent intent) {

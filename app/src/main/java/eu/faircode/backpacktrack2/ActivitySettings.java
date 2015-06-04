@@ -52,7 +52,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 
 public class ActivitySettings extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "BPT2.Settings";
@@ -127,6 +126,15 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     protected void onResume() {
         super.onResume();
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
+        // Shared geo point
+        Uri data = getIntent().getData();
+        if (data != null && "geo".equals(data.getScheme())) {
+            Intent geopointIntent = new Intent(this, LocationService.class);
+            geopointIntent.setAction(LocationService.ACTION_GEOPOINT);
+            geopointIntent.putExtra(LocationService.EXTRA_GEOURI, data);
+            startService(geopointIntent);
+        }
 
         // First run
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
@@ -245,6 +253,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     protected void onPause() {
         super.onPause();
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
     }
 
     @Override

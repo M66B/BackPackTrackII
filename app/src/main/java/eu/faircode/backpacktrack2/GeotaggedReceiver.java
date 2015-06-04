@@ -14,8 +14,8 @@ public class GeotaggedReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.w(TAG, "Received " + intent);
         Intent geotaggedIntent = new Intent(context, LocationService.class);
-        geotaggedIntent.putExtra(LocationManager.KEY_LOCATION_CHANGED, (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED));
         geotaggedIntent.setAction(LocationService.ACTION_GEOTAGGED);
+        geotaggedIntent.putExtra(LocationManager.KEY_LOCATION_CHANGED, (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED));
         context.startService(geotaggedIntent);
     }
 }
