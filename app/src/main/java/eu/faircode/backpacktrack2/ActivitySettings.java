@@ -218,9 +218,16 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         });
 
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        boolean hasProviders = (lm.isProviderEnabled(LocationManager.GPS_PROVIDER) || lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER));
-        pref_enabled.setEnabled(hasProviders);
-        pref_enabled.setSummary(hasProviders ? null : getString(R.string.msg_noproviders));
+        boolean gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        boolean network = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        pref_enabled.setEnabled(gps || network);
+        String providers;
+        if (gps || network) {
+            providers = getString(R.string.msg_gps, getString(gps ? R.string.msg_yes : R.string.msg_no)) + "\n" +
+                    getString(R.string.msg_network, getString(network ? R.string.msg_yes : R.string.msg_no));
+        } else
+            providers = getString(R.string.msg_noproviders);
+        pref_enabled.setSummary(providers);
 
         // Handle location settings
         Intent locationSettingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
@@ -246,12 +253,12 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
             pref_version.setSummary(
                     pInfo.versionName + "/" + pInfo.versionCode + "\n" +
-                            getString(R.string.msg_geocoder) + " " +
-                            getString(Geocoder.isPresent() ? R.string.msg_yes : R.string.msg_no) + "\n" +
-                            getString(R.string.msg_playservices) + " " +
-                            getString(playServices ? R.string.msg_yes : R.string.msg_no) + "\n" +
-                            getString(R.string.msg_significantmotion) + " " +
-                            getString(significantMotion ? R.string.msg_yes : R.string.msg_no));
+                            getString(R.string.msg_geocoder,
+                                    getString(Geocoder.isPresent() ? R.string.msg_yes : R.string.msg_no)) + "\n" +
+                            getString(R.string.msg_playservices,
+                                    getString(playServices ? R.string.msg_yes : R.string.msg_no)) + "\n" +
+                            getString(R.string.msg_significantmotion,
+                                    getString(significantMotion ? R.string.msg_yes : R.string.msg_no)));
         } catch (PackageManager.NameNotFoundException ex) {
             pref_version.setSummary(ex.toString());
         }

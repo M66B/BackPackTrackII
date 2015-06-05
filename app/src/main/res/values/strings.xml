@@ -85,13 +85,15 @@
     <string name="header_distance">Dist.</string>
     <string name="header_bearing">&#176;</string>
 
+    <string name="msg_gps">GPS provider: %s</string>
+    <string name="msg_network">Network provider: %s</string>
     <string name="msg_noproviders">Enable a location provider in the Android location settings to use this application</string>
     <string name="msg_never">never</string>
     <string name="msg_none">none</string>
     <string name="msg_notset">not set</string>
-    <string name="msg_geocoder">Geocoder:</string>
-    <string name="msg_playservices">Play services:</string>
-    <string name="msg_significantmotion">Significant motion:</string>
+    <string name="msg_geocoder">Geocoder: %s</string>
+    <string name="msg_playservices">Play services: %s</string>
+    <string name="msg_significantmotion">Significant motion: %s</string>
     <string name="msg_yes">yes</string>
     <string name="msg_no">no</string>
 
