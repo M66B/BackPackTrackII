@@ -47,6 +47,11 @@ public class GPXFileWriter {
                     + POINT_DATE_FORMATTER.format(new Date(c.getLong(c.getColumnIndex("time")))) + "</time>" + "\n");
 
             if (extensions) {
+                if (!c.isNull(c.getColumnIndex("accuracy"))) {
+                    double hdop = Math.round(c.getDouble(c.getColumnIndex("accuracy")) / 4 * 100) / 100f;
+                    out.append("\t\t\t\t" + "<hdop>" + hdop + "</hdop>" + "\n");
+                }
+
                 out.append("\t\t\t\t" + "<extensions>\n");
 
                 if (!c.isNull(c.getColumnIndex("provider")))
@@ -85,6 +90,11 @@ public class GPXFileWriter {
             out.append("\t\t" + "<name>" + c.getString(c.getColumnIndex("name")) + "</name>" + "\n");
 
             if (extensions) {
+                if (!c.isNull(c.getColumnIndex("accuracy"))) {
+                    double hdop = Math.round(c.getDouble(c.getColumnIndex("accuracy")) / 4 * 100) / 100f;
+                    out.append("\t\t" + "<hdop>" + hdop + "</hdop>" + "\n");
+                }
+
                 out.append("\t\t\t" + "<extensions>\n");
 
                 if (!c.isNull(c.getColumnIndex("provider")))
