@@ -91,6 +91,14 @@
             android:inputType="number"
             android:key="pref_recognition_confidence"
             android:summary="@string/summary_recognition_confidence" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_recognition_tilting"
+            android:title="@string/title_recognition_tilting" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_recognition_unknown"
+            android:title="@string/title_recognition_unknown" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_blog">
         <EditTextPreference

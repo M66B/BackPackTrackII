@@ -163,8 +163,24 @@ public class LocationService extends IntentService {
         DetectedActivity activity = activityResult.getMostProbableActivity();
 
         Log.w(TAG, "Activity=" + activity);
+
+        // Filter unknown activity
+        boolean pref_unknown = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_UNKNOWN, ActivitySettings.DEFAULT_RECOGNITION_UNKNOWN);
+        if (pref_unknown && activity.getType() == DetectedActivity.UNKNOWN) {
+            Log.w(TAG, "Filtering " + activity);
+            return;
+        }
+
+        // Filter tilting activity
+        boolean pref_tilting = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_TILTING, ActivitySettings.DEFAULT_RECOGNITION_TILTING);
+        if (pref_unknown && activity.getType() == DetectedActivity.TILTING) {
+            Log.w(TAG, "Filtering " + activity);
+            return;
+        }
+
+        // Check confidence
         int pref_confidence = Integer.parseInt(prefs.getString(ActivitySettings.PREF_RECOGNITION_CONFIDENCE, ActivitySettings.DEFAULT_RECOGNITION_CONFIDENCE));
-        if (activity.getConfidence() >= pref_confidence && activity.getType() != DetectedActivity.TILTING) {
+        if (activity.getConfidence() >= pref_confidence) {
             // Persist probable activity
             prefs.edit().putInt(ActivitySettings.PREF_LAST_ACTIVITY, activity.getType()).apply();
             updateState(this);
@@ -173,7 +189,6 @@ public class LocationService extends IntentService {
             boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
             if (lastStill != still)
                 if (still) {
-                    // Continue activity recognition
                     stopRepeatingAlarm(this);
                     stopLocating(this);
                 } else
