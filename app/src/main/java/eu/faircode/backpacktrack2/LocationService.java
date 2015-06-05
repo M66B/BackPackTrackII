@@ -101,6 +101,8 @@ public class LocationService extends IntentService {
     private static int EGM96_ROWS = 721;
     private static int EGM96_COLS = 1440;
 
+    private static final int REQUEST_RESOLVE_ERROR = 1001;
+
     public LocationService() {
         super(TAG);
     }
@@ -493,14 +495,16 @@ public class LocationService extends IntentService {
                 @Override
                 public void run() {
                     GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
-                    gac.blockingConnect();
-                    Log.w(TAG, "GoogleApiClient connected");
-                    Intent activityIntent = new Intent(context, LocationService.class);
-                    activityIntent.setAction(LocationService.ACTION_ACTIVITY);
-                    PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    int interval = Integer.parseInt(prefs.getString(ActivitySettings.PREF_RECOGNITION_INTERVAL, ActivitySettings.DEFAULT_RECOGNITION_INTERVAL));
-                    ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(gac, interval * 60 * 1000, pi);
-                    Log.w(TAG, "Activity updates frequency=" + interval + "m");
+                    ConnectionResult result = gac.blockingConnect();
+                    if (result.isSuccess()) {
+                        Log.w(TAG, "GoogleApiClient connected");
+                        Intent activityIntent = new Intent(context, LocationService.class);
+                        activityIntent.setAction(LocationService.ACTION_ACTIVITY);
+                        PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        int interval = Integer.parseInt(prefs.getString(ActivitySettings.PREF_RECOGNITION_INTERVAL, ActivitySettings.DEFAULT_RECOGNITION_INTERVAL));
+                        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(gac, interval * 60 * 1000, pi);
+                        Log.w(TAG, "Activity updates frequency=" + interval + "m");
+                    }
                 }
             }).start();
 
@@ -526,13 +530,15 @@ public class LocationService extends IntentService {
                 @Override
                 public void run() {
                     GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
-                    gac.blockingConnect();
-                    Log.w(TAG, "GoogleApiClient connected");
-                    Intent activityIntent = new Intent(context, LocationService.class);
-                    activityIntent.setAction(LocationService.ACTION_ACTIVITY);
-                    PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                    ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(gac, pi);
-                    Log.w(TAG, "Canceled activity updates");
+                    ConnectionResult result = gac.blockingConnect();
+                    if (result.isSuccess()) {
+                        Log.w(TAG, "GoogleApiClient connected");
+                        Intent activityIntent = new Intent(context, LocationService.class);
+                        activityIntent.setAction(LocationService.ACTION_ACTIVITY);
+                        PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(gac, pi);
+                        Log.w(TAG, "Canceled activity updates");
+                    }
                 }
             }).start();
 
