@@ -25,6 +25,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -136,7 +137,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         public void onReceive(Context context, Intent intent) {
             SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
             Preference pref_upload = findPreference(PREF_UPLOAD);
-            findPreference(PREF_UPLOAD).setEnabled(isConnected() && prefs.getString(PREF_BLOGURL, null) != null);
+            findPreference(PREF_UPLOAD).setEnabled(blogConfigured() && storageMounted() && isConnected());
         }
     };
 
@@ -220,6 +221,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         });
 
         // Handle share GPX
+        pref_share.setEnabled(storageMounted());
         pref_share.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -231,7 +233,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         });
 
         // Handle upload GPX
-        findPreference(PREF_UPLOAD).setEnabled(isConnected() && prefs.getString(PREF_BLOGURL, null) != null);
+        pref_upload.setEnabled(blogConfigured() && storageMounted() && isConnected());
         pref_upload.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -717,6 +719,15 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
+    }
+
+    private boolean storageMounted() {
+        return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
+    }
+
+    private boolean blogConfigured() {
+        SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+        return (prefs.getString(PREF_BLOGURL, null) != null);
     }
 
     // Helper classes
