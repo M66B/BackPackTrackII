@@ -887,7 +887,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
             // Set values
             CharSequence relativeTime = DateUtils.getRelativeTimeSpanString(time, new Date().getTime(),
-                    DateUtils.SECOND_IN_MILLIS, 0);
+                    DateUtils.SECOND_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
             tvTime.setText(relativeTime);
             ivPin.setVisibility(name == null ? View.INVISIBLE : View.VISIBLE);
             if (LocationManager.GPS_PROVIDER.equals(provider))
@@ -903,6 +903,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 tvDistance.setText(Long.toString(Math.round(distance / 1000)) + "k");
             else
                 tvDistance.setText(lastLocation == null ? "?" : Long.toString(Math.round(distance)));
+
+            // tvAltitude.setText("9999");
+            // tvBearing.setText("999");
+            // tvAccuracy.setText("9999");
+            // tvDistance.setText("9999k");
 
             if (name == null)
                 view.setClickable(false);
