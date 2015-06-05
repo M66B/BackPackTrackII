@@ -25,8 +25,7 @@ You could use the [Google Maps GPX Viewer](https://wordpress.org/plugins/google-
 
 BackPackTrack II is a complete rewrite of [BackPackTrack](https://github.com/M66B/BackPackTrack), the first Android application I wrote in 2011.
 
-You can download the latest version of the application [here](https://github.com/M66B/BackPackTrackII/releases)
-or from the [Play store](https://play.google.com/store/apps/details?id=eu.faircode.backpacktrack2).
+You can download the latest version of the application from the [Play store](https://play.google.com/store/apps/details?id=eu.faircode.backpacktrack2).
 
 Frequently asked questions
 --------------------------
