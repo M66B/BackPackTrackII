@@ -322,26 +322,48 @@ public class LocationService extends IntentService {
     }
 
     private void handleGeopoint(Intent intent) {
-        // geo:51.805702,4.721146?z=17
-        // geo:0,0?q=latitude,longitude(label)
+        // geo:latitude,longitude?q=latitude,longitude(label)
         Uri data = (Uri) intent.getExtras().get(EXTRA_GEOURI);
-        Log.w(TAG, "Received geopoint query=" + data.toString());
+        Log.w(TAG, "Received geopoint q=" + data.toString());
+
+        double lat = 0;
+        double lon = 0;
+        String name = null;
         String[] query = data.getSchemeSpecificPart().split("\\?");
-        if (query.length > 0) {
-            String[] loc = query[0].split(",");
-            if (loc.length == 2) {
-                double lat = Double.parseDouble(loc[0]);
-                double lon = Double.parseDouble(loc[1]);
-                if (lat != 0 || lon != 0) {
-                    Location location = new Location("Point");
-                    location.setTime(System.currentTimeMillis());
-                    location.setLatitude(lat);
-                    location.setLongitude(lon);
-                    String waypointName = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-                    new DatabaseHelper(this).insert(location, waypointName);
-                    toast(getString(R.string.msg_added, waypointName), this);
+
+        if (query.length > 1) {
+            String[] q = query[1].split("=");
+            if (q.length > 1 && "q".equals(q[0])) {
+                int p = q[1].indexOf('(');
+                if (p >= 0) {
+                    name = q[1].substring(p + 1, q[1].length() - 1);
+                    q[1] = q[1].substring(0, p);
+                }
+                String[] loc = q[1].split(",");
+                if (loc.length == 2) {
+                    lat = Double.parseDouble(loc[0]);
+                    lon = Double.parseDouble(loc[1]);
                 }
             }
+        }
+
+        if (lat == 0 && lon == 0 && query.length > 0) {
+            String[] loc = query[0].split(",");
+            if (loc.length == 2) {
+                lat = Double.parseDouble(loc[0]);
+                lon = Double.parseDouble(loc[1]);
+            }
+        }
+
+        if (lat != 0 || lon != 0) {
+            Location location = new Location("shared");
+            location.setTime(System.currentTimeMillis());
+            location.setLatitude(lat);
+            location.setLongitude(lon);
+            if (name == null)
+                name = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+            new DatabaseHelper(this).insert(location, name);
+            toast(getString(R.string.msg_added, name), this);
         }
     }
 

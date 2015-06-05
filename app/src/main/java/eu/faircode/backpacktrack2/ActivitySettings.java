@@ -120,12 +120,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
         // Shared geo point
         Uri data = getIntent().getData();
@@ -135,6 +129,12 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             geopointIntent.putExtra(LocationService.EXTRA_GEOURI, data);
             startService(geopointIntent);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
         // First run
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
