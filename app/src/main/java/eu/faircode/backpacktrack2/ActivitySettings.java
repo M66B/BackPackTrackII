@@ -77,6 +77,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
     public static final String PREF_RECOGNITION_INTERVAL = "pref_recognition_interval";
+    public static final String PREF_RECOGNITION_CONFIDENCE = "pref_recognition_confidence";
 
     public static final String PREF_BLOGURL = "pref_blogurl";
     public static final String PREF_BLOGID = "pref_blogid";
@@ -98,6 +99,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
     public static final String DEFAULT_RECOGNITION_INTERVAL = "1"; // minutes
+    public static final String DEFAULT_RECOGNITION_CONFIDENCE = "50"; // percentage
 
     // Transient values
     public static final String PREF_FIRST = "pref_first";
@@ -170,6 +172,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_PASSIVE_ALTITUDE);
 
         updateTitle(prefs, PREF_RECOGNITION_INTERVAL);
+        updateTitle(prefs, PREF_RECOGNITION_CONFIDENCE);
 
         updateTitle(prefs, PREF_BLOGURL);
         updateTitle(prefs, PREF_BLOGID);
@@ -240,6 +243,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         boolean playServices = (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS);
         findPreference(PREF_RECOGNITION_ENABLED).setEnabled(playServices);
         findPreference(PREF_RECOGNITION_INTERVAL).setEnabled(playServices);
+        findPreference(PREF_RECOGNITION_CONFIDENCE).setEnabled(playServices);
 
         // Handle version
         Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
@@ -311,11 +315,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Restart tracking if needed
         if (PREF_ENABLED.equals(key) ||
                 PREF_FREQUENCY.equals(key) ||
-                PREF_ALTITUDE.equals(key) ||
-                PREF_ACCURACY.equals(key) ||
                 PREF_TIMEOUT.equals(key) ||
-                PREF_INACCURATE.equals(key) ||
-                PREF_NEARBY.equals(key) ||
                 PREF_RECOGNITION_ENABLED.equals(key) ||
                 PREF_RECOGNITION_INTERVAL.equals(key)) {
             LocationService.stopTracking(this);
@@ -671,7 +671,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref.setTitle(getString(R.string.title_passive_altitude, prefs.getString(key, DEFAULT_PASSIVE_ALTITUDE)));
 
         else if (PREF_RECOGNITION_INTERVAL.equals(key))
-            pref.setTitle(getString(R.string.title_recognition_interval, prefs.getString(key, PREF_RECOGNITION_INTERVAL)));
+            pref.setTitle(getString(R.string.title_recognition_interval, prefs.getString(key, DEFAULT_RECOGNITION_INTERVAL)));
+        else if (PREF_RECOGNITION_CONFIDENCE.equals(key))
+            pref.setTitle(getString(R.string.title_recognition_confidence, prefs.getString(key, DEFAULT_RECOGNITION_CONFIDENCE)));
 
         else if (PREF_BLOGURL.equals(key))
             pref.setTitle(getString(R.string.title_blogurl, prefs.getString(key, getString(R.string.msg_notset))));

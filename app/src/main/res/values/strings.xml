@@ -27,6 +27,7 @@
     <string name="title_recognition">Activity recognition</string>
     <string name="title_recognition_enabled">Activity recognition enabled</string>
     <string name="title_recognition_interval">Activity recognition interval: %s minutes</string>
+    <string name="title_recognition_confidence">Activity recognition confidence: %s %%</string>
 
     <string name="title_blog">WordPress weblog</string>
     <string name="title_blogurl">URL: %s</string>
@@ -59,6 +60,7 @@
 
     <string name="summary_recognition_enabled">Recognize if you are still or moving and disable tracking when you are still</string>
     <string name="summary_recognition_interval">Recognize your activity every selected number of minutes (the interval will be reduced automatically when you are not moving)</string>
+    <string name="summary_recognition_confidence">Recognize a new activity when the confidence is higher than the selected percentage</string>
 
     <string name="summary_blogurl">WordPress weblog address</string>
     <string name="summary_blogid">WordPress weblog identification\nUse 1 for single site installations</string>

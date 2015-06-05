@@ -163,7 +163,8 @@ public class LocationService extends IntentService {
         DetectedActivity activity = activityResult.getMostProbableActivity();
 
         Log.w(TAG, "Activity=" + activity);
-        if (activity.getConfidence() >= 50 && activity.getType() != DetectedActivity.TILTING) {
+        int pref_confidence = Integer.parseInt(prefs.getString(ActivitySettings.PREF_RECOGNITION_CONFIDENCE, ActivitySettings.DEFAULT_RECOGNITION_CONFIDENCE));
+        if (activity.getConfidence() >= pref_confidence && activity.getType() != DetectedActivity.TILTING) {
             // Persist probable activity
             prefs.edit().putInt(ActivitySettings.PREF_LAST_ACTIVITY, activity.getType()).apply();
             updateState(this);
@@ -889,7 +890,7 @@ public class LocationService extends IntentService {
     }
 
     private static String writeGPXFile(String trackName, boolean extensions, long from, long to, Context context) throws IOException {
-        Log.w(TAG, "Writing track=" + trackName + " from=" + from + "to=" + to);
+        Log.w(TAG, "Writing track=" + trackName + " from=" + from + " to=" + to);
         File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separatorChar + "BackPackTrackII");
         folder.mkdirs();
         String gpxFileName = folder.getAbsolutePath() + File.separatorChar + trackName + ".gpx";

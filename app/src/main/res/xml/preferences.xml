@@ -86,6 +86,11 @@
             android:inputType="number"
             android:key="pref_recognition_interval"
             android:summary="@string/summary_recognition_interval" />
+        <EditTextPreference
+            android:defaultValue="50"
+            android:inputType="number"
+            android:key="pref_recognition_confidence"
+            android:summary="@string/summary_recognition_confidence" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_blog">
         <EditTextPreference
