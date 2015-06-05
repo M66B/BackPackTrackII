@@ -307,6 +307,7 @@ public class LocationService extends IntentService {
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
 
         // It is assumed when the bearing or altitude changes it isn't a nearby location
+        boolean update = false;
 
         // Handle bearing change
         if (location.hasBearing()) {
@@ -316,8 +317,7 @@ public class LocationService extends IntentService {
                 delta = 360 - delta;
             if (lastLocation == null || !lastLocation.hasBearing() || delta >= pref_bearing_change) {
                 Log.w(TAG, "Bearing changed to " + location.getBearing());
-                new DatabaseHelper(this).insert(location, null);
-                prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
+                update = true;
             }
         }
 
@@ -329,9 +329,14 @@ public class LocationService extends IntentService {
             float accuracy = (lastLocation.getAccuracy() + location.getAccuracy()) * 1.5f / 2;
             if (lastLocation == null || !lastLocation.hasAltitude() || delta >= pref_altitude_change + accuracy) {
                 Log.w(TAG, "Altitude changed to " + location.getAltitude());
-                new DatabaseHelper(this).insert(location, null);
-                prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
+                update = true;
             }
+        }
+
+        if (update) {
+            new DatabaseHelper(this).insert(location, null);
+            prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
+            updateState(this);
         }
     }
 
