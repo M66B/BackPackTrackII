@@ -41,7 +41,7 @@ public class GPXFileWriter {
                     + c.getDouble(c.getColumnIndex("longitude")) + "\">" + "\n");
 
             if (!c.isNull(c.getColumnIndex("altitude")))
-                out.append("\t\t\t\t" + "<ele>" + c.getDouble(c.getColumnIndex("altitude")) + "</ele>" + "\n");
+                out.append("\t\t\t\t" + "<ele>" + Math.round(c.getDouble(c.getColumnIndex("altitude"))) + "</ele>" + "\n");
 
             out.append("\t\t\t\t" + "<time>"
                     + POINT_DATE_FORMATTER.format(new Date(c.getLong(c.getColumnIndex("time")))) + "</time>" + "\n");
@@ -84,7 +84,7 @@ public class GPXFileWriter {
                     + c.getDouble(c.getColumnIndex("longitude")) + "\">" + "\n");
 
             if (!c.isNull(c.getColumnIndex("altitude")))
-                out.append("\t\t" + "<ele>" + c.getDouble(c.getColumnIndex("altitude")) + "</ele>" + "\n");
+                out.append("\t\t" + "<ele>" + Math.round(c.getDouble(c.getColumnIndex("altitude"))) + "</ele>" + "\n");
 
             out.append("\t\t" + "<time>" + POINT_DATE_FORMATTER.format(new Date(c.getLong(c.getColumnIndex("time")))) + "</time>" + "\n");
             out.append("\t\t" + "<name>" + c.getString(c.getColumnIndex("name")) + "</name>" + "\n");
