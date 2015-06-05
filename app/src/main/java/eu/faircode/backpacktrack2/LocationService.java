@@ -275,20 +275,36 @@ public class LocationService extends IntentService {
     private void handlePassiveLocationUpdate(Intent intent) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        // Process location update
+        // Process passive location update
         Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
         Log.w(TAG, "Update passive location=" + location);
         if (location == null || (location.getLatitude() == 0.0 && location.getLongitude() == 0.0))
             return;
 
         // Check if bearing or altitude available
-        if (!location.hasBearing() && !location.hasAltitude())
-            Log.w(TAG, "Passive location without bearing/altitude");
+        if (!location.hasBearing() && !location.hasAltitude()) {
+            Log.w(TAG, "Passive location without bearing/altitude, location=" + location);
+            return;
+        }
 
-        // Filter inaccurate locations
+        // Filter inaccurate passive locations
         float pref_inaccurate = Float.parseFloat(prefs.getString(ActivitySettings.PREF_INACCURATE, ActivitySettings.DEFAULT_INACCURATE));
         if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
             Log.w(TAG, "Filtering inaccurate passive location=" + location);
+            return;
+        }
+
+        // Get last location
+        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+        if (lastLocation == null) {
+            Log.w(TAG, "Passive location without last location, location=" + location);
+            return;
+        }
+
+        // Filter nearby passive locations
+        float pref_nearby = Float.parseFloat(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
+        if (lastLocation.distanceTo(location) < pref_nearby) {
+            Log.w(TAG, "Filtering nearby passive location=" + location);
             return;
         }
 
@@ -303,10 +319,6 @@ public class LocationService extends IntentService {
                 Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
-        // Get last location
-        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
-
-        // It is assumed when the bearing or altitude changes it isn't a nearby location
         boolean update = false;
 
         // Handle bearing change
@@ -315,7 +327,7 @@ public class LocationService extends IntentService {
             float delta = Math.abs(lastLocation.getBearing() - location.getBearing());
             if (delta > 180)
                 delta = 360 - delta;
-            if (lastLocation == null || !lastLocation.hasBearing() || delta >= pref_bearing_change) {
+            if (!lastLocation.hasBearing() || delta >= pref_bearing_change) {
                 Log.w(TAG, "Bearing changed to " + location.getBearing());
                 update = true;
             }
@@ -327,7 +339,7 @@ public class LocationService extends IntentService {
             double delta = Math.abs(lastLocation.getAltitude() - location.getAltitude());
             // vertical accuracy ~ 1.5 x horizontal accuracy
             float accuracy = (lastLocation.getAccuracy() + location.getAccuracy()) * 1.5f / 2;
-            if (lastLocation == null || !lastLocation.hasAltitude() || delta >= pref_altitude_change + accuracy) {
+            if (!lastLocation.hasAltitude() || delta >= pref_altitude_change + accuracy) {
                 Log.w(TAG, "Altitude changed to " + location.getAltitude());
                 update = true;
             }
