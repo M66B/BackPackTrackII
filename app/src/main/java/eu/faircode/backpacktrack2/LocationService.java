@@ -277,6 +277,8 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
 
+        // It is assumed when the bearing or altitude changes it isn't a nearby location
+
         // Handle bearing change
         if (location.hasBearing()) {
             float pref_bearing_change = Float.parseFloat(prefs.getString(ActivitySettings.PREF_PASSIVE_BEARING, ActivitySettings.DEFAULT_PASSIVE_BEARING));
@@ -294,7 +296,8 @@ public class LocationService extends IntentService {
         if (location.hasAltitude()) {
             double pref_altitude_change = Double.parseDouble(prefs.getString(ActivitySettings.PREF_PASSIVE_ALTITUDE, ActivitySettings.DEFAULT_PASSIVE_ALTITUDE));
             double delta = Math.abs(lastLocation.getAltitude() - location.getAltitude());
-            float accuracy = (lastLocation.getAccuracy() + location.getAccuracy()) * 1.5f; // vertical accuracy ~ 1.5 x horizontal accuracy
+            // vertical accuracy ~ 1.5 x horizontal accuracy
+            float accuracy = (lastLocation.getAccuracy() + location.getAccuracy()) * 1.5f / 2;
             if (lastLocation == null || !lastLocation.hasAltitude() || delta >= pref_altitude_change + accuracy) {
                 Log.w(TAG, "Altitude changed to " + location.getAltitude());
                 new DatabaseHelper(this).insert(location, null);
@@ -331,6 +334,7 @@ public class LocationService extends IntentService {
         String name = null;
         String[] query = data.getSchemeSpecificPart().split("\\?");
 
+        // Prefer query part
         if (query.length > 1) {
             String[] q = query[1].split("=");
             if (q.length > 1 && "q".equals(q[0])) {
@@ -347,6 +351,7 @@ public class LocationService extends IntentService {
             }
         }
 
+        // Fallback to scheme part
         if (lat == 0 && lon == 0 && query.length > 0) {
             String[] loc = query[0].split(",");
             if (loc.length == 2) {
