@@ -91,6 +91,7 @@
     <string name="msg_notset">not set</string>
     <string name="msg_geocoder">Geocoder:</string>
     <string name="msg_playservices">Play services:</string>
+    <string name="msg_significantmotion">Significant motion:</string>
     <string name="msg_yes">yes</string>
     <string name="msg_no">no</string>
 

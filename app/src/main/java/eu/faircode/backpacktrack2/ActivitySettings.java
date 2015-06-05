@@ -12,6 +12,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -238,12 +240,18 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref_version.setIntent(playStoreIntent);
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+
+            SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
+            boolean significantMotion = (sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION) != null);
+
             pref_version.setSummary(
                     pInfo.versionName + "/" + pInfo.versionCode + "\n" +
                             getString(R.string.msg_geocoder) + " " +
                             getString(Geocoder.isPresent() ? R.string.msg_yes : R.string.msg_no) + "\n" +
                             getString(R.string.msg_playservices) + " " +
-                            getString(playServices ? R.string.msg_yes : R.string.msg_no));
+                            getString(playServices ? R.string.msg_yes : R.string.msg_no) + "\n" +
+                            getString(R.string.msg_significantmotion) + " " +
+                            getString(significantMotion ? R.string.msg_yes : R.string.msg_no));
         } catch (PackageManager.NameNotFoundException ex) {
             pref_version.setSummary(ex.toString());
         }
