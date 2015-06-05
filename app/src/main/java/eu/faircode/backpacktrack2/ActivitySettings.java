@@ -5,9 +5,11 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -18,6 +20,8 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -127,6 +131,15 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     private static final int GEOCODER_RESULTS = 5;
 
+    private BroadcastReceiver mConnectivityChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+            Preference pref_upload = findPreference(PREF_UPLOAD);
+            findPreference(PREF_UPLOAD).setEnabled(isConnected() && prefs.getString(PREF_BLOGURL, null) != null);
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,6 +159,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     protected void onResume() {
         super.onResume();
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
+        registerReceiver(mConnectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         // First run
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
@@ -216,7 +231,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         });
 
         // Handle upload GPX
-        findPreference(PREF_UPLOAD).setEnabled(prefs.getString(PREF_BLOGURL, null) != null);
+        findPreference(PREF_UPLOAD).setEnabled(isConnected() && prefs.getString(PREF_BLOGURL, null) != null);
         pref_upload.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -279,6 +294,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     protected void onPause() {
         super.onPause();
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+
+        unregisterReceiver(mConnectivityChangeReceiver);
     }
 
     @Override
@@ -696,7 +713,13 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 pref.setTitle(getString(R.string.title_blogpwd, "********"));
     }
 
-    // Help classes
+    private boolean isConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
+    }
+
+    // Helper classes
 
     private class WaypointAdapter extends CursorAdapter {
         public WaypointAdapter(Context context, Cursor cursor) {
