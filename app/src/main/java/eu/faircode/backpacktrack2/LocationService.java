@@ -85,6 +85,8 @@ public class LocationService extends IntentService {
     // Constants
     private static final int LOCATION_MIN_TIME = 1000; // milliseconds
     private static final int LOCATION_MIN_DISTANCE = 0; // meters
+    private static final int PASSIVE_MIN_TIME = 1000; // milliseconds
+    private static final int PASSIVE_MIN_DISTANCE = 0; // meters
 
     private static final int STATE_IDLE = 1;
     private static final int STATE_ACQUIRING = 2;
@@ -253,14 +255,24 @@ public class LocationService extends IntentService {
     }
 
     private void handlePassiveLocationUpdate(Intent intent) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         // Process location update
         Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
         Log.w(TAG, "Update passive location=" + location);
         if (location == null || (location.getLatitude() == 0.0 && location.getLongitude() == 0.0))
             return;
 
+        // Check if bearing or altitude available
         if (!location.hasBearing() && !location.hasAltitude())
             Log.w(TAG, "Passive location without bearing/altitude");
+
+        // Filter inaccurate locations
+        float pref_inaccurate = Float.parseFloat(prefs.getString(ActivitySettings.PREF_INACCURATE, ActivitySettings.DEFAULT_INACCURATE));
+        if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
+            Log.w(TAG, "Filtering inaccurate passive location=" + location);
+            return;
+        }
 
         // Correct altitude
         if (LocationManager.GPS_PROVIDER.equals(location.getProvider()))
@@ -274,7 +286,6 @@ public class LocationService extends IntentService {
             }
 
         // Get last location
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
 
         // It is assumed when the bearing or altitude changes it isn't a nearby location
@@ -498,7 +509,7 @@ public class LocationService extends IntentService {
         locationIntent.setAction(LocationService.ACTION_LOCATION_PASSIVE);
         PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, LOCATION_MIN_TIME, LOCATION_MIN_DISTANCE, pi);
+        lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, PASSIVE_MIN_TIME, PASSIVE_MIN_DISTANCE, pi);
         Log.w(TAG, "Requested passive location updates");
     }
 
