@@ -525,12 +525,15 @@ public class LocationService extends IntentService {
             }).start();
 
         // Request passive location updates
-        Intent locationIntent = new Intent(context, LocationService.class);
-        locationIntent.setAction(LocationService.ACTION_LOCATION_PASSIVE);
-        PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-        lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, PASSIVE_MIN_TIME, PASSIVE_MIN_DISTANCE, pi);
-        Log.w(TAG, "Requested passive location updates");
+        boolean passive = prefs.getBoolean(ActivitySettings.PREF_PASSIVE_ENABLED, ActivitySettings.DEFAULT_PASSIVE_ENABLED);
+        if (passive) {
+            Intent locationIntent = new Intent(context, LocationService.class);
+            locationIntent.setAction(LocationService.ACTION_LOCATION_PASSIVE);
+            PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, PASSIVE_MIN_TIME, PASSIVE_MIN_DISTANCE, pi);
+            Log.w(TAG, "Requested passive location updates");
+        }
     }
 
     public static void stopTracking(final Context context) {

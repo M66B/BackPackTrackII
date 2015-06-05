@@ -72,6 +72,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_TIMEOUT = "pref_timeout";
     public static final String PREF_INACCURATE = "pref_inaccurate";
     public static final String PREF_NEARBY = "pref_nearby";
+    public static final String PREF_PASSIVE_ENABLED = "pref_passive_enabled";
     public static final String PREF_PASSIVE_BEARING = "pref_passive_bearing";
     public static final String PREF_PASSIVE_ALTITUDE = "pref_passive_altitude";
 
@@ -96,6 +97,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_TIMEOUT = "60"; // seconds
     public static final String DEFAULT_INACCURATE = "100"; // meters
     public static final String DEFAULT_NEARBY = "100"; // meters
+
+    public static final boolean DEFAULT_PASSIVE_ENABLED = true;
     public static final String DEFAULT_PASSIVE_BEARING = "30"; // degrees
     public static final String DEFAULT_PASSIVE_ALTITUDE = "20"; // meters
 
@@ -320,6 +323,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         if (PREF_ENABLED.equals(key) ||
                 PREF_FREQUENCY.equals(key) ||
                 PREF_TIMEOUT.equals(key) ||
+                PREF_PASSIVE_ENABLED.equals(key) ||
                 PREF_RECOGNITION_ENABLED.equals(key) ||
                 PREF_RECOGNITION_INTERVAL.equals(key)) {
             LocationService.stopTracking(this);

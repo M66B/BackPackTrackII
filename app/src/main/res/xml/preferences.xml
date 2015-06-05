@@ -64,6 +64,11 @@
             android:summary="@string/summary_nearby" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_passive">
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_passive_enabled"
+            android:summary="@string/summary_passive_enabled"
+            android:title="@string/title_passive_enabled" />
         <EditTextPreference
             android:defaultValue="30"
             android:inputType="number"
