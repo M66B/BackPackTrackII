@@ -337,9 +337,7 @@ public class LocationService extends IntentService {
         if (location.hasAltitude()) {
             double pref_altitude_change = Double.parseDouble(prefs.getString(ActivitySettings.PREF_PASSIVE_ALTITUDE, ActivitySettings.DEFAULT_PASSIVE_ALTITUDE));
             double delta = Math.abs(lastLocation.getAltitude() - location.getAltitude());
-            // vertical accuracy ~ 1.5 x horizontal accuracy
-            float accuracy = (lastLocation.getAccuracy() + location.getAccuracy()) * 1.5f / 2;
-            if (!lastLocation.hasAltitude() || delta >= pref_altitude_change + accuracy) {
+            if (!lastLocation.hasAltitude() || delta >= pref_altitude_change) {
                 Log.w(TAG, "Altitude changed to " + location.getAltitude());
                 update = true;
             }

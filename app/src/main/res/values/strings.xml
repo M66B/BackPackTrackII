@@ -60,7 +60,7 @@
 
     <string name="summary_passive_enabled">Use location updates requested by other applications</string>
     <string name="summary_passive_bearing">Use passive location updates when bearing changes for more than the selected number of degrees</string>
-    <string name="summary_passive_altitude">Use passive location updates when altitude changes for more than the selected number of meters (taking into account the accuracy of the location)</string>
+    <string name="summary_passive_altitude">Use passive location updates when altitude changes for more than the selected number of meters</string>
 
     <string name="summary_recognition_enabled">Recognize if you are still or moving and disable tracking when you are still</string>
     <string name="summary_recognition_interval">Recognize your activity every selected number of minutes (the interval will be reduced automatically when you are not moving)</string>
