@@ -178,6 +178,7 @@ public class LocationService extends IntentService {
         if (activity.getConfidence() >= pref_confidence) {
             // Persist probable activity
             prefs.edit().putInt(ActivitySettings.PREF_LAST_ACTIVITY, activity.getType()).apply();
+            prefs.edit().putInt(ActivitySettings.PREF_LAST_CONFIDENCE, activity.getConfidence()).apply();
             updateState(this);
 
             // Stop/start repeating alarm
@@ -833,6 +834,7 @@ public class LocationService extends IntentService {
         }
 
         String activity = getActivityName(prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN), context);
+        int confidence = prefs.getInt(ActivitySettings.PREF_LAST_CONFIDENCE, 50);
         String altitude = "?";
         String accuracy = "?";
         String provider = "";
@@ -847,7 +849,7 @@ public class LocationService extends IntentService {
                 accuracy = Long.toString(Math.round(lastLocation.getAccuracy()));
         }
 
-        String title = context.getString(R.string.msg_notification, activity, altitude, accuracy, provider);
+        String title = context.getString(R.string.msg_notification, activity, confidence, altitude, accuracy, provider);
 
         // Build main intent
         Intent riSettings = new Intent(context, ActivitySettings.class);

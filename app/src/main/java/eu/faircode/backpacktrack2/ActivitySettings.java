@@ -130,6 +130,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     // Remember last values
     public static final String PREF_LAST_ACTIVITY = "pref_last_activity";
+    public static final String PREF_LAST_CONFIDENCE = "pref_last_confidence";
     public static final String PREF_LAST_LOCATION = "pref_last_location";
     public static final String PREF_LAST_SHARE = "pref_last_share";
     public static final String PREF_LAST_UPLOAD = "pref_last_upload";
