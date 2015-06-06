@@ -36,7 +36,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     }
 
-    public void insert(Location location, String name) {
+    public DatabaseHelper insert(Location location, String name) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues cv = new ContentValues();
@@ -71,6 +71,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cv.put("name", name);
 
         db.insert("location", null, cv);
+
+        return this;
     }
 
     public Cursor getList(long from, long to, boolean trackpoints, boolean waypoints) {
@@ -85,20 +87,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery(query, new String[]{Long.toString(from), Long.toString(to)});
     }
 
-    public void update(int id, String name) {
+    public DatabaseHelper update(int id, String name) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("name", name);
         db.update("location", cv, "ID = ?", new String[]{Integer.toString(id)});
+        return this;
     }
 
-    public void delete(int id) {
+    public DatabaseHelper delete(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("location", "ID = ?", new String[]{Integer.toString(id)});
-    }
-
-    public void delete(long from, long to) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete("location", "time >= ? AND time <= ?", new String[]{Long.toString(from),Long.toString(to) });
+        return this;
     }
 }

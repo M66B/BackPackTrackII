@@ -137,6 +137,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     private static final int GEOCODER_RESULTS = 5;
 
+    private DatabaseHelper db = null;
+
     private BroadcastReceiver mConnectivityChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -151,6 +153,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
 
+        db = new DatabaseHelper(this);
+
         // Shared geo point
         Uri data = getIntent().getData();
         if (data != null && "geo".equals(data.getScheme())) {
@@ -159,6 +163,14 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             geopointIntent.putExtra(LocationService.EXTRA_GEOURI, data);
             startService(geopointIntent);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (db != null)
+            db.close();
     }
 
     @Override
@@ -364,7 +376,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Fill list
         ListView lv = (ListView) viewEdit.findViewById(R.id.lvHistory);
-        Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, true, true);
+        Cursor cursor = db.getList(0, Long.MAX_VALUE, true, true);
         LocationAdapter adapter = new LocationAdapter(ActivitySettings.this, cursor);
         lv.setAdapter(adapter);
 
@@ -392,7 +404,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Fill list
         ListView lv = (ListView) viewEdit.findViewById(R.id.lvEdit);
-        Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false, true);
+        Cursor cursor = db.getList(0, Long.MAX_VALUE, false, true);
         final WaypointAdapter adapter = new WaypointAdapter(ActivitySettings.this, cursor);
         lv.setAdapter(adapter);
 
@@ -489,13 +501,13 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
                             new AsyncTask<Object, Object, Object>() {
                                 protected Object doInBackground(Object... params) {
-                                    new DatabaseHelper(ActivitySettings.this).insert(location, geocodedName);
+                                    new DatabaseHelper(ActivitySettings.this).insert(location, geocodedName).close();
                                     return null;
                                 }
 
                                 @Override
                                 protected void onPostExecute(Object result) {
-                                    Cursor cursor = new DatabaseHelper(ActivitySettings.this).getList(0, Long.MAX_VALUE, false, true);
+                                    Cursor cursor = db.getList(0, Long.MAX_VALUE, false, true);
                                     adapter.changeCursor(cursor);
                                     Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, geocodedName), Toast.LENGTH_SHORT).show();
                                 }
@@ -818,13 +830,13 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
                                             new AsyncTask<Object, Object, Object>() {
                                                 protected Object doInBackground(Object... params) {
-                                                    new DatabaseHelper(context).update(id, geocodedName);
+                                                    new DatabaseHelper(context).update(id, geocodedName).close();
                                                     return null;
                                                 }
 
                                                 @Override
                                                 protected void onPostExecute(Object result) {
-                                                    Cursor cursor = new DatabaseHelper(context).getList(0, Long.MAX_VALUE, false, true);
+                                                    Cursor cursor = db.getList(0, Long.MAX_VALUE, false, true);
                                                     changeCursor(cursor);
                                                     Toast.makeText(context, getString(R.string.msg_updated, geocodedName), Toast.LENGTH_SHORT).show();
                                                 }
@@ -855,13 +867,13 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
                     new AsyncTask<Object, Object, Object>() {
                         protected Object doInBackground(Object... params) {
-                            new DatabaseHelper(context).update(id, newName);
+                            new DatabaseHelper(context).update(id, newName).close();
                             return null;
                         }
 
                         @Override
                         protected void onPostExecute(Object result) {
-                            Cursor cursor = new DatabaseHelper(context).getList(0, Long.MAX_VALUE, false, true);
+                            Cursor cursor = db.getList(0, Long.MAX_VALUE, false, true);
                             changeCursor(cursor);
                             Toast.makeText(context, getString(R.string.msg_updated, newName), Toast.LENGTH_SHORT).show();
                         }
@@ -881,13 +893,13 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                                 public void onClick(DialogInterface dialog, int which) {
                                     new AsyncTask<Object, Object, Object>() {
                                         protected Object doInBackground(Object... params) {
-                                            new DatabaseHelper(context).delete(id);
+                                            new DatabaseHelper(context).delete(id).close();
                                             return null;
                                         }
 
                                         @Override
                                         protected void onPostExecute(Object result) {
-                                            Cursor cursor = new DatabaseHelper(context).getList(0, Long.MAX_VALUE, false, true);
+                                            Cursor cursor = db.getList(0, Long.MAX_VALUE, false, true);
                                             changeCursor(cursor);
                                             Toast.makeText(context, getString(R.string.msg_deleted, name), Toast.LENGTH_SHORT).show();
                                         }

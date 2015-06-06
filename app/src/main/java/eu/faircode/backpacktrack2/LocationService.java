@@ -344,7 +344,7 @@ public class LocationService extends IntentService {
         }
 
         if (update) {
-            new DatabaseHelper(this).insert(location, null);
+            new DatabaseHelper(this).insert(location, null).close();
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
             updateState(this);
         }
@@ -411,7 +411,7 @@ public class LocationService extends IntentService {
             location.setLongitude(lon);
             if (name == null)
                 name = new SimpleDateFormat(ActivitySettings.DATETIME_FORMAT, Locale.getDefault()).format(new Date());
-            new DatabaseHelper(this).insert(location, name);
+            new DatabaseHelper(this).insert(location, name).close();
             toast(getString(R.string.msg_added, name), this);
         }
     }
@@ -723,7 +723,7 @@ public class LocationService extends IntentService {
             }
 
             // Persist new location
-            new DatabaseHelper(this).insert(location, waypointName);
+            new DatabaseHelper(this).insert(location, waypointName).close();
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
 
             // Feedback
@@ -928,11 +928,16 @@ public class LocationService extends IntentService {
         folder.mkdirs();
         String gpxFileName = folder.getAbsolutePath() + File.separatorChar + trackName + ".gpx";
         Log.w(TAG, "Writing file=" + gpxFileName);
-        DatabaseHelper databaseHelper = new DatabaseHelper(context);
-        Cursor trackPoints = databaseHelper.getList(from, to, true, false);
-        Cursor wayPoints = databaseHelper.getList(from, to, false, true);
-        GPXFileWriter.writeGpxFile(new File(gpxFileName), trackName, extensions, trackPoints, wayPoints);
-        databaseHelper.close();
+        DatabaseHelper databaseHelper = null;
+        try {
+            databaseHelper = new DatabaseHelper(context);
+            Cursor trackPoints = databaseHelper.getList(from, to, true, false);
+            Cursor wayPoints = databaseHelper.getList(from, to, false, true);
+            GPXFileWriter.writeGpxFile(new File(gpxFileName), trackName, extensions, trackPoints, wayPoints);
+        } finally {
+            if (databaseHelper != null)
+                databaseHelper.close();
+        }
         return gpxFileName;
     }
 
