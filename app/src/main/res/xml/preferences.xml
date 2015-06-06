@@ -34,31 +34,37 @@
             android:title="@string/title_enabled" />
         <EditTextPreference
             android:defaultValue="3"
+            android:dependency="pref_enabled"
             android:inputType="number"
             android:key="pref_frequency"
             android:summary="@string/summary_frequency" />
         <CheckBoxPreference
             android:defaultValue="true"
+            android:dependency="pref_enabled"
             android:key="pref_altitude"
             android:summary="@string/summary_altitude"
             android:title="@string/title_altitude" />
         <EditTextPreference
             android:defaultValue="20"
+            android:dependency="pref_enabled"
             android:inputType="number"
             android:key="pref_accuracy"
             android:summary="@string/summary_accuracy" />
         <EditTextPreference
             android:defaultValue="60"
+            android:dependency="pref_enabled"
             android:inputType="number"
             android:key="pref_timeout"
             android:summary="@string/summary_timeout" />
         <EditTextPreference
             android:defaultValue="100"
+            android:dependency="pref_enabled"
             android:inputType="number"
             android:key="pref_inaccurate"
             android:summary="@string/summary_inaccurate" />
         <EditTextPreference
             android:defaultValue="100"
+            android:dependency="pref_enabled"
             android:inputType="number"
             android:key="pref_nearby"
             android:summary="@string/summary_nearby" />
@@ -66,16 +72,19 @@
     <PreferenceCategory android:title="@string/title_passive">
         <CheckBoxPreference
             android:defaultValue="true"
+            android:dependency="pref_enabled"
             android:key="pref_passive_enabled"
             android:summary="@string/summary_passive_enabled"
             android:title="@string/title_passive_enabled" />
         <EditTextPreference
             android:defaultValue="30"
+            android:dependency="pref_passive_enabled"
             android:inputType="number"
             android:key="pref_passive_bearing"
             android:summary="@string/summary_passive_bearing" />
         <EditTextPreference
             android:defaultValue="20"
+            android:dependency="pref_passive_enabled"
             android:inputType="number"
             android:key="pref_passive_altitude"
             android:summary="@string/summary_passive_altitude" />
@@ -83,25 +92,30 @@
     <PreferenceCategory android:title="@string/title_recognition">
         <CheckBoxPreference
             android:defaultValue="true"
+            android:dependency="pref_enabled"
             android:key="pref_recognition_enabled"
             android:summary="@string/summary_recognition_enabled"
             android:title="@string/title_recognition_enabled" />
         <EditTextPreference
             android:defaultValue="1"
+            android:dependency="pref_recognition_enabled"
             android:inputType="number"
             android:key="pref_recognition_interval"
             android:summary="@string/summary_recognition_interval" />
         <EditTextPreference
             android:defaultValue="50"
+            android:dependency="pref_recognition_enabled"
             android:inputType="number"
             android:key="pref_recognition_confidence"
             android:summary="@string/summary_recognition_confidence" />
         <CheckBoxPreference
             android:defaultValue="true"
+            android:dependency="pref_recognition_enabled"
             android:key="pref_recognition_tilting"
             android:title="@string/title_recognition_tilting" />
         <CheckBoxPreference
             android:defaultValue="false"
+            android:dependency="pref_recognition_enabled"
             android:key="pref_recognition_unknown"
             android:title="@string/title_recognition_unknown" />
     </PreferenceCategory>
@@ -110,13 +124,16 @@
             android:key="pref_blogurl"
             android:summary="@string/summary_blogurl" />
         <EditTextPreference
+            android:dependency="pref_blogurl"
             android:inputType="number"
             android:key="pref_blogid"
             android:summary="@string/summary_blogid" />
         <EditTextPreference
+            android:dependency="pref_blogurl"
             android:key="pref_bloguser"
             android:summary="@string/summary_bloguser" />
         <EditTextPreference
+            android:dependency="pref_blogurl"
             android:inputType="textPassword"
             android:key="pref_blogpwd"
             android:summary="@string/summary_blogpwd" />
