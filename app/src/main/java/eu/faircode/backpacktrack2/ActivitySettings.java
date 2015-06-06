@@ -52,6 +52,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.DetectedActivity;
 
 import java.io.IOException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -129,11 +130,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_LAST_EXTENSIONS = "pref_last_extensions";
     public static final String PREF_LAST_FROM = "pref_last_from";
     public static final String PREF_LAST_TO = "pref_last_to";
-
-    public static final String DATE_FORMNAT = "yyyy-MM-dd";
-    public static final String TIME_FORMAT_SHORT = "HH:mm";
-    public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    public static final String DATETIME_FORMAT_SHORT = "dd/MM HH:mm:ss";
 
     private static final int GEOCODER_RESULTS = 5;
 
@@ -575,8 +571,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         to.setTime(new Date(prefs.getLong(PREF_LAST_TO, defaultTo.getTimeInMillis())));
 
         // Show range
-        final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMNAT);
-        final SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT_SHORT);
+        final DateFormat dateFormat = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM);
+        final DateFormat timeFormat = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT);
 
         tvDateFrom.setText(dateFormat.format(from.getTime()));
         tvTimeFrom.setText(timeFormat.format(from.getTime()));
@@ -962,7 +958,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             TextView tvDistance = (TextView) view.findViewById(R.id.tvDistance);
 
             // Set values
-            tvTime.setText(new SimpleDateFormat(DATETIME_FORMAT, Locale.getDefault()).format(time));
+            tvTime.setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(time));
             ivPin.setVisibility(name == null ? View.INVISIBLE : View.VISIBLE);
             int resId = context.getResources().getIdentifier("provider_" + provider, "string", context.getPackageName());
             tvProvider.setText(resId == 0 ? "-" : context.getString(resId).substring(0, 1));
