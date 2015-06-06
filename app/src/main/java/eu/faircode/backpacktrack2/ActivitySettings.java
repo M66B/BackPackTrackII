@@ -31,7 +31,6 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.provider.Settings;
 import android.text.TextUtils;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,6 +58,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 public class ActivitySettings extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "BPT2.Settings";
@@ -129,6 +129,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_LAST_EXTENSIONS = "pref_last_extensions";
     public static final String PREF_LAST_FROM = "pref_last_from";
     public static final String PREF_LAST_TO = "pref_last_to";
+
+    public static final String DATE_FORMNAT = "yyyy-MM-dd";
+    public static final String TIME_FORMAT_SHORT = "HH:mm";
+    public static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    public static final String DATETIME_FORMAT_SHORT = "dd/MM HH:mm:ss";
 
     private static final int GEOCODER_RESULTS = 5;
 
@@ -558,8 +563,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         to.setTime(new Date(prefs.getLong(PREF_LAST_TO, defaultTo.getTimeInMillis())));
 
         // Show range
-        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMNAT);
+        final SimpleDateFormat timeFormat = new SimpleDateFormat(TIME_FORMAT_SHORT);
 
         tvDateFrom.setText(dateFormat.format(from.getTime()));
         tvTimeFrom.setText(timeFormat.format(from.getTime()));
@@ -945,9 +950,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             TextView tvDistance = (TextView) view.findViewById(R.id.tvDistance);
 
             // Set values
-            CharSequence relativeTime = DateUtils.getRelativeTimeSpanString(time, new Date().getTime(),
-                    DateUtils.SECOND_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE);
-            tvTime.setText(relativeTime);
+            tvTime.setText(new SimpleDateFormat(DATETIME_FORMAT, Locale.getDefault()).format(time));
             ivPin.setVisibility(name == null ? View.INVISIBLE : View.VISIBLE);
             if (LocationManager.GPS_PROVIDER.equals(provider))
                 tvProvider.setText("G");

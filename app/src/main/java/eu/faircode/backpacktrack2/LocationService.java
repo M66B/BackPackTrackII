@@ -410,7 +410,7 @@ public class LocationService extends IntentService {
             location.setLatitude(lat);
             location.setLongitude(lon);
             if (name == null)
-                name = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+                name = new SimpleDateFormat(ActivitySettings.DATETIME_FORMAT, Locale.getDefault()).format(new Date());
             new DatabaseHelper(this).insert(location, name);
             toast(getString(R.string.msg_added, name), this);
         }
@@ -441,7 +441,7 @@ public class LocationService extends IntentService {
 
             // Persist last share time
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            prefs.edit().putString(ActivitySettings.PREF_LAST_SHARE, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date())).apply();
+            prefs.edit().putString(ActivitySettings.PREF_LAST_SHARE, new SimpleDateFormat(ActivitySettings.DATETIME_FORMAT, Locale.getDefault()).format(new Date())).apply();
         } catch (Throwable ex) {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             toast(ex.toString(), this);
@@ -488,7 +488,7 @@ public class LocationService extends IntentService {
             Log.w(TAG, "Uploaded url=" + url);
 
             // Persist last upload time
-            prefs.edit().putString(ActivitySettings.PREF_LAST_UPLOAD, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date())).apply();
+            prefs.edit().putString(ActivitySettings.PREF_LAST_UPLOAD, new SimpleDateFormat(ActivitySettings.DATETIME_FORMAT, Locale.getDefault()).format(new Date())).apply();
 
             // Feedback
             toast(getString(R.string.msg_uploaded, url), this);
@@ -717,7 +717,7 @@ public class LocationService extends IntentService {
             if (locationType == LOCATION_WAYPOINT) {
                 List<String> listAddress = reverseGeocode(location, this);
                 if (listAddress == null || listAddress.size() == 0)
-                    waypointName = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+                    waypointName = new SimpleDateFormat(ActivitySettings.DATETIME_FORMAT, Locale.getDefault()).format(new Date());
                 else
                     waypointName = TextUtils.join(", ", listAddress);
             }
@@ -820,7 +820,7 @@ public class LocationService extends IntentService {
                 text = context.getString(R.string.msg_idle, context.getString(R.string.msg_none));
             else
                 text = context.getString(R.string.msg_idle,
-                        new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(new Date(lastLocation.getTime())));
+                        new SimpleDateFormat(ActivitySettings.DATETIME_FORMAT_SHORT, Locale.getDefault()).format(new Date(lastLocation.getTime())));
 
         } else if (state == STATE_ACQUIRING) {
             lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
@@ -830,7 +830,7 @@ public class LocationService extends IntentService {
             Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
             lastLocation = bestLocation;
             text = context.getString(R.string.msg_acquired,
-                    new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(new Date(lastLocation.getTime())));
+                    new SimpleDateFormat(ActivitySettings.DATETIME_FORMAT_SHORT, Locale.getDefault()).format(new Date(lastLocation.getTime())));
         }
 
         String activity = getActivityName(prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN), context);
