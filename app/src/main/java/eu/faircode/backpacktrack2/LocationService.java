@@ -103,6 +103,9 @@ public class LocationService extends IntentService {
 
     private static final int REQUEST_RESOLVE_ERROR = 1001;
 
+    private static final int VIBRATE_SHORT = 250;
+    private static final int VIBRATE_LONG = 500;
+
     public LocationService() {
         super(TAG);
     }
@@ -732,7 +735,7 @@ public class LocationService extends IntentService {
                 if (locationType == LOCATION_WAYPOINT)
                     toast(waypointName, this);
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                vibrator.vibrate(locationType == LOCATION_TRACKPOINT ? 250 : 500);
+                vibrator.vibrate(locationType == LOCATION_TRACKPOINT ? VIBRATE_SHORT : VIBRATE_LONG);
             }
         } else
             Log.w(TAG, "Filtered location=" + location);
