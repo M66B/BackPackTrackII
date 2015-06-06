@@ -118,6 +118,9 @@
     <string name="msg_geocoding">Geocoding \'%s\' ...</string>
     <string name="msg_rgeocoding">Reverse geocoding ...</string>
 
+    <string name="provider_gps">GPS</string>
+    <string name="provider_network">Network</string>
+
     <string name="still">Still</string>
     <string name="tilting">Tilting</string>
     <string name="on_foot">On foot</string>

@@ -839,6 +839,9 @@ public class LocationService extends IntentService {
         String provider = "";
         if (lastLocation != null) {
             provider = lastLocation.getProvider();
+            int resId = context.getResources().getIdentifier("provider_" + provider, "string", context.getPackageName());
+            if (resId != 0)
+                provider = context.getString(resId);
             if (lastLocation.hasAltitude())
                 altitude = Long.toString(Math.round(lastLocation.getAltitude()));
             if (lastLocation.hasAccuracy())
