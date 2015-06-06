@@ -72,8 +72,8 @@ public class LocationService extends IntentService {
     public static final String ACTION_WAYPOINT = "WayPoint";
     public static final String ACTION_GEOPOINT = "Geopoint";
     public static final String ACTION_GEOTAGGED = "Geotagged";
-    public static final String ACTION_SHARE = "Share";
-    public static final String ACTION_UPLOAD = "Upload";
+    public static final String ACTION_SHARE_GPX = "ShareGPX";
+    public static final String ACTION_UPLOAD_GPX = "UploadGPX";
 
     // Extras
     public static final String EXTRA_TRACK = "Track";
@@ -138,10 +138,10 @@ public class LocationService extends IntentService {
             else if (ACTION_GEOTAGGED.equals(intent.getAction()))
                 handleGeotagged(intent);
 
-            else if (ACTION_SHARE.equals(intent.getAction()))
+            else if (ACTION_SHARE_GPX.equals(intent.getAction()))
                 handleShare(intent);
 
-            else if (ACTION_UPLOAD.equals(intent.getAction()))
+            else if (ACTION_UPLOAD_GPX.equals(intent.getAction()))
                 handleUpload(intent);
 
             else

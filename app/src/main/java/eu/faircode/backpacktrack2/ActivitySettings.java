@@ -243,7 +243,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 Intent intent = new Intent(ActivitySettings.this, LocationService.class);
-                intent.setAction(LocationService.ACTION_SHARE);
+                intent.setAction(LocationService.ACTION_SHARE_GPX);
                 export(intent);
                 return true;
             }
@@ -255,7 +255,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 Intent intent = new Intent(ActivitySettings.this, LocationService.class);
-                intent.setAction(LocationService.ACTION_UPLOAD);
+                intent.setAction(LocationService.ACTION_UPLOAD_GPX);
                 export(intent);
                 return true;
             }
