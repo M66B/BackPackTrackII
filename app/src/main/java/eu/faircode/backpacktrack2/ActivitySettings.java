@@ -958,7 +958,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             TextView tvDistance = (TextView) view.findViewById(R.id.tvDistance);
 
             // Set values
-            tvTime.setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(time));
+            tvTime.setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(time));
             ivPin.setVisibility(name == null ? View.INVISIBLE : View.VISIBLE);
             int resId = context.getResources().getIdentifier("provider_" + provider, "string", context.getPackageName());
             tvProvider.setText(resId == 0 ? "-" : context.getString(resId).substring(0, 1));
