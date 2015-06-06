@@ -3,7 +3,8 @@
 Description
 -----------
 
-BackPackTrack II is an open source utility application meant to continuously record your location, without draining your battery.
+BackPackTrack II is an open source utility application meant to continuously record your location,
+without draining your battery and without requiring an internet connection.
 
 The GPS will be switched on every 3 minutes for a maximum of 60 seconds (configurable) to acquire a location, but only if you are moving.
 When the GPS cannot get a fix, a network location will be used as backup.
