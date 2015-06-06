@@ -58,7 +58,7 @@
     <string name="summary_accuracy">Stop acquiring a location after a location with the selected accuracy has been acquired</string>
     <string name="summary_timeout">Always stop acquiring a location after the selected number of seconds</string>
     <string name="summary_inaccurate">Filter locations less accurate than the selected number of meters</string>
-    <string name="summary_nearby">Filter locations closer than the selected number of meters to the last location</string>
+    <string name="summary_nearby">Filter locations closer than the selected number of meters to the last location, except when a location is more accurate than the last location</string>
     <string name="summary_mintime">Minimum time between location updates</string>
     <string name="summary_mindist">Minimum distance between location updates</string>
 
