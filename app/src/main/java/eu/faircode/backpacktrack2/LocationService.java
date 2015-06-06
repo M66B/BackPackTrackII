@@ -52,7 +52,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import de.timroes.axmlrpc.XMLRPCClient;
@@ -83,11 +82,6 @@ public class LocationService extends IntentService {
     public static final String EXTRA_GEOURI = "Geopoint";
 
     // Constants
-    private static final int LOCATION_MIN_TIME = 1000; // milliseconds
-    private static final int LOCATION_MIN_DISTANCE = 0; // meters
-    private static final int PASSIVE_MIN_TIME = 1000; // milliseconds
-    private static final int PASSIVE_MIN_DISTANCE = 0; // meters
-
     private static final int STATE_IDLE = 1;
     private static final int STATE_ACQUIRING = 2;
     private static final int STATE_ACQUIRED = 3;
@@ -97,11 +91,9 @@ public class LocationService extends IntentService {
     private static final int LOCATION_PERIODIC = 3;
     private static final int LOCATION_GEOTAG = 4;
 
-    private static double EGM96_INTERVAL = 15d / 60d; // 15' angle delta
-    private static int EGM96_ROWS = 721;
-    private static int EGM96_COLS = 1440;
-
-    private static final int REQUEST_RESOLVE_ERROR = 1001;
+    private static final double EGM96_INTERVAL = 15d / 60d; // 15' angle delta
+    private static final int EGM96_ROWS = 721;
+    private static final int EGM96_COLS = 1440;
 
     private static final int VIBRATE_SHORT = 250;
     private static final int VIBRATE_LONG = 500;
@@ -176,7 +168,7 @@ public class LocationService extends IntentService {
 
         // Filter tilting activity
         boolean pref_tilting = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_TILTING, ActivitySettings.DEFAULT_RECOGNITION_TILTING);
-        if (pref_unknown && activity.getType() == DetectedActivity.TILTING) {
+        if (pref_tilting && activity.getType() == DetectedActivity.TILTING) {
             Log.w(TAG, "Filtering " + activity);
             return;
         }
@@ -239,8 +231,8 @@ public class LocationService extends IntentService {
 
         // Get location preferences
         boolean pref_altitude = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE, ActivitySettings.DEFAULT_ALTITUDE);
-        float pref_accuracy = Float.parseFloat(prefs.getString(ActivitySettings.PREF_ACCURACY, ActivitySettings.DEFAULT_ACCURACY));
-        float pref_inaccurate = Float.parseFloat(prefs.getString(ActivitySettings.PREF_INACCURATE, ActivitySettings.DEFAULT_INACCURATE));
+        int pref_accuracy = Integer.parseInt(prefs.getString(ActivitySettings.PREF_ACCURACY, ActivitySettings.DEFAULT_ACCURACY));
+        int pref_inaccurate = Integer.parseInt(prefs.getString(ActivitySettings.PREF_INACCURATE, ActivitySettings.DEFAULT_INACCURATE));
         Log.w(TAG, "Prefer altitude=" + pref_altitude + " accuracy=" + pref_accuracy + " inaccurate=" + pref_inaccurate);
 
         if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
@@ -291,7 +283,7 @@ public class LocationService extends IntentService {
         }
 
         // Filter inaccurate passive locations
-        float pref_inaccurate = Float.parseFloat(prefs.getString(ActivitySettings.PREF_INACCURATE, ActivitySettings.DEFAULT_INACCURATE));
+        int pref_inaccurate = Integer.parseInt(prefs.getString(ActivitySettings.PREF_INACCURATE, ActivitySettings.DEFAULT_INACCURATE));
         if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
             Log.w(TAG, "Filtering inaccurate passive location=" + location);
             return;
@@ -305,7 +297,7 @@ public class LocationService extends IntentService {
         }
 
         // Filter nearby passive locations
-        float pref_nearby = Float.parseFloat(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
+        int pref_nearby = Integer.parseInt(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
         if (lastLocation.distanceTo(location) < pref_nearby) {
             Log.w(TAG, "Filtering nearby passive location=" + location);
             return;
@@ -326,7 +318,7 @@ public class LocationService extends IntentService {
 
         // Handle bearing change
         if (location.hasBearing()) {
-            float pref_bearing_change = Float.parseFloat(prefs.getString(ActivitySettings.PREF_PASSIVE_BEARING, ActivitySettings.DEFAULT_PASSIVE_BEARING));
+            int pref_bearing_change = Integer.parseInt(prefs.getString(ActivitySettings.PREF_PASSIVE_BEARING, ActivitySettings.DEFAULT_PASSIVE_BEARING));
             float delta = Math.abs(lastLocation.getBearing() - location.getBearing());
             if (delta > 180)
                 delta = 360 - delta;
@@ -338,7 +330,7 @@ public class LocationService extends IntentService {
 
         // Handle altitude change
         if (location.hasAltitude()) {
-            double pref_altitude_change = Double.parseDouble(prefs.getString(ActivitySettings.PREF_PASSIVE_ALTITUDE, ActivitySettings.DEFAULT_PASSIVE_ALTITUDE));
+            int pref_altitude_change = Integer.parseInt(prefs.getString(ActivitySettings.PREF_PASSIVE_ALTITUDE, ActivitySettings.DEFAULT_PASSIVE_ALTITUDE));
             double delta = Math.abs(lastLocation.getAltitude() - location.getAltitude());
             if (!lastLocation.hasAltitude() || delta >= pref_altitude_change) {
                 Log.w(TAG, "Altitude changed to " + location.getAltitude());
@@ -549,7 +541,9 @@ public class LocationService extends IntentService {
             locationIntent.setAction(LocationService.ACTION_LOCATION_PASSIVE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-            lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, PASSIVE_MIN_TIME, PASSIVE_MIN_DISTANCE, pi);
+            int minTime = Integer.parseInt(prefs.getString(ActivitySettings.PREF_PASSIVE_MINTIME, ActivitySettings.DEFAULT_PASSIVE_MINTIME));
+            int minDist = Integer.parseInt(prefs.getString(ActivitySettings.PREF_PASSIVE_MINDIST, ActivitySettings.DEFAULT_PASSIVE_MINDIST));
+            lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, minTime * 1000, minDist, pi);
             Log.w(TAG, "Requested passive location updates");
         }
     }
@@ -621,12 +615,15 @@ public class LocationService extends IntentService {
             return;
         }
 
+        int minTime = Integer.parseInt(prefs.getString(ActivitySettings.PREF_MINTIME, ActivitySettings.DEFAULT_MINTIME));
+        int minDist = Integer.parseInt(prefs.getString(ActivitySettings.PREF_MINDIST, ActivitySettings.DEFAULT_MINDIST));
+
         // Request coarse location
         if (lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             Intent locationIntent = new Intent(context, LocationService.class);
             locationIntent.setAction(LocationService.ACTION_LOCATION_COARSE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_MIN_TIME, LOCATION_MIN_DISTANCE, pi);
+            lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTime * 1000, minDist, pi);
             Log.w(TAG, "Requested network location updates");
         }
 
@@ -635,7 +632,7 @@ public class LocationService extends IntentService {
             Intent locationIntent = new Intent(context, LocationService.class);
             locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_MIN_TIME, LOCATION_MIN_DISTANCE, pi);
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime * 1000, minDist, pi);
             Log.w(TAG, "Requested GPS location updates");
         }
 
@@ -706,7 +703,7 @@ public class LocationService extends IntentService {
     private void handleLocation(int locationType, Location location) {
         // Filter close locations
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        float pref_nearby = Float.parseFloat(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
+        int pref_nearby = Integer.parseInt(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
         if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT || locationType == LOCATION_GEOTAG ||
                 lastLocation == null || lastLocation.distanceTo(location) >= pref_nearby ||
@@ -830,8 +827,7 @@ public class LocationService extends IntentService {
             text = context.getString(R.string.msg_acquiring);
 
         } else if (state == STATE_ACQUIRED) {
-            Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
-            lastLocation = bestLocation;
+            lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
             text = context.getString(R.string.msg_acquired,
                     SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(new Date(lastLocation.getTime())));
         }

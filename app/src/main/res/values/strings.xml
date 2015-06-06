@@ -19,6 +19,8 @@
     <string name="title_timeout">Location time-out: %s seconds</string>
     <string name="title_inaccurate">Filter inaccurate locations: %s meters</string>
     <string name="title_nearby">Filter nearby locations: %s meters</string>
+    <string name="title_mintime">Minimum update time: %s seconds</string>
+    <string name="title_mindist">Minimum update distance: %s meters</string>
 
     <string name="title_passive">Passive locations</string>
     <string name="title_passive_enabled">Passive locations enabled</string>
@@ -57,6 +59,8 @@
     <string name="summary_timeout">Always stop acquiring a location after the selected number of seconds</string>
     <string name="summary_inaccurate">Filter locations less accurate than the selected number of meters</string>
     <string name="summary_nearby">Filter locations closer than the selected number of meters to the last location</string>
+    <string name="summary_mintime">Minimum time between location updates</string>
+    <string name="summary_mindist">Minimum distance between location updates</string>
 
     <string name="summary_passive_enabled">Use location updates requested by other applications</string>
     <string name="summary_passive_bearing">Use passive location updates when bearing changes for more than the selected number of degrees</string>

@@ -68,6 +68,18 @@
             android:inputType="number"
             android:key="pref_nearby"
             android:summary="@string/summary_nearby" />
+        <EditTextPreference
+            android:defaultValue="1"
+            android:dependency="pref_enabled"
+            android:inputType="number"
+            android:key="pref_mintime"
+            android:summary="@string/summary_mintime" />
+        <EditTextPreference
+            android:defaultValue="0"
+            android:dependency="pref_enabled"
+            android:inputType="number"
+            android:key="pref_mindist"
+            android:summary="@string/summary_mindist" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_passive">
         <CheckBoxPreference
@@ -88,6 +100,18 @@
             android:inputType="number"
             android:key="pref_passive_altitude"
             android:summary="@string/summary_passive_altitude" />
+        <EditTextPreference
+            android:defaultValue="1"
+            android:dependency="pref_passive_enabled"
+            android:inputType="number"
+            android:key="pref_passive_mintime"
+            android:summary="@string/summary_mintime" />
+        <EditTextPreference
+            android:defaultValue="0"
+            android:dependency="pref_passive_enabled"
+            android:inputType="number"
+            android:key="pref_passive_mindist"
+            android:summary="@string/summary_mindist" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_recognition">
         <CheckBoxPreference
