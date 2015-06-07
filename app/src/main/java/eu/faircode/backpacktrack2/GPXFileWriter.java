@@ -71,7 +71,6 @@ public class GPXFileWriter {
 
             fw.write(out.toString());
         }
-        c.close();
 
         fw.write("\t\t" + "</trkseg>" + "\n");
         fw.write("\t" + "</trk>" + "\n");
@@ -116,6 +115,5 @@ public class GPXFileWriter {
 
             fw.write(out.toString());
         }
-        c.close();
     }
 }

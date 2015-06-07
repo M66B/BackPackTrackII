@@ -2,7 +2,8 @@
     <string name="app_name">BackPackTrack II</string>
 
     <string name="title_action">Actions</string>
-    <string name="title_history">History</string>
+    <string name="title_location_history">Location history</string>
+    <string name="title_activity_history">Activity history</string>
     <string name="title_edit">Edit waypoints</string>
     <string name="title_share">Share GPX file</string>
     <string name="title_upload">Upload GPX file</string>
@@ -47,7 +48,8 @@
     <string name="title_license">License</string>
     <string name="title_egm96">EGM96</string>
 
-    <string name="summary_history">Show the location history to verify everything works</string>
+    <string name="summary_location_history">Show the location history to verify everything works</string>
+    <string name="summary_activity_history">Show the activity history to verify everything works</string>
     <string name="summary_edit">Add, change or delete waypoints</string>
     <string name="summary_share">Tap to write and share a GPX file\nLast share: %s</string>
     <string name="summary_upload">Tap to write and upload a GPX file to a WordPress weblog\nLast upload: %s</string>

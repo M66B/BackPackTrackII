@@ -158,6 +158,7 @@ public class LocationService extends IntentService {
         DetectedActivity activity = activityResult.getMostProbableActivity();
 
         Log.w(TAG, "Activity=" + activity);
+        new DatabaseHelper(this).insert(new Date().getTime(), activity.getType(), activity.getConfidence()).close();
 
         // Filter unknown activity
         boolean pref_unknown = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_UNKNOWN, ActivitySettings.DEFAULT_RECOGNITION_UNKNOWN);
@@ -905,7 +906,7 @@ public class LocationService extends IntentService {
         nm.notify(0, notificationBuilder.build());
     }
 
-    private static String getActivityName(int activityType, Context context) {
+    public static String getActivityName(int activityType, Context context) {
         switch (activityType) {
             case DetectedActivity.STILL:
                 return context.getString(R.string.still);
@@ -939,12 +940,18 @@ public class LocationService extends IntentService {
         String gpxFileName = folder.getAbsolutePath() + File.separatorChar + trackName + ".gpx";
         Log.w(TAG, "Writing file=" + gpxFileName);
         DatabaseHelper databaseHelper = null;
+        Cursor trackPoints = null;
+        Cursor wayPoints = null;
         try {
             databaseHelper = new DatabaseHelper(context);
-            Cursor trackPoints = databaseHelper.getList(from, to, true, false);
-            Cursor wayPoints = databaseHelper.getList(from, to, false, true);
+            trackPoints = databaseHelper.getLocations(from, to, true, false);
+            wayPoints = databaseHelper.getLocations(from, to, false, true);
             GPXFileWriter.writeGpxFile(new File(gpxFileName), trackName, extensions, trackPoints, wayPoints);
         } finally {
+            if (wayPoints != null)
+                wayPoints.close();
+            if (trackPoints != null)
+                trackPoints.close();
             if (databaseHelper != null)
                 databaseHelper.close();
         }
