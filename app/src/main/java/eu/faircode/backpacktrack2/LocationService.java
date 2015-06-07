@@ -1,5 +1,6 @@
 package eu.faircode.backpacktrack2;
 
+import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
@@ -14,6 +15,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -809,6 +811,7 @@ public class LocationService extends IntentService {
         return listline;
     }
 
+    @TargetApi(21)
     private static void updateState(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int state = prefs.getInt(ActivitySettings.PREF_STATE, STATE_IDLE);
@@ -874,6 +877,10 @@ public class LocationService extends IntentService {
         notificationBuilder.setWhen(System.currentTimeMillis());
         notificationBuilder.setAutoCancel(false);
         notificationBuilder.setOngoing(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            notificationBuilder.setCategory(Notification.CATEGORY_SERVICE);
+            notificationBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        }
 
         if (state == STATE_IDLE) {
             // Build trackpoint intent
@@ -892,6 +899,9 @@ public class LocationService extends IntentService {
             notificationBuilder.addAction(android.R.drawable.ic_menu_myplaces, context.getString(R.string.title_waypoint),
                     piWaypoint);
         } else {
+            // Indeterminate progress
+            notificationBuilder.setProgress(0, 0, true);
+
             // Build stop intent
             Intent riStop = new Intent(context, LocationService.class);
             riStop.setAction(LocationService.ACTION_STOP);
