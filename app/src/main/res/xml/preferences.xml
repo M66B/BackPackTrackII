@@ -5,16 +5,6 @@
         android:selectable="false" />
     <PreferenceCategory android:title="@string/title_action">
         <Preference
-            android:icon="@android:drawable/ic_menu_recent_history"
-            android:key="pref_location_history"
-            android:summary="@string/summary_location_history"
-            android:title="@string/title_location_history" />
-        <Preference
-            android:icon="@android:drawable/ic_menu_recent_history"
-            android:key="pref_activity_history"
-            android:summary="@string/summary_activity_history"
-            android:title="@string/title_activity_history" />
-        <Preference
             android:icon="@android:drawable/ic_menu_edit"
             android:key="pref_edit"
             android:summary="@string/summary_edit"
@@ -29,6 +19,16 @@
             android:key="pref_upload"
             android:summary="@string/summary_upload"
             android:title="@string/title_upload" />
+        <Preference
+            android:icon="@android:drawable/ic_menu_agenda"
+            android:key="pref_location_history"
+            android:summary="@string/summary_location_history"
+            android:title="@string/title_location_history" />
+        <Preference
+            android:icon="@android:drawable/ic_menu_view"
+            android:key="pref_activity_history"
+            android:summary="@string/summary_activity_history"
+            android:title="@string/title_activity_history" />
         <Preference
             android:icon="@android:drawable/ic_menu_mylocation"
             android:key="pref_check"
