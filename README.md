@@ -53,6 +53,7 @@ The following libraries are being used:
 * [Gson](https://github.com/google/gson) (JSON serialization)
 * [Play Services](http://developer.android.com/google/play-services/) (activity recognition)
 * [aXMLRPC](https://github.com/timroes/aXMLRPC) (XML-RPC)
+* [jdom2](http://www.jdom.org/) (GPX)
 
 Screenshot
 ----------
