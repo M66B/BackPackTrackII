@@ -3,117 +3,140 @@ package eu.faircode.backpacktrack2;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
 
 import android.database.Cursor;
 
+import org.jdom2.Attribute;
+import org.jdom2.Namespace;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+
 public class GPXFileWriter {
 
-    private static final SimpleDateFormat POINT_DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'",
-            Locale.getDefault());
+    private static String NS = "http://www.topografix.com/GPX/1/1";
+    private static DecimalFormat DF = new DecimalFormat("#.##", new DecimalFormatSymbols(Locale.ROOT));
+    private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
 
     // Main logic
     public static void writeGpxFile(File target, String trackName, boolean extensions, Cursor cTrackPoints, Cursor cWayPoints)
             throws IOException {
-        FileWriter fw = new FileWriter(target);
-        fw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
-        fw.write("<gpx"
-                + " xmlns=\"http://www.topografix.com/GPX/1/1\""
-                + " version=\"1.1\""
-                + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-                + " xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd\">\n");
-        writeTrackPoints(trackName, extensions, fw, cTrackPoints);
-        writeWayPoints(extensions, fw, cWayPoints);
-        fw.write("</gpx>");
-        fw.close();
+
+        Document doc = new Document();
+        Element gpx = new Element("gpx", NS);
+        Namespace xsi = Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        gpx.addNamespaceDeclaration(xsi);
+        gpx.setAttribute("schemaLocation", "http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd", xsi);
+        gpx.setAttribute(new Attribute("version", "1.1"));
+        gpx.setAttribute(new Attribute("creator", "BackPackTrackII"));
+        gpx.addContent(getTrackpoints(trackName, extensions, cTrackPoints));
+        gpx.addContent(getWayPoints(extensions, cWayPoints));
+        doc.setRootElement(gpx);
+
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter(target);
+            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+            xout.output(doc, fw);
+            fw.flush();
+        } finally {
+            if (fw != null)
+                fw.close();
+        }
     }
 
-    private static void writeTrackPoints(String trackName, boolean extensions, FileWriter fw, Cursor c) throws IOException {
-        fw.write("\t" + "<trk>" + "\n");
-        fw.write("\t\t" + "<name>" + trackName + "</name>" + "\n");
-        fw.write("\t\t" + "<trkseg>" + "\n");
+    private static Element getTrackpoints(String trackName, boolean extensions, Cursor c) {
+        Element trk = new Element("trk", NS);
+        trk.addContent(new Element("name", NS).addContent(trackName));
 
+        int colLat = c.getColumnIndex("latitude");
+        int colLon = c.getColumnIndex("longitude");
+        int colAlt = c.getColumnIndex("altitude");
+        int colTime = c.getColumnIndex("time");
+        int colAcc = c.getColumnIndex("accuracy");
+        int colProv = c.getColumnIndex("provider");
+        int colSpeed = c.getColumnIndex("speed");
+        int colBear = c.getColumnIndex("bearing");
+
+        Element trkseg = new Element("trkseg", NS);
+        trk.addContent(trkseg);
         while (c.moveToNext()) {
-            StringBuilder out = new StringBuilder();
-            out.append("\t\t\t" + "<trkpt lat=\"" + c.getDouble(c.getColumnIndex("latitude")) + "\" " + "lon=\""
-                    + c.getDouble(c.getColumnIndex("longitude")) + "\">" + "\n");
-
+            Element trkpt = new Element("trkpt", NS);
+            trkpt.setAttribute(new Attribute("lat", Double.toString(c.getDouble(colLat))));
+            trkpt.setAttribute(new Attribute("lon", Double.toString(c.getDouble(colLon))));
             if (!c.isNull(c.getColumnIndex("altitude")))
-                out.append("\t\t\t\t" + "<ele>" + Math.round(c.getDouble(c.getColumnIndex("altitude"))) + "</ele>" + "\n");
-
-            out.append("\t\t\t\t" + "<time>"
-                    + POINT_DATE_FORMATTER.format(new Date(c.getLong(c.getColumnIndex("time")))) + "</time>" + "\n");
+                trkpt.addContent(new Element("ele", NS).addContent(DF.format(c.getDouble(colAlt))));
+            trkpt.addContent(new Element("time", NS).addContent(SDF.format(new Date(c.getLong(colTime)))));
+            if (extensions)
+                trkpt.addContent(new Element("hdop", NS).addContent(DF.format(c.getDouble(colAcc) / 4)));
 
             if (extensions) {
-                if (!c.isNull(c.getColumnIndex("accuracy"))) {
-                    double hdop = Math.round(c.getDouble(c.getColumnIndex("accuracy")) / 4 * 100) / 100f;
-                    out.append("\t\t\t\t" + "<hdop>" + hdop + "</hdop>" + "\n");
-                }
-
-                out.append("\t\t\t\t" + "<extensions>\n");
-
+                Element ext = new Element("extensions", NS);
                 if (!c.isNull(c.getColumnIndex("provider")))
-                    out.append("\t\t\t\t\t" + "<provider>" + c.getString(c.getColumnIndex("provider")) + "</provider>" + "\n");
+                    ext.addContent(new Element("provider", NS).addContent(c.getString(colProv)));
                 if (!c.isNull(c.getColumnIndex("speed")))
-                    out.append("\t\t\t\t\t" + "<speed>" + c.getString(c.getColumnIndex("speed")) + "</speed>" + "\n");
+                    ext.addContent(new Element("speed", NS).addContent(DF.format(c.getDouble(colSpeed))));
                 if (!c.isNull(c.getColumnIndex("bearing")))
-                    out.append("\t\t\t\t\t" + "<bearing>" + c.getString(c.getColumnIndex("bearing")) + "</bearing>" + "\n");
+                    ext.addContent(new Element("bearing", NS).addContent(DF.format(c.getDouble(colBear))));
                 if (!c.isNull(c.getColumnIndex("accuracy")))
-                    out.append("\t\t\t\t\t" + "<accuracy>" + c.getString(c.getColumnIndex("accuracy")) + "</accuracy>"
-                            + "\n");
-
-                out.append("\t\t\t\t" + "</extensions>\n");
+                    ext.addContent(new Element("accuracy", NS).addContent(DF.format(c.getDouble(colAcc))));
+                trkpt.addContent(ext);
             }
 
-            out.append("\t\t\t" + "</trkpt>" + "\n");
-
-            fw.write(out.toString());
+            trkseg.addContent(trkpt);
         }
 
-        fw.write("\t\t" + "</trkseg>" + "\n");
-        fw.write("\t" + "</trk>" + "\n");
+        return trk;
     }
 
-    private static void writeWayPoints(boolean extensions, FileWriter fw, Cursor c) throws IOException {
+    private static Collection<Element> getWayPoints(boolean extensions, Cursor c) {
+        Collection<Element> wpts = new ArrayList<Element>();
+
+        int colLat = c.getColumnIndex("latitude");
+        int colLon = c.getColumnIndex("longitude");
+        int colAlt = c.getColumnIndex("altitude");
+        int colTime = c.getColumnIndex("time");
+        int colName = c.getColumnIndex("name");
+        int colAcc = c.getColumnIndex("accuracy");
+        int colProv = c.getColumnIndex("provider");
+        int colSpeed = c.getColumnIndex("speed");
+        int colBear = c.getColumnIndex("bearing");
+
         while (c.moveToNext()) {
-            StringBuilder out = new StringBuilder();
-            out.append("\t" + "<wpt lat=\"" + c.getDouble(c.getColumnIndex("latitude")) + "\" " + "lon=\""
-                    + c.getDouble(c.getColumnIndex("longitude")) + "\">" + "\n");
-
+            Element wpt = new Element("wpt", NS);
+            wpt.setAttribute(new Attribute("lat", Double.toString(c.getDouble(colLat))));
+            wpt.setAttribute(new Attribute("lon", Double.toString(c.getDouble(colLon))));
             if (!c.isNull(c.getColumnIndex("altitude")))
-                out.append("\t\t" + "<ele>" + Math.round(c.getDouble(c.getColumnIndex("altitude"))) + "</ele>" + "\n");
-
-            out.append("\t\t" + "<time>" + POINT_DATE_FORMATTER.format(new Date(c.getLong(c.getColumnIndex("time")))) + "</time>" + "\n");
-            out.append("\t\t" + "<name>" + c.getString(c.getColumnIndex("name")) + "</name>" + "\n");
+                wpt.addContent(new Element("ele", NS).addContent(DF.format(c.getDouble(colAlt))));
+            wpt.addContent(new Element("time", NS).addContent(SDF.format(new Date(c.getLong(colTime)))));
+            wpt.addContent(new Element("name", NS).addContent(c.getString(colName)));
+            if (extensions)
+                wpt.addContent(new Element("hdop", NS).addContent(DF.format(c.getDouble(colAcc) / 4)));
 
             if (extensions) {
-                if (!c.isNull(c.getColumnIndex("accuracy"))) {
-                    double hdop = Math.round(c.getDouble(c.getColumnIndex("accuracy")) / 4 * 100) / 100f;
-                    out.append("\t\t" + "<hdop>" + hdop + "</hdop>" + "\n");
-                }
-
-                out.append("\t\t\t" + "<extensions>\n");
-
+                Element ext = new Element("extensions", NS);
                 if (!c.isNull(c.getColumnIndex("provider")))
-                    out.append("\t\t\t\t" + "<provider>" + c.getString(c.getColumnIndex("provider")) + "</provider>" + "\n");
-
+                    ext.addContent(new Element("provider", NS).addContent(c.getString(colProv)));
                 if (!c.isNull(c.getColumnIndex("speed")))
-                    out.append("\t\t\t\t" + "<speed>" + c.getString(c.getColumnIndex("speed")) + "</speed>" + "\n");
-
+                    ext.addContent(new Element("speed", NS).addContent(DF.format(c.getDouble(colSpeed))));
                 if (!c.isNull(c.getColumnIndex("bearing")))
-                    out.append("\t\t\t\t" + "<bearing>" + c.getString(c.getColumnIndex("bearing")) + "</bearing>" + "\n");
-
+                    ext.addContent(new Element("bearing", NS).addContent(DF.format(c.getDouble(colBear))));
                 if (!c.isNull(c.getColumnIndex("accuracy")))
-                    out.append("\t\t\t\t" + "<accuracy>" + c.getString(c.getColumnIndex("accuracy")) + "</accuracy>" + "\n");
-
-                out.append("\t\t\t" + "</extensions>\n");
+                    ext.addContent(new Element("accuracy", NS).addContent(DF.format(c.getDouble(colAcc))));
+                wpt.addContent(ext);
             }
 
-            out.append("\t" + "</wpt>" + "\n");
-
-            fw.write(out.toString());
+            wpts.add(wpt);
         }
+
+        return wpts;
     }
 }
