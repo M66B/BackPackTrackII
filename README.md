@@ -28,6 +28,10 @@ BackPackTrack II is a complete rewrite of [BackPackTrack](https://github.com/M66
 
 You can download the latest version of the application from the [Play store](https://play.google.com/store/apps/details?id=eu.faircode.backpacktrack2).
 
+Works on Android 4.1 (Jelly Bean) and later.
+
+You can ask questions [here](http://forum.xda-developers.com/android/apps-games/app-backpacktrack-ii-t3123682).
+
 Frequently asked questions
 --------------------------
 
