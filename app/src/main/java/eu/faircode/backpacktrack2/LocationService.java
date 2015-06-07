@@ -870,7 +870,10 @@ public class LocationService extends IntentService {
 
         // Build notification
         Notification.Builder notificationBuilder = new Notification.Builder(context);
-        notificationBuilder.setSmallIcon(R.drawable.backpacker);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            notificationBuilder.setSmallIcon(R.drawable.backpacker);
+        else
+            notificationBuilder.setSmallIcon(R.mipmap.ic_launcher);
         notificationBuilder.setContentTitle(title);
         notificationBuilder.setContentText(text);
         notificationBuilder.setContentIntent(piSettings);
