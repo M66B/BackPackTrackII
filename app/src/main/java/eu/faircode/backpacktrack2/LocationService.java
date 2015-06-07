@@ -211,35 +211,31 @@ public class LocationService extends IntentService {
     }
 
     private void handleLocationUpdate(Intent intent) {
-        // Process location update
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Process location update
         int locationType = prefs.getInt(ActivitySettings.PREF_LOCATION_TYPE, -1);
         Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
         Log.w(TAG, "Update location=" + location + " type=" + locationType);
         if (location == null || (location.getLatitude() == 0.0 && location.getLongitude() == 0.0))
             return;
 
+        // Filter inaccurate location
+        int pref_inaccurate = Integer.parseInt(prefs.getString(ActivitySettings.PREF_INACCURATE, ActivitySettings.DEFAULT_INACCURATE));
+        if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
+            Log.w(TAG, "Filtering inaccurate location=" + location);
+            return;
+        }
+
         // Correct altitude
         if (LocationManager.GPS_PROVIDER.equals(location.getProvider()))
             try {
                 double offset = getEGM96Offset(location, this);
-                Log.w(TAG, "Offset=" + offset);
                 location.setAltitude(location.getAltitude() - offset);
                 Log.w(TAG, "Corrected location=" + location + " type=" + locationType);
             } catch (IOException ex) {
                 Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
-
-        // Get location preferences
-        boolean pref_altitude = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE, ActivitySettings.DEFAULT_ALTITUDE);
-        int pref_accuracy = Integer.parseInt(prefs.getString(ActivitySettings.PREF_ACCURACY, ActivitySettings.DEFAULT_ACCURACY));
-        int pref_inaccurate = Integer.parseInt(prefs.getString(ActivitySettings.PREF_INACCURATE, ActivitySettings.DEFAULT_INACCURATE));
-        Log.w(TAG, "Prefer altitude=" + pref_altitude + " accuracy=" + pref_accuracy + " inaccurate=" + pref_inaccurate);
-
-        if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
-            Log.w(TAG, "Filtering inaccurate location=" + location);
-            return;
-        }
 
         // Persist better location
         Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
@@ -251,12 +247,14 @@ public class LocationService extends IntentService {
         }
 
         // Check altitude
+        boolean pref_altitude = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE, ActivitySettings.DEFAULT_ALTITUDE);
         if (!location.hasAltitude() && pref_altitude) {
             Log.w(TAG, "No altitude, but preferred, location=" + location);
             return;
         }
 
         // Check accuracy
+        int pref_accuracy = Integer.parseInt(prefs.getString(ActivitySettings.PREF_ACCURACY, ActivitySettings.DEFAULT_ACCURACY));
         if (!location.hasAccuracy() || location.getAccuracy() > pref_accuracy) {
             Log.w(TAG, "Accuracy not reached, location=" + location);
             return;
@@ -297,23 +295,22 @@ public class LocationService extends IntentService {
             return;
         }
 
+        // Correct altitude
+        if (LocationManager.GPS_PROVIDER.equals(location.getProvider()))
+            try {
+                double offset = getEGM96Offset(location, this);
+                location.setAltitude(location.getAltitude() - offset);
+                Log.w(TAG, "Corrected location=" + location);
+            } catch (IOException ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
+
         // Filter nearby passive locations
         int pref_nearby = Integer.parseInt(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
         if (lastLocation.distanceTo(location) < pref_nearby) {
             Log.w(TAG, "Filtering nearby passive location=" + location);
             return;
         }
-
-        // Correct altitude
-        if (LocationManager.GPS_PROVIDER.equals(location.getProvider()))
-            try {
-                double offset = getEGM96Offset(location, this);
-                Log.w(TAG, "Offset=" + offset);
-                location.setAltitude(location.getAltitude() - offset);
-                Log.w(TAG, "Corrected location=" + location);
-            } catch (IOException ex) {
-                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            }
 
         boolean update = false;
 
@@ -347,8 +344,9 @@ public class LocationService extends IntentService {
     }
 
     private void handleLocationTimeout(Intent intent) {
-        // Process location time-out
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Process location time-out
         int locationType = prefs.getInt(ActivitySettings.PREF_LOCATION_TYPE, -1);
         Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
         Log.w(TAG, "Timeout best location=" + bestLocation + " type=" + locationType);
@@ -702,8 +700,9 @@ public class LocationService extends IntentService {
     }
 
     private void handleLocation(int locationType, Location location) {
-        // Filter close locations
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Filter nearby locations
         int pref_nearby = Integer.parseInt(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
         if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT || locationType == LOCATION_GEOTAG ||

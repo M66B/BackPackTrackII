@@ -24,6 +24,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.EditTextPreference;
@@ -270,6 +271,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             }
         });
 
+        // Show enabled providers
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         boolean gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean network = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -295,15 +297,20 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         findPreference(PREF_RECOGNITION_INTERVAL).setEnabled(playServices);
         findPreference(PREF_RECOGNITION_CONFIDENCE).setEnabled(playServices);
 
-        // Handle version
+        // Handle Play store link
         Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName()));
         if (getPackageManager().queryIntentActivities(playStoreIntent, 0).size() > 0)
             pref_version.setIntent(playStoreIntent);
+
+        // Handle version/feature info
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 
-            SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
-            boolean significantMotion = (sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION) != null);
+            boolean significantMotion = false;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
+                significantMotion = (sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION) != null);
+            }
 
             pref_version.setSummary(
                     pInfo.versionName + "/" + pInfo.versionCode + "\n" +
@@ -324,11 +331,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 
         unregisterReceiver(mConnectivityChangeReceiver);
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
     }
 
     @Override
