@@ -812,43 +812,50 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int state = prefs.getInt(ActivitySettings.PREF_STATE, STATE_IDLE);
 
-        String text = null;
-        Location lastLocation = null;
-        if (state == STATE_IDLE) {
-            lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
-            if (lastLocation == null)
-                text = context.getString(R.string.msg_idle, context.getString(R.string.msg_none));
-            else
-                text = context.getString(R.string.msg_idle,
-                        SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(new Date(lastLocation.getTime())));
+        // Get location
+        Location location = null;
+        if (state == STATE_IDLE || state == STATE_ACQUIRING)
+            location = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+        else if (state == STATE_ACQUIRED)
+            location = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
 
-        } else if (state == STATE_ACQUIRING) {
-            lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
-            text = context.getString(R.string.msg_acquiring);
-
-        } else if (state == STATE_ACQUIRED) {
-            lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
-            text = context.getString(R.string.msg_acquired,
-                    SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(new Date(lastLocation.getTime())));
+        // Get location provider
+        String provider = "";
+        if (location != null) {
+            provider = location.getProvider();
+            int resId = context.getResources().getIdentifier("provider_" + provider, "string", context.getPackageName());
+            if (resId != 0)
+                provider = context.getString(resId);
         }
 
+        // Get title
         String activity = getActivityName(prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN), context);
         int confidence = prefs.getInt(ActivitySettings.PREF_LAST_CONFIDENCE, 50);
         String altitude = "?";
         String accuracy = "?";
-        String provider = "";
-        if (lastLocation != null) {
-            provider = lastLocation.getProvider();
-            int resId = context.getResources().getIdentifier("provider_" + provider, "string", context.getPackageName());
-            if (resId != 0)
-                provider = context.getString(resId);
-            if (lastLocation.hasAltitude())
-                altitude = Long.toString(Math.round(lastLocation.getAltitude()));
-            if (lastLocation.hasAccuracy())
-                accuracy = Long.toString(Math.round(lastLocation.getAccuracy()));
+        if (location != null) {
+            if (location.hasAltitude())
+                altitude = Long.toString(Math.round(location.getAltitude()));
+            if (location.hasAccuracy())
+                accuracy = Long.toString(Math.round(location.getAccuracy()));
         }
+        String title = context.getString(R.string.msg_notification, activity, confidence, altitude, accuracy);
 
-        String title = context.getString(R.string.msg_notification, activity, confidence, altitude, accuracy, provider);
+        // Get text
+        String text = null;
+        if (state == STATE_IDLE)
+            if (location == null)
+                text = context.getString(R.string.msg_idle, context.getString(R.string.msg_none), "");
+            else
+                text = context.getString(R.string.msg_idle,
+                        SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(new Date(location.getTime())),
+                        provider);
+        else if (state == STATE_ACQUIRING)
+            text = context.getString(R.string.msg_acquiring);
+        else if (state == STATE_ACQUIRED)
+            text = context.getString(R.string.msg_acquired,
+                    SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(new Date(location.getTime())),
+                    provider);
 
         // Build main intent
         Intent riSettings = new Intent(context, ActivitySettings.class);

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <Preference
+        android:layout="@layout/title"
+        android:selectable="false" />
     <PreferenceCategory android:title="@string/title_action">
         <Preference
             android:icon="@android:drawable/ic_menu_agenda"
