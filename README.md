@@ -41,7 +41,8 @@ Acknowledgements
 ----------------
 
 * The launcher/application icon was taken from [Wikimedia Commons](http://commons.wikimedia.org/wiki/File:Exquisite-backpack.svg "Exquisite backpack")
-* The notification icon was made by [Freepik](http://www.freepik.com "Freepik") from [www.flaticon.com "Flaticon"](http://www.flaticon.com) is licensed under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
+* Notification icon made by [Freepik](http://www.freepik.com "Freepik") from [www.flaticon.com](http://www.flaticon.com "Flaticon") is licensed under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
+	* Listed [here](http://www.flaticon.com/free-icon/backpacker_10595)
 
 The following libraries are being used:
 
