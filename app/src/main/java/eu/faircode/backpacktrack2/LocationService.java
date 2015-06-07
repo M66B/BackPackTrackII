@@ -67,8 +67,8 @@ public class LocationService extends IntentService {
     public static final String ACTION_LOCATION_FINE = "LocationFine";
     public static final String ACTION_LOCATION_COARSE = "LocationCoarse";
     public static final String ACTION_LOCATION_PASSIVE = "LocationPassive";
-    public static final String ACTION_TIMEOUT = "TimeOut";
-    public static final String ACTION_STOP = "Stop";
+    public static final String ACTION_LOCATION_TIMEOUT = "LocationTimeout";
+    public static final String ACTION_STOP_LOCATING = "StopLocating";
     public static final String ACTION_TRACKPOINT = "TrackPoint";
     public static final String ACTION_WAYPOINT = "WayPoint";
     public static final String ACTION_GEOPOINT = "Geopoint";
@@ -123,10 +123,10 @@ public class LocationService extends IntentService {
             else if (ACTION_LOCATION_PASSIVE.equals(intent.getAction()))
                 handlePassiveLocationUpdate(intent);
 
-            else if (ACTION_TIMEOUT.equals(intent.getAction()))
+            else if (ACTION_LOCATION_TIMEOUT.equals(intent.getAction()))
                 handleLocationTimeout(intent);
 
-            else if (ACTION_STOP.equals(intent.getAction()))
+            else if (ACTION_STOP_LOCATING.equals(intent.getAction()))
                 handleStop(intent);
 
             else if (ACTION_GEOPOINT.equals(intent.getAction()))
@@ -642,7 +642,7 @@ public class LocationService extends IntentService {
         if (lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER) || lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             int timeout = Integer.parseInt(prefs.getString(ActivitySettings.PREF_TIMEOUT, ActivitySettings.DEFAULT_TIMEOUT));
             Intent alarmIntent = new Intent(context, LocationService.class);
-            alarmIntent.setAction(LocationService.ACTION_TIMEOUT);
+            alarmIntent.setAction(LocationService.ACTION_LOCATION_TIMEOUT);
             PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + timeout * 1000, pi);
@@ -679,7 +679,7 @@ public class LocationService extends IntentService {
         // Cancel alarm
         {
             Intent alarmIntent = new Intent(context, LocationService.class);
-            alarmIntent.setAction(LocationService.ACTION_TIMEOUT);
+            alarmIntent.setAction(LocationService.ACTION_LOCATION_TIMEOUT);
             PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             am.cancel(pi);
@@ -904,7 +904,7 @@ public class LocationService extends IntentService {
 
             // Build stop intent
             Intent riStop = new Intent(context, LocationService.class);
-            riStop.setAction(LocationService.ACTION_STOP);
+            riStop.setAction(LocationService.ACTION_STOP_LOCATING);
             PendingIntent piStop = PendingIntent.getService(context, 4, riStop, PendingIntent.FLAG_UPDATE_CURRENT);
 
             // Add action
