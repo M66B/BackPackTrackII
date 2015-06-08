@@ -62,15 +62,6 @@
             </intent-filter>
         </receiver>
 
-        <receiver
-            android:name=".GeotaggedReceiver"
-            android:enabled="true">
-            <intent-filter>
-                <action android:name="eu.faircode.action.GEOTAGGED" />
-                <data android:scheme="file" />
-            </intent-filter>
-        </receiver>
-
         <service
             android:name=".LocationService"
             android:icon="@drawable/backpacker"

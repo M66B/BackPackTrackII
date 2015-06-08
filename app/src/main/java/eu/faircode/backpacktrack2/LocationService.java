@@ -74,7 +74,6 @@ public class LocationService extends IntentService {
     public static final String ACTION_TRACKPOINT = "TrackPoint";
     public static final String ACTION_WAYPOINT = "WayPoint";
     public static final String ACTION_GEOPOINT = "Geopoint";
-    public static final String ACTION_GEOTAGGED = "Geotagged";
     public static final String ACTION_SHARE_GPX = "ShareGPX";
     public static final String ACTION_UPLOAD_GPX = "UploadGPX";
 
@@ -137,9 +136,6 @@ public class LocationService extends IntentService {
 
             else if (ACTION_GEOPOINT.equals(intent.getAction()))
                 handleGeopoint(intent);
-
-            else if (ACTION_GEOTAGGED.equals(intent.getAction()))
-                handleGeotagged(intent);
 
             else if (ACTION_SHARE_GPX.equals(intent.getAction()))
                 handleShare(intent);
@@ -444,13 +440,6 @@ public class LocationService extends IntentService {
             new DatabaseHelper(this).insert(location, name).close();
             toast(getString(R.string.msg_added, name), this);
         }
-    }
-
-    private void handleGeotagged(Intent intent) {
-        // Process photo location
-        Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
-        if (location != null)
-            handleLocation(LOCATION_GEOTAG, location);
     }
 
     private void handleShare(Intent intent) {
