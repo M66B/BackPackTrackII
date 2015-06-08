@@ -150,8 +150,16 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     private BroadcastReceiver mConnectivityChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
-            Preference pref_upload = findPreference(PREF_UPLOAD);
+            Log.w(TAG, "Connectivity changed");
+            findPreference(PREF_UPLOAD).setEnabled(blogConfigured() && storageMounted() && isConnected());
+        }
+    };
+
+    private BroadcastReceiver mExternalStorageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.w(TAG, "External storage changed");
+            findPreference(PREF_SHARE).setEnabled(blogConfigured() && storageMounted() && isConnected());
             findPreference(PREF_UPLOAD).setEnabled(blogConfigured() && storageMounted() && isConnected());
         }
     };
@@ -188,6 +196,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
         registerReceiver(mConnectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        IntentFilter storageFilter = new IntentFilter();
+        storageFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+        storageFilter.addAction(Intent.ACTION_MEDIA_REMOVED);
+        registerReceiver(mExternalStorageReceiver, storageFilter);
 
         // First run
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
@@ -345,6 +357,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 
         unregisterReceiver(mConnectivityChangeReceiver);
+        unregisterReceiver(mExternalStorageReceiver);
     }
 
     @Override
