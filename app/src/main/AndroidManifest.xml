@@ -64,7 +64,6 @@
 
         <service
             android:name=".LocationService"
-            android:icon="@drawable/backpacker"
-            android:process=":service" />
+            android:icon="@drawable/backpacker" />
     </application>
 </manifest>

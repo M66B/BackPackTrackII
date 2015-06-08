@@ -461,7 +461,8 @@ public class LocationService extends IntentService {
 
             // Persist last share time
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            prefs.edit().putString(ActivitySettings.PREF_LAST_SHARE, SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date())).apply();
+            String lastShare = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
+            prefs.edit().putString(ActivitySettings.PREF_LAST_SHARE, lastShare).apply();
 
             // Delete data on request
             if (delete)
@@ -512,7 +513,8 @@ public class LocationService extends IntentService {
             Log.w(TAG, "Uploaded url=" + url);
 
             // Persist last upload time
-            prefs.edit().putString(ActivitySettings.PREF_LAST_UPLOAD, SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date())).apply();
+            String lastUpload = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
+            prefs.edit().putString(ActivitySettings.PREF_LAST_UPLOAD, lastUpload).apply();
 
             // Feedback
             toast(getString(R.string.msg_uploaded, url), this);
