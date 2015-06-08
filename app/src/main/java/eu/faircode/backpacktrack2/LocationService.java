@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.GpsSatellite;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -68,6 +69,7 @@ public class LocationService extends IntentService {
     public static final String ACTION_LOCATION_COARSE = "LocationCoarse";
     public static final String ACTION_LOCATION_PASSIVE = "LocationPassive";
     public static final String ACTION_LOCATION_TIMEOUT = "LocationTimeout";
+    public static final String ACTION_LOCATION_CHECK = "LocationCheck";
     public static final String ACTION_STOP_LOCATING = "StopLocating";
     public static final String ACTION_TRACKPOINT = "TrackPoint";
     public static final String ACTION_WAYPOINT = "WayPoint";
@@ -123,6 +125,9 @@ public class LocationService extends IntentService {
 
             else if (ACTION_LOCATION_PASSIVE.equals(intent.getAction()))
                 handlePassiveLocationUpdate(intent);
+
+            else if (ACTION_LOCATION_CHECK.equals(intent.getAction()))
+                handleSatelliteCheck(intent);
 
             else if (ACTION_LOCATION_TIMEOUT.equals(intent.getAction()))
                 handleLocationTimeout(intent);
@@ -344,6 +349,33 @@ public class LocationService extends IntentService {
             new DatabaseHelper(this).insert(location, null).close();
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
             updateState(this);
+        }
+    }
+
+    private void handleSatelliteCheck(Intent intent) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        try {
+            // Get number of visible satellites
+            int visible = 0;
+            LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
+            for (GpsSatellite sat : lm.getGpsStatus(null).getSatellites())
+                visible++;
+
+            int checksat = Integer.parseInt(prefs.getString(ActivitySettings.PREF_CHECK_SAT, ActivitySettings.DEFAULT_CHECK_SAT));
+            Log.w(TAG, "Check visible satellites=" + visible + " required=" + checksat);
+
+            // Check if there is any chance for a GPS fix
+            if (visible < checksat) {
+                // Cancel fine location updates
+                Intent locationIntent = new Intent(this, LocationService.class);
+                locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
+                PendingIntent pi = PendingIntent.getService(this, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                lm.removeUpdates(pi);
+                Log.w(TAG, "Canceled fine location updates");
+            }
+        } catch (Throwable ex) {
+            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
         }
     }
 
@@ -646,13 +678,25 @@ public class LocationService extends IntentService {
 
         // Set location timeout
         if (lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER) || lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            int timeout = Integer.parseInt(prefs.getString(ActivitySettings.PREF_TIMEOUT, ActivitySettings.DEFAULT_TIMEOUT));
-            Intent alarmIntent = new Intent(context, LocationService.class);
-            alarmIntent.setAction(LocationService.ACTION_LOCATION_TIMEOUT);
-            PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-            AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + timeout * 1000, pi);
-            Log.w(TAG, "Set timeout=" + timeout + "s");
+            {
+                int check = Integer.parseInt(prefs.getString(ActivitySettings.PREF_CHECK_TIME, ActivitySettings.DEFAULT_CHECK_TIME));
+                Intent alarmIntent = new Intent(context, LocationService.class);
+                alarmIntent.setAction(LocationService.ACTION_LOCATION_CHECK);
+                PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + check * 1000, pi);
+                Log.w(TAG, "Set check=" + check + "s");
+            }
+
+            {
+                int timeout = Integer.parseInt(prefs.getString(ActivitySettings.PREF_TIMEOUT, ActivitySettings.DEFAULT_TIMEOUT));
+                Intent alarmIntent = new Intent(context, LocationService.class);
+                alarmIntent.setAction(LocationService.ACTION_LOCATION_TIMEOUT);
+                PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + timeout * 1000, pi);
+                Log.w(TAG, "Set timeout=" + timeout + "s");
+            }
 
             prefs.edit().putInt(ActivitySettings.PREF_STATE, STATE_ACQUIRING).apply();
             updateState(context);
@@ -682,7 +726,16 @@ public class LocationService extends IntentService {
             lm.removeUpdates(pi);
         }
 
-        // Cancel alarm
+        // Cancel check
+        {
+            Intent alarmIntent = new Intent(context, LocationService.class);
+            alarmIntent.setAction(LocationService.ACTION_LOCATION_CHECK);
+            PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            am.cancel(pi);
+        }
+
+        // Cancel timeout
         {
             Intent alarmIntent = new Intent(context, LocationService.class);
             alarmIntent.setAction(LocationService.ACTION_LOCATION_TIMEOUT);

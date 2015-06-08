@@ -7,7 +7,9 @@ BackPackTrack II is an open source utility application meant to continuously rec
 without draining your battery and without requiring an internet connection.
 
 The GPS will be switched on every 3 minutes for a maximum of 60 seconds (both configurable) to acquire a location,
-but only if you are moving. When the GPS cannot get a fix, a network location will be used as backup.
+but only if you are moving.
+If there is not at least one satelite after 30 seconds visible (configurable), the GPS will be turned off.
+When the GPS cannot get a fix, a network location will be used as backup.
 
 BackPackTrack II will also passively use locations requested by other applications, for example mapping applications.
 Passive locations will be recorded if the bearing changes by more than 30 degrees

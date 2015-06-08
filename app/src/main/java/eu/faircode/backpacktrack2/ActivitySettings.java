@@ -78,6 +78,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_ALTITUDE = "pref_altitude";
     public static final String PREF_ACCURACY = "pref_accuracy";
     public static final String PREF_TIMEOUT = "pref_timeout";
+    public static final String PREF_CHECK_TIME = "pref_check_time";
+    public static final String PREF_CHECK_SAT = "pref_check_sat";
     public static final String PREF_INACCURATE = "pref_inaccurate";
     public static final String PREF_NEARBY = "pref_nearby";
     public static final String PREF_MINTIME = "pref_mintime";
@@ -108,6 +110,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final boolean DEFAULT_ALTITUDE = true;
     public static final String DEFAULT_ACCURACY = "20"; // meters
     public static final String DEFAULT_TIMEOUT = "60"; // seconds
+    public static final String DEFAULT_CHECK_TIME = "30"; // seconds
+    public static final String DEFAULT_CHECK_SAT = "1";
     public static final String DEFAULT_INACCURATE = "100"; // meters
     public static final String DEFAULT_NEARBY = "100"; // meters
     public static final String DEFAULT_MINTIME = "1"; // seconds
@@ -227,6 +231,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_ALTITUDE);
         updateTitle(prefs, PREF_ACCURACY);
         updateTitle(prefs, PREF_TIMEOUT);
+        updateTitle(prefs, PREF_CHECK_TIME);
+        updateTitle(prefs, PREF_CHECK_SAT);
         updateTitle(prefs, PREF_INACCURATE);
         updateTitle(prefs, PREF_NEARBY);
         updateTitle(prefs, PREF_MINTIME);
@@ -397,6 +403,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         if (PREF_ENABLED.equals(key) ||
                 PREF_FREQUENCY.equals(key) ||
                 PREF_TIMEOUT.equals(key) ||
+                PREF_CHECK_TIME.equals(key) ||
                 PREF_MINTIME.equals(key) ||
                 PREF_MINDIST.equals(key) ||
                 PREF_PASSIVE_ENABLED.equals(key) ||
@@ -774,6 +781,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref.setTitle(getString(R.string.title_accuracy, prefs.getString(key, DEFAULT_ACCURACY)));
         else if (PREF_TIMEOUT.equals(key))
             pref.setTitle(getString(R.string.title_timeout, prefs.getString(key, DEFAULT_TIMEOUT)));
+        else if (PREF_CHECK_TIME.equals(key))
+            pref.setTitle(getString(R.string.title_check_time, prefs.getString(key, DEFAULT_CHECK_TIME)));
+        else if (PREF_CHECK_SAT.equals(key))
+            pref.setTitle(getString(R.string.title_check_sat, prefs.getString(key, DEFAULT_CHECK_SAT)));
         else if (PREF_INACCURATE.equals(key))
             pref.setTitle(getString(R.string.title_inaccurate, prefs.getString(key, DEFAULT_INACCURATE)));
         else if (PREF_NEARBY.equals(key))

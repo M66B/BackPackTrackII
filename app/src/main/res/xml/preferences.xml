@@ -65,6 +65,18 @@
             android:key="pref_timeout"
             android:summary="@string/summary_timeout" />
         <EditTextPreference
+            android:defaultValue="30"
+            android:dependency="pref_enabled"
+            android:inputType="number"
+            android:key="pref_check_time"
+            android:summary="@string/summary_check_time" />
+        <EditTextPreference
+            android:defaultValue="1"
+            android:dependency="pref_enabled"
+            android:inputType="number"
+            android:key="pref_check_sat"
+            android:summary="@string/summary_check_sat" />
+        <EditTextPreference
             android:defaultValue="100"
             android:dependency="pref_enabled"
             android:inputType="number"
