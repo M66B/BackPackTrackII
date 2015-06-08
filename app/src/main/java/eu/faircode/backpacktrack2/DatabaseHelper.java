@@ -135,4 +135,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete("location", "ID = ?", new String[]{Integer.toString(id)});
         return this;
     }
+
+    public DatabaseHelper delete(long from, long to) {
+        Log.w(TAG, "Delete from=" + from + " to=" + to);
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("location", "time >= ? AND time <= ?", new String[]{Long.toString(from), Long.toString(to)});
+        db.delete("activity", "time >= ? AND time <= ?", new String[]{Long.toString(from), Long.toString(to)});
+        return this;
+    }
 }

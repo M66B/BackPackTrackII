@@ -32,8 +32,8 @@
     <string name="title_recognition_enabled">Activity recognition enabled</string>
     <string name="title_recognition_interval">Activity recognition interval: %s minutes</string>
     <string name="title_recognition_confidence">Activity recognition confidence: %s%%</string>
-    <string name="title_recognition_tilting">Use recognized activity \'tilting\'</string>
-    <string name="title_recognition_unknown">Use recognized activity \'unknown\'</string>
+    <string name="title_recognition_tilting">Filter activity \'tilting\'</string>
+    <string name="title_recognition_unknown">Filter activity \'unknown\'</string>
 
     <string name="title_blog">WordPress weblog</string>
     <string name="title_blogurl">URL: %s</string>
@@ -71,8 +71,8 @@
     <string name="summary_recognition_enabled">Recognize if you are still or moving and disable tracking when you are still</string>
     <string name="summary_recognition_interval">Recognize your activity every selected number of minutes (the interval will be reduced automatically when you are not moving)</string>
     <string name="summary_recognition_confidence">Recognize a new activity when the confidence is higher than the selected percentage</string>
-    <string name="summary_recognition_tilting">Consider the recognized activity \'tilting\' as motion</string>
-    <string name="summary_recognition_unknown">Consider the recognized activity \'unknown\' as motion</string>
+    <string name="summary_recognition_tilting">Consider the recognized activity \'tilting\' not as motion</string>
+    <string name="summary_recognition_unknown">Consider the recognized activity \'unknown\' not as motion</string>
 
     <string name="summary_blogurl">WordPress weblog address</string>
     <string name="summary_blogid">WordPress weblog identification\nUse 1 for single site installations</string>
@@ -90,6 +90,7 @@
     <string name="title_export">Export GPX file</string>
     <string name="title_track">Track name:</string>
     <string name="title_extensions">Use GPX extensions (provider, speed, bearing, accuracy)</string>
+    <string name="title_delete">Delete data after exporting</string>
     <string name="title_from">From date/time:</string>
     <string name="title_to">To date/time:</string>
     <string name="title_pick">Pick</string>

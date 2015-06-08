@@ -79,6 +79,7 @@ public class LocationService extends IntentService {
     // Extras
     public static final String EXTRA_TRACK = "Track";
     public static final String EXTRA_EXTENSIONS = "Extensions";
+    public static final String EXTRA_DELETE = "Delete";
     public static final String EXTRA_FROM = "From";
     public static final String EXTRA_TO = "To";
     public static final String EXTRA_GEOURI = "Geopoint";
@@ -425,6 +426,7 @@ public class LocationService extends IntentService {
             // Write GPX file
             String trackName = intent.getStringExtra(EXTRA_TRACK);
             boolean extensions = intent.getBooleanExtra(EXTRA_EXTENSIONS, false);
+            boolean delete = intent.getBooleanExtra(EXTRA_DELETE, false);
             long from = intent.getLongExtra(EXTRA_FROM, 0);
             long to = intent.getLongExtra(EXTRA_TO, 0);
             String gpxFileName = writeGPXFile(trackName, extensions, from, to, this);
@@ -439,6 +441,10 @@ public class LocationService extends IntentService {
             // Persist last share time
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
             prefs.edit().putString(ActivitySettings.PREF_LAST_SHARE, SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date())).apply();
+
+            // Delete data on request
+            if (delete)
+                new DatabaseHelper(this).delete(from, to).close();
         } catch (Throwable ex) {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             toast(ex.toString(), this);

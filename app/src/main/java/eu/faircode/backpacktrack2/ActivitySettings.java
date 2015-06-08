@@ -592,6 +592,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Reference controls
         final TextView tvTrackName = (TextView) view.findViewById(R.id.tvTrackName);
         final CheckBox cbExtensions = (CheckBox) view.findViewById(R.id.cbExtensions);
+        final CheckBox cbDelete = (CheckBox) view.findViewById(R.id.cbDelete);
         Button btnDateFrom = (Button) view.findViewById(R.id.btnDateFrom);
         Button btnTimeFrom = (Button) view.findViewById(R.id.btnTimeFrom);
         Button btnDateTo = (Button) view.findViewById(R.id.btnDateTo);
@@ -730,6 +731,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                                 prefs.edit().putLong(PREF_LAST_TO, to.getTimeInMillis()).apply();
                                 intent.putExtra(LocationService.EXTRA_TRACK, tvTrackName.getText().toString());
                                 intent.putExtra(LocationService.EXTRA_EXTENSIONS, cbExtensions.isChecked());
+                                intent.putExtra(LocationService.EXTRA_DELETE, cbDelete.isChecked());
                                 intent.putExtra(LocationService.EXTRA_FROM, from.getTimeInMillis());
                                 intent.putExtra(LocationService.EXTRA_TO, to.getTimeInMillis());
                                 startService(intent);

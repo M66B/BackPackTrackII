@@ -23,6 +23,13 @@
         android:layout_marginTop="6dp"
         android:text="@string/title_extensions" />
 
+    <CheckBox
+        android:id="@+id/cbDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:text="@string/title_delete" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
