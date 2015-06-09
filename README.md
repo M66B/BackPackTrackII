@@ -71,6 +71,29 @@ Activity recognition (provided by Google Play services) does not require interne
 
 Acquiring GPS locations does not require internet access, but acquiring network locations does.
 
+Battery usage
+-------------
+
+BackPackTrack will mainly consume power for two things:
+
+* To acquire locations using the GPS
+* To recognize your activity
+
+The frequency and the duration the GPS is being switched on can be configured.
+
+The frequency the GPS will be switched on is equal to the tracking frequency and a matter of personal preference.
+Acquiring a location more often will result in more trackpoints at the expense of more power usage.
+
+The duration the GPS will be switched on depends on the preferred accuracy, the location time-out and the satellite check time / count.
+The time to a location fix is different for different device types,
+so you there may be some room to tune the location time-out and the satellite check time / count.
+Leaving the GPS on, while there is no chance for a location fix, for example when you are indoors or in a plain, is a waste of power.
+
+The frequency activity is being recognized can be configured as well.
+Devices with a significant motion sensor (see version information) will automatically reduce the frequency when still.
+Reducing the activity recognition interval for devices without a significant motion sensor will probably result in less power usage when still (not moving).
+Activity recognition does consume a lot less power than using the GPS, so power used for activity recognition is not wasted.
+
 Acknowledgements
 ----------------
 
