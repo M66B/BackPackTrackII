@@ -76,7 +76,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_ENABLED = "pref_enabled";
     public static final String PREF_FREQUENCY = "pref_frequency";
     public static final String PREF_ALTITUDE = "pref_altitude";
-    public static final String PREF_ACCURACY = "pref_accuracy";
+    public static final String PREF_TP_ACCURACY = "pref_accuracy";
+    public static final String PREF_WP_ACCURACY = "pref_wp_accuracy";
     public static final String PREF_TIMEOUT = "pref_timeout";
     public static final String PREF_CHECK_TIME = "pref_check_time";
     public static final String PREF_CHECK_SAT = "pref_check_sat";
@@ -108,7 +109,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final boolean DEFAULT_ENABLED = true;
     public static final String DEFAULT_FREQUENCY = "3"; // minutes
     public static final boolean DEFAULT_ALTITUDE = true;
-    public static final String DEFAULT_ACCURACY = "20"; // meters
+    public static final String DEFAULT_TP_ACCURACY = "20"; // meters
+    public static final String DEFAULT_WP_ACCURACY = "10"; // meters
     public static final String DEFAULT_TIMEOUT = "60"; // seconds
     public static final String DEFAULT_CHECK_TIME = "30"; // seconds
     public static final String DEFAULT_CHECK_SAT = "1";
@@ -229,7 +231,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         updateTitle(prefs, PREF_FREQUENCY);
         updateTitle(prefs, PREF_ALTITUDE);
-        updateTitle(prefs, PREF_ACCURACY);
+        updateTitle(prefs, PREF_TP_ACCURACY);
+        updateTitle(prefs, PREF_WP_ACCURACY);
         updateTitle(prefs, PREF_TIMEOUT);
         updateTitle(prefs, PREF_CHECK_TIME);
         updateTitle(prefs, PREF_CHECK_SAT);
@@ -777,8 +780,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         else if (PREF_FREQUENCY.equals(key))
             pref.setTitle(getString(R.string.title_frequency, prefs.getString(key, DEFAULT_FREQUENCY)));
-        else if (PREF_ACCURACY.equals(key))
-            pref.setTitle(getString(R.string.title_accuracy, prefs.getString(key, DEFAULT_ACCURACY)));
+        else if (PREF_TP_ACCURACY.equals(key))
+            pref.setTitle(getString(R.string.title_tp_accuracy, prefs.getString(key, DEFAULT_TP_ACCURACY)));
+        else if (PREF_WP_ACCURACY.equals(key))
+            pref.setTitle(getString(R.string.title_wp_accuracy, prefs.getString(key, DEFAULT_WP_ACCURACY)));
         else if (PREF_TIMEOUT.equals(key))
             pref.setTitle(getString(R.string.title_timeout, prefs.getString(key, DEFAULT_TIMEOUT)));
         else if (PREF_CHECK_TIME.equals(key))

@@ -59,6 +59,12 @@
             android:key="pref_accuracy"
             android:summary="@string/summary_accuracy" />
         <EditTextPreference
+            android:defaultValue="10"
+            android:dependency="pref_enabled"
+            android:inputType="number"
+            android:key="pref_wp_accuracy"
+            android:summary="@string/summary_accuracy" />
+        <EditTextPreference
             android:defaultValue="60"
             android:dependency="pref_enabled"
             android:inputType="number"

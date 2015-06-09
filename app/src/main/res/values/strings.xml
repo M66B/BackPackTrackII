@@ -17,7 +17,8 @@
     <string name="title_enabled">Tracking enabled</string>
     <string name="title_frequency">Tracking frequency: %s minutes</string>
     <string name="title_altitude">Altitude preferred</string>
-    <string name="title_accuracy">Preferred accuracy: %s meters</string>
+    <string name="title_tp_accuracy">Preferred trackpoint accuracy: %s meters</string>
+    <string name="title_wp_accuracy">Preferred waypoint accuracy: %s meters</string>
     <string name="title_timeout">Location time-out: %s seconds</string>
     <string name="title_check_time">Check visible satellites: %s seconds</string>
     <string name="title_check_sat">Required visible satellites: %s</string>

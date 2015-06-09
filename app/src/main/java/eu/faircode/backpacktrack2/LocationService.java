@@ -259,7 +259,11 @@ public class LocationService extends IntentService {
         }
 
         // Check accuracy
-        int pref_accuracy = Integer.parseInt(prefs.getString(ActivitySettings.PREF_ACCURACY, ActivitySettings.DEFAULT_ACCURACY));
+        int pref_accuracy;
+        if (locationType == LOCATION_WAYPOINT)
+            pref_accuracy = Integer.parseInt(prefs.getString(ActivitySettings.PREF_WP_ACCURACY, ActivitySettings.DEFAULT_WP_ACCURACY));
+        else
+            pref_accuracy = Integer.parseInt(prefs.getString(ActivitySettings.PREF_TP_ACCURACY, ActivitySettings.DEFAULT_TP_ACCURACY));
         if (!location.hasAccuracy() || location.getAccuracy() > pref_accuracy) {
             Log.w(TAG, "Accuracy not reached, location=" + location);
             return;
