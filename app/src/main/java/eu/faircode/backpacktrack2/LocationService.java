@@ -616,7 +616,7 @@ public class LocationService extends IntentService {
                         activityIntent.setAction(LocationService.ACTION_ACTIVITY);
                         PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                         ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(gac, interval * 1000, pi);
-                        Log.w(TAG, "Activity updates frequency=" + interval + "m");
+                        Log.w(TAG, "Activity updates frequency=" + interval + "s");
                     }
                 }
             }).start();

@@ -31,7 +31,7 @@ public class BackgroundService extends Service {
                 }
 
                 // Persist fixed/visible satellites
-                Log.w(TAG, "Satellites visible=" + visible);
+                Log.w(TAG, "Satellites fixed/visible=" + fixed + "/" + visible);
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(BackgroundService.this);
                 prefs.edit().putInt(ActivitySettings.PREF_SATS_FIXED, fixed).apply();
                 prefs.edit().putInt(ActivitySettings.PREF_SATS_VISIBLE, visible).apply();
