@@ -69,7 +69,7 @@ Android permissions
 
 Activity recognition (provided by Google Play services) does not require internet access.
 
-Acquiring GPS locations does not require internet access, but acquiring network locations does.
+The Android location manager needs internet access to acquire network locations (but not for GPS locations).
 
 Battery usage
 -------------
