@@ -20,8 +20,8 @@
     <string name="title_tp_accuracy">Preferred trackpoint accuracy: %s meters</string>
     <string name="title_wp_accuracy">Preferred waypoint accuracy: %s meters</string>
     <string name="title_timeout">Location time-out: %s seconds</string>
-    <string name="title_check_time">Check visible satellites: %s seconds</string>
-    <string name="title_check_sat">Required visible satellites: %s</string>
+    <string name="title_check_time">Check satellites: %s seconds</string>
+    <string name="title_check_sat">Required satellites: %s</string>
     <string name="title_inaccurate">Filter inaccurate locations: %s meters</string>
     <string name="title_nearby">Filter nearby locations: %s meters</string>
     <string name="title_mintime">Minimum update time: %s seconds</string>
