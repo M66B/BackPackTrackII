@@ -356,12 +356,7 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         try {
-            // Get number of visible satellites
-            int visible = 0;
-            LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
-            for (GpsSatellite sat : lm.getGpsStatus(null).getSatellites())
-                visible++;
-
+            int visible = prefs.getInt(ActivitySettings.PREF_VISIBLE_SATS, 0);
             int checksat = Integer.parseInt(prefs.getString(ActivitySettings.PREF_CHECK_SAT, ActivitySettings.DEFAULT_CHECK_SAT));
             Log.w(TAG, "Check visible satellites=" + visible + " required=" + checksat);
 
@@ -371,6 +366,7 @@ public class LocationService extends IntentService {
                 Intent locationIntent = new Intent(this, LocationService.class);
                 locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
                 PendingIntent pi = PendingIntent.getService(this, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
                 lm.removeUpdates(pi);
                 Log.w(TAG, "Canceled fine location updates");
             }
@@ -668,6 +664,7 @@ public class LocationService extends IntentService {
             locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime * 1000, minDist, pi);
+            context.startService(new Intent(context, BackgroundService.class));
             Log.w(TAG, "Requested GPS location updates");
         }
 
@@ -719,6 +716,7 @@ public class LocationService extends IntentService {
             locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             lm.removeUpdates(pi);
+            context.stopService(new Intent(context, BackgroundService.class));
         }
 
         // Cancel check
