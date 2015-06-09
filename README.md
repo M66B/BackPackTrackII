@@ -56,6 +56,21 @@ Unfortunately there are no open source libraries available to detect user activi
 BackPackTrack II is meant to continuously record your location, so there is no exit or quit option/menu.
 If you want to stop tracking, you can uncheck the check box labelled with *Tracking enabled*.
 
+Android permissions
+-------------------
+
+* ACTIVITY_RECOGNITION: to recognize your activity (still, on foot, in vehicle, etc)
+* RECEIVE_BOOT_COMPLETED: to start tracking / activity recognition after a reboot
+* ACCESS_COARSE/FINE_LOCATION: to acquire locations from the Android location manager
+* VIBRATE: to give feedback after making a waypoint / uploading a GPX file (imagine bright sunlight)
+* READ/WRITE_EXTERNAL_STORAGE: to write GPX files to the external/shared storage
+* INTERNET: to upload GPX files (solely)
+* ACCESS_NETWORK_STATE: to disable/enable the upload menu
+
+Activity recognition (provided by Google Play services) does not require internet access.
+
+Acquiring GPS locations does not require internet access, but acquiring network locations does.
+
 Acknowledgements
 ----------------
 
