@@ -20,14 +20,26 @@ public class BackgroundService extends Service {
         @Override
         public void onGpsStatusChanged(int event) {
             if (event == GpsStatus.GPS_EVENT_SATELLITE_STATUS) {
+                // Count fixed/visible satellites
+                int fixed = 0;
                 int visible = 0;
                 LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
-                for (GpsSatellite sat : lm.getGpsStatus(null).getSatellites())
+                for (GpsSatellite sat : lm.getGpsStatus(null).getSatellites()) {
+                    visible++;
                     if (sat.usedInFix())
-                        visible++;
+                        fixed++;
+                }
+
+                // Persist fixed/visible satellites
                 Log.w(TAG, "Satellites visible=" + visible);
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(BackgroundService.this);
-                prefs.edit().putInt(ActivitySettings.PREF_VISIBLE_SATS, visible).apply();
+                prefs.edit().putInt(ActivitySettings.PREF_SATS_FIXED, fixed).apply();
+                prefs.edit().putInt(ActivitySettings.PREF_SATS_VISIBLE, visible).apply();
+
+                // Send state changed intent
+                Intent geotaggedIntent = new Intent(BackgroundService.this, LocationService.class);
+                geotaggedIntent.setAction(LocationService.ACTION_STATE_CHANGED);
+                startService(geotaggedIntent);
             }
         }
     };
@@ -37,7 +49,8 @@ public class BackgroundService extends Service {
         super.onCreate();
         Log.w(TAG, "Requesting GPS status updates");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(BackgroundService.this);
-        prefs.edit().remove(ActivitySettings.PREF_VISIBLE_SATS).apply();
+        prefs.edit().remove(ActivitySettings.PREF_SATS_FIXED).apply();
+        prefs.edit().remove(ActivitySettings.PREF_SATS_VISIBLE).apply();
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         lm.addGpsStatusListener(mGpsStatusListener);
     }
@@ -46,7 +59,8 @@ public class BackgroundService extends Service {
     public void onDestroy() {
         Log.w(TAG, "Stopping GPS status updates");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(BackgroundService.this);
-        prefs.edit().remove(ActivitySettings.PREF_VISIBLE_SATS).apply();
+        prefs.edit().remove(ActivitySettings.PREF_SATS_FIXED).apply();
+        prefs.edit().remove(ActivitySettings.PREF_SATS_VISIBLE).apply();
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         lm.removeGpsStatusListener(mGpsStatusListener);
         super.onDestroy();

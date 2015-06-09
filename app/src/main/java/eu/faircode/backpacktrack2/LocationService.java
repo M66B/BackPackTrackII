@@ -70,6 +70,7 @@ public class LocationService extends IntentService {
     public static final String ACTION_LOCATION_PASSIVE = "LocationPassive";
     public static final String ACTION_LOCATION_TIMEOUT = "LocationTimeout";
     public static final String ACTION_LOCATION_CHECK = "LocationCheck";
+    public static final String ACTION_STATE_CHANGED = "StateChanged";
     public static final String ACTION_STOP_LOCATING = "StopLocating";
     public static final String ACTION_TRACKPOINT = "TrackPoint";
     public static final String ACTION_WAYPOINT = "WayPoint";
@@ -127,6 +128,9 @@ public class LocationService extends IntentService {
 
             else if (ACTION_LOCATION_CHECK.equals(intent.getAction()))
                 handleSatelliteCheck(intent);
+
+            else if (ACTION_STATE_CHANGED.equals(intent.getAction()))
+                handleStateChanged(intent);
 
             else if (ACTION_LOCATION_TIMEOUT.equals(intent.getAction()))
                 handleLocationTimeout(intent);
@@ -356,12 +360,13 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         try {
-            int visible = prefs.getInt(ActivitySettings.PREF_VISIBLE_SATS, 0);
+            int fixed = prefs.getInt(ActivitySettings.PREF_SATS_FIXED, 0);
+            int visible = prefs.getInt(ActivitySettings.PREF_SATS_VISIBLE, 0);
             int checksat = Integer.parseInt(prefs.getString(ActivitySettings.PREF_CHECK_SAT, ActivitySettings.DEFAULT_CHECK_SAT));
-            Log.w(TAG, "Check visible satellites=" + visible + " required=" + checksat);
+            Log.w(TAG, "Check satellites fixed/visible=" + fixed + "/" + visible + " required=" + checksat);
 
             // Check if there is any chance for a GPS fix
-            if (visible < checksat) {
+            if (fixed < checksat) {
                 // Cancel fine location updates
                 Intent locationIntent = new Intent(this, LocationService.class);
                 locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
@@ -373,6 +378,10 @@ public class LocationService extends IntentService {
         } catch (Throwable ex) {
             Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
         }
+    }
+
+    private void handleStateChanged(Intent intent) {
+        updateState(this);
     }
 
     private void handleLocationTimeout(Intent intent) {
@@ -863,55 +872,55 @@ public class LocationService extends IntentService {
         return listline;
     }
 
+    private static String getProviderName(Location location, Context context) {
+        if (location != null) {
+            String provider = location.getProvider();
+            int resId = context.getResources().getIdentifier("provider_" + provider, "string", context.getPackageName());
+            if (resId != 0)
+                return context.getString(resId);
+        }
+        return "";
+    }
+
     @TargetApi(21)
     private static void updateState(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int state = prefs.getInt(ActivitySettings.PREF_STATE, STATE_IDLE);
 
-        // Get location
-        Location location = null;
-        if (state == STATE_IDLE || state == STATE_ACQUIRING)
-            location = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
-        else if (state == STATE_ACQUIRED)
-            location = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
-
-        // Get location provider
-        String provider = "";
-        if (location != null) {
-            provider = location.getProvider();
-            int resId = context.getResources().getIdentifier("provider_" + provider, "string", context.getPackageName());
-            if (resId != 0)
-                provider = context.getString(resId);
-        }
+        // Get last location
+        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
 
         // Get title
         String activity = getActivityName(prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN), context);
         int confidence = prefs.getInt(ActivitySettings.PREF_LAST_CONFIDENCE, 50);
         String altitude = "?";
         String accuracy = "?";
-        if (location != null) {
-            if (location.hasAltitude())
-                altitude = Long.toString(Math.round(location.getAltitude()));
-            if (location.hasAccuracy())
-                accuracy = Long.toString(Math.round(location.getAccuracy()));
+        if (lastLocation != null) {
+            if (lastLocation.hasAltitude())
+                altitude = Long.toString(Math.round(lastLocation.getAltitude()));
+            if (lastLocation.hasAccuracy())
+                accuracy = Long.toString(Math.round(lastLocation.getAccuracy()));
         }
         String title = context.getString(R.string.msg_notification, activity, confidence, altitude, accuracy);
 
         // Get text
         String text = null;
         if (state == STATE_IDLE)
-            if (location == null)
+            if (lastLocation == null)
                 text = context.getString(R.string.msg_idle, context.getString(R.string.msg_none), "");
-            else
+            else {
                 text = context.getString(R.string.msg_idle,
-                        SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(new Date(location.getTime())),
-                        provider);
+                        SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(new Date(lastLocation.getTime())),
+                        getProviderName(lastLocation, context));
+            }
         else if (state == STATE_ACQUIRING)
             text = context.getString(R.string.msg_acquiring);
-        else if (state == STATE_ACQUIRED)
+        else if (state == STATE_ACQUIRED) {
+            Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
             text = context.getString(R.string.msg_acquired,
-                    SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(new Date(location.getTime())),
-                    provider);
+                    SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(new Date(bestLocation.getTime())),
+                    getProviderName(bestLocation, context));
+        }
 
         // Build main intent
         Intent riSettings = new Intent(context, ActivitySettings.class);
@@ -955,7 +964,12 @@ public class LocationService extends IntentService {
                     piWaypoint);
         } else {
             // Indeterminate progress
-            notificationBuilder.setProgress(0, 0, true);
+            int fixed = prefs.getInt(ActivitySettings.PREF_SATS_FIXED, 0);
+            int visible = prefs.getInt(ActivitySettings.PREF_SATS_VISIBLE, 0);
+            if (visible == 0)
+                notificationBuilder.setProgress(0, 0, true);
+            else
+                notificationBuilder.setProgress(visible, fixed, false);
 
             // Build stop intent
             Intent riStop = new Intent(context, LocationService.class);
