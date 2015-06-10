@@ -127,7 +127,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_PASSIVE_MINDIST = "0"; // meters
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
-    public static final String DEFAULT_RECOGNITION_INTERVAL_STILL = "180"; // seconds
+    public static final String DEFAULT_RECOGNITION_INTERVAL_STILL = "90"; // seconds
     public static final String DEFAULT_RECOGNITION_INTERVAL_MOVING = "90"; // seconds
     public static final String DEFAULT_RECOGNITION_CONFIDENCE = "50"; // percentage
     public static final boolean DEFAULT_RECOGNITION_TILTING = true;
@@ -704,7 +704,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                             }
                         }, from.get(Calendar.HOUR_OF_DAY), from.get(Calendar.MINUTE), ampm);
                     }
-                }.show(getFragmentManager(), "datePicker");
+                }.show(getFragmentManager(), "timePicker");
             }
         });
 
@@ -743,7 +743,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                             }
                         }, to.get(Calendar.HOUR_OF_DAY), to.get(Calendar.MINUTE), ampm);
                     }
-                }.show(getFragmentManager(), "datePicker");
+                }.show(getFragmentManager(), "timePicker");
             }
         });
 
