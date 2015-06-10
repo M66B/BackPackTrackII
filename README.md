@@ -86,20 +86,19 @@ Acquiring a location more often will result in more trackpoints at the expense o
 
 The duration the GPS will be switched on depends on the preferred accuracy, the location time-out and the satellite check time / count.
 The time to a location fix is different for different device types,
-so for you there may be some room to tune the location time-out and the satellite check time / count.
-Leaving the GPS on, while there is no chance for a location fix, for example when you are indoors or in a plain, is a waste of power.
+so there may be some room to tune the location time-out and the satellite check time / count for your device.
+Leaving the GPS on, while there is no chance for a location fix, for example when you are indoors, is a waste of power.
 
-The frequency at which the activity is being recognized can be configured as well.
-Devices with a significant motion sensor (see version information) will automatically reduce the frequency when still.
-Reducing the activity recognition interval for devices without a significant motion sensor will probably result in less power usage when still (not moving).
+The frequency at which your activity is being recognized can be configured as well.
+Devices with a significant motion sensor (see version information) will automatically reduce the frequency when still (not moving).
+Reducing the activity recognition interval for devices without a significant motion sensor will probably result in less power usage when still.
 Activity recognition does consume a lot less power than using the GPS, so power used for activity recognition is not wasted.
 
 Acknowledgements
 ----------------
 
 * The launcher/application icon was taken from [Wikimedia Commons](http://commons.wikimedia.org/wiki/File:Exquisite-backpack.svg "Exquisite backpack")
-* Notification icon made by [Freepik](http://www.freepik.com "Freepik") from [www.flaticon.com](http://www.flaticon.com "Flaticon") is licensed under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
-	* Listed [here](http://www.flaticon.com/free-icon/backpacker_10595)
+* [Notification](http://www.flaticon.com/free-icon/backpacker_10595) icon made by [Freepik](http://www.freepik.com "Freepik") from [www.flaticon.com](http://www.flaticon.com "Flaticon") is licensed under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
 
 The following libraries are being used:
 
