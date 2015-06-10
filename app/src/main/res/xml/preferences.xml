@@ -152,13 +152,13 @@
             android:summary="@string/summary_recognition_enabled"
             android:title="@string/title_recognition_enabled" />
         <EditTextPreference
-            android:defaultValue="90"
+            android:defaultValue="60"
             android:dependency="pref_recognition_enabled"
             android:inputType="number"
             android:key="pref_recognition_interval_still"
             android:summary="@string/summary_recognition_interval" />
         <EditTextPreference
-            android:defaultValue="90"
+            android:defaultValue="60"
             android:dependency="pref_recognition_enabled"
             android:inputType="number"
             android:key="pref_recognition_interval_moving"
