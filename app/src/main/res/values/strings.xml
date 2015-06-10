@@ -42,7 +42,7 @@
     <string name="title_recognition_unknown">Filter activity \'unknown\'</string>
 
     <string name="title_step_counter">Step counter</string>
-    <string name="title_step_size">Step size: %s centimeter</string>
+    <string name="title_step_size">Step size: %s centimeters</string>
     <string name="title_step_delta">Update: %s steps</string>
     <string name="title_weight">Weight: %s kilogram</string>
 
