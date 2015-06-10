@@ -20,7 +20,7 @@
             android:summary="@string/summary_upload"
             android:title="@string/title_upload" />
         <Preference
-            android:icon="@android:drawable/ic_menu_agenda"
+            android:icon="@android:drawable/ic_menu_directions"
             android:key="pref_location_history"
             android:summary="@string/summary_location_history"
             android:title="@string/title_location_history" />

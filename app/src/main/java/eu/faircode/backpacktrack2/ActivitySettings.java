@@ -773,7 +773,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
         alertDialogBuilder.setTitle(R.string.title_location_history);
-        alertDialogBuilder.setIcon(android.R.drawable.ic_menu_agenda);
+        alertDialogBuilder.setIcon(android.R.drawable.ic_menu_directions);
         alertDialogBuilder.setView(viewHistory);
         alertDialogBuilder
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
