@@ -50,11 +50,19 @@ Frequently asked questions
 No, but acquiring locations will not stop if you are still (not moving) anymore.
 Unfortunately there are no open source libraries available to detect user activity (what you are doing).
 
+The version information shows if a usable version of Google Play services is installed.
+
 <a name="FAQ2"></a>
 **(2) How can I stop this application?**
 
 BackPackTrack II is meant to continuously record your location, so there is no exit or quit option/menu.
 If you want to stop tracking, you can uncheck the check box labelled with *Tracking enabled*.
+
+<a name="FAQ3"></a>
+**(3) What is needed to make (reverse) geocoding work?**
+
+The Google Geocoder needs to be present on your device.
+See the version information to see if it is available.
 
 Android permissions
 -------------------

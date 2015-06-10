@@ -12,7 +12,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.GpsSatellite;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -149,6 +148,8 @@ public class LocationService extends IntentService {
 
             else
                 Log.w(TAG, "Unknown action");
+
+            startService(new Intent(this, StepCounterService.class));
         } catch (Throwable ex) {
             Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
         }
@@ -693,7 +694,7 @@ public class LocationService extends IntentService {
             locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime * 1000, minDist, pi);
-            context.startService(new Intent(context, BackgroundService.class));
+            context.startService(new Intent(context, GpsStatusService.class));
             Log.w(TAG, "Requested GPS location updates");
         }
 
@@ -745,7 +746,7 @@ public class LocationService extends IntentService {
             locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             lm.removeUpdates(pi);
-            context.stopService(new Intent(context, BackgroundService.class));
+            context.stopService(new Intent(context, GpsStatusService.class));
         }
 
         // Cancel check

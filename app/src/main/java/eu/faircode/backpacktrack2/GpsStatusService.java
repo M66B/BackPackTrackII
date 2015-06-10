@@ -10,10 +10,10 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-public class BackgroundService extends Service {
-    private static final String TAG = "BPT2.BackgroundService";
+public class GpsStatusService extends Service {
+    private static final String TAG = "BPT2.GpsStatusService";
 
-    public BackgroundService() {
+    public GpsStatusService() {
     }
 
     private GpsStatus.Listener mGpsStatusListener = new GpsStatus.Listener() {
@@ -32,12 +32,12 @@ public class BackgroundService extends Service {
 
                 // Persist fixed/visible satellites
                 Log.w(TAG, "Satellites fixed/visible=" + fixed + "/" + visible);
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(BackgroundService.this);
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsStatusService.this);
                 prefs.edit().putInt(ActivitySettings.PREF_SATS_FIXED, fixed).apply();
                 prefs.edit().putInt(ActivitySettings.PREF_SATS_VISIBLE, visible).apply();
 
                 // Send state changed intent
-                Intent geotaggedIntent = new Intent(BackgroundService.this, LocationService.class);
+                Intent geotaggedIntent = new Intent(GpsStatusService.this, LocationService.class);
                 geotaggedIntent.setAction(LocationService.ACTION_STATE_CHANGED);
                 startService(geotaggedIntent);
             }
@@ -48,7 +48,7 @@ public class BackgroundService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.w(TAG, "Requesting GPS status updates");
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(BackgroundService.this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsStatusService.this);
         prefs.edit().remove(ActivitySettings.PREF_SATS_FIXED).apply();
         prefs.edit().remove(ActivitySettings.PREF_SATS_VISIBLE).apply();
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -58,7 +58,7 @@ public class BackgroundService extends Service {
     @Override
     public void onDestroy() {
         Log.w(TAG, "Stopping GPS status updates");
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(BackgroundService.this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsStatusService.this);
         prefs.edit().remove(ActivitySettings.PREF_SATS_FIXED).apply();
         prefs.edit().remove(ActivitySettings.PREF_SATS_VISIBLE).apply();
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);

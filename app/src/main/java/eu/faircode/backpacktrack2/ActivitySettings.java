@@ -346,12 +346,12 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Handle version/feature info
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
 
             boolean significantMotion = false;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
                 significantMotion = (sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION) != null);
-            }
+            boolean stepCounter = (sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null);
 
             pref_version.setSummary(
                     pInfo.versionName + "/" + pInfo.versionCode + "\n" +
@@ -359,8 +359,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                                     getString(Geocoder.isPresent() ? R.string.msg_yes : R.string.msg_no)) + "\n" +
                             getString(R.string.msg_playservices,
                                     getString(playServices ? R.string.msg_yes : R.string.msg_no)) + "\n" +
-                            getString(R.string.msg_significantmotion,
-                                    getString(significantMotion ? R.string.msg_yes : R.string.msg_no)));
+                            getString(R.string.msg_stepcounter, getString(stepCounter ? R.string.msg_yes : R.string.msg_no)) + "\n" +
+                            getString(R.string.msg_significantmotion, getString(significantMotion ? R.string.msg_yes : R.string.msg_no)));
         } catch (PackageManager.NameNotFoundException ex) {
             pref_version.setSummary(ex.toString());
         }

@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="eu.faircode.backpacktrack2">
 
+    <uses-feature
+        android:name="android.hardware.location"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.sensor.stepcounter"
+        android:required="false" />
+
     <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -72,7 +79,13 @@
             android:icon="@drawable/backpacker" />
 
         <service
-            android:name=".BackgroundService"
+            android:name=".GpsStatusService"
+            android:enabled="true"
+            android:exported="false"
+            android:icon="@drawable/backpacker" />
+
+        <service
+            android:name=".StepCounterService"
             android:enabled="true"
             android:exported="false"
             android:icon="@drawable/backpacker" />
