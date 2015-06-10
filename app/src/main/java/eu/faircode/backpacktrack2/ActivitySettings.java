@@ -102,6 +102,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_RECOGNITION_UNKNOWN = "pref_recognition_unknown";
 
     public static final String PREF_STEP_SIZE = "pref_step_size";
+    public static final String PREF_STEP_DELTA = "pref_step_delta";
     public static final String PREF_WEIGHT = "pref_weight";
 
     public static final String PREF_BLOGURL = "pref_blogurl";
@@ -139,6 +140,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final boolean DEFAULT_RECOGNITION_UNKNOWN = false;
 
     public static final String DEFAULT_STEP_SIZE = "75"; // centimeters
+    public static final String DEFAULT_STEP_DELTA = "10"; // steps
     public static final String DEFAULT_WEIGHT = "75"; // kilograms
 
     // Transient values
@@ -239,6 +241,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         Preference pref_step_history = findPreference(PREF_STEP_HISTORY);
         Preference pref_version = findPreference(PREF_VERSION);
         Preference pref_step_size = findPreference(PREF_STEP_SIZE);
+        Preference pref_step_update = findPreference(PREF_STEP_DELTA);
         Preference pref_weight = findPreference(PREF_WEIGHT);
 
         // Set titles/summaries
@@ -267,6 +270,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_RECOGNITION_CONFIDENCE);
 
         updateTitle(prefs, PREF_STEP_SIZE);
+        updateTitle(prefs, PREF_STEP_DELTA);
         updateTitle(prefs, PREF_WEIGHT);
 
         updateTitle(prefs, PREF_BLOGURL);
@@ -374,10 +378,13 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             significantMotion = (sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION) != null);
         boolean stepCounter = (sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null);
 
-        // Step counting available
-        pref_step_history.setEnabled(stepCounter);
-        pref_step_size.setEnabled(stepCounter);
-        pref_weight.setEnabled(stepCounter);
+        // Step counting not available
+        if (!stepCounter) {
+            pref_step_history.setEnabled(false);
+            pref_step_size.setEnabled(false);
+            pref_step_update.setEnabled(false);
+            pref_weight.setEnabled(false);
+        }
 
         // Handle version info
         try {
@@ -879,6 +886,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         else if (PREF_STEP_SIZE.equals(key))
             pref.setTitle(getString(R.string.title_step_size, prefs.getString(key, DEFAULT_STEP_SIZE)));
+        else if (PREF_STEP_DELTA.equals(key))
+            pref.setTitle(getString(R.string.title_step_delta, prefs.getString(key, DEFAULT_STEP_DELTA)));
         else if (PREF_WEIGHT.equals(key))
             pref.setTitle(getString(R.string.title_weight, prefs.getString(key, DEFAULT_WEIGHT)));
 

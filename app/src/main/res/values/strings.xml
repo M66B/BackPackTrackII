@@ -43,6 +43,7 @@
 
     <string name="title_step_counter">Step counter</string>
     <string name="title_step_size">Step size: %s centimeter</string>
+    <string name="title_step_delta">Update: %s steps</string>
     <string name="title_weight">Weight: %s kilogram</string>
 
     <string name="title_blog">WordPress weblog</string>
@@ -88,6 +89,7 @@
     <string name="summary_recognition_unknown">Consider the recognized activity \'unknown\' not as motion</string>
 
     <string name="summary_step_size">Your step size in centimeters to calculate the distance walked</string>
+    <string name="summary_step_delta">Update the step counter each selected number of steps</string>
     <string name="summary_weight">Your weight in kilograms to calculate the number of calories burned</string>
 
     <string name="summary_blogurl">WordPress weblog address</string>

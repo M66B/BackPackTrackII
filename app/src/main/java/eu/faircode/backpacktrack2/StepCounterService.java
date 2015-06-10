@@ -25,11 +25,14 @@ public class StepCounterService extends Service {
         public void onSensorChanged(SensorEvent sensorEvent) {
             int steps = (int) sensorEvent.values[0];
             Log.w(TAG, "Step count=" + steps);
+
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(StepCounterService.this);
             int laststeps = prefs.getInt(ActivitySettings.PREF_LAST_STEP, -1);
-            prefs.edit().putInt(ActivitySettings.PREF_LAST_STEP, steps).apply();
-            if (laststeps >= 0)
+            int delta = Integer.parseInt(prefs.getString(ActivitySettings.PREF_STEP_DELTA, ActivitySettings.DEFAULT_STEP_DELTA));
+            if (laststeps < 0 || steps - laststeps >= delta) {
+                prefs.edit().putInt(ActivitySettings.PREF_LAST_STEP, steps).apply();
                 new DatabaseHelper(StepCounterService.this).update(new Date().getTime(), steps - laststeps).close();
+            }
         }
 
         @Override
