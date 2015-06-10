@@ -9,10 +9,12 @@
     <string name="title_location_history">Location history</string>
     <string name="title_activity_history">Activity history</string>
     <string name="title_step_history">Walking history</string>
-    <string name="title_settings">Location settings</string>
+    <string name="title_loc_settings">Location settings</string>
 
     <string name="title_geocode">Geocode address</string>
     <string name="title_rgeocode">Reverse geocode location</string>
+
+    <string name="title_app_settings">Settings</string>
 
     <string name="title_tracking">Tracking</string>
     <string name="title_enabled">Tracking enabled</string>
@@ -65,7 +67,7 @@
     <string name="summary_location_history">Show the location history to verify everything works</string>
     <string name="summary_activity_history">Show the activity history to verify everything works</string>
     <string name="summary_step_history">Show the daily number of steps taken, distance walked and calories burned</string>
-    <string name="summary_settings">Tap to open the Android location settings</string>
+    <string name="summary_loc_settings">Tap to open the Android location settings</string>
 
     <string name="summary_frequency">Try to acquire a new location every selected number of minutes</string>
     <string name="summary_altitude">Prefer less accurate locations with altitude information over more accurate locations without altitude information</string>
