@@ -12,7 +12,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DBNAME = "BACKPACKTRACKII";
-    private static final int DBVERSION = 2;
+    private static final int DBVERSION = 3;
 
     public DatabaseHelper(Context context) {
         super(context, DBNAME, null, DBVERSION);
@@ -39,14 +39,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(TAG, "Upgrading from version " + oldVersion + " to " + newVersion);
-        switch (oldVersion) {
-            case 1:
-                db.execSQL("CREATE TABLE activity (" +
-                        " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
-                        ", time INTEGER NOT NULL" +
-                        ", activity INTEGER NOT NULL" +
-                        ", confidence INTEGER NOT NULL" + ");");
-                db.execSQL("CREATE INDEX idx_activity_time ON activity(time)");
+
+        if (oldVersion < 2) {
+            Log.w(TAG, "Adding table activity");
+            db.execSQL("CREATE TABLE activity (" +
+                    " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
+                    ", time INTEGER NOT NULL" +
+                    ", activity INTEGER NOT NULL" +
+                    ", confidence INTEGER NOT NULL" + ");");
+            db.execSQL("CREATE INDEX idx_activity_time ON activity(time)");
+        }
+
+        if (oldVersion < 3) {
+            Log.w(TAG, "Adding table step");
+            db.execSQL("CREATE TABLE step (" +
+                    " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
+                    ", time INTEGER NOT NULL" +
+                    ", count INTEGER NOT NULL" + ");");
+            db.execSQL("CREATE INDEX idx_step_time ON step(time)");
         }
     }
 
@@ -98,6 +108,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put("confidence", confidence);
 
         db.insert("activity", null, cv);
+
+        return this;
+    }
+
+    public DatabaseHelper update(long time, int delta) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        long count = -1;
+        Cursor cCount = db.rawQuery("SELECT count FROM step WHERE time = ?", new String[]{Long.toString(time)});
+        if (cCount.moveToFirst())
+            count = cCount.getLong(cCount.getColumnIndex("count"));
+
+        if (count < 0) {
+            Log.w(TAG, "Creating new day time=" + time);
+            ContentValues cv = new ContentValues();
+            cv.put("time", time);
+            cv.put("count", delta);
+            db.insert("step", null, cv);
+        } else {
+            ContentValues cv = new ContentValues();
+            cv.put("count", count + delta);
+            db.update("step", cv, "time = ?", new String[]{Long.toString(time)});
+        }
 
         return this;
     }

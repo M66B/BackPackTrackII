@@ -140,6 +140,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_BEST_LOCATION = "pref_best_location";
     public static final String PREF_SATS_FIXED = "pref_sats_fixed";
     public static final String PREF_SATS_VISIBLE = "pref_sats_visible";
+    public static final String PREF_LAST_STEP = "pref_last_step";
 
     // Remember last values
     public static final String PREF_LAST_ACTIVITY = "pref_last_activity";

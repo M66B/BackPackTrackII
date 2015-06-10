@@ -15,8 +15,11 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import java.util.Date;
+
 public class StepCounterService extends Service {
     private static final String TAG = "BPT2.StepCounterService";
+    private static final long MS_DAY = 24 * 60 * 60 * 1000L;
 
     public StepCounterService() {
     }
@@ -24,7 +27,15 @@ public class StepCounterService extends Service {
     private SensorEventListener mStepCounterListener = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent sensorEvent) {
-            Log.w(TAG, "Step count=" + sensorEvent.values[0]);
+            int steps = (int) sensorEvent.values[0];
+            Log.w(TAG, "Step count=" + steps);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(StepCounterService.this);
+            int laststeps = prefs.getInt(ActivitySettings.PREF_LAST_STEP, -1);
+            prefs.edit().putInt(ActivitySettings.PREF_LAST_STEP, steps).apply();
+            if (laststeps >= 0) {
+                long day = new Date().getTime() / MS_DAY * MS_DAY;
+                new DatabaseHelper(StepCounterService.this).update(day, steps - laststeps);
+            }
         }
 
         @Override
@@ -48,8 +59,11 @@ public class StepCounterService extends Service {
 
     @Override
     public void onDestroy() {
+        Log.w(TAG, "Unregistering step counter listener");
         SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sm.unregisterListener(mStepCounterListener);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.edit().remove(ActivitySettings.PREF_LAST_STEP).apply();
         super.onDestroy();
     }
 

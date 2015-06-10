@@ -148,8 +148,6 @@ public class LocationService extends IntentService {
 
             else
                 Log.w(TAG, "Unknown action");
-
-            startService(new Intent(this, StepCounterService.class));
         } catch (Throwable ex) {
             Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
         }
@@ -191,8 +189,10 @@ public class LocationService extends IntentService {
             prefs.edit().putInt(ActivitySettings.PREF_LAST_CONFIDENCE, activity.getConfidence()).apply();
             updateState(this);
 
+            boolean still = (activity.getType() == DetectedActivity.STILL);
+            boolean onfoot = (activity.getType() == DetectedActivity.ON_FOOT);
+
             // Stop/start repeating alarm
-            boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
             if (lastStill != still) {
                 stopActivityRecognition(this);
                 startActivityRecognition(this);
@@ -202,6 +202,11 @@ public class LocationService extends IntentService {
                 } else
                     startRepeatingAlarm(this);
             }
+
+            if (onfoot)
+                startService(new Intent(this, StepCounterService.class));
+            else
+                stopService(new Intent(this, StepCounterService.class));
         }
     }
 
