@@ -23,6 +23,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.w(TAG, "Creating database");
+        createTableLocation(db);
+        createTableActivity(db);
+        createTableStep(db);
+    }
+
+    private void createTableLocation(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE location (" +
                 " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
                 ", time INTEGER NOT NULL" +
@@ -38,28 +44,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE INDEX idx_location_name ON location(name)");
     }
 
+    private void createTableActivity(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE activity (" +
+                " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
+                ", time INTEGER NOT NULL" +
+                ", activity INTEGER NOT NULL" +
+                ", confidence INTEGER NOT NULL" + ");");
+        db.execSQL("CREATE INDEX idx_activity_time ON activity(time)");
+    }
+
+    private void createTableStep(SQLiteDatabase db) {
+        Log.w(TAG, "Adding table step");
+        db.execSQL("CREATE TABLE step (" +
+                " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
+                ", time INTEGER NOT NULL" +
+                ", count INTEGER NOT NULL" + ");");
+        db.execSQL("CREATE INDEX idx_step_time ON step(time)");
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(TAG, "Upgrading from version " + oldVersion + " to " + newVersion);
 
-        if (oldVersion < 2) {
-            Log.w(TAG, "Adding table activity");
-            db.execSQL("CREATE TABLE activity (" +
-                    " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
-                    ", time INTEGER NOT NULL" +
-                    ", activity INTEGER NOT NULL" +
-                    ", confidence INTEGER NOT NULL" + ");");
-            db.execSQL("CREATE INDEX idx_activity_time ON activity(time)");
-        }
+        if (oldVersion < 2)
+            createTableActivity(db);
 
-        if (oldVersion < 3) {
-            Log.w(TAG, "Adding table step");
-            db.execSQL("CREATE TABLE step (" +
-                    " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
-                    ", time INTEGER NOT NULL" +
-                    ", count INTEGER NOT NULL" + ");");
-            db.execSQL("CREATE INDEX idx_step_time ON step(time)");
-        }
+        if (oldVersion < 3)
+            createTableStep(db);
     }
 
     public DatabaseHelper insert(Location location, String name) {
@@ -119,9 +130,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         long day = time / MS_DAY * MS_DAY;
 
         long count = -1;
-        Cursor cCount = db.rawQuery("SELECT count FROM step WHERE time = ?", new String[]{Long.toString(day)});
-        if (cCount.moveToFirst())
-            count = cCount.getLong(cCount.getColumnIndex("count"));
+        Cursor c = null;
+        try {
+            c = db.query("step", new String[]{"count"}, "time = ?", new String[]{Long.toString(day)}, null, null, null, null);
+            if (c.moveToFirst())
+                count = c.getLong(c.getColumnIndex("count"));
+        } finally {
+            if (c != null)
+                c.close();
+        }
 
         if (count < 0) {
             Log.w(TAG, "Creating new day time=" + day);
@@ -170,13 +187,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = null;
         try {
-            c = db.rawQuery("SELECT count FROM step WHERE time = ?", new String[]{Long.toString(day)});
+            c = db.query("step", new String[]{"count"}, "time = ?", new String[]{Long.toString(day)}, null, null, "time DESC", null);
             if (c.moveToFirst())
                 return c.getLong(c.getColumnIndex("count"));
             else
                 return 0;
         } finally {
-            c.close();
+            if (c != null)
+                c.close();
         }
     }
 
