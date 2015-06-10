@@ -55,6 +55,7 @@ import com.google.android.gms.location.DetectedActivity;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -66,12 +67,13 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     private static final String TAG = "BPT2.Settings";
 
     // Preference names
-    public static final String PREF_LOCATION_HISTORY = "pref_location_history";
-    public static final String PREF_ACTIVITY_HISTORY = "pref_activity_history";
     public static final String PREF_EDIT = "pref_edit";
     public static final String PREF_SHARE = "pref_share";
     public static final String PREF_UPLOAD = "pref_upload";
-    public static final String PREF_CHECK = "pref_check";
+    public static final String PREF_LOCATION_HISTORY = "pref_location_history";
+    public static final String PREF_ACTIVITY_HISTORY = "pref_activity_history";
+    public static final String PREF_STEP_HISTORY = "pref_step_history";
+    public static final String PREF_SETTINGS = "pref_settings";
 
     public static final String PREF_ENABLED = "pref_enabled";
     public static final String PREF_FREQUENCY = "pref_frequency";
@@ -98,6 +100,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_RECOGNITION_CONFIDENCE = "pref_recognition_confidence";
     public static final String PREF_RECOGNITION_TILTING = "pref_recognition_tilting";
     public static final String PREF_RECOGNITION_UNKNOWN = "pref_recognition_unknown";
+
+    public static final String PREF_STEP_SIZE = "pref_step_size";
+    public static final String PREF_WEIGHT = "pref_weight";
 
     public static final String PREF_BLOGURL = "pref_blogurl";
     public static final String PREF_BLOGID = "pref_blogid";
@@ -132,6 +137,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_RECOGNITION_CONFIDENCE = "50"; // percentage
     public static final boolean DEFAULT_RECOGNITION_TILTING = true;
     public static final boolean DEFAULT_RECOGNITION_UNKNOWN = false;
+
+    public static final String DEFAULT_STEP_SIZE = "75"; // centimeters
+    public static final String DEFAULT_WEIGHT = "75"; // kilograms
 
     // Transient values
     public static final String PREF_FIRST = "pref_first";
@@ -221,14 +229,17 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         }
 
         // Get preferences
-        Preference pref_location_history = findPreference(PREF_LOCATION_HISTORY);
-        Preference pref_activity_history = findPreference(PREF_ACTIVITY_HISTORY);
         Preference pref_edit = findPreference(PREF_EDIT);
         Preference pref_share = findPreference(PREF_SHARE);
         Preference pref_upload = findPreference(PREF_UPLOAD);
         Preference pref_enabled = findPreference(PREF_ENABLED);
-        Preference pref_check = findPreference(PREF_CHECK);
+        Preference pref_check = findPreference(PREF_SETTINGS);
+        Preference pref_location_history = findPreference(PREF_LOCATION_HISTORY);
+        Preference pref_activity_history = findPreference(PREF_ACTIVITY_HISTORY);
+        Preference pref_step_history = findPreference(PREF_STEP_HISTORY);
         Preference pref_version = findPreference(PREF_VERSION);
+        Preference pref_step_size = findPreference(PREF_STEP_SIZE);
+        Preference pref_weight = findPreference(PREF_WEIGHT);
 
         // Set titles/summaries
         updateTitle(prefs, PREF_SHARE);
@@ -255,28 +266,13 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_RECOGNITION_INTERVAL_MOVING);
         updateTitle(prefs, PREF_RECOGNITION_CONFIDENCE);
 
+        updateTitle(prefs, PREF_STEP_SIZE);
+        updateTitle(prefs, PREF_WEIGHT);
+
         updateTitle(prefs, PREF_BLOGURL);
         updateTitle(prefs, PREF_BLOGID);
         updateTitle(prefs, PREF_BLOGUSER);
         updateTitle(prefs, PREF_BLOGPWD);
-
-        // Handle location history
-        pref_location_history.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                location_history();
-                return true;
-            }
-        });
-
-        // Handle location history
-        pref_activity_history.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                activity_history();
-                return true;
-            }
-        });
 
         // Handle waypoint_edit waypoints
         pref_edit.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -324,6 +320,33 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             providers = getString(R.string.msg_noproviders);
         pref_enabled.setSummary(providers);
 
+        // Handle location history
+        pref_location_history.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                location_history();
+                return true;
+            }
+        });
+
+        // Handle location history
+        pref_activity_history.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                activity_history();
+                return true;
+            }
+        });
+
+        // Handle step count history
+        pref_step_history.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                step_history();
+                return true;
+            }
+        });
+
         // Handle location settings
         Intent locationSettingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         if (getPackageManager().queryIntentActivities(locationSettingsIntent, 0).size() > 0)
@@ -344,16 +367,21 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         if (getPackageManager().queryIntentActivities(playStoreIntent, 0).size() > 0)
             pref_version.setIntent(playStoreIntent);
 
-        // Handle version/feature info
+        // Get available sensors
+        SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
+        boolean significantMotion = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
+            significantMotion = (sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION) != null);
+        boolean stepCounter = (sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null);
+
+        // Step counting available
+        pref_step_history.setEnabled(stepCounter);
+        pref_step_size.setEnabled(stepCounter);
+        pref_weight.setEnabled(stepCounter);
+
+        // Handle version info
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
-
-            boolean significantMotion = false;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-                significantMotion = (sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION) != null);
-            boolean stepCounter = (sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null);
-
             pref_version.setSummary(
                     pInfo.versionName + "/" + pInfo.versionCode + "\n" +
                             getString(R.string.msg_geocoder,
@@ -428,60 +456,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     }
 
     // Helper methods
-
-    private void location_history() {
-        // Get layout
-        LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
-        View viewHistory = inflater.inflate(R.layout.location_history, null);
-
-        // Fill list
-        ListView lv = (ListView) viewHistory.findViewById(R.id.lvLocationHistory);
-        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true);
-        LocationAdapter adapter = new LocationAdapter(ActivitySettings.this, cursor);
-        lv.setAdapter(adapter);
-
-        // Show layout
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
-        alertDialogBuilder.setTitle(R.string.title_location_history);
-        alertDialogBuilder.setView(viewHistory);
-        alertDialogBuilder
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                });
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-        // Fix keyboard input
-        alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-    }
-
-    private void activity_history() {
-        // Get layout
-        LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
-        View viewHistory = inflater.inflate(R.layout.activity_history, null);
-
-        // Fill list
-        ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityHistory);
-        Cursor cursor = db.getActivities(0, Long.MAX_VALUE);
-        ActivityAdapter adapter = new ActivityAdapter(ActivitySettings.this, cursor);
-        lv.setAdapter(adapter);
-
-        // Show layout
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
-        alertDialogBuilder.setTitle(R.string.title_activity_history);
-        alertDialogBuilder.setView(viewHistory);
-        alertDialogBuilder
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                });
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-    }
 
     private void edit_waypoints() {
         // Get layout
@@ -778,6 +752,86 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         alertDialog.show();
     }
 
+    private void location_history() {
+        // Get layout
+        LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
+        View viewHistory = inflater.inflate(R.layout.location_history, null);
+
+        // Fill list
+        ListView lv = (ListView) viewHistory.findViewById(R.id.lvLocationHistory);
+        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true);
+        LocationAdapter adapter = new LocationAdapter(ActivitySettings.this, cursor);
+        lv.setAdapter(adapter);
+
+        // Show layout
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+        alertDialogBuilder.setTitle(R.string.title_location_history);
+        alertDialogBuilder.setView(viewHistory);
+        alertDialogBuilder
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+        // Fix keyboard input
+        alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+    }
+
+    private void activity_history() {
+        // Get layout
+        LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
+        View viewHistory = inflater.inflate(R.layout.activity_history, null);
+
+        // Fill list
+        ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityHistory);
+        Cursor cursor = db.getActivities(0, Long.MAX_VALUE);
+        ActivityAdapter adapter = new ActivityAdapter(ActivitySettings.this, cursor);
+        lv.setAdapter(adapter);
+
+        // Show layout
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+        alertDialogBuilder.setTitle(R.string.title_activity_history);
+        alertDialogBuilder.setView(viewHistory);
+        alertDialogBuilder
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
+    private void step_history() {
+        // Get layout
+        LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
+        View viewHistory = inflater.inflate(R.layout.step_history, null);
+
+        // Fill list
+        ListView lv = (ListView) viewHistory.findViewById(R.id.lvStepHistory);
+        Cursor cursor = db.getSteps();
+        StepAdapter adapter = new StepAdapter(ActivitySettings.this, cursor);
+        lv.setAdapter(adapter);
+
+        // Show layout
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+        alertDialogBuilder.setTitle(R.string.title_step_history);
+        alertDialogBuilder.setView(viewHistory);
+        alertDialogBuilder
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
+
     private void updateTitle(SharedPreferences prefs, String key) {
         Preference pref = findPreference(key);
 
@@ -822,6 +876,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref.setTitle(getString(R.string.title_recognition_interval_moving, prefs.getString(key, DEFAULT_RECOGNITION_INTERVAL_MOVING)));
         else if (PREF_RECOGNITION_CONFIDENCE.equals(key))
             pref.setTitle(getString(R.string.title_recognition_confidence, prefs.getString(key, DEFAULT_RECOGNITION_CONFIDENCE)));
+
+        else if (PREF_STEP_SIZE.equals(key))
+            pref.setTitle(getString(R.string.title_step_size, prefs.getString(key, DEFAULT_STEP_SIZE)));
+        else if (PREF_WEIGHT.equals(key))
+            pref.setTitle(getString(R.string.title_weight, prefs.getString(key, DEFAULT_WEIGHT)));
 
         else if (PREF_BLOGURL.equals(key))
             pref.setTitle(getString(R.string.title_blogurl, prefs.getString(key, getString(R.string.msg_notset))));
@@ -1078,11 +1137,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             else
                 tvDistance.setText(lastLocation == null ? "?" : Long.toString(Math.round(distance)));
 
-            // tvAltitude.setText("9999");
-            // tvBearing.setText("999");
-            // tvAccuracy.setText("9999");
-            // tvDistance.setText("9999k");
-
             if (name == null)
                 view.setClickable(false);
             else
@@ -1136,6 +1190,46 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             tvTime.setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(time));
             tvActivity.setText(LocationService.getActivityName(activity, ActivitySettings.this));
             tvConfidence.setText(confidence + "%");
+        }
+    }
+
+    private class StepAdapter extends CursorAdapter {
+        public StepAdapter(Context context, Cursor cursor) {
+            super(context, cursor, 0);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            return LayoutInflater.from(context).inflate(R.layout.step, parent, false);
+        }
+
+        @Override
+        public void bindView(final View view, final Context context, final Cursor cursor) {
+            // Get values
+            long time = cursor.getLong(cursor.getColumnIndex("time"));
+            long count = cursor.getLong(cursor.getColumnIndex("count"));
+
+            // Get views
+            TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
+            TextView tvCount = (TextView) view.findViewById(R.id.tvCount);
+            TextView tvDistance = (TextView) view.findViewById(R.id.tvDistance);
+            TextView tvCalories = (TextView) view.findViewById(R.id.tvCalories);
+
+            // Get factors
+            SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+            int stepsize = Integer.parseInt(prefs.getString(PREF_STEP_SIZE, DEFAULT_STEP_SIZE));
+            int weight = Integer.parseInt(prefs.getString(PREF_WEIGHT, DEFAULT_WEIGHT));
+
+            // Calculations
+            float distance = count * stepsize / 100f;
+            float calories = (distance / 1000f / 1.609344f) * (weight / 0.45359237f) * 0.3f;
+            // http://www.runnersworld.com/weight-loss/how-many-calories-are-you-really-burning
+
+            // Set values
+            tvTime.setText(SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(time));
+            tvCount.setText(Long.toString(count));
+            tvDistance.setText(Long.toString(Math.round(distance)));
+            tvCalories.setText(new DecimalFormat("#.##").format(calories));
         }
     }
 }

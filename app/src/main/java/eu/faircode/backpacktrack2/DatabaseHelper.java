@@ -14,6 +14,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DBNAME = "BACKPACKTRACKII";
     private static final int DBVERSION = 3;
 
+    private static final long MS_DAY = 24 * 60 * 60 * 1000L;
+
     public DatabaseHelper(Context context) {
         super(context, DBNAME, null, DBVERSION);
     }
@@ -114,22 +116,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public DatabaseHelper update(long time, int delta) {
         SQLiteDatabase db = this.getWritableDatabase();
+        long day = time / MS_DAY * MS_DAY;
 
         long count = -1;
-        Cursor cCount = db.rawQuery("SELECT count FROM step WHERE time = ?", new String[]{Long.toString(time)});
+        Cursor cCount = db.rawQuery("SELECT count FROM step WHERE time = ?", new String[]{Long.toString(day)});
         if (cCount.moveToFirst())
             count = cCount.getLong(cCount.getColumnIndex("count"));
 
         if (count < 0) {
-            Log.w(TAG, "Creating new day time=" + time);
+            Log.w(TAG, "Creating new day time=" + day);
             ContentValues cv = new ContentValues();
-            cv.put("time", time);
+            cv.put("time", day);
             cv.put("count", delta);
             db.insert("step", null, cv);
         } else {
             ContentValues cv = new ContentValues();
             cv.put("count", count + delta);
-            db.update("step", cv, "time = ?", new String[]{Long.toString(time)});
+            db.update("step", cv, "time = ?", new String[]{Long.toString(day)});
         }
 
         return this;
@@ -153,6 +156,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         query += " WHERE time >= ? AND time <= ?";
         query += " ORDER BY time DESC";
         return db.rawQuery(query, new String[]{Long.toString(from), Long.toString(to)});
+    }
+
+    public Cursor getSteps() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT *, ID AS _id FROM step";
+        query += " ORDER BY time DESC";
+        return db.rawQuery(query, new String[]{});
+    }
+
+    public long getCount(long time) {
+        long day = time / MS_DAY * MS_DAY;
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = null;
+        try {
+            c = db.rawQuery("SELECT count FROM step WHERE time = ?", new String[]{Long.toString(day)});
+            if (c.moveToFirst())
+                return c.getLong(c.getColumnIndex("count"));
+            else
+                return 0;
+        } finally {
+            c.close();
+        }
     }
 
     public DatabaseHelper update(int id, String name) {

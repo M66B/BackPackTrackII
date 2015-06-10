@@ -8,9 +8,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.GpsSatellite;
-import android.location.GpsStatus;
-import android.location.LocationManager;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -19,7 +16,6 @@ import java.util.Date;
 
 public class StepCounterService extends Service {
     private static final String TAG = "BPT2.StepCounterService";
-    private static final long MS_DAY = 24 * 60 * 60 * 1000L;
 
     public StepCounterService() {
     }
@@ -32,10 +28,8 @@ public class StepCounterService extends Service {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(StepCounterService.this);
             int laststeps = prefs.getInt(ActivitySettings.PREF_LAST_STEP, -1);
             prefs.edit().putInt(ActivitySettings.PREF_LAST_STEP, steps).apply();
-            if (laststeps >= 0) {
-                long day = new Date().getTime() / MS_DAY * MS_DAY;
-                new DatabaseHelper(StepCounterService.this).update(day, steps - laststeps);
-            }
+            if (laststeps >= 0)
+                new DatabaseHelper(StepCounterService.this).update(new Date().getTime(), steps - laststeps).close();
         }
 
         @Override

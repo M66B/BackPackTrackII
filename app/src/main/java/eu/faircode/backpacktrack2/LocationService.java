@@ -382,6 +382,7 @@ public class LocationService extends IntentService {
                 PendingIntent pi = PendingIntent.getService(this, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
                 lm.removeUpdates(pi);
+                stopService(new Intent(this, GpsStatusService.class));
                 Log.w(TAG, "Canceled fine location updates");
             }
         } catch (Throwable ex) {
@@ -927,13 +928,22 @@ public class LocationService extends IntentService {
             if (lastLocation.hasAccuracy())
                 accuracy = Long.toString(Math.round(lastLocation.getAccuracy()));
         }
-        String title = context.getString(R.string.msg_notification, activity, confidence, altitude, accuracy);
+        long steps;
+        DatabaseHelper db = null;
+        try {
+            db = new DatabaseHelper(context);
+            steps = db.getCount(new Date().getTime());
+        } finally {
+            if (db != null)
+                db.close();
+        }
+        String title = context.getString(R.string.msg_notification, activity, confidence, altitude, accuracy, steps);
 
         // Get text
         String text = null;
         if (state == STATE_IDLE)
             if (lastLocation == null)
-                text = context.getString(R.string.msg_idle, context.getString(R.string.msg_none), "");
+                text = context.getString(R.string.msg_idle, "-", "");
             else {
                 text = context.getString(R.string.msg_idle,
                         SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(new Date(lastLocation.getTime())),

@@ -25,15 +25,20 @@
             android:summary="@string/summary_location_history"
             android:title="@string/title_location_history" />
         <Preference
-            android:icon="@android:drawable/ic_menu_view"
+            android:icon="@android:drawable/ic_menu_recent_history"
             android:key="pref_activity_history"
             android:summary="@string/summary_activity_history"
             android:title="@string/title_activity_history" />
         <Preference
+            android:icon="@drawable/footsteps"
+            android:key="pref_step_history"
+            android:summary="@string/summary_step_history"
+            android:title="@string/title_step_history" />
+        <Preference
             android:icon="@android:drawable/ic_menu_mylocation"
-            android:key="pref_check"
-            android:summary="@string/summary_check"
-            android:title="@string/title_check" />
+            android:key="pref_settings"
+            android:summary="@string/summary_settings"
+            android:title="@string/title_settings" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_tracking">
         <CheckBoxPreference
@@ -176,6 +181,20 @@
             android:key="pref_recognition_unknown"
             android:summary="@string/summary_recognition_unknown"
             android:title="@string/title_recognition_unknown" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/title_step_counter">
+        <EditTextPreference
+            android:defaultValue="75"
+            android:dependency="pref_recognition_enabled"
+            android:inputType="number"
+            android:key="pref_step_size"
+            android:summary="@string/summary_step_size" />
+        <EditTextPreference
+            android:defaultValue="75"
+            android:dependency="pref_recognition_enabled"
+            android:inputType="number"
+            android:key="pref_weight"
+            android:summary="@string/summary_weight" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_blog">
         <EditTextPreference

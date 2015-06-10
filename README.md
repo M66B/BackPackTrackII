@@ -64,6 +64,21 @@ If you want to stop tracking, you can uncheck the check box labelled with *Track
 The Google Geocoder needs to be present on your device.
 See the version information to see if it is available.
 
+<a name="FAQ4"></a>
+**(4) Why is the number of steps low?**
+
+Counting steps will start when the activity *on foot* has been recognized and will stop when any other activity has been recognized,
+which means that BackPackTrack II, unlike most similar applications, doesn't count false steps, for example when traveling in a vehicle.
+
+Note that your device needs to have a hardware step counter for step counting to work.
+See the version information to check if this is the case.
+
+<a name="FAQ5"></a>
+**(5) Why is the number of calories low?**
+
+Unlike most similar applications, BackPackTrack shows an estimate of the **net** number of calories burned.
+If you want to see a higher number of calories, walk more ;-)
+
 Android permissions
 -------------------
 
@@ -107,6 +122,7 @@ Acknowledgements
 
 * The launcher/application icon was taken from [Wikimedia Commons](http://commons.wikimedia.org/wiki/File:Exquisite-backpack.svg "Exquisite backpack")
 * [Notification](http://www.flaticon.com/free-icon/backpacker_10595) icon made by [Freepik](http://www.freepik.com "Freepik") from [www.flaticon.com](http://www.flaticon.com "Flaticon") is licensed under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
+* The foot steps icon was taken from [Wikimedia Commons](http://commons.wikimedia.org/wiki/File:Footsteps_icon.svg "Footsteps")
 
 The following libraries are being used:
 
