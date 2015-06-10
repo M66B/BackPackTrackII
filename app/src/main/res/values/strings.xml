@@ -131,7 +131,7 @@
     <string name="msg_yes">yes</string>
     <string name="msg_no">no</string>
 
-    <string name="msg_notification">%1$s %2$d%% @%3$sm &#177;%4$sm #%5$d</string>
+    <string name="msg_notification">%1$s @%2$sm #%3$d</string>
     <string name="msg_idle">Last @%1$s %2$s</string>
     <string name="msg_acquiring">Acquiring ...</string>
     <string name="msg_acquired">Acquired @%1$s %2$s</string>

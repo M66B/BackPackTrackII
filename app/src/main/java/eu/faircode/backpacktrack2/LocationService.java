@@ -919,15 +919,9 @@ public class LocationService extends IntentService {
 
         // Get title
         String activity = getActivityName(prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN), context);
-        int confidence = prefs.getInt(ActivitySettings.PREF_LAST_CONFIDENCE, 50);
         String altitude = "?";
-        String accuracy = "?";
-        if (lastLocation != null) {
-            if (lastLocation.hasAltitude())
-                altitude = Long.toString(Math.round(lastLocation.getAltitude()));
-            if (lastLocation.hasAccuracy())
-                accuracy = Long.toString(Math.round(lastLocation.getAccuracy()));
-        }
+        if (lastLocation != null && lastLocation.hasAltitude())
+            altitude = Long.toString(Math.round(lastLocation.getAltitude()));
         long steps;
         DatabaseHelper db = null;
         try {
@@ -937,7 +931,7 @@ public class LocationService extends IntentService {
             if (db != null)
                 db.close();
         }
-        String title = context.getString(R.string.msg_notification, activity, confidence, altitude, accuracy, steps);
+        String title = context.getString(R.string.msg_notification, activity, altitude, steps);
 
         // Get text
         String text = null;
