@@ -47,6 +47,9 @@ public class StepCounterService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.edit().remove(ActivitySettings.PREF_LAST_STEP).apply();
+
         SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor stepCounter = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
         if (stepCounter == null)
@@ -62,6 +65,7 @@ public class StepCounterService extends Service {
         Log.w(TAG, "Unregistering step counter listener");
         SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sm.unregisterListener(mStepCounterListener);
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit().remove(ActivitySettings.PREF_LAST_STEP).apply();
         super.onDestroy();
