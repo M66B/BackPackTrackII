@@ -185,17 +185,17 @@
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_step_counter">
             <EditTextPreference
-                android:defaultValue="75"
-                android:dependency="pref_recognition_enabled"
-                android:inputType="number"
-                android:key="pref_step_size"
-                android:summary="@string/summary_step_size" />
-            <EditTextPreference
                 android:defaultValue="10"
                 android:dependency="pref_recognition_enabled"
                 android:inputType="number"
                 android:key="pref_step_delta"
                 android:summary="@string/summary_step_delta" />
+            <EditTextPreference
+                android:defaultValue="75"
+                android:dependency="pref_recognition_enabled"
+                android:inputType="number"
+                android:key="pref_step_size"
+                android:summary="@string/summary_step_size" />
             <EditTextPreference
                 android:defaultValue="75"
                 android:dependency="pref_recognition_enabled"

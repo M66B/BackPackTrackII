@@ -43,8 +43,8 @@
     <string name="title_recognition_unknown">Aktivität \'unbekannt\' filtern</string>
 
     <string name="title_step_counter">Schrittzähler</string>
-    <string name="title_step_size">Schrittgröße: %s Centimeter</string>
     <string name="title_step_delta">Update: %s Schritte</string>
+    <string name="title_step_size">Schrittgröße: %s Centimeter</string>
     <string name="title_weight">Gewicht: %s Kilogram</string>
 
     <string name="title_blog">WordPress Weblog</string>
@@ -90,8 +90,8 @@
     <string name="summary_recognition_tilting">Behandele die Aktivität \'kippen\' als stillstehend</string>
     <string name="summary_recognition_unknown">Behandele die Aktivität \'unbekannt\' als stillstehend</string>
 
-    <string name="summary_step_size">Ihre Schrittgröße in Zentimeter um die gelaufe Strecke zu ermitteln</string>
     <string name="summary_step_delta">Schrittzähler jede Anzahl von Schritte aktualizierenn</string>
+    <string name="summary_step_size">Ihre Schrittgröße in Zentimeter um die gelaufe Strecke zu ermitteln</string>
     <string name="summary_weight">Ihr Gewicht in Kilogramm um die Anzahl von verbrannten Kalorien zu ermitteln</string>
 
     <string name="summary_blogurl">WordPress Weblog Adresse</string>
