@@ -15,7 +15,7 @@
             android:summary="@string/summary_share"
             android:title="@string/title_share" />
         <Preference
-            android:icon="@android:drawable/ic_menu_upload"
+            android:icon="@drawable/backup"
             android:key="pref_upload"
             android:summary="@string/summary_upload"
             android:title="@string/title_upload" />
@@ -35,7 +35,7 @@
             android:summary="@string/summary_step_history"
             android:title="@string/title_step_history" />
         <Preference
-            android:icon="@android:drawable/ic_menu_mylocation"
+            android:icon="@drawable/gpsfixed"
             android:key="pref_settings"
             android:summary="@string/summary_loc_settings"
             android:title="@string/title_loc_settings" />
