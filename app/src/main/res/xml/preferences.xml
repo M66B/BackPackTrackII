@@ -121,17 +121,23 @@
                 android:summary="@string/summary_passive_enabled"
                 android:title="@string/title_passive_enabled" />
             <EditTextPreference
-                android:defaultValue="30"
+                android:defaultValue="15"
                 android:dependency="pref_passive_enabled"
                 android:inputType="number"
                 android:key="pref_passive_bearing"
                 android:summary="@string/summary_passive_bearing" />
             <EditTextPreference
-                android:defaultValue="20"
+                android:defaultValue="10"
                 android:dependency="pref_passive_enabled"
                 android:inputType="number"
                 android:key="pref_passive_altitude"
                 android:summary="@string/summary_passive_altitude" />
+            <EditTextPreference
+                android:defaultValue="10"
+                android:dependency="pref_passive_enabled"
+                android:inputType="number"
+                android:key="pref_passive_inaccurate"
+                android:summary="@string/summary_inaccurate" />
             <EditTextPreference
                 android:defaultValue="1"
                 android:dependency="pref_passive_enabled"

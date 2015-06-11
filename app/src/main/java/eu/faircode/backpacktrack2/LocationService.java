@@ -300,7 +300,7 @@ public class LocationService extends IntentService {
         }
 
         // Filter inaccurate passive locations
-        int pref_inaccurate = Integer.parseInt(prefs.getString(ActivitySettings.PREF_INACCURATE, ActivitySettings.DEFAULT_INACCURATE));
+        int pref_inaccurate = Integer.parseInt(prefs.getString(ActivitySettings.PREF_PASSIVE_INACCURATE, ActivitySettings.DEFAULT_PASSIVE_INACCURATE));
         if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
             Log.w(TAG, "Filtering inaccurate passive location=" + location);
             return;
