@@ -56,6 +56,7 @@
 
     <string name="title_info">Information</string>
     <string name="title_version">Version</string>
+    <string name="title_issue">Report issue</string>
     <string name="title_author">Author</string>
     <string name="title_license">License</string>
     <string name="title_egm96">EGM96</string>
@@ -99,6 +100,7 @@
     <string name="summary_blogpwd">WordPress password</string>
     <string name="summary_plugin">Tap to open the WordPress plugin page (will start the browser)</string>
 
+    <string name="summary_issue">Tap to go to the support forum (will start the browser)</string>
     <string name="summary_author">Marcel Bokhorst (M66B)\nTap for details (will start the browser)</string>
     <string name="summary_license">GNU General Public License version 3\nTap for details (will start the browser)</string>
     <string name="summary_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nTap for more information (will start the browser)</string>

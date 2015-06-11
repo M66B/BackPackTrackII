@@ -235,6 +235,13 @@
             android:key="pref_version"
             android:title="@string/title_version" />
         <Preference
+            android:summary="@string/summary_issue"
+            android:title="@string/title_issue">
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:data="http://forum.xda-developers.com/showthread.php?t=3123682" />
+        </Preference>
+        <Preference
             android:summary="@string/summary_author"
             android:title="@string/title_author">
             <intent
