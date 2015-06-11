@@ -914,8 +914,13 @@ public class LocationService extends IntentService {
         // Get title
         String activity = getActivityName(prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN), context);
         String altitude = "?";
-        if (lastLocation != null && lastLocation.hasAltitude())
-            altitude = Long.toString(Math.round(lastLocation.getAltitude()));
+        String bearing = "?";
+        if (lastLocation != null) {
+            if (lastLocation.hasAltitude())
+                altitude = Long.toString(Math.round(lastLocation.getAltitude()));
+            if (lastLocation.hasBearing())
+                bearing = Long.toString(Math.round(lastLocation.getBearing()));
+        }
         long steps;
         DatabaseHelper db = null;
         try {
@@ -925,7 +930,7 @@ public class LocationService extends IntentService {
             if (db != null)
                 db.close();
         }
-        String title = context.getString(R.string.msg_notification, activity, altitude, steps);
+        String title = context.getString(R.string.msg_notification, activity, altitude, bearing, steps);
 
         // Get text
         String text = null;
