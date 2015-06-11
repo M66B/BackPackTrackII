@@ -92,8 +92,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_PASSIVE_MINDIST = "pref_passive_mindist";
 
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
-    public static final String PREF_RECOGNITION_INTERVAL_STILL = "pref_recognition_interval_still";
-    public static final String PREF_RECOGNITION_INTERVAL_MOVING = "pref_recognition_interval_moving";
+    public static final String PREF_RECOGNITION_FREQUENCY = "pref_recognition_frequency";
     public static final String PREF_RECOGNITION_CONFIDENCE = "pref_recognition_confidence";
     public static final String PREF_RECOGNITION_TILTING = "pref_recognition_tilting";
     public static final String PREF_RECOGNITION_UNKNOWN = "pref_recognition_unknown";
@@ -130,8 +129,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_PASSIVE_MINDIST = "0"; // meters
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
-    public static final String DEFAULT_RECOGNITION_INTERVAL_STILL = "60"; // seconds
-    public static final String DEFAULT_RECOGNITION_INTERVAL_MOVING = "60"; // seconds
+    public static final String DEFAULT_RECOGNITION_FREQUENCY = "60"; // seconds
     public static final String DEFAULT_RECOGNITION_CONFIDENCE = "50"; // percentage
     public static final boolean DEFAULT_RECOGNITION_TILTING = true;
     public static final boolean DEFAULT_RECOGNITION_UNKNOWN = false;
@@ -262,8 +260,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_PASSIVE_MINTIME);
         updateTitle(prefs, PREF_PASSIVE_MINDIST);
 
-        updateTitle(prefs, PREF_RECOGNITION_INTERVAL_STILL);
-        updateTitle(prefs, PREF_RECOGNITION_INTERVAL_MOVING);
+        updateTitle(prefs, PREF_RECOGNITION_FREQUENCY);
         updateTitle(prefs, PREF_RECOGNITION_CONFIDENCE);
 
         updateTitle(prefs, PREF_STEP_SIZE);
@@ -359,8 +356,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         boolean playServices = (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS);
         findPreference(PREF_ACTIVITY_HISTORY).setEnabled(playServices);
         findPreference(PREF_RECOGNITION_ENABLED).setEnabled(playServices);
-        findPreference(PREF_RECOGNITION_INTERVAL_STILL).setEnabled(playServices);
-        findPreference(PREF_RECOGNITION_INTERVAL_MOVING).setEnabled(playServices);
+        findPreference(PREF_RECOGNITION_FREQUENCY).setEnabled(playServices);
         findPreference(PREF_RECOGNITION_CONFIDENCE).setEnabled(playServices);
 
         // Handle Play store link
@@ -452,8 +448,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 PREF_PASSIVE_MINTIME.equals(key) ||
                 PREF_PASSIVE_MINDIST.equals(key) ||
                 PREF_RECOGNITION_ENABLED.equals(key) ||
-                PREF_RECOGNITION_INTERVAL_STILL.equals(key) ||
-                PREF_RECOGNITION_INTERVAL_MOVING.equals(key)) {
+                PREF_RECOGNITION_FREQUENCY.equals(key)) {
             LocationService.stopTracking(this);
             LocationService.startTracking(this);
         }
@@ -913,10 +908,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         else if (PREF_PASSIVE_MINDIST.equals(key))
             pref.setTitle(getString(R.string.title_mindist, prefs.getString(key, DEFAULT_PASSIVE_MINDIST)));
 
-        else if (PREF_RECOGNITION_INTERVAL_STILL.equals(key))
-            pref.setTitle(getString(R.string.title_recognition_interval_still, prefs.getString(key, DEFAULT_RECOGNITION_INTERVAL_STILL)));
-        else if (PREF_RECOGNITION_INTERVAL_MOVING.equals(key))
-            pref.setTitle(getString(R.string.title_recognition_interval_moving, prefs.getString(key, DEFAULT_RECOGNITION_INTERVAL_MOVING)));
+        else if (PREF_RECOGNITION_FREQUENCY.equals(key))
+            pref.setTitle(getString(R.string.title_recognition_frequency, prefs.getString(key, DEFAULT_RECOGNITION_FREQUENCY)));
         else if (PREF_RECOGNITION_CONFIDENCE.equals(key))
             pref.setTitle(getString(R.string.title_recognition_confidence, prefs.getString(key, DEFAULT_RECOGNITION_CONFIDENCE)));
 

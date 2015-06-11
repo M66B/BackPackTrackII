@@ -189,20 +189,16 @@ public class LocationService extends IntentService {
             prefs.edit().putInt(ActivitySettings.PREF_LAST_CONFIDENCE, activity.getConfidence()).apply();
             updateState(this);
 
-            boolean still = (activity.getType() == DetectedActivity.STILL);
-            boolean onfoot = (activity.getType() == DetectedActivity.ON_FOOT);
-
             // Stop/start repeating alarm
-            if (lastStill != still) {
-                stopActivityRecognition(this);
-                startActivityRecognition(this);
+            boolean still = (activity.getType() == DetectedActivity.STILL);
+            if (lastStill != still)
                 if (still) {
                     stopRepeatingAlarm(this);
                     stopLocating(this);
                 } else
                     startRepeatingAlarm(this);
-            }
 
+            boolean onfoot = (activity.getType() == DetectedActivity.ON_FOOT);
             if (onfoot)
                 startService(new Intent(this, StepCounterService.class));
             else
@@ -607,9 +603,7 @@ public class LocationService extends IntentService {
             return;
 
         boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
-        String setting = (still ? ActivitySettings.PREF_RECOGNITION_INTERVAL_STILL : ActivitySettings.PREF_RECOGNITION_INTERVAL_MOVING);
-        String standard = (still ? ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_STILL : ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_MOVING);
-        final int interval = Integer.parseInt(prefs.getString(setting, standard));
+        final int interval = Integer.parseInt(prefs.getString(ActivitySettings.PREF_RECOGNITION_FREQUENCY, ActivitySettings.DEFAULT_RECOGNITION_FREQUENCY));
 
         if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS)
             new Thread(new Runnable() {
