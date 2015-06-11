@@ -11,13 +11,13 @@ import android.util.Log;
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
-    private static final String DBNAME = "BACKPACKTRACKII";
-    private static final int DBVERSION = 3;
+    private static final String DB_NAME = "BACKPACKTRACKII";
+    private static final int DB_VERSION = 3;
 
     private static final long MS_DAY = 24 * 60 * 60 * 1000L;
 
     public DatabaseHelper(Context context) {
-        super(context, DBNAME, null, DBVERSION);
+        super(context, DB_NAME, null, DB_VERSION);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             createTableStep(db);
     }
 
-    public DatabaseHelper insert(Location location, String name) {
+    public DatabaseHelper insertLocation(Location location, String name) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues cv = new ContentValues();
@@ -112,7 +112,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this;
     }
 
-    public DatabaseHelper insert(long time, int activity, int confidence) {
+    public DatabaseHelper insertActivity(long time, int activity, int confidence) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues cv = new ContentValues();
@@ -125,7 +125,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this;
     }
 
-    public DatabaseHelper update(long time, int delta) {
+    public DatabaseHelper updateSteps(long time, int delta) {
         SQLiteDatabase db = this.getWritableDatabase();
         long day = time / MS_DAY * MS_DAY;
 
@@ -198,7 +198,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public DatabaseHelper update(int id, String name) {
+    public DatabaseHelper updateLocation(int id, String name) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("name", name);
@@ -206,21 +206,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this;
     }
 
-    public DatabaseHelper delete(int id) {
+    public DatabaseHelper deleteLocation(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("location", "ID = ?", new String[]{Integer.toString(id)});
         return this;
     }
 
-    public DatabaseHelper delete(long from, long to) {
+    public DatabaseHelper deleteLocations(long from, long to) {
         Log.w(TAG, "Delete from=" + from + " to=" + to);
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("location", "time >= ? AND time <= ?", new String[]{Long.toString(from), Long.toString(to)});
-        db.delete("activity", "time >= ? AND time <= ?", new String[]{Long.toString(from), Long.toString(to)});
         return this;
     }
 
-    public DatabaseHelper deleteActivity() {
+    public DatabaseHelper deleteActivities() {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("activity", null, new String[]{});
         return this;

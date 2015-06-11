@@ -369,10 +369,12 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Get available sensors
         SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
+        boolean stepCounter = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            stepCounter = (sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null);
         boolean significantMotion = false;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
             significantMotion = (sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION) != null);
-        boolean stepCounter = (sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null);
 
         // Step counting not available
         if (!stepCounter) {
@@ -563,7 +565,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
                             new AsyncTask<Object, Object, Object>() {
                                 protected Object doInBackground(Object... params) {
-                                    new DatabaseHelper(ActivitySettings.this).insert(location, geocodedName).close();
+                                    new DatabaseHelper(ActivitySettings.this).insertLocation(location, geocodedName).close();
                                     return null;
                                 }
 
@@ -808,7 +810,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                             public void onClick(DialogInterface dialog, int which) {
                                 new AsyncTask<Object, Object, Object>() {
                                     protected Object doInBackground(Object... params) {
-                                        new DatabaseHelper(ActivitySettings.this).deleteActivity().close();
+                                        new DatabaseHelper(ActivitySettings.this).deleteActivities().close();
                                         return null;
                                     }
 

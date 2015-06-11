@@ -111,7 +111,7 @@ public class WaypointAdapter extends CursorAdapter {
 
                                         new AsyncTask<Object, Object, Object>() {
                                             protected Object doInBackground(Object... params) {
-                                                new DatabaseHelper(context).update(id, geocodedName).close();
+                                                new DatabaseHelper(context).updateLocation(id, geocodedName).close();
                                                 return null;
                                             }
 
@@ -148,7 +148,7 @@ public class WaypointAdapter extends CursorAdapter {
 
                 new AsyncTask<Object, Object, Object>() {
                     protected Object doInBackground(Object... params) {
-                        new DatabaseHelper(context).update(id, newName).close();
+                        new DatabaseHelper(context).updateLocation(id, newName).close();
                         return null;
                     }
 
@@ -174,7 +174,7 @@ public class WaypointAdapter extends CursorAdapter {
                             public void onClick(DialogInterface dialog, int which) {
                                 new AsyncTask<Object, Object, Object>() {
                                     protected Object doInBackground(Object... params) {
-                                        new DatabaseHelper(context).delete(id).close();
+                                        new DatabaseHelper(context).deleteLocation(id).close();
                                         return null;
                                     }
 

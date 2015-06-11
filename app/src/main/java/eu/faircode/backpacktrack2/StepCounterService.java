@@ -1,5 +1,6 @@
 package eu.faircode.backpacktrack2;
 
+import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -32,7 +33,7 @@ public class StepCounterService extends Service {
             if (last < 0 || steps - last >= delta) {
                 prefs.edit().putInt(ActivitySettings.PREF_LAST_STEP, steps).apply();
                 if (last >= 0) {
-                    new DatabaseHelper(StepCounterService.this).update(new Date().getTime(), steps - last).close();
+                    new DatabaseHelper(StepCounterService.this).updateSteps(new Date().getTime(), steps - last).close();
                     LocationService.updateState(StepCounterService.this);
                 }
             }
@@ -45,6 +46,7 @@ public class StepCounterService extends Service {
     };
 
     @Override
+    @TargetApi(19)
     public void onCreate() {
         super.onCreate();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);

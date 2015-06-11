@@ -165,7 +165,7 @@ public class LocationService extends IntentService {
         DetectedActivity activity = activityResult.getMostProbableActivity();
 
         Log.w(TAG, "Activity=" + activity);
-        new DatabaseHelper(this).insert(new Date().getTime(), activity.getType(), activity.getConfidence()).close();
+        new DatabaseHelper(this).insertActivity(new Date().getTime(), activity.getType(), activity.getConfidence()).close();
 
         // Filter unknown activity
         boolean pref_unknown = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_UNKNOWN, ActivitySettings.DEFAULT_RECOGNITION_UNKNOWN);
@@ -355,7 +355,7 @@ public class LocationService extends IntentService {
         }
 
         if (update) {
-            new DatabaseHelper(this).insert(location, null).close();
+            new DatabaseHelper(this).insertLocation(location, null).close();
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
             updateState(this);
         }
@@ -452,7 +452,7 @@ public class LocationService extends IntentService {
             location.setLongitude(lon);
             if (name == null)
                 name = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
-            new DatabaseHelper(this).insert(location, name).close();
+            new DatabaseHelper(this).insertLocation(location, name).close();
             toast(getString(R.string.msg_added, name), this);
         }
     }
@@ -481,7 +481,7 @@ public class LocationService extends IntentService {
 
             // Delete data on request
             if (delete)
-                new DatabaseHelper(this).delete(from, to).close();
+                new DatabaseHelper(this).deleteLocations(from, to).close();
         } catch (Throwable ex) {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             toast(ex.toString(), this);
@@ -597,13 +597,10 @@ public class LocationService extends IntentService {
     }
 
     private static void startActivityRecognition(final Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
         if (!recognition)
             return;
-
-        boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
-        final int interval = Integer.parseInt(prefs.getString(ActivitySettings.PREF_RECOGNITION_FREQUENCY, ActivitySettings.DEFAULT_RECOGNITION_FREQUENCY));
 
         if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS)
             new Thread(new Runnable() {
@@ -616,6 +613,7 @@ public class LocationService extends IntentService {
                         Intent activityIntent = new Intent(context, LocationService.class);
                         activityIntent.setAction(LocationService.ACTION_ACTIVITY);
                         PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        int interval = Integer.parseInt(prefs.getString(ActivitySettings.PREF_RECOGNITION_FREQUENCY, ActivitySettings.DEFAULT_RECOGNITION_FREQUENCY));
                         ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(gac, interval * 1000, pi);
                         Log.w(TAG, "Activity updates frequency=" + interval + "s");
                     }
@@ -808,7 +806,7 @@ public class LocationService extends IntentService {
             }
 
             // Persist new location
-            new DatabaseHelper(this).insert(location, waypointName).close();
+            new DatabaseHelper(this).insertLocation(location, waypointName).close();
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
 
             // Feedback
