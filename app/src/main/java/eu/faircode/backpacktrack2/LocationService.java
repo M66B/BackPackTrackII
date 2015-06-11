@@ -893,16 +893,6 @@ public class LocationService extends IntentService {
         return listline;
     }
 
-    private static String getProviderName(Location location, Context context) {
-        if (location != null) {
-            String provider = location.getProvider();
-            int resId = context.getResources().getIdentifier("provider_" + provider, "string", context.getPackageName());
-            if (resId != 0)
-                return context.getString(resId);
-        }
-        return "";
-    }
-
     @TargetApi(21)
     public static void updateState(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -913,13 +903,13 @@ public class LocationService extends IntentService {
 
         // Get title
         String activity = getActivityName(prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN), context);
-        String altitude = "?";
         String bearing = "?";
+        String altitude = "?";
         if (lastLocation != null) {
+            if (lastLocation.hasBearing())
+                bearing = getWindDirectionName(lastLocation.getBearing(), context);
             if (lastLocation.hasAltitude())
                 altitude = Long.toString(Math.round(lastLocation.getAltitude()));
-            if (lastLocation.hasBearing())
-                bearing = Long.toString(Math.round(lastLocation.getBearing()));
         }
         long steps;
         DatabaseHelper db = null;
@@ -930,7 +920,7 @@ public class LocationService extends IntentService {
             if (db != null)
                 db.close();
         }
-        String title = context.getString(R.string.msg_notification, activity, altitude, bearing, steps);
+        String title = context.getString(R.string.msg_notification, activity, bearing, altitude, steps);
 
         // Get text
         String text = null;
@@ -1034,6 +1024,23 @@ public class LocationService extends IntentService {
                 return context.getString(R.string.unknown);
         }
         return context.getString(R.string.undefined);
+    }
+
+    private static String getWindDirectionName(float bearing, Context context) {
+        int b = Math.round(bearing) + 15;
+        b = (b % 360) / 30 * 30;
+        int resId = context.getResources().getIdentifier("direction_" + b, "string", context.getPackageName());
+        return (resId == 0 ? "?" : context.getString(resId));
+    }
+
+    private static String getProviderName(Location location, Context context) {
+        if (location != null) {
+            String provider = location.getProvider();
+            int resId = context.getResources().getIdentifier("provider_" + provider, "string", context.getPackageName());
+            if (resId != 0)
+                return context.getString(resId);
+        }
+        return "";
     }
 
     private static void cancelNotification(Context context) {

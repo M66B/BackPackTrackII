@@ -134,7 +134,7 @@
     <string name="msg_yes">yes</string>
     <string name="msg_no">no</string>
 
-    <string name="msg_notification">%1$s @%2$sm %3$s&#176; #%4$d</string>
+    <string name="msg_notification">%1$s %2$s @%3$sm #%4$d</string>
     <string name="msg_idle">Last @%1$s %2$s</string>
     <string name="msg_acquiring">Acquiring ...</string>
     <string name="msg_acquired">Acquired @%1$s %2$s</string>
@@ -161,4 +161,17 @@
     <string name="in_vehicle">In vehicle</string>
     <string name="unknown">Unknown</string>
     <string name="undefined">Undefined</string>
+
+    <string name="direction_0">N</string>
+    <string name="direction_30">NNE</string>
+    <string name="direction_60">NE</string>
+    <string name="direction_90">E</string>
+    <string name="direction_120">SE</string>
+    <string name="direction_150">SSE</string>
+    <string name="direction_180">S</string>
+    <string name="direction_210">SSW</string>
+    <string name="direction_240">SW</string>
+    <string name="direction_270">W</string>
+    <string name="direction_300">NW</string>
+    <string name="direction_330">NNW</string>
 </resources>
