@@ -219,4 +219,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete("activity", "time >= ? AND time <= ?", new String[]{Long.toString(from), Long.toString(to)});
         return this;
     }
+
+    public DatabaseHelper deleteActivity() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("activity", null, new String[]{});
+        return this;
+    }
 }

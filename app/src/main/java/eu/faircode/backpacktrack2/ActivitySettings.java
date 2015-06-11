@@ -610,6 +610,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         final TextView tvTimeFrom = (TextView) view.findViewById(R.id.tvTimeFrom);
         final TextView tvDateTo = (TextView) view.findViewById(R.id.tvDateTo);
         final TextView tvTimeTo = (TextView) view.findViewById(R.id.tvTimeTo);
+
         final boolean ampm = android.text.format.DateFormat.is24HourFormat(this);
 
         // Set last track name/extensions
@@ -793,8 +794,43 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Fill list
         ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityHistory);
         Cursor cursor = db.getActivities(0, Long.MAX_VALUE);
-        ActivityAdapter adapter = new ActivityAdapter(ActivitySettings.this, cursor);
+        final ActivityAdapter adapter = new ActivityAdapter(ActivitySettings.this, cursor);
         lv.setAdapter(adapter);
+
+        // Handle delete
+        ImageView ivDelete = (ImageView) viewHistory.findViewById(R.id.ivDelete);
+        ivDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+                alertDialogBuilder.setTitle(getString(R.string.msg_delete, getString(R.string.title_activity_history)));
+                alertDialogBuilder
+                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                new AsyncTask<Object, Object, Object>() {
+                                    protected Object doInBackground(Object... params) {
+                                        new DatabaseHelper(ActivitySettings.this).deleteActivity().close();
+                                        return null;
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(Object result) {
+                                        adapter.changeCursor(db.getActivities(0, Long.MAX_VALUE));
+                                    }
+                                }.execute();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Ignore
+                            }
+                        });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
+            }
+        });
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
