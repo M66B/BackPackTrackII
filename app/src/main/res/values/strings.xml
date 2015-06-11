@@ -122,7 +122,7 @@
     <string name="header_bearing">&#176;</string>
 
     <string name="header_steps">Steps</string>
-    <string name="header_calories">Cal. (net)</string>
+    <string name="header_calories">kcal (net)</string>
 
     <string name="msg_gps">GPS provider: %s</string>
     <string name="msg_network">Network provider: %s</string>
