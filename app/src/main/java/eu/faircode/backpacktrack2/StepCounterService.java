@@ -31,8 +31,10 @@ public class StepCounterService extends Service {
             int delta = Integer.parseInt(prefs.getString(ActivitySettings.PREF_STEP_DELTA, ActivitySettings.DEFAULT_STEP_DELTA));
             if (laststeps < 0 || steps - laststeps >= delta) {
                 prefs.edit().putInt(ActivitySettings.PREF_LAST_STEP, steps).apply();
-                if (laststeps >= 0)
+                if (laststeps >= 0) {
                     new DatabaseHelper(StepCounterService.this).update(new Date().getTime(), steps - laststeps).close();
+                    LocationService.updateState(StepCounterService.this);
+                }
             }
         }
 

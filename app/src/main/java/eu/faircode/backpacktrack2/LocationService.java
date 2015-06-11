@@ -904,7 +904,7 @@ public class LocationService extends IntentService {
     }
 
     @TargetApi(21)
-    private static void updateState(Context context) {
+    public static void updateState(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int state = prefs.getInt(ActivitySettings.PREF_STATE, STATE_IDLE);
 
