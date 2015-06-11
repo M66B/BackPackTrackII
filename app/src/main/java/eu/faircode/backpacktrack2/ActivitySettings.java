@@ -424,7 +424,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Reset activity
         if (PREF_RECOGNITION_ENABLED.equals(key))
-            prefs.edit().putInt(PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN).apply();
+            prefs.edit().remove(PREF_LAST_ACTIVITY).apply();
 
         // Update blog URL
         if (PREF_BLOGURL.equals(key)) {
