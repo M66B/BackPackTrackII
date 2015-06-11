@@ -121,8 +121,8 @@ Acknowledgements
 ----------------
 
 * The launcher/application icon was taken from [Wikimedia Commons](http://commons.wikimedia.org/wiki/File:Exquisite-backpack.svg "Exquisite backpack")
-* [Notification](http://www.flaticon.com/free-icon/backpacker_10595) icon made by [Freepik](http://www.freepik.com "Freepik") from [www.flaticon.com](http://www.flaticon.com "Flaticon") is licensed under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
-* The foot steps icon was taken from [Wikimedia Commons](http://commons.wikimedia.org/wiki/File:Footsteps_icon.svg "Footsteps")
+* [Backpacker](http://www.flaticon.com/free-icon/backpacker_10595) icon made by [Freepik](http://www.freepik.com "Freepik") from [www.flaticon.com](http://www.flaticon.com "Flaticon") is licensed under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
+* Activity icons from [Material icons](https://www.google.com/design/icons/)
 
 The following libraries are being used:
 

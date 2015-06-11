@@ -893,14 +893,14 @@ public class LocationService extends IntentService {
 
     @TargetApi(21)
     public static void updateState(Context context) {
+        // Get state
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int state = prefs.getInt(ActivitySettings.PREF_STATE, STATE_IDLE);
-
-        // Get last location
+        int activityType = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN);
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
 
         // Get title
-        String activity = getActivityName(prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN), context);
+        String activity = getActivityName(activityType, context);
         String bearing = "?";
         String altitude = "?";
         if (lastLocation != null) {
@@ -948,10 +948,18 @@ public class LocationService extends IntentService {
 
         // Build notification
         Notification.Builder notificationBuilder = new Notification.Builder(context);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            notificationBuilder.setSmallIcon(R.drawable.backpacker);
+        if (activityType == DetectedActivity.STILL)
+            notificationBuilder.setSmallIcon(R.drawable.pause);
+        else if (activityType == DetectedActivity.ON_FOOT || activityType == DetectedActivity.WALKING)
+            notificationBuilder.setSmallIcon(R.drawable.walk);
+        else if (activityType == DetectedActivity.RUNNING)
+            notificationBuilder.setSmallIcon(R.drawable.run);
+        else if (activityType == DetectedActivity.ON_BICYCLE)
+            notificationBuilder.setSmallIcon(R.drawable.bike);
+        else if (activityType == DetectedActivity.IN_VEHICLE)
+            notificationBuilder.setSmallIcon(R.drawable.car);
         else
-            notificationBuilder.setSmallIcon(R.mipmap.ic_launcher);
+            notificationBuilder.setSmallIcon(R.drawable.notinterested);
         notificationBuilder.setContentTitle(title);
         notificationBuilder.setContentText(text);
         notificationBuilder.setContentIntent(piSettings);

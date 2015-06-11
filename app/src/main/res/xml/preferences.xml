@@ -5,12 +5,12 @@
         android:selectable="false" />
     <PreferenceCategory android:title="@string/title_action">
         <Preference
-            android:icon="@android:drawable/ic_menu_edit"
+            android:icon="@drawable/create"
             android:key="pref_edit"
             android:summary="@string/summary_edit"
             android:title="@string/title_edit" />
         <Preference
-            android:icon="@android:drawable/ic_menu_share"
+            android:icon="@drawable/send"
             android:key="pref_share"
             android:summary="@string/summary_share"
             android:title="@string/title_share" />
@@ -20,17 +20,17 @@
             android:summary="@string/summary_upload"
             android:title="@string/title_upload" />
         <Preference
-            android:icon="@android:drawable/ic_menu_directions"
+            android:icon="@drawable/location"
             android:key="pref_location_history"
             android:summary="@string/summary_location_history"
             android:title="@string/title_location_history" />
         <Preference
-            android:icon="@android:drawable/ic_menu_recent_history"
+            android:icon="@drawable/history"
             android:key="pref_activity_history"
             android:summary="@string/summary_activity_history"
             android:title="@string/title_activity_history" />
         <Preference
-            android:icon="@drawable/footsteps"
+            android:icon="@drawable/backpacker"
             android:key="pref_step_history"
             android:summary="@string/summary_step_history"
             android:title="@string/title_step_history" />

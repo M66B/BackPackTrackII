@@ -75,19 +75,16 @@
         <service
             android:name=".LocationService"
             android:enabled="true"
-            android:exported="false"
-            android:icon="@drawable/backpacker" />
+            android:exported="false" />
 
         <service
             android:name=".GpsStatusService"
             android:enabled="true"
-            android:exported="false"
-            android:icon="@drawable/backpacker" />
+            android:exported="false" />
 
         <service
             android:name=".StepCounterService"
             android:enabled="true"
-            android:exported="false"
-            android:icon="@drawable/backpacker" />
+            android:exported="false" />
     </application>
 </manifest>

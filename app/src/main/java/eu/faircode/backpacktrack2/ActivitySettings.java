@@ -771,7 +771,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
         alertDialogBuilder.setTitle(R.string.title_location_history);
-        alertDialogBuilder.setIcon(android.R.drawable.ic_menu_directions);
+        alertDialogBuilder.setIcon(R.drawable.location);
         alertDialogBuilder.setView(viewHistory);
         alertDialogBuilder
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -835,7 +835,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
         alertDialogBuilder.setTitle(R.string.title_activity_history);
-        alertDialogBuilder.setIcon(android.R.drawable.ic_menu_recent_history);
+        alertDialogBuilder.setIcon(R.drawable.history);
         alertDialogBuilder.setView(viewHistory);
         alertDialogBuilder
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -862,7 +862,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
         alertDialogBuilder.setTitle(R.string.title_step_history);
-        alertDialogBuilder.setIcon(R.drawable.footsteps);
+        alertDialogBuilder.setIcon(R.drawable.walk);
         alertDialogBuilder.setView(viewHistory);
         alertDialogBuilder
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
