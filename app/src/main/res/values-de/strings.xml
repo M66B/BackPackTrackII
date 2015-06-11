@@ -1,0 +1,165 @@
+<resources>
+    <string name="app_name">BackPackTrack II</string>
+    <string name="app_description">Ihre Position kontinuierlich aufzeichnen, ohne Ihr Akku zu belasten</string>
+
+    <string name="title_action">Aktionen</string>
+    <string name="title_edit">Wegpunkte bearbeiten</string>
+    <string name="title_share">GPX Datei teilen</string>
+    <string name="title_upload">GPX Datei Hochladen</string>
+    <string name="title_location_history">Positionsverlauf</string>
+    <string name="title_activity_history">Aktivitätenverlauf</string>
+    <string name="title_step_history">Schrittverlauf</string>
+    <string name="title_loc_settings">Standorteinstellungen</string>
+
+    <string name="title_geocode">Geocode-Adresse</string>
+    <string name="title_rgeocode">Umwandlung der Geocode-Position</string>
+
+    <string name="title_app_settings">Einstellungen</string>
+
+    <string name="title_tracking">Tracking</string>
+    <string name="title_enabled">Tracking aktiviert</string>
+    <string name="title_frequency">Tracking Hüufigkeit: %s Minuten</string>
+    <string name="title_altitude">Höhe bevorzugt</string>
+    <string name="title_tp_accuracy">Bevorzugte Trackpoint Genauigkeit: %s Meter</string>
+    <string name="title_wp_accuracy">Bevorzugtke Wegpunkt Genauigkeit: %s Meter</string>
+    <string name="title_timeout">Position Auszeit: %s Sekunden</string>
+    <string name="title_check_time">Satelliten prüfen: %s Sekunden</string>
+    <string name="title_check_sat">Benötigte Satelliten: %s</string>
+    <string name="title_inaccurate">Ungenaue Positionen ausfiltern: %s Meter</string>
+    <string name="title_nearby">Nahgelegene Positionen ausfiltern: %s Meter</string>
+    <string name="title_mintime">Minimum Update Zeit: %s Sekunden</string>
+    <string name="title_mindist">Minimum Update Entfehrnung: %s Meter</string>
+
+    <string name="title_passive">Passive Standorte</string>
+    <string name="title_passive_enabled">Passive Standorte aktiviert</string>
+    <string name="title_passive_bearing">Richtungsänderung: %s Grad</string>
+    <string name="title_passive_altitude">Höhenveränderung: %s Meter</string>
+
+    <string name="title_recognition">Aktivitätserkennung</string>
+    <string name="title_recognition_enabled">Aktivitätserkennung aktiviert</string>
+    <string name="title_recognition_interval_still">Aktivitätserkennung bei Stillstand: %s Sekunden</string>
+    <string name="title_recognition_interval_moving">Aktivitätserkennung bei Bewegung: %s Sekunden</string>
+    <string name="title_recognition_confidence">Aktivitätserkennung Genauigkeit: %s%%</string>
+    <string name="title_recognition_tilting">Aktivität \'kippen\' filtern</string>
+    <string name="title_recognition_unknown">Aktivität \'unbekannt\' filtern</string>
+
+    <string name="title_step_counter">Schrittzähler</string>
+    <string name="title_step_size">Schrittgröße: %s Centimeter</string>
+    <string name="title_step_delta">Update: %s Schritte</string>
+    <string name="title_weight">Gewicht: %s Kilogram</string>
+
+    <string name="title_blog">WordPress Weblog</string>
+    <string name="title_blogurl">URL: %s</string>
+    <string name="title_blogid">ID: %s</string>
+    <string name="title_bloguser">Benutzername: %s</string>
+    <string name="title_blogpwd">Passwort: %s</string>
+    <string name="title_plugin">Plugin</string>
+
+    <string name="title_info">Information</string>
+    <string name="title_version">Version</string>
+    <string name="title_author">Verfasser</string>
+    <string name="title_license">Lizenz</string>
+    <string name="title_egm96">EGM96</string>
+
+    <string name="summary_edit">Wegpunkte hinzufügen, ändern oder entfernen</string>
+    <string name="summary_share">Klicken um eine GPX Datei zu erstellen und teilen\nLetzte Teilung: %s</string>
+    <string name="summary_upload">Klicken um eine GPX Dateien zu erstellen und auf ein WordPress Weblog hochzuladen\nLetzter Upload: %s</string>
+    <string name="summary_location_history">Zeige den Positionsverlauf um zu verifizieren, dass alles funktioniert</string>
+    <string name="summary_activity_history">Zeige den Aktivitätenverlauf um zu verifizieren, dass alles funktioniert</string>
+    <string name="summary_step_history">Zeige die täglich Schrittzahl, gelaufene Strecke und verbrante Kalorien</string>
+    <string name="summary_loc_settings">Klicken um Android Standorteinstellungen zu öffnen</string>
+
+    <string name="summary_frequency">Versuche eine neue Position jede Anzahl von Minuten zu bestimmen</string>
+    <string name="summary_altitude">Bevorzuge eine ungenauere Position mit Höheninformationen zu einer genaueren Position ohne Höheninformationen</string>
+    <string name="summary_accuracy">Beende die Standortbestimmung nach dem eine Position mit der ausgewählten Genauigkeit ermittelt wurde</string>
+    <string name="summary_timeout">Beende immer die Standortbestimmung nach der ausgewählten Sekundenanzahl</string>
+    <string name="summary_check_time">Prüfe die Anzahl der Satelliten nach der ausgewählten Sekundenanzahl</string>
+    <string name="summary_check_sat">Erforderliche Anzahl von Satelliten um eine Bestimmung per GPS fortzuführen</string>
+    <string name="summary_inaccurate">Standorte ohne die ausgewählte Genauigkeit in Meter ausblenden</string>
+    <string name="summary_nearby">Standorte ausblenden die näher sind als die angegebene Meteranzahl, außer wenn eine Position eine höhere Genauigkeit hat als die letzte Position</string>
+    <string name="summary_mintime">Zeitminimum zwischen Positionabfragen</string>
+    <string name="summary_mindist">Entfernungsminimum zwischen Positionabfragen</string>
+
+    <string name="summary_passive_enabled">Benutze Positionsabfragen von anderen Applikationen</string>
+    <string name="summary_passive_bearing">Benutze passive Standortabfragen wen sich die Richtung um mehr als die ausgewählte Gradzahl ändert</string>
+    <string name="summary_passive_altitude">Benutze passive Standortabfragen wen sich die Höhe um mehr als die ausgewählte Anzahl von Meter ändert</string>
+
+    <string name="summary_recognition_enabled">Erkennen ob Sie sich bewegen oder stillstehen, und Tracking ausschalten wenn Sie stillstehen</string>
+    <string name="summary_recognition_interval">Aktivität jede Anzahl von Sekunden ermitteln</string>
+    <string name="summary_recognition_confidence">Eine neue Aktivität erkennen wenn die Genauigkeit höher ist als die ausgewählte Prozentzahl</string>
+    <string name="summary_recognition_tilting">Behandele die Aktivität \'kippen\' als stillstehend</string>
+    <string name="summary_recognition_unknown">Behandele die Aktivität \'unbekannt\' als stillstehend</string>
+
+    <string name="summary_step_size">Ihre Schrittgröße in Zentimeter um die gelaufe Strecke zu ermitteln</string>
+    <string name="summary_step_delta">Schrittzähler jede Anzahl von Schritte aktualizierenn</string>
+    <string name="summary_weight">Ihr Gewicht in Kilogramm um die Anzahl von verbrannten Kalorien zu ermitteln</string>
+
+    <string name="summary_blogurl">WordPress Weblog Adresse</string>
+    <string name="summary_blogid">WordPress Weblog Identifikation\nBenutze 1 für eine Single-Site Installation</string>
+    <string name="summary_bloguser">WordPress Benutzername</string>
+    <string name="summary_blogpwd">WordPress Passwort</string>
+    <string name="summary_plugin">Klicken um die WordPress Plugin Seite zu öffnen (Öffnet im Browser)</string>
+
+    <string name="summary_author">Marcel Bokhorst (M66B)\nKlicken für Details (Öffnet im Browser)</string>
+    <string name="summary_license">Marcel Bokhorst (M66B)\nKlicken für Details (Öffnet im Browser)</string>
+    <string name="summary_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAlle Rechte vorbehalten.\nKlicken für mehr Informationen (öffnet im Browser)</string>
+
+    <string name="title_trackpoint">Trackpoint</string>
+    <string name="title_waypoint">Wegpunkt</string>
+
+    <string name="title_export">GPX Datei exportieren</string>
+    <string name="title_track">Track Name:</string>
+    <string name="title_extensions">Benutze GPX Extensions (Provider, Geschwindigkeit, Richtung, Genauigkeit)</string>
+    <string name="title_delete">Daten nach dem Export löschen</string>
+    <string name="title_from">Von Datum/Uhrzeit:</string>
+    <string name="title_to">Bis Datum/Uhrzeit:</string>
+    <string name="title_pick">Auswählen</string>
+
+    <string name="header_altitude">Höhe</string>
+    <string name="header_accuracy">Genauigkeit</string>
+    <string name="header_distance">Entfernung</string>
+    <string name="header_bearing">&#176;</string>
+
+    <string name="header_steps">Schritte</string>
+    <string name="header_calories">Kcal (Net)</string>
+
+    <string name="msg_gps">GPS Provider: %s</string>
+    <string name="msg_network">Netzwerk Provider: %s</string>
+    <string name="msg_noproviders">Einen Standort Provider in den Android Standorteinstellungen aktivieren um diese Applikation zu nutzen</string>
+    <string name="msg_never">nie</string>
+    <string name="msg_notset">nicht gesezt</string>
+    <string name="msg_geocoder">Geocoder: %s</string>
+    <string name="msg_playservices">Play Dienste: %s</string>
+    <string name="msg_stepcounter">Schrittzähler: %s</string>
+    <string name="msg_significantmotion">Signifikante Bewegung: %s</string>
+    <string name="msg_yes">ja</string>
+    <string name="msg_no">nein</string>
+
+    <string name="msg_notification">%1$s @%2$sm #%3$d</string>
+    <string name="msg_idle">Last @%1$s %2$s</string>
+    <string name="msg_acquiring">Ermitteln ...</string>
+    <string name="msg_acquired">Ermittelt @%1$s %2$s</string>
+
+    <string name="msg_added">Hinzugefügt \'%s\'</string>
+    <string name="msg_updated">Aktualisiert \'%s\'</string>
+    <string name="msg_delete">Löschen \'%s\' ?</string>
+    <string name="msg_deleted">Gelöscht \'%s\'</string>
+    <string name="msg_uploaded">Hochgeladen \'%s\'</string>
+    <string name="msg_nolocation">Adresse \'%s\' nicht gefunden</string>
+    <string name="msg_noaddress">Keine Adresse gefunden</string>
+    <string name="msg_geocoding">Geocoding \'%s\' ...</string>
+    <string name="msg_rgeocoding">Umgewandelte Geocoding ...</string>
+
+    <string name="provider_gps">GPS</string>
+    <string name="provider_network">Netzwerk</string>
+
+    <string name="still">Stillstand</string>
+    <string name="tilting">Kippen</string>
+    <string name="on_foot">Zu Fuß</string>
+    <string name="walking">Laufen</string>
+    <string name="running">Rennen</string>
+    <string name="on_bicycle">Auf dem Fahrad</string>
+    <string name="in_vehicle">Im Auto</string>
+    <string name="unknown">Unbekannt</string>
+    <string name="undefined">Nicht definiert</string>
+</resources>
