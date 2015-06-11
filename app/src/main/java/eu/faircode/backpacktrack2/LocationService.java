@@ -183,7 +183,7 @@ public class LocationService extends IntentService {
 
         // Check confidence
         int pref_confidence = Integer.parseInt(prefs.getString(ActivitySettings.PREF_RECOGNITION_CONFIDENCE, ActivitySettings.DEFAULT_RECOGNITION_CONFIDENCE));
-        if (activity.getConfidence() >= pref_confidence) {
+        if (activity.getConfidence() > pref_confidence) {
             // Persist probable activity
             prefs.edit().putInt(ActivitySettings.PREF_LAST_ACTIVITY, activity.getType()).apply();
             prefs.edit().putInt(ActivitySettings.PREF_LAST_CONFIDENCE, activity.getConfidence()).apply();
@@ -338,7 +338,7 @@ public class LocationService extends IntentService {
             float delta = Math.abs(lastLocation.getBearing() - location.getBearing());
             if (delta > 180)
                 delta = 360 - delta;
-            if (!lastLocation.hasBearing() || delta >= pref_bearing_change) {
+            if (!lastLocation.hasBearing() || delta > pref_bearing_change) {
                 Log.w(TAG, "Bearing changed to " + location.getBearing());
                 update = true;
             }
@@ -348,7 +348,7 @@ public class LocationService extends IntentService {
         if (location.hasAltitude()) {
             int pref_altitude_change = Integer.parseInt(prefs.getString(ActivitySettings.PREF_PASSIVE_ALTITUDE, ActivitySettings.DEFAULT_PASSIVE_ALTITUDE));
             double delta = Math.abs(lastLocation.getAltitude() - location.getAltitude());
-            if (!lastLocation.hasAltitude() || delta >= pref_altitude_change) {
+            if (!lastLocation.hasAltitude() || delta > pref_altitude_change) {
                 Log.w(TAG, "Altitude changed to " + location.getAltitude());
                 update = true;
             }
