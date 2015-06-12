@@ -11,10 +11,18 @@ public class BootReceiver extends BroadcastReceiver {
     private static final String TAG = "BPT2.Boot";
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, Intent intent) {
         Log.w(TAG, "Received " + intent);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         prefs.edit().remove(ActivitySettings.PREF_LAST_STEP).apply();
-        LocationService.startTracking(context);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (context) {
+                    LocationService.startTracking(context.getApplicationContext());
+                }
+            }
+        }).start();
     }
 }

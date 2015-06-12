@@ -17,10 +17,16 @@ public class PackageChangedReceiver extends BroadcastReceiver {
         if (inputUri.getScheme().equals("package"))
             if (intent.getAction().equals(Intent.ACTION_PACKAGE_REPLACED)) {
                 String packageName = inputUri.getSchemeSpecificPart();
-                if (packageName.equals(context.getPackageName())) {
-                    LocationService.stopTracking(context);
-                    LocationService.startTracking(context);
-                }
+                if (packageName.equals(context.getPackageName()))
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            synchronized (context.getApplicationContext()) {
+                                LocationService.stopTracking(context);
+                                LocationService.startTracking(context);
+                            }
+                        }
+                    }).start();
             }
     }
 }

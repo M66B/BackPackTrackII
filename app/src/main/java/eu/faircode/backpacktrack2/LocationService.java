@@ -607,47 +607,37 @@ public class LocationService extends IntentService {
         if (!recognition)
             return;
 
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS)
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
-                    ConnectionResult result = gac.blockingConnect();
-                    if (result.isSuccess()) {
-                        Log.w(TAG, "GoogleApiClient connected");
-                        Intent activityIntent = new Intent(context, LocationService.class);
-                        activityIntent.setAction(LocationService.ACTION_ACTIVITY);
-                        PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS) {
+            GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
+            if (gac.blockingConnect().isSuccess()) {
+                Log.w(TAG, "GoogleApiClient connected");
+                Intent activityIntent = new Intent(context, LocationService.class);
+                activityIntent.setAction(LocationService.ACTION_ACTIVITY);
+                PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-                        boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
-                        String setting = (still ? ActivitySettings.PREF_RECOGNITION_INTERVAL_STILL : ActivitySettings.PREF_RECOGNITION_INTERVAL_MOVING);
-                        String standard = (still ? ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_STILL : ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_MOVING);
-                        int interval = Integer.parseInt(prefs.getString(setting, standard));
+                boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
+                String setting = (still ? ActivitySettings.PREF_RECOGNITION_INTERVAL_STILL : ActivitySettings.PREF_RECOGNITION_INTERVAL_MOVING);
+                String standard = (still ? ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_STILL : ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_MOVING);
+                int interval = Integer.parseInt(prefs.getString(setting, standard));
 
-                        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(gac, interval * 1000, pi);
-                        Log.w(TAG, "Activity updates frequency=" + interval + "s");
-                    }
-                }
-            }).start();
+                ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(gac, interval * 1000, pi);
+                Log.w(TAG, "Activity updates frequency=" + interval + "s");
+            }
+        }
     }
 
     private static void stopActivityRecognition(final Context context) {
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS)
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
-                    ConnectionResult result = gac.blockingConnect();
-                    if (result.isSuccess()) {
-                        Log.w(TAG, "GoogleApiClient connected");
-                        Intent activityIntent = new Intent(context, LocationService.class);
-                        activityIntent.setAction(LocationService.ACTION_ACTIVITY);
-                        PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                        ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(gac, pi);
-                        Log.w(TAG, "Canceled activity updates");
-                    }
-                }
-            }).start();
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS) {
+            GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
+            if (gac.blockingConnect().isSuccess()) {
+                Log.w(TAG, "GoogleApiClient connected");
+                Intent activityIntent = new Intent(context, LocationService.class);
+                activityIntent.setAction(LocationService.ACTION_ACTIVITY);
+                PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(gac, pi);
+                Log.w(TAG, "Canceled activity updates");
+            }
+        }
     }
 
     private static void startRepeatingAlarm(Context context) {

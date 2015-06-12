@@ -14,7 +14,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.Address;
@@ -50,9 +49,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.DetectedActivity;
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
@@ -232,7 +229,15 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         if (prefs.getBoolean(PREF_FIRST, true)) {
             Log.w(TAG, "First run");
             prefs.edit().putBoolean(PREF_FIRST, false).apply();
-            LocationService.startTracking(this);
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (ActivitySettings.this.getApplicationContext()) {
+                        LocationService.startTracking(ActivitySettings.this);
+                    }
+                }
+            }).start();
         }
 
         // Get preferences
@@ -464,10 +469,16 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 PREF_PASSIVE_MINDIST.equals(key) ||
                 PREF_RECOGNITION_ENABLED.equals(key) ||
                 PREF_RECOGNITION_INTERVAL_STILL.equals(key) ||
-                PREF_RECOGNITION_INTERVAL_MOVING.equals(key)) {
-            LocationService.stopTracking(this);
-            LocationService.startTracking(this);
-        }
+                PREF_RECOGNITION_INTERVAL_MOVING.equals(key))
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (ActivitySettings.this.getApplicationContext()) {
+                        LocationService.stopTracking(ActivitySettings.this);
+                        LocationService.startTracking(ActivitySettings.this);
+                    }
+                }
+            }).start();
     }
 
     // Helper methods

@@ -9,9 +9,16 @@ public class ProvidersChangedReceiver extends BroadcastReceiver {
     private static final String TAG = "BPT2.ProvidersChanged";
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, Intent intent) {
         Log.w(TAG, "Received " + intent);
-        LocationService.stopTracking(context);
-        LocationService.startTracking(context);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (context.getApplicationContext()) {
+                    LocationService.stopTracking(context);
+                    LocationService.startTracking(context);
+                }
+            }
+        }).start();
     }
 }
