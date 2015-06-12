@@ -5,37 +5,37 @@
         android:selectable="false" />
     <PreferenceCategory android:title="@string/title_action">
         <Preference
-            android:icon="@drawable/create"
+            android:icon="@drawable/create_60"
             android:key="pref_edit"
             android:summary="@string/summary_edit"
             android:title="@string/title_edit" />
         <Preference
-            android:icon="@drawable/send"
+            android:icon="@drawable/send_60"
             android:key="pref_share"
             android:summary="@string/summary_share"
             android:title="@string/title_share" />
         <Preference
-            android:icon="@drawable/backup"
+            android:icon="@drawable/backup_60"
             android:key="pref_upload"
             android:summary="@string/summary_upload"
             android:title="@string/title_upload" />
         <Preference
-            android:icon="@drawable/location"
+            android:icon="@drawable/location_60"
             android:key="pref_location_history"
             android:summary="@string/summary_location_history"
             android:title="@string/title_location_history" />
         <Preference
-            android:icon="@drawable/history"
+            android:icon="@drawable/history_60"
             android:key="pref_activity_history"
             android:summary="@string/summary_activity_history"
             android:title="@string/title_activity_history" />
         <Preference
-            android:icon="@drawable/backpacker"
+            android:icon="@drawable/walk_60"
             android:key="pref_step_history"
             android:summary="@string/summary_step_history"
             android:title="@string/title_step_history" />
         <Preference
-            android:icon="@drawable/gpsfixed"
+            android:icon="@drawable/gpsfixed_60"
             android:key="pref_settings"
             android:summary="@string/summary_loc_settings"
             android:title="@string/title_loc_settings" />

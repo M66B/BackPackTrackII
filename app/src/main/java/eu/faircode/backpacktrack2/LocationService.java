@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -948,6 +949,8 @@ public class LocationService extends IntentService {
 
         // Build notification
         Notification.Builder notificationBuilder = new Notification.Builder(context);
+
+        notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.backpacker_grey));
         if (activityType == DetectedActivity.STILL)
             notificationBuilder.setSmallIcon(R.drawable.pause);
         else if (activityType == DetectedActivity.ON_FOOT || activityType == DetectedActivity.WALKING)
@@ -959,7 +962,8 @@ public class LocationService extends IntentService {
         else if (activityType == DetectedActivity.IN_VEHICLE)
             notificationBuilder.setSmallIcon(R.drawable.car);
         else
-            notificationBuilder.setSmallIcon(R.drawable.notinterested);
+            notificationBuilder.setSmallIcon(R.drawable.explore);
+
         notificationBuilder.setContentTitle(title);
         notificationBuilder.setContentText(text);
         notificationBuilder.setContentIntent(piSettings);
