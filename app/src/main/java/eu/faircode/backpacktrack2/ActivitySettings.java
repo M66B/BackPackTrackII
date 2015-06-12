@@ -774,21 +774,17 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         View viewHistory = inflater.inflate(R.layout.location_history, null);
 
         // Show altitude graph
-        GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvLocation);
         Cursor c = db.getLocations(0, Long.MAX_VALUE, true, true, true);
+        GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvLocation);
         LineGraphSeries<DataPoint> seriesAltitude = new LineGraphSeries<DataPoint>();
         int colTime = c.getColumnIndex("time");
         int colAltitude = c.getColumnIndex("altitude");
         while (c.moveToNext()) {
             Date time = new Date(c.getLong(colTime));
             if (!c.isNull(colAltitude))
-                seriesAltitude.appendData(new DataPoint(time, c.getDouble(colAltitude)), false, 100);
+                seriesAltitude.appendData(new DataPoint(time, c.getDouble(colAltitude)), true, Integer.MAX_VALUE);
         }
         graph.addSeries(seriesAltitude);
-
-        //seriesAltitude.setTitle(getString(R.string.header_altitude));
-        //graph.getLegendRenderer().setVisible(true);
-        //graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
 
         graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
         graph.getGridLabelRenderer().setNumHorizontalLabels(2);
