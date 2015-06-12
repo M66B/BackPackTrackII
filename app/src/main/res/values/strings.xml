@@ -8,7 +8,7 @@
     <string name="title_upload">Upload GPX file</string>
     <string name="title_location_history">Location history</string>
     <string name="title_activity_history">Activity history</string>
-    <string name="title_step_history">Walking history</string>
+    <string name="title_step_history">Walk history</string>
     <string name="title_loc_settings">Location settings</string>
 
     <string name="title_geocode">Geocode address</string>
