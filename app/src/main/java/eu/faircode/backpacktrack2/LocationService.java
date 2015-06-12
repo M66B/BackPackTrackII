@@ -1069,8 +1069,8 @@ public class LocationService extends IntentService {
         Cursor wayPoints = null;
         try {
             databaseHelper = new DatabaseHelper(context);
-            trackPoints = databaseHelper.getLocations(from, to, true, false);
-            wayPoints = databaseHelper.getLocations(from, to, false, true);
+            trackPoints = databaseHelper.getLocations(from, to, true, false, true);
+            wayPoints = databaseHelper.getLocations(from, to, false, true, true);
             GPXFileWriter.writeGpxFile(new File(gpxFileName), trackName, extensions, trackPoints, wayPoints);
         } finally {
             if (wayPoints != null)

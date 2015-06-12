@@ -155,7 +155,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this;
     }
 
-    public Cursor getLocations(long from, long to, boolean trackpoints, boolean waypoints) {
+    public Cursor getLocations(long from, long to, boolean trackpoints, boolean waypoints, boolean asc) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT *, ID AS _id FROM location";
         query += " WHERE time >= ? AND time <= ?";
@@ -163,7 +163,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             query += " AND name IS NULL";
         if (!trackpoints && waypoints)
             query += " AND NOT name IS NULL";
-        query += " ORDER BY time DESC";
+        query += " ORDER BY time";
+        if (!asc)
+            query += " DESC";
         return db.rawQuery(query, new String[]{Long.toString(from), Long.toString(to)});
     }
 

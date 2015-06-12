@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.Address;
@@ -50,6 +51,11 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.DetectedActivity;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LegendRenderer;
+import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -468,7 +474,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Fill list
         ListView lv = (ListView) viewEdit.findViewById(R.id.lvEdit);
-        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true);
+        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
         final WaypointAdapter adapter = new WaypointAdapter(ActivitySettings.this, cursor, db);
         lv.setAdapter(adapter);
 
@@ -571,7 +577,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
                                 @Override
                                 protected void onPostExecute(Object result) {
-                                    Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true);
+                                    Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
                                     adapter.changeCursor(cursor);
                                     Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, geocodedName), Toast.LENGTH_SHORT).show();
                                 }
@@ -762,9 +768,31 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
         View viewHistory = inflater.inflate(R.layout.location_history, null);
 
+        // Show altitude graph
+        GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvLocation);
+        Cursor c = db.getLocations(0, Long.MAX_VALUE, true, true, true);
+        LineGraphSeries<DataPoint> seriesAltitude = new LineGraphSeries<DataPoint>();
+        int colTime = c.getColumnIndex("time");
+        int colAltitude = c.getColumnIndex("altitude");
+        while (c.moveToNext()) {
+            Date time = new Date(c.getLong(colTime));
+            if (!c.isNull(colAltitude))
+                seriesAltitude.appendData(new DataPoint(time, c.getDouble(colAltitude)), false, 100);
+        }
+        graph.addSeries(seriesAltitude);
+
+        //seriesAltitude.setTitle(getString(R.string.header_altitude));
+        //graph.getLegendRenderer().setVisible(true);
+        //graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+
+        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
+        graph.getGridLabelRenderer().setNumHorizontalLabels(2);
+        graph.getViewport().setScalable(true);
+        graph.getViewport().setScrollable(true);
+
         // Fill list
         ListView lv = (ListView) viewHistory.findViewById(R.id.lvLocationHistory);
-        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true);
+        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
         LocationAdapter adapter = new LocationAdapter(ActivitySettings.this, cursor);
         lv.setAdapter(adapter);
 
