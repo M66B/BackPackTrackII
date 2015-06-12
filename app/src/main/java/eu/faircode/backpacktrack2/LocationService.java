@@ -190,16 +190,20 @@ public class LocationService extends IntentService {
             prefs.edit().putInt(ActivitySettings.PREF_LAST_CONFIDENCE, activity.getConfidence()).apply();
             updateState(this);
 
-            // Stop/start repeating alarm
             boolean still = (activity.getType() == DetectedActivity.STILL);
-            if (lastStill != still)
+            boolean onfoot = (activity.getType() == DetectedActivity.ON_FOOT);
+
+            // Stop/start repeating alarm
+            if (lastStill != still) {
+                stopActivityRecognition(this);
+                startActivityRecognition(this);
                 if (still) {
                     stopRepeatingAlarm(this);
                     stopLocating(this);
                 } else
                     startRepeatingAlarm(this);
+            }
 
-            boolean onfoot = (activity.getType() == DetectedActivity.ON_FOOT);
             if (onfoot)
                 startService(new Intent(this, StepCounterService.class));
             else
@@ -614,7 +618,12 @@ public class LocationService extends IntentService {
                         Intent activityIntent = new Intent(context, LocationService.class);
                         activityIntent.setAction(LocationService.ACTION_ACTIVITY);
                         PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                        int interval = Integer.parseInt(prefs.getString(ActivitySettings.PREF_RECOGNITION_FREQUENCY, ActivitySettings.DEFAULT_RECOGNITION_FREQUENCY));
+
+                        boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
+                        String setting = (still ? ActivitySettings.PREF_RECOGNITION_INTERVAL_STILL : ActivitySettings.PREF_RECOGNITION_INTERVAL_MOVING);
+                        String standard = (still ? ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_STILL : ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_MOVING);
+                        int interval = Integer.parseInt(prefs.getString(setting, standard));
+
                         ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(gac, interval * 1000, pi);
                         Log.w(TAG, "Activity updates frequency=" + interval + "s");
                     }

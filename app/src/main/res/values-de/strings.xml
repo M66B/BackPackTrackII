@@ -37,7 +37,8 @@
 
     <string name="title_recognition">Aktivitätserkennung</string>
     <string name="title_recognition_enabled">Aktivitätserkennung aktiviert</string>
-    <string name="title_recognition_frequency">Aktivitätserkennung Hüufigkeit: %s Sekunden</string>
+    <string name="title_recognition_interval_still">Aktivitätserkennung bei Stillstand: %s Sekunden</string>
+    <string name="title_recognition_interval_moving">Aktivitätserkennung bei Bewegung: %s Sekunden</string>
     <string name="title_recognition_confidence">Aktivitätserkennung Präzision: %s%%</string>
     <string name="title_recognition_tilting">Aktivität \'kippen\' filtern</string>
     <string name="title_recognition_unknown">Aktivität \'unbekannt\' filtern</string>
@@ -85,7 +86,7 @@
     <string name="summary_passive_altitude">Benutze passive Standortabfragen wen sich die Höhe um mehr als die ausgewählte Anzahl von Meter ändert</string>
 
     <string name="summary_recognition_enabled">Erkennen ob Sie sich bewegen oder stillstehen, und Tracking ausschalten wenn Sie stillstehen</string>
-    <string name="summary_recognition_frequency">Aktivität jede Anzahl von Sekunden ermitteln</string>
+    <string name="summary_recognition_interval">Aktivität jede Anzahl von Sekunden ermitteln</string>
     <string name="summary_recognition_confidence">Eine neue Aktivität erkennen wenn die Präzision höher ist als die ausgewählte Prozentzahl</string>
     <string name="summary_recognition_tilting">Behandele die Aktivität \'kippen\' als stillstehend</string>
     <string name="summary_recognition_unknown">Behandele die Aktivität \'unbekannt\' als stillstehend</string>
