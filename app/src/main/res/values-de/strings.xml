@@ -20,8 +20,8 @@
     <string name="title_enabled">Tracking aktiviert</string>
     <string name="title_frequency">Tracking Hüufigkeit: %s Minuten</string>
     <string name="title_altitude">Höhe bevorzugt</string>
-    <string name="title_tp_accuracy">Bevorzugte Trackpoint Genauigkeit: %s Meter</string>
-    <string name="title_wp_accuracy">Bevorzugtke Wegpunkt Genauigkeit: %s Meter</string>
+    <string name="title_tp_accuracy">Bevorzugte Trackpoint Präzision: %s Meter</string>
+    <string name="title_wp_accuracy">Bevorzugtke Wegpunkt Präzision: %s Meter</string>
     <string name="title_timeout">Position Auszeit: %s Sekunden</string>
     <string name="title_check_time">Satelliten prüfen: %s Sekunden</string>
     <string name="title_check_sat">Benötigte Satelliten: %s</string>
@@ -38,13 +38,13 @@
     <string name="title_recognition">Aktivitätserkennung</string>
     <string name="title_recognition_enabled">Aktivitätserkennung aktiviert</string>
     <string name="title_recognition_frequency">Aktivitätserkennung Hüufigkeit: %s Sekunden</string>
-    <string name="title_recognition_confidence">Aktivitätserkennung Genauigkeit: %s%%</string>
+    <string name="title_recognition_confidence">Aktivitätserkennung Präzision: %s%%</string>
     <string name="title_recognition_tilting">Aktivität \'kippen\' filtern</string>
     <string name="title_recognition_unknown">Aktivität \'unbekannt\' filtern</string>
 
     <string name="title_step_counter">Schrittzähler</string>
     <string name="title_step_delta">Update: %s Schritte</string>
-    <string name="title_step_size">Schrittgröße: %s Centimeter</string>
+    <string name="title_step_size">Schrittgröße: %s Zentimeter</string>
     <string name="title_weight">Gewicht: %s Kilogram</string>
 
     <string name="title_blog">WordPress Weblog</string>
@@ -71,12 +71,12 @@
 
     <string name="summary_frequency">Versuche eine neue Position jede Anzahl von Minuten zu bestimmen</string>
     <string name="summary_altitude">Bevorzuge eine ungenauere Position mit Höheninformationen zu einer genaueren Position ohne Höheninformationen</string>
-    <string name="summary_accuracy">Beende die Standortbestimmung nach dem eine Position mit der ausgewählten Genauigkeit ermittelt wurde</string>
+    <string name="summary_accuracy">Beende die Standortbestimmung nach dem eine Position mit der ausgewählten Präzision ermittelt wurde</string>
     <string name="summary_timeout">Beende immer die Standortbestimmung nach der ausgewählten Sekundenanzahl</string>
     <string name="summary_check_time">Prüfe die Anzahl der Satelliten nach der ausgewählten Sekundenanzahl</string>
     <string name="summary_check_sat">Erforderliche Anzahl von Satelliten um eine Bestimmung per GPS fortzuführen</string>
-    <string name="summary_inaccurate">Standorte ohne die ausgewählte Genauigkeit in Meter ausblenden</string>
-    <string name="summary_nearby">Standorte ausblenden die näher sind als die angegebene Meteranzahl, außer wenn eine Position eine höhere Genauigkeit hat als die letzte Position</string>
+    <string name="summary_inaccurate">Standorte ohne die ausgewählte Präzision in Meter ausblenden</string>
+    <string name="summary_nearby">Standorte ausblenden die näher sind als die angegebene Meteranzahl, außer wenn eine Position eine höhere Präzision hat als die letzte Position</string>
     <string name="summary_mintime">Zeitminimum zwischen Positionabfragen</string>
     <string name="summary_mindist">Entfernungsminimum zwischen Positionabfragen</string>
 
@@ -86,7 +86,7 @@
 
     <string name="summary_recognition_enabled">Erkennen ob Sie sich bewegen oder stillstehen, und Tracking ausschalten wenn Sie stillstehen</string>
     <string name="summary_recognition_frequency">Aktivität jede Anzahl von Sekunden ermitteln</string>
-    <string name="summary_recognition_confidence">Eine neue Aktivität erkennen wenn die Genauigkeit höher ist als die ausgewählte Prozentzahl</string>
+    <string name="summary_recognition_confidence">Eine neue Aktivität erkennen wenn die Präzision höher ist als die ausgewählte Prozentzahl</string>
     <string name="summary_recognition_tilting">Behandele die Aktivität \'kippen\' als stillstehend</string>
     <string name="summary_recognition_unknown">Behandele die Aktivität \'unbekannt\' als stillstehend</string>
 
@@ -110,15 +110,15 @@
 
     <string name="title_export">GPX Datei exportieren</string>
     <string name="title_track">Track Name:</string>
-    <string name="title_extensions">Benutze GPX Extensions (Provider, Geschwindigkeit, Richtung, Genauigkeit)</string>
+    <string name="title_extensions">Benutze GPX Extensions (Provider, Geschwindigkeit, Richtung, Präzision)</string>
     <string name="title_delete">Daten nach dem Export löschen</string>
     <string name="title_from">Von Datum/Uhrzeit:</string>
     <string name="title_to">Bis Datum/Uhrzeit:</string>
     <string name="title_pick">Auswählen</string>
 
     <string name="header_altitude">Höhe</string>
-    <string name="header_accuracy">Genauigkeit</string>
-    <string name="header_distance">Entfernung</string>
+    <string name="header_accuracy">Pr.</string>
+    <string name="header_distance">Entf.</string>
     <string name="header_bearing">&#176;</string>
 
     <string name="header_steps">Schritte</string>
