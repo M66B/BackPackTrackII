@@ -18,7 +18,7 @@
 
     <string name="title_tracking">Tracking</string>
     <string name="title_enabled">Tracking enabled</string>
-    <string name="title_frequency">Tracking frequency: %s minutes</string>
+    <string name="title_interval">Tracking interval: %s seconds</string>
     <string name="title_altitude">Altitude preferred</string>
     <string name="title_tp_accuracy">Preferred trackpoint accuracy: %s meters</string>
     <string name="title_wp_accuracy">Preferred waypoint accuracy: %s meters</string>
@@ -71,7 +71,7 @@
     <string name="summary_step_history">Show the daily number of steps taken, distance walked and calories burned</string>
     <string name="summary_loc_settings">Tap to open the Android location settings</string>
 
-    <string name="summary_frequency">Try to acquire a new location every selected number of minutes</string>
+    <string name="summary_interval">Try to acquire a new location every selected number of seconds</string>
     <string name="summary_altitude">Prefer less accurate locations with altitude information over more accurate locations without altitude information</string>
     <string name="summary_accuracy">Stop acquiring a location after a location with the selected accuracy has been acquired</string>
     <string name="summary_timeout">Always stop acquiring a location after the selected number of seconds</string>

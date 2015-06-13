@@ -18,7 +18,7 @@
 
     <string name="title_tracking">Tracking</string>
     <string name="title_enabled">Tracking aktiviert</string>
-    <string name="title_frequency">Tracking Hüufigkeit: %s Minuten</string>
+    <string name="title_interval">Tracking Hüufigkeit: %s Sekunden</string>
     <string name="title_altitude">Höhe bevorzugt</string>
     <string name="title_tp_accuracy">Bevorzugte Trackpoint Präzision: %s Meter</string>
     <string name="title_wp_accuracy">Bevorzugtke Wegpunkt Präzision: %s Meter</string>
@@ -71,7 +71,7 @@
     <string name="summary_step_history">Zeige die täglich Schrittzahl, gelaufene Strecke und verbrante Kalorien</string>
     <string name="summary_loc_settings">Klicken um Android Standorteinstellungen zu öffnen</string>
 
-    <string name="summary_frequency">Versuche eine neue Position jede Anzahl von Minuten zu bestimmen</string>
+    <string name="summary_interval">Versuche eine neue Position jede Anzahl von Sekunden zu bestimmen</string>
     <string name="summary_altitude">Bevorzuge eine ungenauere Position mit Höheninformationen zu einer genaueren Position ohne Höheninformationen</string>
     <string name="summary_accuracy">Beende die Standortbestimmung nach dem eine Position mit der ausgewählten Präzision ermittelt wurde</string>
     <string name="summary_timeout">Beende immer die Standortbestimmung nach der ausgewählten Sekundenanzahl</string>

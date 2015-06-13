@@ -76,7 +76,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_SETTINGS = "pref_settings";
 
     public static final String PREF_ENABLED = "pref_enabled";
-    public static final String PREF_FREQUENCY = "pref_frequency";
+    public static final String PREF_INTERVAL = "pref_interval";
     public static final String PREF_ALTITUDE = "pref_altitude";
     public static final String PREF_TP_ACCURACY = "pref_accuracy";
     public static final String PREF_WP_ACCURACY = "pref_wp_accuracy";
@@ -115,7 +115,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     // Preference defaults
     public static final boolean DEFAULT_ENABLED = true;
-    public static final String DEFAULT_FREQUENCY = "3"; // minutes
+    public static final String DEFAULT_INTERVAL = "180"; // seconds
     public static final boolean DEFAULT_ALTITUDE = true;
     public static final String DEFAULT_TP_ACCURACY = "20"; // meters
     public static final String DEFAULT_WP_ACCURACY = "10"; // meters
@@ -258,7 +258,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_SHARE);
         updateTitle(prefs, PREF_UPLOAD);
 
-        updateTitle(prefs, PREF_FREQUENCY);
+        updateTitle(prefs, PREF_INTERVAL);
         updateTitle(prefs, PREF_ALTITUDE);
         updateTitle(prefs, PREF_TP_ACCURACY);
         updateTitle(prefs, PREF_WP_ACCURACY);
@@ -459,7 +459,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Restart tracking if needed
         if (PREF_ENABLED.equals(key) ||
-                PREF_FREQUENCY.equals(key) ||
+                PREF_INTERVAL.equals(key) ||
                 PREF_TIMEOUT.equals(key) ||
                 PREF_CHECK_TIME.equals(key) ||
                 PREF_MINTIME.equals(key) ||
@@ -923,8 +923,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         else if (PREF_UPLOAD.equals(key))
             pref.setSummary(getString(R.string.summary_upload, prefs.getString(PREF_LAST_UPLOAD, getString(R.string.msg_never))));
 
-        else if (PREF_FREQUENCY.equals(key))
-            pref.setTitle(getString(R.string.title_frequency, prefs.getString(key, DEFAULT_FREQUENCY)));
+        else if (PREF_INTERVAL.equals(key))
+            pref.setTitle(getString(R.string.title_interval, prefs.getString(key, DEFAULT_INTERVAL)));
         else if (PREF_TP_ACCURACY.equals(key))
             pref.setTitle(getString(R.string.title_tp_accuracy, prefs.getString(key, DEFAULT_TP_ACCURACY)));
         else if (PREF_WP_ACCURACY.equals(key))

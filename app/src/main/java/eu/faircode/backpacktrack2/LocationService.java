@@ -653,9 +653,9 @@ public class LocationService extends IntentService {
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        int frequency = Integer.parseInt(prefs.getString(ActivitySettings.PREF_FREQUENCY, ActivitySettings.DEFAULT_FREQUENCY));
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 1000, frequency * 60 * 1000, pi);
-        Log.w(TAG, "Start repeating alarm frequency=" + frequency + "m");
+        int interval = Integer.parseInt(prefs.getString(ActivitySettings.PREF_INTERVAL, ActivitySettings.DEFAULT_INTERVAL));
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 1000, interval * 1000, pi);
+        Log.w(TAG, "Start repeating alarm frequency=" + interval + "s");
     }
 
     private static void stopRepeatingAlarm(Context context) {

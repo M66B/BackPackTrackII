@@ -47,11 +47,11 @@
                 android:key="pref_enabled"
                 android:title="@string/title_enabled" />
             <EditTextPreference
-                android:defaultValue="3"
+                android:defaultValue="180"
                 android:dependency="pref_enabled"
                 android:inputType="number"
-                android:key="pref_frequency"
-                android:summary="@string/summary_frequency" />
+                android:key="pref_interval"
+                android:summary="@string/summary_interval" />
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="pref_enabled"
