@@ -83,10 +83,10 @@ If you want to see a higher number of calories, walk more ;-)
 **(6) What is a waypoint/trackpoint?**
 
 Locations are recorded either as waypoint or trackpoint.
-The difference between a waypoint and a trackpoint is that a waypoint has a name and a trackpoint has not.
+The difference between a waypoint and a trackpoint is that a waypoint has a name and a trackpoint does not.
 Waypoints can be edited by the waypoint editor, but trackpoints cannot.
-It are waypoints and trackpoints which are being exported to a GPX file.
-Most GPX visualization tools connect trackpoints by line segments, designating the track you have followed.
+It is the waypoints and trackpoints which are being exported to a GPX file.
+Most GPX visualization tools connect trackpoints by line segments, designating the path you have followed.
 Waypoints are mostly represented by symbols, like a little flag.
 
 Android permissions
