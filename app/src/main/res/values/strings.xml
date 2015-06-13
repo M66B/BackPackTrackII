@@ -56,6 +56,7 @@
     <string name="title_plugin">Plugin</string>
 
     <string name="title_info">Information</string>
+    <string name="title_legend">Legend</string>
     <string name="title_version">Version</string>
     <string name="title_support">Support</string>
     <string name="title_author">Author</string>

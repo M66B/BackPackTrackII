@@ -237,6 +237,26 @@
         </PreferenceScreen>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_info">
+        <PreferenceScreen android:title="@string/title_legend">
+            <Preference
+                android:icon="@drawable/pause"
+                android:title="@string/still" />
+            <Preference
+                android:icon="@drawable/walk"
+                android:title="@string/on_foot" />
+            <Preference
+                android:icon="@drawable/run"
+                android:title="@string/running" />
+            <Preference
+                android:icon="@drawable/bike"
+                android:title="@string/on_bicycle" />
+            <Preference
+                android:icon="@drawable/car"
+                android:title="@string/in_vehicle" />
+            <Preference
+                android:icon="@drawable/explore"
+                android:title="@string/undefined" />
+        </PreferenceScreen>
         <Preference
             android:key="pref_version"
             android:title="@string/title_version" />
