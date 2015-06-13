@@ -241,8 +241,8 @@
             android:key="pref_version"
             android:title="@string/title_version" />
         <Preference
-            android:summary="@string/summary_issue"
-            android:title="@string/title_issue">
+            android:summary="@string/summary_support"
+            android:title="@string/title_support">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="http://forum.xda-developers.com/showthread.php?t=3123682" />
