@@ -166,7 +166,8 @@ public class LocationService extends IntentService {
         DetectedActivity activity = activityResult.getMostProbableActivity();
 
         Log.w(TAG, "Activity=" + activity);
-        new DatabaseHelper(this).insertActivity(new Date().getTime(), activity.getType(), activity.getConfidence()).close();
+        if (prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_HISTORY, ActivitySettings.DEFAULT_RECOGNITION_HISTORY))
+            new DatabaseHelper(this).insertActivity(new Date().getTime(), activity.getType(), activity.getConfidence()).close();
 
         // Filter unknown activity
         boolean pref_unknown = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_UNKNOWN, ActivitySettings.DEFAULT_RECOGNITION_UNKNOWN);

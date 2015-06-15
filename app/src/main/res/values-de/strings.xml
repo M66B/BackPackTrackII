@@ -46,6 +46,7 @@
     <string name="title_recognition_confidence">Aktivitätserkennung Präzision: %s%%</string>
     <string name="title_recognition_tilting">Aktivität \'kippen\' filtern</string>
     <string name="title_recognition_unknown">Aktivität \'unbekannt\' filtern</string>
+    <string name="title_recognition_history">History enabled</string>
 
     <string name="title_step_counter">Schrittzähler</string>
     <string name="title_step_delta">Update: %s Schritte</string>

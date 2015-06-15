@@ -39,6 +39,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -103,6 +104,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_RECOGNITION_CONFIDENCE = "pref_recognition_confidence";
     public static final String PREF_RECOGNITION_TILTING = "pref_recognition_tilting";
     public static final String PREF_RECOGNITION_UNKNOWN = "pref_recognition_unknown";
+    public static final String PREF_RECOGNITION_HISTORY = "pref_recognition_history";
 
     public static final String PREF_STEP_DELTA = "pref_step_delta";
     public static final String PREF_STEP_SIZE = "pref_step_size";
@@ -144,6 +146,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_RECOGNITION_CONFIDENCE = "50"; // percentage
     public static final boolean DEFAULT_RECOGNITION_TILTING = true;
     public static final boolean DEFAULT_RECOGNITION_UNKNOWN = false;
+    public static final boolean DEFAULT_RECOGNITION_HISTORY = true;
 
     public static final String DEFAULT_STEP_DELTA = "10"; // steps
     public static final String DEFAULT_STEP_SIZE = "75"; // centimeters
@@ -834,6 +837,18 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Get layout
         LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
         View viewHistory = inflater.inflate(R.layout.activity_history, null);
+
+        // Set/handle history enabled
+        final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+        boolean enabled = prefs.getBoolean(PREF_RECOGNITION_HISTORY, DEFAULT_RECOGNITION_HISTORY);
+        CheckBox cbHistoryEnabled = (CheckBox) viewHistory.findViewById(R.id.cbHistoryEnabled);
+        cbHistoryEnabled.setChecked(enabled);
+        cbHistoryEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                prefs.edit().putBoolean(PREF_RECOGNITION_HISTORY, isChecked).apply();
+            }
+        });
 
         // Fill list
         ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityHistory);
