@@ -91,7 +91,7 @@
     <string name="summary_passive_altitude">Use passive location updates when altitude changes for more than the selected number of meters</string>
 
     <string name="summary_correction_enabled">Enable GPS altitude correction using EGM96</string>
-    <string name="summary_correction_egm96" translatable="false">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nTap for more information (will start the browser)</string>
+    <string name="summary_correction_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nTap for more information (will start the browser)</string>
 
     <string name="summary_recognition_enabled">Recognize if you are still or moving and disable tracking when you are still</string>
     <string name="summary_recognition_interval">Recognize your activity every selected number of seconds</string>
