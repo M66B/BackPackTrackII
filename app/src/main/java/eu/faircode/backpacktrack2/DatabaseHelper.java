@@ -184,14 +184,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery(query, new String[]{});
     }
 
-    public long getCount(long time) {
+    public int getStepCount(long time) {
         long day = time / MS_DAY * MS_DAY;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = null;
         try {
             c = db.query("step", new String[]{"count"}, "time = ?", new String[]{Long.toString(day)}, null, null, "time DESC", null);
             if (c.moveToFirst())
-                return c.getLong(c.getColumnIndex("count"));
+                return c.getInt(c.getColumnIndex("count"));
             else
                 return 0;
         } finally {

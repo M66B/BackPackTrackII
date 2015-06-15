@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
 public class StepAdapter extends CursorAdapter {
@@ -33,7 +32,7 @@ public class StepAdapter extends CursorAdapter {
     public void bindView(final View view, final Context context, final Cursor cursor) {
         // Get values
         long time = cursor.getLong(cursor.getColumnIndex("time"));
-        long count = cursor.getLong(cursor.getColumnIndex("count"));
+        int count = cursor.getInt(cursor.getColumnIndex("count"));
 
         // Get views
         TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
@@ -50,7 +49,7 @@ public class StepAdapter extends CursorAdapter {
         tvTime.setText(SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(time));
         tvCount.setText(Long.toString(count));
         tvDistance.setText(Long.toString(Math.round(distance)));
-        tvCalories.setText(new DecimalFormat("#.##").format(calories));
+        tvCalories.setText(Long.toString(Math.round(calories)));
     }
 }
 

@@ -920,7 +920,7 @@ public class LocationService extends IntentService {
         DatabaseHelper db = null;
         try {
             db = new DatabaseHelper(context);
-            steps = db.getCount(new Date().getTime());
+            steps = db.getStepCount(new Date().getTime());
         } finally {
             if (db != null)
                 db.close();
