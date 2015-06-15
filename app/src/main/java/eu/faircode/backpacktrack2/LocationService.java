@@ -98,10 +98,6 @@ public class LocationService extends IntentService {
     private static final int LOCATION_PERIODIC = 3;
     private static final int LOCATION_GEOTAG = 4;
 
-    private static final double EGM96_INTERVAL = 15d / 60d; // 15' angle delta
-    private static final int EGM96_ROWS = 721;
-    private static final int EGM96_COLS = 1440;
-
     private static final int VIBRATE_SHORT = 250;
     private static final int VIBRATE_LONG = 500;
 
