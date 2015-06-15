@@ -50,6 +50,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -820,6 +822,7 @@ public class LocationService extends IntentService {
             if (prefs.getBoolean(ActivitySettings.PREF_CORRECTION_ENABLED, ActivitySettings.DEFAULT_CORRECTION_ENABLED))
                 try {
                     double offset = getEGM96Offset(location, context);
+                    Log.w(TAG, "Offset=" + offset);
                     location.setAltitude(location.getAltitude() - offset);
                     Log.w(TAG, "Corrected location=" + location);
                 } catch (IOException ex) {
@@ -834,37 +837,20 @@ public class LocationService extends IntentService {
             is = context.getAssets().open("WW15MGH.DAC");
 
             double lat = location.getLatitude();
-            double lon = (location.getLongitude() >= 0 ? location.getLongitude() : location.getLongitude() + 360);
+            double lon = location.getLongitude();
 
-            int topRow = (int) ((90 - lat) / EGM96_INTERVAL);
-            if (lat <= -90)
-                topRow = EGM96_ROWS - 2;
-            int bottomRow = topRow + 1;
+            int shy = (int) Math.floor((90 - lat) * 4);
+            int shx = (int) Math.floor((lon >= 0 ? lon : lon + 360) * 4);
+            int pointer = ((shy * 1440) + shx) * 2;
 
-            int leftCol = (int) (lon / EGM96_INTERVAL);
-            int rightCol = leftCol + 1;
-            if (lon >= 360 - EGM96_INTERVAL) {
-                leftCol = EGM96_COLS - 1;
-                rightCol = 0;
-            }
+            is.skip(pointer);
 
-            double latTop = 90 - topRow * EGM96_INTERVAL;
-            double lonLeft = leftCol * EGM96_INTERVAL;
+            ByteBuffer bb = ByteBuffer.allocate(2);
+            bb.order(ByteOrder.BIG_ENDIAN);
+            bb.put((byte) is.read());
+            bb.put((byte) is.read());
+            int offset = bb.getShort(0);
 
-            double ul = getEGM96Integer(is, topRow, leftCol);
-            double ll = getEGM96Integer(is, bottomRow, leftCol);
-            double lr = getEGM96Integer(is, bottomRow, rightCol);
-            double ur = getEGM96Integer(is, topRow, rightCol);
-
-            double u = (lon - lonLeft) / EGM96_INTERVAL;
-            double v = (latTop - lat) / EGM96_INTERVAL;
-
-            double pll = (1.0 - u) * (1.0 - v);
-            double plr = u * (1.0 - v);
-            double pur = u * v;
-            double pul = (1.0 - u) * v;
-
-            double offset = pll * ll + plr * lr + pur * ur + pul * ul;
             return offset / 100d;
         } finally {
             if (is != null) {
@@ -874,13 +860,6 @@ public class LocationService extends IntentService {
                 }
             }
         }
-    }
-
-    private static int getEGM96Integer(InputStream is, int row, int col) throws IOException {
-        int k = row * EGM96_COLS + col;
-        is.reset();
-        is.skip(k * 2);
-        return is.read() * 256 + is.read();
     }
 
     private static List<String> reverseGeocode(Location location, Context context) {
