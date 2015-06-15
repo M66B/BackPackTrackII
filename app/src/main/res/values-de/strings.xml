@@ -16,7 +16,7 @@
 
     <string name="title_app_settings">Einstellungen</string>
 
-    <string name="title_tracking">Tracking</string>
+    <string name="title_tracking">Standorttracking</string>
     <string name="title_enabled">Tracking aktiviert</string>
     <string name="title_interval">Tracking Hüufigkeit: %s Sekunden</string>
     <string name="title_altitude">Höhe bevorzugt</string>
@@ -35,8 +35,8 @@
     <string name="title_passive_bearing">Richtungsänderung: %s Grad</string>
     <string name="title_passive_altitude">Höhenveränderung: %s Meter</string>
 
-    <string name="title_correction">Altitude correction</string>
-    <string name="title_correction_enabled">Correction enabled</string>
+    <string name="title_correction">Höhenkorrektur</string>
+    <string name="title_correction_enabled">Korrektur aktiviert</string>
     <string name="title_correction_egm96">EGM96 Lizenz</string>
 
     <string name="title_recognition">Aktivitätserkennung</string>
@@ -46,7 +46,7 @@
     <string name="title_recognition_confidence">Aktivitätserkennung Präzision: %s%%</string>
     <string name="title_recognition_tilting">Aktivität \'kippen\' filtern</string>
     <string name="title_recognition_unknown">Aktivität \'unbekannt\' filtern</string>
-    <string name="title_recognition_history">History enabled</string>
+    <string name="title_recognition_history">Historie aktiviert</string>
 
     <string name="title_step_counter">Schrittzähler</string>
     <string name="title_step_delta">Update: %s Schritte</string>
@@ -90,7 +90,7 @@
     <string name="summary_passive_bearing">Benutze passive Standortabfragen wen sich die Richtung um mehr als die ausgewählte Gradzahl ändert</string>
     <string name="summary_passive_altitude">Benutze passive Standortabfragen wen sich die Höhe um mehr als die ausgewählte Anzahl von Meter ändert</string>
 
-    <string name="summary_correction_enabled">Enable GPS altitude correction using EGM96</string>
+    <string name="summary_correction_enabled">Höhenkorrektur mittels EGM96 aktivieren</string>
 
     <string name="summary_recognition_enabled">Erkennen ob Sie sich bewegen oder stillstehen, und Tracking ausschalten wenn Sie stillstehen</string>
     <string name="summary_recognition_interval">Aktivität jede Anzahl von Sekunden ermitteln</string>
