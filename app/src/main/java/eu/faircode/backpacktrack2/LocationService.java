@@ -253,14 +253,7 @@ public class LocationService extends IntentService {
         }
 
         // Correct altitude
-        if (LocationManager.GPS_PROVIDER.equals(location.getProvider()))
-            try {
-                double offset = getEGM96Offset(location, this);
-                location.setAltitude(location.getAltitude() - offset);
-                Log.w(TAG, "Corrected location=" + location + " type=" + locationType);
-            } catch (IOException ex) {
-                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            }
+        correctAltitude(location, this);
 
         // Persist better location
         Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
@@ -325,14 +318,7 @@ public class LocationService extends IntentService {
         }
 
         // Correct altitude
-        if (LocationManager.GPS_PROVIDER.equals(location.getProvider()))
-            try {
-                double offset = getEGM96Offset(location, this);
-                location.setAltitude(location.getAltitude() - offset);
-                Log.w(TAG, "Corrected location=" + location);
-            } catch (IOException ex) {
-                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            }
+        correctAltitude(location, this);
 
         // Filter nearby passive locations
         int pref_nearby = Integer.parseInt(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
@@ -827,11 +813,18 @@ public class LocationService extends IntentService {
             Log.w(TAG, "Filtered location=" + location);
     }
 
-    private static int getEGM96Integer(InputStream is, int row, int col) throws IOException {
-        int k = row * EGM96_COLS + col;
-        is.reset();
-        is.skip(k * 2);
-        return is.read() * 256 + is.read();
+    private static void correctAltitude(Location location, Context context) {
+        if (LocationManager.GPS_PROVIDER.equals(location.getProvider())) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            if (prefs.getBoolean(ActivitySettings.PREF_CORRECTION_ENABLED, ActivitySettings.DEFAULT_CORRECTION_ENABLED))
+                try {
+                    double offset = getEGM96Offset(location, context);
+                    location.setAltitude(location.getAltitude() - offset);
+                    Log.w(TAG, "Corrected location=" + location);
+                } catch (IOException ex) {
+                    Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                }
+        }
     }
 
     private static double getEGM96Offset(Location location, Context context) throws IOException {
@@ -880,6 +873,13 @@ public class LocationService extends IntentService {
                 }
             }
         }
+    }
+
+    private static int getEGM96Integer(InputStream is, int row, int col) throws IOException {
+        int k = row * EGM96_COLS + col;
+        is.reset();
+        is.skip(k * 2);
+        return is.read() * 256 + is.read();
     }
 
     private static List<String> reverseGeocode(Location location, Context context) {

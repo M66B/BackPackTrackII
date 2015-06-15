@@ -151,6 +151,21 @@
                 android:key="pref_passive_mindist"
                 android:summary="@string/summary_mindist" />
         </PreferenceScreen>
+        <PreferenceScreen android:title="@string/title_correction">
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="pref_enabled"
+                android:key="pref_correction_enabled"
+                android:summary="@string/summary_correction_enabled"
+                android:title="@string/title_correction_enabled" />
+            <Preference
+                android:summary="@string/summary_correction_egm96"
+                android:title="@string/title_correction_egm96">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="http://worldwind.arc.nasa.gov/worldwind-nosa-1.3.html" />
+            </Preference>
+        </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_recognition">
             <CheckBoxPreference
                 android:defaultValue="true"
@@ -280,13 +295,6 @@
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="http://www.gnu.org/licenses/gpl.txt" />
-        </Preference>
-        <Preference
-            android:summary="@string/summary_egm96"
-            android:title="@string/title_egm96">
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:data="http://worldwind.arc.nasa.gov/worldwind-nosa-1.3.html" />
         </Preference>
     </PreferenceCategory>
 </PreferenceScreen>

@@ -16,7 +16,7 @@
 
     <string name="title_app_settings">Settings</string>
 
-    <string name="title_tracking">Tracking</string>
+    <string name="title_tracking">Location tracking</string>
     <string name="title_enabled">Tracking enabled</string>
     <string name="title_interval">Tracking interval: %s seconds</string>
     <string name="title_altitude">Altitude preferred</string>
@@ -34,6 +34,10 @@
     <string name="title_passive_enabled">Passive locations enabled</string>
     <string name="title_passive_bearing">Bearing change: %s degrees</string>
     <string name="title_passive_altitude">Altitude change: %s meters</string>
+
+    <string name="title_correction">Altitude correction</string>
+    <string name="title_correction_enabled">Correction enabled</string>
+    <string name="title_correction_egm96">EGM96 license</string>
 
     <string name="title_recognition">Activity recognition</string>
     <string name="title_recognition_enabled">Activity recognition enabled</string>
@@ -61,7 +65,6 @@
     <string name="title_support">Support</string>
     <string name="title_author">Author</string>
     <string name="title_license">License</string>
-    <string name="title_egm96">EGM96</string>
 
     <string name="summary_edit">Add, change or delete waypoints</string>
     <string name="summary_share">Tap to write and share a GPX file\nLast share: %s</string>
@@ -86,6 +89,9 @@
     <string name="summary_passive_bearing">Use passive location updates when bearing changes for more than the selected number of degrees</string>
     <string name="summary_passive_altitude">Use passive location updates when altitude changes for more than the selected number of meters</string>
 
+    <string name="summary_correction_enabled">Enable GPS altitude correction using EGM96</string>
+    <string name="summary_correction_egm96" translatable="false">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nTap for more information (will start the browser)</string>
+
     <string name="summary_recognition_enabled">Recognize if you are still or moving and disable tracking when you are still</string>
     <string name="summary_recognition_interval">Recognize your activity every selected number of seconds</string>
     <string name="summary_recognition_confidence">Recognize a new activity when the confidence is higher than the selected percentage</string>
@@ -105,7 +111,6 @@
     <string name="summary_support">Tap to go to the support forum to report issues, request features or ask questions (will start the browser)</string>
     <string name="summary_author">Marcel Bokhorst (M66B)\nTap for details (will start the browser)</string>
     <string name="summary_license">GNU General Public License version 3\nTap for details (will start the browser)</string>
-    <string name="summary_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nTap for more information (will start the browser)</string>
 
     <string name="title_trackpoint">Trackpoint</string>
     <string name="title_waypoint">Waypoint</string>

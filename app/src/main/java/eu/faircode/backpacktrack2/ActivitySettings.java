@@ -95,6 +95,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_PASSIVE_MINTIME = "pref_passive_mintime";
     public static final String PREF_PASSIVE_MINDIST = "pref_passive_mindist";
 
+    public static final String PREF_CORRECTION_ENABLED = "pref_correction_enabled";
+
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
     public static final String PREF_RECOGNITION_INTERVAL_STILL = "pref_recognition_interval_still";
     public static final String PREF_RECOGNITION_INTERVAL_MOVING = "pref_recognition_interval_moving";
@@ -133,6 +135,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_PASSIVE_INACCURATE = "10"; // meters
     public static final String DEFAULT_PASSIVE_MINTIME = "1"; // seconds
     public static final String DEFAULT_PASSIVE_MINDIST = "0"; // meters
+
+    public static final boolean DEFAULT_CORRECTION_ENABLED = true;
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
     public static final String DEFAULT_RECOGNITION_INTERVAL_STILL = "60"; // seconds

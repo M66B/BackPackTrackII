@@ -35,6 +35,10 @@
     <string name="title_passive_bearing">Richtungsänderung: %s Grad</string>
     <string name="title_passive_altitude">Höhenveränderung: %s Meter</string>
 
+    <string name="title_correction">Altitude correction</string>
+    <string name="title_correction_enabled">Correction enabled</string>
+    <string name="title_correction_egm96">EGM96 Lizenz</string>
+
     <string name="title_recognition">Aktivitätserkennung</string>
     <string name="title_recognition_enabled">Aktivitätserkennung aktiviert</string>
     <string name="title_recognition_interval_still">Aktivitätserkennung bei Stillstand: %s Sekunden</string>
@@ -61,7 +65,6 @@
     <string name="title_support">Problem melden</string>
     <string name="title_author">Verfasser</string>
     <string name="title_license">Lizenz</string>
-    <string name="title_egm96">EGM96</string>
 
     <string name="summary_edit">Wegpunkte hinzufügen, ändern oder entfernen</string>
     <string name="summary_share">Klicken um eine GPX Datei zu erstellen und teilen\nLetzte Teilung: %s</string>
@@ -86,6 +89,8 @@
     <string name="summary_passive_bearing">Benutze passive Standortabfragen wen sich die Richtung um mehr als die ausgewählte Gradzahl ändert</string>
     <string name="summary_passive_altitude">Benutze passive Standortabfragen wen sich die Höhe um mehr als die ausgewählte Anzahl von Meter ändert</string>
 
+    <string name="summary_correction_enabled">Enable GPS altitude correction using EGM96</string>
+
     <string name="summary_recognition_enabled">Erkennen ob Sie sich bewegen oder stillstehen, und Tracking ausschalten wenn Sie stillstehen</string>
     <string name="summary_recognition_interval">Aktivität jede Anzahl von Sekunden ermitteln</string>
     <string name="summary_recognition_confidence">Eine neue Aktivität erkennen wenn die Präzision höher ist als die ausgewählte Prozentzahl</string>
@@ -105,7 +110,6 @@
     <string name="summary_support">Klicken um das Support Forum zu öffnen (Öffnet im Browser)</string>
     <string name="summary_author">Marcel Bokhorst (M66B)\nKlicken für Details (Öffnet im Browser)</string>
     <string name="summary_license">Marcel Bokhorst (M66B)\nKlicken für Details (Öffnet im Browser)</string>
-    <string name="summary_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAlle Rechte vorbehalten.\nKlicken für mehr Informationen (öffnet im Browser)</string>
 
     <string name="title_trackpoint">Trackpoint</string>
     <string name="title_waypoint">Wegpunkt</string>
