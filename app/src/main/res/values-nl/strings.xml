@@ -20,20 +20,20 @@
     <string name="title_enabled">Volgen aan</string>
     <string name="title_interval">Volg interval: %s seconden</string>
     <string name="title_altitude">Bij voorkeur hoogte</string>
-    <string name="title_tp_accuracy">Voorkeur trackpoint-nauwkeurigheid: %s meters</string>
-    <string name="title_wp_accuracy">Voorkeur waypoint-nauwkeurigheid: %s meters</string>
+    <string name="title_tp_accuracy">Voorkeur trackpoint nauwkeurigheid: %s meter</string>
+    <string name="title_wp_accuracy">Voorkeur waypoint nauwkeurigheid: %s meter</string>
     <string name="title_timeout">Locatie time-out: %s seconden</string>
     <string name="title_check_time">Controleer satellieten: %s seconden</string>
     <string name="title_check_sat">Vereiste satellieten: %s</string>
-    <string name="title_inaccurate">Filter onnauwkeurige locaties: %s meters</string>
-    <string name="title_nearby">Filter locaties dichtbij: %s meters</string>
+    <string name="title_inaccurate">Filter onnauwkeurige locaties: %s meter</string>
+    <string name="title_nearby">Filter locaties dichtbij: %s meter</string>
     <string name="title_mintime">Minimale bijwerktijd: %s seconden</string>
-    <string name="title_mindist">Minimale bijwerkafstand: %s meters</string>
+    <string name="title_mindist">Minimale bijwerkafstand: %s meter</string>
 
     <string name="title_passive">Passieve locaties</string>
     <string name="title_passive_enabled">Passieve locaties aan</string>
     <string name="title_passive_bearing">Richtingsverandering: %s graden</string>
-    <string name="title_passive_altitude">Hoogteverandering: %s meters</string>
+    <string name="title_passive_altitude">Hoogteverandering: %s meter</string>
 
     <string name="title_correction">Hoogtecorrectie</string>
     <string name="title_correction_enabled">Hoogtecorrectie aan</string>
@@ -50,7 +50,7 @@
 
     <string name="title_step_counter">Stappenteller</string>
     <string name="title_step_delta">Bijwerken: %s stappen</string>
-    <string name="title_step_size">Stapgrootte: %s centimeters</string>
+    <string name="title_step_size">Stapgrootte: %s centimeter</string>
     <string name="title_weight">Gewicht: %s kilogram</string>
 
     <string name="title_blog">WordPress weblog</string>
@@ -146,8 +146,8 @@
 
     <string name="msg_notification">%1$s %2$s @%3$sm #%4$d</string>
     <string name="msg_idle">Laatste @%1$s %2$s</string>
-    <string name="msg_acquiring">Zoeken ...</string>
-    <string name="msg_acquired">Gevonden @%1$s %2$s</string>
+    <string name="msg_acquiring">Bepalen ...</string>
+    <string name="msg_acquired">Bepaald @%1$s %2$s</string>
 
     <string name="msg_added">Toegevoegd \'%s\'</string>
     <string name="msg_updated">Bijgewerkt \'%s\'</string>
