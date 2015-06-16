@@ -163,12 +163,12 @@
     <string name="provider_network">Netwerk</string>
 
     <string name="still">Stil</string>
-    <string name="tilting">Kantelen</string>
-    <string name="on_foot">Te voet</string>
+    <string name="tilting">Kanteling</string>
+    <string name="on_foot">Lopen</string>
     <string name="walking">Wandelen</string>
     <string name="running">Rennen</string>
     <string name="on_bicycle">Fietsen</string>
-    <string name="in_vehicle">Voertuig</string>
+    <string name="in_vehicle">In voertuig</string>
     <string name="unknown">Onbekend</string>
     <string name="undefined">Ongedefinieerd</string>
 
