@@ -36,7 +36,7 @@
     <string name="title_passive_altitude">Altitude change: %s meters</string>
 
     <string name="title_correction">Altitude correction</string>
-    <string name="title_correction_enabled">Correction enabled</string>
+    <string name="title_correction_enabled">Altitude correction enabled</string>
     <string name="title_correction_egm96">EGM96 license</string>
 
     <string name="title_recognition">Activity recognition</string>
@@ -155,7 +155,7 @@
     <string name="msg_deleted">Deleted \'%s\'</string>
     <string name="msg_uploaded">Uploaded \'%s\'</string>
     <string name="msg_nolocation">Address \'%s\' not found</string>
-    <string name="msg_noaddress">No address found</string>
+    <string name="msg_noaddress">No addresses found</string>
     <string name="msg_geocoding">Geocoding \'%s\' ...</string>
     <string name="msg_rgeocoding">Reverse geocoding ...</string>
 
