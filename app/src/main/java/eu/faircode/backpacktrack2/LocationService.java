@@ -334,15 +334,17 @@ public class LocationService extends IntentService {
             return;
         }
 
+        float bchange = 0;
+        double achange = 0;
         boolean update = false;
 
         // Handle bearing change
         if (location.hasBearing()) {
             int pref_bearing_change = Integer.parseInt(prefs.getString(ActivitySettings.PREF_PASSIVE_BEARING, ActivitySettings.DEFAULT_PASSIVE_BEARING));
-            float delta = Math.abs(lastLocation.getBearing() - location.getBearing());
-            if (delta > 180)
-                delta = 360 - delta;
-            if (!lastLocation.hasBearing() || delta > pref_bearing_change) {
+            bchange = Math.abs(lastLocation.getBearing() - location.getBearing());
+            if (bchange > 180)
+                bchange = 360 - bchange;
+            if (!lastLocation.hasBearing() || bchange > pref_bearing_change) {
                 Log.w(TAG, "Bearing changed to " + location.getBearing());
                 update = true;
             }
@@ -351,8 +353,8 @@ public class LocationService extends IntentService {
         // Handle altitude change
         if (location.hasAltitude()) {
             int pref_altitude_change = Integer.parseInt(prefs.getString(ActivitySettings.PREF_PASSIVE_ALTITUDE, ActivitySettings.DEFAULT_PASSIVE_ALTITUDE));
-            double delta = Math.abs(lastLocation.getAltitude() - location.getAltitude());
-            if (!lastLocation.hasAltitude() || delta > pref_altitude_change) {
+            achange = Math.abs(lastLocation.getAltitude() - location.getAltitude());
+            if (!lastLocation.hasAltitude() || achange > pref_altitude_change) {
                 Log.w(TAG, "Altitude changed to " + location.getAltitude());
                 update = true;
             }
@@ -362,6 +364,8 @@ public class LocationService extends IntentService {
             new DatabaseHelper(this).insertLocation(location, null).close();
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
             updateState(this);
+            if (prefs.getBoolean(ActivitySettings.PREF_DEBUG, false))
+                toast(getString(R.string.title_trackpoint) + " " + bchange + "&#176; " + achange + "m", this);
         }
     }
 
@@ -813,7 +817,8 @@ public class LocationService extends IntentService {
                     toast(waypointName, this);
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(locationType == LOCATION_TRACKPOINT ? VIBRATE_SHORT : VIBRATE_LONG);
-            }
+            } else if (prefs.getBoolean(ActivitySettings.PREF_DEBUG, false))
+                toast(getString(R.string.title_trackpoint), this);
         } else
             Log.w(TAG, "Filtered location=" + location);
     }
