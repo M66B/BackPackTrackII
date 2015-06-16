@@ -998,9 +998,18 @@ public class LocationService extends IntentService {
             riStop.setAction(LocationService.ACTION_STOP_LOCATING);
             PendingIntent piStop = PendingIntent.getService(context, 4, riStop, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            // Add action
+            // Build stop intent
+            Intent riAccept = new Intent(context, LocationService.class);
+            riAccept.setAction(LocationService.ACTION_LOCATION_TIMEOUT);
+            PendingIntent piAccept = PendingIntent.getService(context, 5, riAccept, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            // Add actions
             notificationBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(android.R.string.cancel),
                     piStop);
+            Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
+            if (bestLocation != null)
+                notificationBuilder.addAction(android.R.drawable.ic_menu_save, context.getString(R.string.title_accept),
+                        piAccept);
         }
 
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);

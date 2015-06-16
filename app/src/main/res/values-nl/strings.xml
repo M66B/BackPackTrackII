@@ -117,6 +117,7 @@
 
     <string name="title_trackpoint">Trackpoint</string>
     <string name="title_waypoint">Waypoint</string>
+    <string name="title_accept">Accepteren</string>
 
     <string name="title_export">Exporteer GPX-bestand</string>
     <string name="title_track">Tracknaam:</string>
