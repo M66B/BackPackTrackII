@@ -36,7 +36,7 @@
     <string name="title_passive_altitude">Höhenveränderung: %s Meter</string>
 
     <string name="title_correction">Höhenkorrektur</string>
-    <string name="title_correction_enabled">Korrektur aktiviert</string>
+    <string name="title_correction_enabled">Höhenkorrektur aktiviert</string>
     <string name="title_correction_egm96">EGM96 Lizenz</string>
 
     <string name="title_recognition">Aktivitätserkennung</string>
@@ -155,7 +155,7 @@
     <string name="msg_deleted">Gelöscht \'%s\'</string>
     <string name="msg_uploaded">Hochgeladen \'%s\'</string>
     <string name="msg_nolocation">Adresse \'%s\' nicht gefunden</string>
-    <string name="msg_noaddress">Keine Adresse gefunden</string>
+    <string name="msg_noaddress">Keine Adressen gefunden</string>
     <string name="msg_geocoding">Geocoding \'%s\' ...</string>
     <string name="msg_rgeocoding">Umgewandelte Geocoding ...</string>
 
