@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -598,7 +600,7 @@ public class LocationService extends IntentService {
         if (!recognition)
             return;
 
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS) {
+        if (hasPlayServices(context)) {
             GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
             if (gac.blockingConnect().isSuccess()) {
                 Log.w(TAG, "GoogleApiClient connected");
@@ -618,7 +620,7 @@ public class LocationService extends IntentService {
     }
 
     private static void stopActivityRecognition(final Context context) {
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS) {
+        if (hasPlayServices(context)) {
             GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
             if (gac.blockingConnect().isSuccess()) {
                 Log.w(TAG, "GoogleApiClient connected");
@@ -1072,6 +1074,26 @@ public class LocationService extends IntentService {
                 Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public static boolean hasPlayServices(Context context) {
+        return (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS);
+    }
+
+    public static boolean hasStepCounter(Context context) {
+        SensorManager sm = (SensorManager) context.getSystemService(SENSOR_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            return (sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null);
+        else
+            return false;
+    }
+
+    public static boolean hasSignificantMotion(Context context) {
+        SensorManager sm = (SensorManager) context.getSystemService(SENSOR_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
+            return (sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION) != null);
+        else
+            return false;
     }
 
     private static boolean debugMode(Context context) {

@@ -14,8 +14,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -49,8 +47,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
@@ -382,7 +378,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref_check.setEnabled(false);
 
         // Check for Play services
-        boolean playServices = (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS);
+        boolean playServices = LocationService.hasPlayServices(this);
         findPreference(PREF_ACTIVITY_HISTORY).setEnabled(playServices);
         findPreference(PREF_RECOGNITION_ENABLED).setEnabled(playServices);
         findPreference(PREF_RECOGNITION_INTERVAL_STILL).setEnabled(playServices);
@@ -394,17 +390,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         if (getPackageManager().queryIntentActivities(playStoreIntent, 0).size() > 0)
             pref_version.setIntent(playStoreIntent);
 
-        // Get available sensors
-        SensorManager sm = (SensorManager) getSystemService(SENSOR_SERVICE);
-        boolean stepCounter = false;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            stepCounter = (sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null);
-        boolean significantMotion = false;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-            significantMotion = (sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION) != null);
-
         // Step counting not available
-        if (!stepCounter) {
+        if (!LocationService.hasStepCounter(this)) {
             pref_step_history.setEnabled(false);
             pref_step_size.setEnabled(false);
             pref_step_update.setEnabled(false);
@@ -419,9 +406,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                             getString(R.string.msg_geocoder,
                                     getString(Geocoder.isPresent() ? R.string.msg_yes : R.string.msg_no)) + "\n" +
                             getString(R.string.msg_playservices,
-                                    getString(playServices ? R.string.msg_yes : R.string.msg_no)) + "\n" +
-                            getString(R.string.msg_stepcounter, getString(stepCounter ? R.string.msg_yes : R.string.msg_no)) + "\n" +
-                            getString(R.string.msg_significantmotion, getString(significantMotion ? R.string.msg_yes : R.string.msg_no)));
+                                    getString(LocationService.hasPlayServices(this) ? R.string.msg_yes : R.string.msg_no)) + "\n" +
+                            getString(R.string.msg_stepcounter, getString(LocationService.hasStepCounter(this) ? R.string.msg_yes : R.string.msg_no)) + "\n" +
+                            getString(R.string.msg_significantmotion, getString(LocationService.hasSignificantMotion(this) ? R.string.msg_yes : R.string.msg_no)));
         } catch (PackageManager.NameNotFoundException ex) {
             pref_version.setSummary(ex.toString());
         }
