@@ -52,6 +52,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
+import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
@@ -912,9 +913,26 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
         View viewHistory = inflater.inflate(R.layout.step_history, null);
 
+        // Show steps bar graph
+        Cursor c = db.getSteps(true);
+        GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvStep);
+        BarGraphSeries<DataPoint> seriesStep = new BarGraphSeries<DataPoint>();
+        int colTime = c.getColumnIndex("time");
+        int colCount = c.getColumnIndex("count");
+        while (c.moveToNext()) {
+            Date time = new Date(c.getLong(colTime));
+            seriesStep.appendData(new DataPoint(time, c.getInt(colCount)), true, Integer.MAX_VALUE);
+        }
+        graph.addSeries(seriesStep);
+
+        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)));
+        graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+        graph.getViewport().setScalable(true);
+        graph.getViewport().setScrollable(true);
+
         // Fill list
         ListView lv = (ListView) viewHistory.findViewById(R.id.lvStepHistory);
-        Cursor cursor = db.getSteps();
+        Cursor cursor = db.getSteps(false);
         StepAdapter adapter = new StepAdapter(ActivitySettings.this, cursor);
         lv.setAdapter(adapter);
 

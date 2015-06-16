@@ -177,10 +177,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery(query, new String[]{Long.toString(from), Long.toString(to)});
     }
 
-    public Cursor getSteps() {
+    public Cursor getSteps(boolean asc) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT *, ID AS _id FROM step";
-        query += " ORDER BY time DESC";
+        query += " ORDER BY time";
+        if (!asc)
+            query += " DESC";
         return db.rawQuery(query, new String[]{});
     }
 
