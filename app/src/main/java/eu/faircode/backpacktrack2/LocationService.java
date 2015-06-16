@@ -894,7 +894,7 @@ public class LocationService extends IntentService {
 
         // Get title
         String activity = getActivityName(activityType, context);
-        String bearing = "?";
+        String bearing = "-";
         String altitude = "?";
         if (lastLocation != null) {
             if (lastLocation.hasBearing())

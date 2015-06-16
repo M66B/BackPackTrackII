@@ -12,13 +12,13 @@
 
     <TextView
         android:id="@+id/tvActivity"
-        android:layout_width="65dp"
+        android:layout_width="90dp"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
         android:id="@+id/tvConfidence"
-        android:layout_width="35dp"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:gravity="right"
         android:textAppearance="?android:attr/textAppearanceSmall" />

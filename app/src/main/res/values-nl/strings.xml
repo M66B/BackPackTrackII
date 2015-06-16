@@ -21,8 +21,8 @@
     <string name="title_interval">Volg interval: %s seconden</string>
     <string name="title_steps">Volg te voet: %s stappen</string>
     <string name="title_altitude">Bij voorkeur hoogte</string>
-    <string name="title_tp_accuracy">Voorkeur trackpoint nauwkeurigheid: %s meter</string>
-    <string name="title_wp_accuracy">Voorkeur waypoint nauwkeurigheid: %s meter</string>
+    <string name="title_tp_accuracy">Trackpoint nauwkeurigheid: %s meter</string>
+    <string name="title_wp_accuracy">Waypoint nauwkeurigheid: %s meter</string>
     <string name="title_timeout">Locatie time-out: %s seconden</string>
     <string name="title_check_time">Controleer satellieten: %s seconden</string>
     <string name="title_check_sat">Vereiste satellieten: %s</string>
@@ -166,7 +166,7 @@
     <string name="provider_network">Netwerk</string>
 
     <string name="still">Stil</string>
-    <string name="tilting">Kanteling</string>
+    <string name="tilting">Kantelen</string>
     <string name="on_foot">Lopen</string>
     <string name="walking">Wandelen</string>
     <string name="running">Rennen</string>

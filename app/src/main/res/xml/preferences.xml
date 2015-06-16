@@ -276,7 +276,7 @@
                 android:title="@string/in_vehicle" />
             <Preference
                 android:icon="@drawable/explore"
-                android:title="@string/undefined" />
+                android:title="@string/unknown" />
         </PreferenceScreen>
         <Preference
             android:key="pref_version"
