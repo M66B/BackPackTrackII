@@ -169,7 +169,7 @@ public class LocationService extends IntentService {
 
         // Filter unknown activity
         boolean pref_unknown = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_UNKNOWN, ActivitySettings.DEFAULT_RECOGNITION_UNKNOWN);
-        if (pref_unknown && activity.getType() == DetectedActivity.UNKNOWN) {
+        if (pref_unknown && activity.getType() == DetectedActivity.UNKNOWN && !lastStill) {
             Log.w(TAG, "Filtering " + activity);
             return;
         }
