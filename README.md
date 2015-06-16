@@ -141,7 +141,9 @@ The following libraries are being used:
 * [aXMLRPC](https://github.com/timroes/aXMLRPC) (XML-RPC)
 * [jdom2](http://www.jdom.org/) (GPX)
 
-Screenshot
-----------
+Screenshots
+-----------
 
-<img src="screenshot.png"/>
+<img src="screenshot1.png"/>
+
+<img src="screenshot2.png"/>
