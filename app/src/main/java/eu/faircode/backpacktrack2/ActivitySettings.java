@@ -37,6 +37,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -117,6 +118,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_BLOGPWD = "pref_blogpwd";
 
     public static final String PREF_VERSION = "pref_version";
+    public static final String PREF_SUPPORT = "pref_support";
+    public static final String PREF_DEBUG = "pref_debug";
 
     // Preference defaults
     public static final boolean DEFAULT_ENABLED = true;
@@ -257,10 +260,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         Preference pref_location_history = findPreference(PREF_LOCATION_HISTORY);
         Preference pref_activity_history = findPreference(PREF_ACTIVITY_HISTORY);
         Preference pref_step_history = findPreference(PREF_STEP_HISTORY);
-        Preference pref_version = findPreference(PREF_VERSION);
         Preference pref_step_update = findPreference(PREF_STEP_DELTA);
         Preference pref_step_size = findPreference(PREF_STEP_SIZE);
         Preference pref_weight = findPreference(PREF_WEIGHT);
+        Preference pref_version = findPreference(PREF_VERSION);
+        Preference pref_support = findPreference(PREF_SUPPORT);
 
         // Set titles/summaries
         updateTitle(prefs, PREF_SHARE);
@@ -421,6 +425,22 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         } catch (PackageManager.NameNotFoundException ex) {
             pref_version.setSummary(ex.toString());
         }
+
+        // Debug mode switching
+        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Object item = adapterView.getItemAtPosition(position);
+                if (item instanceof Preference && PREF_SUPPORT.equals(((Preference) item).getKey())) {
+                    SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+                    boolean debug = !prefs.getBoolean(PREF_DEBUG, false);
+                    prefs.edit().putBoolean(PREF_DEBUG, debug).apply();
+                    Toast.makeText(ActivitySettings.this, "Debug " + debug, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override

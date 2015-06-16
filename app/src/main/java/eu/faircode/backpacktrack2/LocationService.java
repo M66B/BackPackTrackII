@@ -1074,6 +1074,11 @@ public class LocationService extends IntentService {
         });
     }
 
+    private static boolean debugMode(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(ActivitySettings.PREF_DEBUG, false);
+    }
+
     // Serialization
 
     public static class LocationSerializer implements JsonSerializer<Location> {
