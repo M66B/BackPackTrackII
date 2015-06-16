@@ -27,14 +27,28 @@ public class StepCounterService extends Service {
             int steps = (int) sensorEvent.values[0];
             Log.w(TAG, "Step count=" + steps);
 
+            // Check delta
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(StepCounterService.this);
             int last = prefs.getInt(ActivitySettings.PREF_LAST_STEP, -1);
             int delta = Integer.parseInt(prefs.getString(ActivitySettings.PREF_STEP_DELTA, ActivitySettings.DEFAULT_STEP_DELTA));
             if (last < 0 || steps - last >= delta) {
+                // Update last step count
                 prefs.edit().putInt(ActivitySettings.PREF_LAST_STEP, steps).apply();
+
                 if (last >= 0) {
-                    new DatabaseHelper(StepCounterService.this).updateSteps(new Date().getTime(), steps - last).close();
+                    // Update total step count
+                    int stepped = steps - last;
+                    new DatabaseHelper(StepCounterService.this).updateSteps(new Date().getTime(), stepped).close();
                     LocationService.updateState(StepCounterService.this);
+
+                    // Check accumulated steps
+                    int asteps = prefs.getInt(ActivitySettings.PREF_LAST_STEPS, 0);
+                    int adelta = Integer.parseInt(prefs.getString(ActivitySettings.PREF_STEPS, ActivitySettings.DEFAULT_STEPS));
+                    if (adelta > 0 && asteps + stepped > adelta) {
+                        prefs.edit().remove(ActivitySettings.PREF_LAST_STEPS);
+                        LocationService.startLocating(StepCounterService.this);
+                    } else
+                        prefs.edit().putInt(ActivitySettings.PREF_LAST_STEPS, asteps + stepped).apply();
                 }
             }
         }

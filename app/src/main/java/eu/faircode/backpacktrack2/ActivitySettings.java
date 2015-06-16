@@ -76,6 +76,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     public static final String PREF_ENABLED = "pref_enabled";
     public static final String PREF_INTERVAL = "pref_interval";
+    public static final String PREF_STEPS = "pref_steps";
     public static final String PREF_ALTITUDE = "pref_altitude";
     public static final String PREF_TP_ACCURACY = "pref_accuracy";
     public static final String PREF_WP_ACCURACY = "pref_wp_accuracy";
@@ -120,6 +121,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     // Preference defaults
     public static final boolean DEFAULT_ENABLED = true;
     public static final String DEFAULT_INTERVAL = "180"; // seconds
+    public static final String DEFAULT_STEPS = "250"; // steps
     public static final boolean DEFAULT_ALTITUDE = true;
     public static final String DEFAULT_TP_ACCURACY = "20"; // meters
     public static final String DEFAULT_WP_ACCURACY = "10"; // meters
@@ -160,6 +162,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_SATS_FIXED = "pref_sats_fixed";
     public static final String PREF_SATS_VISIBLE = "pref_sats_visible";
     public static final String PREF_LAST_STEP = "pref_last_step";
+    public static final String PREF_LAST_STEPS = "pref_last_steps";
 
     // Remember last values
     public static final String PREF_LAST_ACTIVITY = "pref_last_activity";
@@ -252,6 +255,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         Preference pref_share = findPreference(PREF_SHARE);
         Preference pref_upload = findPreference(PREF_UPLOAD);
         Preference pref_enabled = findPreference(PREF_ENABLED);
+        Preference pref_steps = findPreference(PREF_STEPS);
         Preference pref_check = findPreference(PREF_SETTINGS);
         Preference pref_location_history = findPreference(PREF_LOCATION_HISTORY);
         Preference pref_activity_history = findPreference(PREF_ACTIVITY_HISTORY);
@@ -260,13 +264,13 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         Preference pref_step_size = findPreference(PREF_STEP_SIZE);
         Preference pref_weight = findPreference(PREF_WEIGHT);
         Preference pref_version = findPreference(PREF_VERSION);
-        Preference pref_support = findPreference(PREF_SUPPORT);
 
         // Set titles/summaries
         updateTitle(prefs, PREF_SHARE);
         updateTitle(prefs, PREF_UPLOAD);
 
         updateTitle(prefs, PREF_INTERVAL);
+        updateTitle(prefs, PREF_STEPS);
         updateTitle(prefs, PREF_ALTITUDE);
         updateTitle(prefs, PREF_TP_ACCURACY);
         updateTitle(prefs, PREF_WP_ACCURACY);
@@ -392,6 +396,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Step counting not available
         if (!LocationService.hasStepCounter(this)) {
+            pref_steps.setEnabled(false);
             pref_step_history.setEnabled(false);
             pref_step_size.setEnabled(false);
             pref_step_update.setEnabled(false);
@@ -969,6 +974,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         else if (PREF_INTERVAL.equals(key))
             pref.setTitle(getString(R.string.title_interval, prefs.getString(key, DEFAULT_INTERVAL)));
+        else if (PREF_STEPS.equals(key))
+            pref.setTitle(getString(R.string.title_steps, prefs.getString(key, DEFAULT_STEPS)));
         else if (PREF_TP_ACCURACY.equals(key))
             pref.setTitle(getString(R.string.title_tp_accuracy, prefs.getString(key, DEFAULT_TP_ACCURACY)));
         else if (PREF_WP_ACCURACY.equals(key))

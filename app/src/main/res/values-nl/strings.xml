@@ -19,6 +19,7 @@
     <string name="title_tracking">Locatie volgen</string>
     <string name="title_enabled">Volgen aan</string>
     <string name="title_interval">Volg interval: %s seconden</string>
+    <string name="title_steps">Volg te voet: %s stappen</string>
     <string name="title_altitude">Bij voorkeur hoogte</string>
     <string name="title_tp_accuracy">Voorkeur trackpoint nauwkeurigheid: %s meter</string>
     <string name="title_wp_accuracy">Voorkeur waypoint nauwkeurigheid: %s meter</string>
@@ -76,6 +77,7 @@
     <string name="summary_loc_settings">Tap to open the Android location settings</string>
 
     <string name="summary_interval">Try to acquire a new location every selected number of seconds</string>
+    <string name="summary_steps">Try to acquire a new location every selected number of steps (enter zero to disable)</string>
     <string name="summary_altitude">Prefer less accurate locations with altitude information over more accurate locations without altitude information</string>
     <string name="summary_accuracy">Stop acquiring a location after a location with the selected accuracy has been acquired</string>
     <string name="summary_timeout">Always stop acquiring a location after the selected number of seconds</string>

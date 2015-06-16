@@ -191,8 +191,15 @@ public class LocationService extends IntentService {
             prefs.edit().putInt(ActivitySettings.PREF_LAST_CONFIDENCE, activity.getConfidence()).apply();
             updateState(this);
 
-            // Stop/start repeating alarm
             boolean still = (activity.getType() == DetectedActivity.STILL);
+            boolean onfoot = (activity.getType() == DetectedActivity.ON_FOOT || activity.getType() == DetectedActivity.WALKING);
+            int steps = Integer.parseInt(prefs.getString(ActivitySettings.PREF_STEPS, ActivitySettings.DEFAULT_STEPS));
+
+            // Clear accumulated steps
+            if (!still && !onfoot)
+                prefs.edit().remove(ActivitySettings.PREF_LAST_STEPS).apply();
+
+            // Stop/start repeating alarm
             if (lastStill != still) {
                 // Restart activity recognition if needed
                 int intervalStill = Integer.parseInt(prefs.getString(ActivitySettings.PREF_RECOGNITION_INTERVAL_STILL, ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_STILL));
@@ -206,11 +213,10 @@ public class LocationService extends IntentService {
                 if (still) {
                     stopRepeatingAlarm(this);
                     stopLocating(this);
-                } else
+                } else if (!onfoot || steps == 0 || !hasStepCounter(this))
                     startRepeatingAlarm(this);
             }
 
-            boolean onfoot = (activity.getType() == DetectedActivity.ON_FOOT || activity.getType() == DetectedActivity.WALKING);
             if (onfoot)
                 startService(new Intent(this, StepCounterService.class));
             else
@@ -553,14 +559,12 @@ public class LocationService extends IntentService {
 
         updateState(context);
 
-        // Conditionally start repeating alarm
+        // Start activity recognition / repeating alarm
         boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
-        boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
-        if (!recognition || !still)
+        if (recognition)
+            startActivityRecognition(context);
+        else
             startRepeatingAlarm(context);
-
-        // Request activity updates
-        startActivityRecognition(context);
 
         // Request passive location updates
         boolean passive = prefs.getBoolean(ActivitySettings.PREF_PASSIVE_ENABLED, ActivitySettings.DEFAULT_PASSIVE_ENABLED);
@@ -595,11 +599,6 @@ public class LocationService extends IntentService {
     }
 
     private static void startActivityRecognition(final Context context) {
-        final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
-        if (!recognition)
-            return;
-
         if (hasPlayServices(context)) {
             GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
             if (gac.blockingConnect().isSuccess()) {
@@ -608,6 +607,7 @@ public class LocationService extends IntentService {
                 activityIntent.setAction(LocationService.ACTION_ACTIVITY);
                 PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                 boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
                 String setting = (still ? ActivitySettings.PREF_RECOGNITION_INTERVAL_STILL : ActivitySettings.PREF_RECOGNITION_INTERVAL_MOVING);
                 String standard = (still ? ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_STILL : ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_MOVING);
@@ -628,6 +628,10 @@ public class LocationService extends IntentService {
                 activityIntent.setAction(LocationService.ACTION_ACTIVITY);
                 PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(gac, pi);
+
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                prefs.edit().remove(ActivitySettings.PREF_LAST_ACTIVITY).apply();
+                prefs.edit().remove(ActivitySettings.PREF_LAST_CONFIDENCE).apply();
                 Log.w(TAG, "Canceled activity updates");
             }
         }
@@ -655,7 +659,7 @@ public class LocationService extends IntentService {
         Log.w(TAG, "Stop repeating alarm");
     }
 
-    private static void startLocating(Context context) {
+    public static void startLocating(Context context) {
         Log.w(TAG, "Start locating");
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
