@@ -44,8 +44,8 @@ public class StepCounterService extends Service {
                     // Check accumulated steps
                     int asteps = prefs.getInt(ActivitySettings.PREF_LAST_STEPS, 0);
                     int adelta = Integer.parseInt(prefs.getString(ActivitySettings.PREF_STEPS, ActivitySettings.DEFAULT_STEPS));
-                    if (adelta > 0 && asteps + stepped > adelta) {
-                        prefs.edit().remove(ActivitySettings.PREF_LAST_STEPS);
+                    if (adelta > 0 && asteps + stepped >= adelta) {
+                        prefs.edit().putInt(ActivitySettings.PREF_LAST_STEPS, asteps + stepped - adelta).apply();
                         LocationService.startLocating(StepCounterService.this);
                     } else
                         prefs.edit().putInt(ActivitySettings.PREF_LAST_STEPS, asteps + stepped).apply();
