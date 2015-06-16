@@ -144,6 +144,6 @@ The following libraries are being used:
 Screenshots
 -----------
 
-<img src="screenshot1.png"/>
+<img src="screenshot1_scaled.png"/>
 
-<img src="screenshot2.png"/>
+<img src="screenshot2_scaled.png"/>
