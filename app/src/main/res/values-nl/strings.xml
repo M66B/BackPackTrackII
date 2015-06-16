@@ -1,0 +1,187 @@
+<resources>
+    <string name="app_name">BackPackTrack II</string>
+    <string name="app_description">Neem voortdurend uw locatie op, zonder uw battery leeg te maken</string>
+
+    <string name="title_action">Acties</string>
+    <string name="title_edit">Bewerk waypointen</string>
+    <string name="title_share">Deel GPX-bestand</string>
+    <string name="title_upload">Upload GPX-bestand</string>
+    <string name="title_location_history">Locatiegeschiedenis</string>
+    <string name="title_activity_history">Activiteitsgeschiedenis</string>
+    <string name="title_step_history">Wandelgeschiedenis</string>
+    <string name="title_loc_settings">Locatie-instellingen</string>
+
+    <string name="title_geocode">Geocode adres</string>
+    <string name="title_rgeocode">Reverse geocode locatie</string>
+
+    <string name="title_app_settings">Instellingen</string>
+
+    <string name="title_tracking">Locatie volgen</string>
+    <string name="title_enabled">Volgen aan</string>
+    <string name="title_interval">Volg interval: %s seconden</string>
+    <string name="title_altitude">Bij voorkeur hoogte</string>
+    <string name="title_tp_accuracy">Voorkeur trackpoint-nauwkeurigheid: %s meters</string>
+    <string name="title_wp_accuracy">Voorkeur waypoint-nauwkeurigheid: %s meters</string>
+    <string name="title_timeout">Locatie time-out: %s seconden</string>
+    <string name="title_check_time">Controleer satellieten: %s seconden</string>
+    <string name="title_check_sat">Vereiste satellieten: %s</string>
+    <string name="title_inaccurate">Filter onnauwkeurige locaties: %s meters</string>
+    <string name="title_nearby">Filter locaties dichtbij: %s meters</string>
+    <string name="title_mintime">Minimale bijwerktijd: %s seconden</string>
+    <string name="title_mindist">Minimale bijwerkafstand: %s meters</string>
+
+    <string name="title_passive">Passieve locaties</string>
+    <string name="title_passive_enabled">Passieve locaties aan</string>
+    <string name="title_passive_bearing">Richtingsverandering: %s graden</string>
+    <string name="title_passive_altitude">Hoogteverandering: %s meters</string>
+
+    <string name="title_correction">Hoogtecorrectie</string>
+    <string name="title_correction_enabled">Hoogtecorrectie aan</string>
+    <string name="title_correction_egm96">EGM96 licentie</string>
+
+    <string name="title_recognition">Activiteitsherkenning</string>
+    <string name="title_recognition_enabled">Activiteitsherkenning aan</string>
+    <string name="title_recognition_interval_still">Activiteitsherkenning stil: %s seconden</string>
+    <string name="title_recognition_interval_moving">Activiteitsherkenning beweging: %s seconden</string>
+    <string name="title_recognition_confidence">Betrouwbaarheid activiteitsherkenning: %s%%</string>
+    <string name="title_recognition_tilting">Filter activiteit \'kantelen\'</string>
+    <string name="title_recognition_unknown">Filter activiteit \'onbekend\'</string>
+    <string name="title_recognition_history">Geschiedenis aan</string>
+
+    <string name="title_step_counter">Stappenteller</string>
+    <string name="title_step_delta">Bijwerken: %s stappen</string>
+    <string name="title_step_size">Stapgrootte: %s centimeters</string>
+    <string name="title_weight">Gewicht: %s kilogram</string>
+
+    <string name="title_blog">WordPress weblog</string>
+    <string name="title_blogurl">URL: %s</string>
+    <string name="title_blogid">ID: %s</string>
+    <string name="title_bloguser">Gebruikersnaam: %s</string>
+    <string name="title_blogpwd">Wachtwoord: %s</string>
+    <string name="title_plugin">Plugin</string>
+
+    <string name="title_info">Informatie</string>
+    <string name="title_legend">Legenda</string>
+    <string name="title_version">Versie</string>
+    <string name="title_support">Ondersteuning</string>
+    <string name="title_author">Auteur</string>
+    <string name="title_license">Licentie</string>
+
+    <string name="summary_edit">Add, change or delete waypoints</string>
+    <string name="summary_share">Tap to write and share a GPX file\nLast share: %s</string>
+    <string name="summary_upload">Tap to write and upload a GPX file to a WordPress weblog\nLast upload: %s</string>
+    <string name="summary_location_history">Show the location history to verify everything works</string>
+    <string name="summary_activity_history">Show the activity history to verify everything works</string>
+    <string name="summary_step_history">Show the daily number of steps taken, distance walked and calories burned</string>
+    <string name="summary_loc_settings">Tap to open the Android location settings</string>
+
+    <string name="summary_interval">Try to acquire a new location every selected number of seconds</string>
+    <string name="summary_altitude">Prefer less accurate locations with altitude information over more accurate locations without altitude information</string>
+    <string name="summary_accuracy">Stop acquiring a location after a location with the selected accuracy has been acquired</string>
+    <string name="summary_timeout">Always stop acquiring a location after the selected number of seconds</string>
+    <string name="summary_check_time">Check the number of satellites after the selected number of seconds</string>
+    <string name="summary_check_sat">Required number of satellites to continue acquiring a location using the GPS</string>
+    <string name="summary_inaccurate">Filter locations less accurate than the selected number of meters</string>
+    <string name="summary_nearby">Filter locations closer than the selected number of meters to the last location, except when a location is more accurate than the last location</string>
+    <string name="summary_mintime">Minimum time between location updates</string>
+    <string name="summary_mindist">Minimum distance between location updates</string>
+
+    <string name="summary_passive_enabled">Use location updates requested by other applications</string>
+    <string name="summary_passive_bearing">Use passive location updates when bearing changes for more than the selected number of degrees</string>
+    <string name="summary_passive_altitude">Use passive location updates when altitude changes for more than the selected number of meters</string>
+
+    <string name="summary_correction_enabled">Enable GPS altitude correction using EGM96</string>
+    <string name="summary_correction_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nTap for more information (will start the browser)</string>
+
+    <string name="summary_recognition_enabled">Recognize if you are still or moving and disable tracking when you are still</string>
+    <string name="summary_recognition_interval">Recognize your activity every selected number of seconds</string>
+    <string name="summary_recognition_confidence">Recognize a new activity when the confidence is higher than the selected percentage</string>
+    <string name="summary_recognition_tilting">Consider the recognized activity \'tilting\' not as motion</string>
+    <string name="summary_recognition_unknown">Consider the recognized activity \'unknown\' not as motion</string>
+
+    <string name="summary_step_delta">Update the step counter every selected number of steps</string>
+    <string name="summary_step_size">Your step size in centimeters to calculate the distance walked</string>
+    <string name="summary_weight">Your weight in kilograms to calculate the number of calories burned</string>
+
+    <string name="summary_blogurl">WordPress weblog address</string>
+    <string name="summary_blogid">WordPress weblog identification\nUse 1 for single site installations</string>
+    <string name="summary_bloguser">WordPress user name</string>
+    <string name="summary_blogpwd">WordPress password</string>
+    <string name="summary_plugin">Tap to open the WordPress plugin page (will start the browser)</string>
+
+    <string name="summary_support">Tap to go to the support forum to report issues, request features or ask questions (will start the browser)</string>
+    <string name="summary_author">Marcel Bokhorst (M66B)\nTap for details (will start the browser)</string>
+    <string name="summary_license">GNU General Public License version 3\nTap for details (will start the browser)</string>
+
+    <string name="title_trackpoint">Trackpoint</string>
+    <string name="title_waypoint">Waypoint</string>
+
+    <string name="title_export">Exporteer GPX-bestand</string>
+    <string name="title_track">Tracknaam:</string>
+    <string name="title_extensions">Gebruik GPX-extensies (provider, snelheid, richting, nauwkeurigheid)</string>
+    <string name="title_delete">Verwijder gegevens na exporteren</string>
+    <string name="title_from">Van datum/tijd:</string>
+    <string name="title_to">Tot datum/tijd:</string>
+    <string name="title_pick">Kies</string>
+
+    <string name="header_altitude">Hgt.</string>
+    <string name="header_accuracy">Nwk.</string>
+    <string name="header_distance">Afst.</string>
+    <string name="header_bearing">&#176;</string>
+
+    <string name="header_steps">Stappen</string>
+    <string name="header_calories">Kcal</string>
+
+    <string name="msg_gps">GPS-provider: %s</string>
+    <string name="msg_network">Netwerkprovider: %s</string>
+    <string name="msg_noproviders">Zet een locatieprovider in de Android locatie-instellingen aan om deze applicatie te gebruiken</string>
+    <string name="msg_never">nooit</string>
+    <string name="msg_notset">niet gezet</string>
+    <string name="msg_geocoder">Geocoder: %s</string>
+    <string name="msg_playservices">Play services: %s</string>
+    <string name="msg_stepcounter">Stappenteller: %s</string>
+    <string name="msg_significantmotion">Significante beweging: %s</string>
+    <string name="msg_yes">ja</string>
+    <string name="msg_no">nee</string>
+
+    <string name="msg_notification">%1$s %2$s @%3$sm #%4$d</string>
+    <string name="msg_idle">Laatste @%1$s %2$s</string>
+    <string name="msg_acquiring">Zoeken ...</string>
+    <string name="msg_acquired">Gevonden @%1$s %2$s</string>
+
+    <string name="msg_added">Toegevoegd \'%s\'</string>
+    <string name="msg_updated">Bijgewerkt \'%s\'</string>
+    <string name="msg_delete">Verwijder \'%s\' ?</string>
+    <string name="msg_deleted">Verwijderd \'%s\'</string>
+    <string name="msg_uploaded">Uploaded \'%s\'</string>
+    <string name="msg_nolocation">Adres \'%s\' niet gevonden</string>
+    <string name="msg_noaddress">Geen adressen gevonden</string>
+    <string name="msg_geocoding">Geocoding \'%s\' ...</string>
+    <string name="msg_rgeocoding">Reverse geocoding ...</string>
+
+    <string name="provider_gps">GPS</string>
+    <string name="provider_network">Netwerk</string>
+
+    <string name="still">Stil</string>
+    <string name="tilting">Kantelen</string>
+    <string name="on_foot">Te voet</string>
+    <string name="walking">Wandelen</string>
+    <string name="running">Rennen</string>
+    <string name="on_bicycle">Fietsen</string>
+    <string name="in_vehicle">Voertuig</string>
+    <string name="unknown">Onbekend</string>
+    <string name="undefined">Ongedefinieerd</string>
+
+    <string name="direction_0">N</string>
+    <string name="direction_30">NNO</string>
+    <string name="direction_60">NO</string>
+    <string name="direction_90">O</string>
+    <string name="direction_120">ZO</string>
+    <string name="direction_150">ZZO</string>
+    <string name="direction_180">Z</string>
+    <string name="direction_210">ZZW</string>
+    <string name="direction_240">ZW</string>
+    <string name="direction_270">W</string>
+    <string name="direction_300">NW</string>
+    <string name="direction_330">NNW</string>
+</resources>
