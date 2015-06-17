@@ -38,10 +38,11 @@
     <string name="title_passive_bearing">Richtungsänderung: %s Grad</string>
     <string name="title_passive_altitude">Höhenveränderung: %s Meter</string>
 
-    <string name="title_correction">Höhenkorrektur</string>
-    <string name="title_correction_enabled">Höhenkorrektur aktiviert</string>
+    <string name="title_altitude_settings">Höhe</string>
+    <string name="title_correction_enabled">Korrektur</string>
     <string name="title_correction_egm96">EGM96 Lizenz</string>
-    <string name="title_correction_avg">Gleitender Mittelwert: %s Proben</string>
+    <string name="title_altitude_days">Graphical display: %s days</string>
+    <string name="title_altitude_avg">Gleitender Mittelwert: %s Proben</string>
 
     <string name="title_recognition">Aktivitätserkennung</string>
     <string name="title_recognition_enabled">Aktivitätserkennung aktiviert</string>
@@ -97,7 +98,8 @@
 
     <string name="summary_correction_enabled">Höhenkorrektur mittels EGM96 aktivieren</string>
     <string name="summary_correction_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nKlicken für Details (Öffnet im Browser)</string>
-    <string name="summary_correction_avg">Filtern des Rauschens der GPS-Höhe unter Verwendung eines gleitenden Mittelwerts der ausgewählten Anzahl von Proben</string>
+    <string name="summary_altitude_days">Number of days to display in the altitude graph</string>
+    <string name="summary_altitude_avg">Filtern des Rauschens der GPS-Höhe unter Verwendung eines gleitenden Mittelwerts der ausgewählten Anzahl von Proben</string>
 
     <string name="summary_recognition_enabled">Erkennen ob Sie sich bewegen oder stillstehen, und Tracking ausschalten wenn Sie stillstehen</string>
     <string name="summary_recognition_interval">Aktivität jede Anzahl von Sekunden ermitteln</string>

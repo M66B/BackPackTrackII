@@ -23,7 +23,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.EditTextPreference;
@@ -99,7 +98,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_PASSIVE_MINDIST = "pref_passive_mindist";
 
     public static final String PREF_CORRECTION_ENABLED = "pref_correction_enabled";
-    public static final String PREF_CORRECTION_AVERAGE = "pref_correction_average";
+    public static final String PREF_ALTITUDE_DAYS = "pref_altitude_days";
+    public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
 
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
     public static final String PREF_RECOGNITION_INTERVAL_STILL = "pref_recognition_interval_still";
@@ -147,7 +147,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_PASSIVE_MINDIST = "0"; // meters
 
     public static final boolean DEFAULT_CORRECTION_ENABLED = true;
-    public static final String DEFAULT_CORRECTION_AVERAGE = "5"; // samples
+    public static final String DEFAULT_ALTITUDE_DAYS = "30"; // days
+    public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
     public static final String DEFAULT_RECOGNITION_INTERVAL_STILL = "60"; // seconds
@@ -184,6 +185,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_LAST_TO = "pref_last_to";
 
     private static final int GEOCODER_RESULTS = 5;
+    private static final long DAY_MS = 24L * 3600L * 1000L;
 
     private DatabaseHelper db = null;
 
@@ -295,7 +297,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_PASSIVE_MINTIME);
         updateTitle(prefs, PREF_PASSIVE_MINDIST);
 
-        updateTitle(prefs, PREF_CORRECTION_AVERAGE);
+        updateTitle(prefs, PREF_ALTITUDE_DAYS);
+        updateTitle(prefs, PREF_ALTITUDE_AVG);
 
         updateTitle(prefs, PREF_RECOGNITION_INTERVAL_STILL);
         updateTitle(prefs, PREF_RECOGNITION_INTERVAL_MOVING);
@@ -819,8 +822,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Show altitude graph
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
-        int samples = Integer.parseInt(prefs.getString(PREF_CORRECTION_AVERAGE, DEFAULT_CORRECTION_AVERAGE));
-        Cursor c = db.getLocations(0, Long.MAX_VALUE, true, true, true);
+        int days = Integer.parseInt(prefs.getString(PREF_ALTITUDE_DAYS, DEFAULT_ALTITUDE_DAYS));
+        int samples = Integer.parseInt(prefs.getString(PREF_ALTITUDE_AVG, DEFAULT_ALTITUDE_AVG));
+        long to = new Date().getTime();
+        long from = to / DAY_MS * DAY_MS - days * DAY_MS;
+        Cursor c = db.getLocations(from, to, true, true, true);
         GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvLocation);
         LineGraphSeries<DataPoint> seriesAltitudeReal = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesAltitudeAvg = new LineGraphSeries<DataPoint>();
@@ -1032,8 +1038,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         else if (PREF_PASSIVE_MINDIST.equals(key))
             pref.setTitle(getString(R.string.title_mindist, prefs.getString(key, DEFAULT_PASSIVE_MINDIST)));
 
-        else if (PREF_CORRECTION_AVERAGE.equals(key))
-            pref.setTitle(getString(R.string.title_correction_avg, prefs.getString(key, DEFAULT_CORRECTION_AVERAGE)));
+        else if (PREF_ALTITUDE_DAYS.equals(key))
+            pref.setTitle(getString(R.string.title_altitude_days, prefs.getString(key, DEFAULT_ALTITUDE_DAYS)));
+        else if (PREF_ALTITUDE_AVG.equals(key))
+            pref.setTitle(getString(R.string.title_altitude_avg, prefs.getString(key, DEFAULT_ALTITUDE_AVG)));
 
         else if (PREF_RECOGNITION_INTERVAL_STILL.equals(key))
             pref.setTitle(getString(R.string.title_recognition_interval_still, prefs.getString(key, DEFAULT_RECOGNITION_INTERVAL_STILL)));
