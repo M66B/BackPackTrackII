@@ -462,6 +462,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             if ("".equals(prefs.getString(key, null)))
                 prefs.edit().remove(key).apply();
 
+        // Reset tracking by steps
+        if (PREF_STEPS.equals(key))
+            prefs.edit().remove(ActivitySettings.PREF_LAST_STEPS).apply();
+
         // Reset activity
         if (PREF_RECOGNITION_ENABLED.equals(key))
             prefs.edit().remove(PREF_LAST_ACTIVITY).apply();
