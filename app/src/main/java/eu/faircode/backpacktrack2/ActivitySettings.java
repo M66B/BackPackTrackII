@@ -48,6 +48,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.ValueDependentColor;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
@@ -98,7 +99,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_PASSIVE_MINDIST = "pref_passive_mindist";
 
     public static final String PREF_CORRECTION_ENABLED = "pref_correction_enabled";
-    public static final String PREF_ALTITUDE_DAYS = "pref_altitude_days";
     public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
 
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
@@ -147,7 +147,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_PASSIVE_MINDIST = "0"; // meters
 
     public static final boolean DEFAULT_CORRECTION_ENABLED = true;
-    public static final String DEFAULT_ALTITUDE_DAYS = "30"; // days
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
@@ -297,7 +296,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_PASSIVE_MINTIME);
         updateTitle(prefs, PREF_PASSIVE_MINDIST);
 
-        updateTitle(prefs, PREF_ALTITUDE_DAYS);
         updateTitle(prefs, PREF_ALTITUDE_AVG);
 
         updateTitle(prefs, PREF_RECOGNITION_INTERVAL_STILL);
@@ -822,36 +820,57 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Show altitude graph
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
-        int days = Integer.parseInt(prefs.getString(PREF_ALTITUDE_DAYS, DEFAULT_ALTITUDE_DAYS));
         int samples = Integer.parseInt(prefs.getString(PREF_ALTITUDE_AVG, DEFAULT_ALTITUDE_AVG));
-        long to = new Date().getTime();
-        long from = to / DAY_MS * DAY_MS - days * DAY_MS;
-        Cursor c = db.getLocations(from, to, true, true, true);
+        Cursor c = db.getLocations(0, Long.MAX_VALUE, true, true, true);
         GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvLocation);
         LineGraphSeries<DataPoint> seriesAltitudeReal = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesAltitudeAvg = new LineGraphSeries<DataPoint>();
         int colTime = c.getColumnIndex("time");
         int colAltitude = c.getColumnIndex("altitude");
+        double minAlt = 0;
+        double maxAlt = 0;
+        long minTime = new Date().getTime();
+        long maxTime = 0;
+        long from = new Date().getTime() / DAY_MS * DAY_MS - 30 * DAY_MS;
         double avg = 0;
         int n = 0;
         while (c.moveToNext()) {
-            Date time = new Date(c.getLong(colTime));
+            long time = c.getLong(colTime);
+            if (time > from && time < minTime)
+                minTime = time;
+            if (time > maxTime)
+                maxTime = time;
             if (!c.isNull(colAltitude)) {
                 double alt = c.getDouble(colAltitude);
+                if (alt < minAlt)
+                    minAlt = alt;
+                if (alt > maxAlt)
+                    maxAlt = alt;
                 avg = (n * avg + alt) / (n + 1);
                 if (n < samples)
                     n++;
-                seriesAltitudeReal.appendData(new DataPoint(time, alt), true, Integer.MAX_VALUE);
-                seriesAltitudeAvg.appendData(new DataPoint(time, avg), true, Integer.MAX_VALUE);
+                seriesAltitudeReal.appendData(new DataPoint(new Date(time), alt), true, Integer.MAX_VALUE);
+                seriesAltitudeAvg.appendData(new DataPoint(new Date(time), avg), true, Integer.MAX_VALUE);
             }
         }
+
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(minTime);
+        graph.getViewport().setMaxX(maxTime);
+
+        graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setMinY(minAlt);
+        graph.getViewport().setMaxY(maxAlt);
+
+        seriesAltitudeAvg.setDrawDataPoints(true);
+        seriesAltitudeAvg.setDataPointsRadius(3);
         seriesAltitudeReal.setColor(Color.GRAY);
+
         graph.addSeries(seriesAltitudeReal);
         graph.addSeries(seriesAltitudeAvg);
 
         graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
         graph.getGridLabelRenderer().setNumHorizontalLabels(2);
-        graph.getViewport().setScalable(true);
         graph.getViewport().setScrollable(true);
 
         // Fill list
@@ -961,17 +980,30 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         Cursor c = db.getSteps(true);
         GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvStep);
         BarGraphSeries<DataPoint> seriesStep = new BarGraphSeries<DataPoint>();
+        int max = 10000;
         int colTime = c.getColumnIndex("time");
         int colCount = c.getColumnIndex("count");
         while (c.moveToNext()) {
             Date time = new Date(c.getLong(colTime));
-            seriesStep.appendData(new DataPoint(time, c.getInt(colCount)), true, Integer.MAX_VALUE);
+            int count = c.getInt(colCount);
+            if (count > max)
+                max = count;
+            seriesStep.appendData(new DataPoint(time, count), true, Integer.MAX_VALUE);
         }
+
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(new Date().getTime() / DAY_MS * DAY_MS - 7 * DAY_MS);
+        graph.getViewport().setMaxX(new Date().getTime());
+
+        graph.getViewport().setYAxisBoundsManual(true);
+        graph.getViewport().setMinY(0);
+        graph.getViewport().setMaxY(max);
+
+        seriesStep.setSpacing(10);
         graph.addSeries(seriesStep);
 
         graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)));
         graph.getGridLabelRenderer().setNumHorizontalLabels(3);
-        graph.getViewport().setScalable(true);
         graph.getViewport().setScrollable(true);
 
         // Fill list
@@ -1038,8 +1070,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         else if (PREF_PASSIVE_MINDIST.equals(key))
             pref.setTitle(getString(R.string.title_mindist, prefs.getString(key, DEFAULT_PASSIVE_MINDIST)));
 
-        else if (PREF_ALTITUDE_DAYS.equals(key))
-            pref.setTitle(getString(R.string.title_altitude_days, prefs.getString(key, DEFAULT_ALTITUDE_DAYS)));
         else if (PREF_ALTITUDE_AVG.equals(key))
             pref.setTitle(getString(R.string.title_altitude_avg, prefs.getString(key, DEFAULT_ALTITUDE_AVG)));
 

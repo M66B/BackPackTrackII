@@ -41,7 +41,6 @@
     <string name="title_altitude_settings">Altitude</string>
     <string name="title_correction_enabled">Correction</string>
     <string name="title_correction_egm96">EGM96 license</string>
-    <string name="title_altitude_days">Graphical display: %s days</string>
     <string name="title_altitude_avg">Moving average: %s samples</string>
 
     <string name="title_recognition">Activity recognition</string>
@@ -98,7 +97,6 @@
 
     <string name="summary_correction_enabled">Enable GPS altitude correction using EGM96</string>
     <string name="summary_correction_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nTap for more information (will start the browser)</string>
-    <string name="summary_altitude_days">Number of days to display in the altitude graph</string>
     <string name="summary_altitude_avg">Filter the noise of the GPS altitude using a moving average with the selected number of samples</string>
 
     <string name="summary_recognition_enabled">Recognize if you are still or moving and disable tracking when you are still</string>
