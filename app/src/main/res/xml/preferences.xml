@@ -155,6 +155,12 @@
                 android:key="pref_passive_inaccurate"
                 android:summary="@string/summary_inaccurate" />
             <EditTextPreference
+                android:defaultValue="20"
+                android:dependency="pref_passive_enabled"
+                android:inputType="number"
+                android:key="pref_passive_nearby"
+                android:summary="@string/summary_nearby" />
+            <EditTextPreference
                 android:defaultValue="1"
                 android:dependency="pref_passive_enabled"
                 android:inputType="number"

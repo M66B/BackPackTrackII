@@ -328,8 +328,10 @@ public class LocationService extends IntentService {
         correctAltitude(location, this);
 
         // Filter nearby passive locations
-        int pref_nearby = Integer.parseInt(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
-        if (lastLocation.distanceTo(location) < pref_nearby) {
+        int pref_nearby = Integer.parseInt(prefs.getString(ActivitySettings.PREF_PASSIVE_NEARBY, ActivitySettings.DEFAULT_PASSIVE_NEARBY));
+        if (lastLocation.distanceTo(location) < pref_nearby &&
+                (lastLocation.hasAccuracy() ? lastLocation.getAccuracy() : Float.MAX_VALUE) <=
+                        (location.hasAccuracy() ? location.getAccuracy() : Float.MAX_VALUE)) {
             Log.w(TAG, "Filtering nearby passive location=" + location);
             return;
         }
@@ -365,7 +367,7 @@ public class LocationService extends IntentService {
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
             updateState(this);
             if (prefs.getBoolean(ActivitySettings.PREF_DEBUG, false))
-                toast(getString(R.string.title_trackpoint) + " " + bchange + "&#176; " + achange + "m", this);
+                toast(getString(R.string.title_trackpoint) + " " + Math.round(bchange) + "° / " + Math.round(achange) + "m", this);
         }
     }
 

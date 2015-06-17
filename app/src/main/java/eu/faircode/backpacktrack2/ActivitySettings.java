@@ -95,6 +95,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_PASSIVE_BEARING = "pref_passive_bearing";
     public static final String PREF_PASSIVE_ALTITUDE = "pref_passive_altitude";
     public static final String PREF_PASSIVE_INACCURATE = "pref_passive_inaccurate";
+    public static final String PREF_PASSIVE_NEARBY = "pref_passive_nearby";
     public static final String PREF_PASSIVE_MINTIME = "pref_passive_mintime";
     public static final String PREF_PASSIVE_MINDIST = "pref_passive_mindist";
 
@@ -143,6 +144,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_PASSIVE_BEARING = "15"; // degrees
     public static final String DEFAULT_PASSIVE_ALTITUDE = "10"; // meters
     public static final String DEFAULT_PASSIVE_INACCURATE = "10"; // meters
+    public static final String DEFAULT_PASSIVE_NEARBY = "20"; // meters
     public static final String DEFAULT_PASSIVE_MINTIME = "1"; // seconds
     public static final String DEFAULT_PASSIVE_MINDIST = "0"; // meters
 
@@ -293,6 +295,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_PASSIVE_BEARING);
         updateTitle(prefs, PREF_PASSIVE_ALTITUDE);
         updateTitle(prefs, PREF_PASSIVE_INACCURATE);
+        updateTitle(prefs, PREF_PASSIVE_NEARBY);
         updateTitle(prefs, PREF_PASSIVE_MINTIME);
         updateTitle(prefs, PREF_PASSIVE_MINDIST);
 
@@ -1081,6 +1084,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref.setTitle(getString(R.string.title_passive_altitude, prefs.getString(key, DEFAULT_PASSIVE_ALTITUDE)));
         else if (PREF_PASSIVE_INACCURATE.equals(key))
             pref.setTitle(getString(R.string.title_inaccurate, prefs.getString(key, DEFAULT_PASSIVE_INACCURATE)));
+        else if (PREF_PASSIVE_NEARBY.equals(key))
+            pref.setTitle(getString(R.string.title_nearby, prefs.getString(key, DEFAULT_PASSIVE_NEARBY)));
         else if (PREF_PASSIVE_MINTIME.equals(key))
             pref.setTitle(getString(R.string.title_mintime, prefs.getString(key, DEFAULT_PASSIVE_MINTIME)));
         else if (PREF_PASSIVE_MINDIST.equals(key))
