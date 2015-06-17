@@ -820,13 +820,13 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Show altitude graph
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
-        int samples = Integer.parseInt(prefs.getString(PREF_ALTITUDE_AVG, DEFAULT_ALTITUDE_AVG));
         Cursor c = db.getLocations(0, Long.MAX_VALUE, true, true, true);
         GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvLocation);
         LineGraphSeries<DataPoint> seriesAltitudeReal = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesAltitudeAvg = new LineGraphSeries<DataPoint>();
         int colTime = c.getColumnIndex("time");
         int colAltitude = c.getColumnIndex("altitude");
+        boolean data = false;
         double minAlt = 0;
         double maxAlt = 0;
         long minTime = new Date().getTime();
@@ -834,44 +834,52 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         long from = new Date().getTime() / DAY_MS * DAY_MS - 30 * DAY_MS;
         double avg = 0;
         int n = 0;
-        while (c.moveToNext()) {
-            long time = c.getLong(colTime);
-            if (time > from && time < minTime)
-                minTime = time;
-            if (time > maxTime)
-                maxTime = time;
+        int samples = Integer.parseInt(prefs.getString(PREF_ALTITUDE_AVG, DEFAULT_ALTITUDE_AVG));
+        while (c.moveToNext())
             if (!c.isNull(colAltitude)) {
+                data = true;
+
+                long time = c.getLong(colTime);
+                if (time > from && time < minTime)
+                    minTime = time;
+                if (time > maxTime)
+                    maxTime = time;
+
                 double alt = c.getDouble(colAltitude);
                 if (alt < minAlt)
                     minAlt = alt;
                 if (alt > maxAlt)
                     maxAlt = alt;
+
                 avg = (n * avg + alt) / (n + 1);
                 if (n < samples)
                     n++;
+
                 seriesAltitudeReal.appendData(new DataPoint(new Date(time), alt), true, Integer.MAX_VALUE);
                 seriesAltitudeAvg.appendData(new DataPoint(new Date(time), avg), true, Integer.MAX_VALUE);
             }
-        }
 
-        graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMinX(minTime);
-        graph.getViewport().setMaxX(maxTime);
+        if (data) {
+            graph.getViewport().setXAxisBoundsManual(true);
+            graph.getViewport().setMinX(minTime);
+            graph.getViewport().setMaxX(maxTime);
 
-        graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMinY(minAlt);
-        graph.getViewport().setMaxY(maxAlt);
+            graph.getViewport().setYAxisBoundsManual(true);
+            graph.getViewport().setMinY(minAlt);
+            graph.getViewport().setMaxY(maxAlt);
 
-        seriesAltitudeAvg.setDrawDataPoints(true);
-        seriesAltitudeAvg.setDataPointsRadius(3);
-        seriesAltitudeReal.setColor(Color.GRAY);
+            seriesAltitudeAvg.setDrawDataPoints(true);
+            seriesAltitudeAvg.setDataPointsRadius(3);
+            seriesAltitudeReal.setColor(Color.GRAY);
 
-        graph.addSeries(seriesAltitudeReal);
-        graph.addSeries(seriesAltitudeAvg);
+            graph.addSeries(seriesAltitudeReal);
+            graph.addSeries(seriesAltitudeAvg);
 
-        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
-        graph.getGridLabelRenderer().setNumHorizontalLabels(2);
-        graph.getViewport().setScrollable(true);
+            graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
+            graph.getGridLabelRenderer().setNumHorizontalLabels(2);
+            graph.getViewport().setScrollable(true);
+        } else
+            graph.setVisibility(View.GONE);
 
         // Fill list
         ListView lv = (ListView) viewHistory.findViewById(R.id.lvLocationHistory);
@@ -980,31 +988,39 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         Cursor c = db.getSteps(true);
         GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvStep);
         BarGraphSeries<DataPoint> seriesStep = new BarGraphSeries<DataPoint>();
+        boolean data = false;
         int max = 10000;
         int colTime = c.getColumnIndex("time");
         int colCount = c.getColumnIndex("count");
         while (c.moveToNext()) {
-            Date time = new Date(c.getLong(colTime));
+            data = true;
+
+            long time = c.getLong(colTime);
+
             int count = c.getInt(colCount);
             if (count > max)
                 max = count;
-            seriesStep.appendData(new DataPoint(time, count), true, Integer.MAX_VALUE);
+
+            seriesStep.appendData(new DataPoint(new Date(time), count), true, Integer.MAX_VALUE);
         }
 
-        graph.getViewport().setXAxisBoundsManual(true);
-        graph.getViewport().setMinX(new Date().getTime() / DAY_MS * DAY_MS - 7 * DAY_MS);
-        graph.getViewport().setMaxX(new Date().getTime());
+        if (data) {
+            graph.getViewport().setXAxisBoundsManual(true);
+            graph.getViewport().setMinX(new Date().getTime() / DAY_MS * DAY_MS - 7 * DAY_MS);
+            graph.getViewport().setMaxX(new Date().getTime());
 
-        graph.getViewport().setYAxisBoundsManual(true);
-        graph.getViewport().setMinY(0);
-        graph.getViewport().setMaxY(max);
+            graph.getViewport().setYAxisBoundsManual(true);
+            graph.getViewport().setMinY(0);
+            graph.getViewport().setMaxY(max);
 
-        seriesStep.setSpacing(10);
-        graph.addSeries(seriesStep);
+            seriesStep.setSpacing(10);
+            graph.addSeries(seriesStep);
 
-        graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)));
-        graph.getGridLabelRenderer().setNumHorizontalLabels(3);
-        graph.getViewport().setScrollable(true);
+            graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)));
+            graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+            graph.getViewport().setScrollable(true);
+        } else
+            graph.setVisibility(View.GONE);
 
         // Fill list
         ListView lv = (ListView) viewHistory.findViewById(R.id.lvStepHistory);
