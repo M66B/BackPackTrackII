@@ -174,7 +174,8 @@
             <EditTextPreference
                 android:defaultValue="5"
                 android:inputType="number"
-                android:key="pref_correction_average" />
+                android:key="pref_correction_average"
+                android:summary="@string/summary_correction_avg" />
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_recognition">
             <CheckBoxPreference
