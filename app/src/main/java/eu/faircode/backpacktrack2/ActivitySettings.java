@@ -48,7 +48,6 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.ValueDependentColor;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
@@ -586,7 +585,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     private void add_waypoint(final String name, final WaypointAdapter adapter) {
         // Geocode name
-        Toast.makeText(this, getString(R.string.msg_geocoding, name), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.msg_geocoding, name), Toast.LENGTH_LONG).show();
 
         new AsyncTask<Object, Object, List<Address>>() {
             protected List<Address> doInBackground(Object... params) {
@@ -633,7 +632,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                                 protected void onPostExecute(Object result) {
                                     Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
                                     adapter.changeCursor(cursor);
-                                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, geocodedName), Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, geocodedName), Toast.LENGTH_LONG).show();
                                 }
                             }.execute();
                         }
@@ -646,7 +645,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                     });
                     alertDialogBuilder.show();
                 } else
-                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_nolocation, name), Toast.LENGTH_LONG).show();
             }
         }.execute();
     }

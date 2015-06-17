@@ -370,7 +370,7 @@ public class LocationService extends IntentService {
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
             updateState(this);
             if (prefs.getBoolean(ActivitySettings.PREF_DEBUG, false))
-                toast(getString(R.string.title_trackpoint) + " " + Math.round(bchange) + "° / " + Math.round(achange) + "m", this);
+                toast(getString(R.string.title_trackpoint) + " " + Math.round(bchange) + "° / " + Math.round(achange) + "m", Toast.LENGTH_LONG, this);
         }
     }
 
@@ -466,7 +466,7 @@ public class LocationService extends IntentService {
             if (name == null)
                 name = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
             new DatabaseHelper(this).insertLocation(location, name).close();
-            toast(getString(R.string.msg_added, name), this);
+            toast(getString(R.string.msg_added, name), Toast.LENGTH_LONG, this);
         }
     }
 
@@ -497,7 +497,7 @@ public class LocationService extends IntentService {
                 new DatabaseHelper(this).deleteLocations(from, to).close();
         } catch (Throwable ex) {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            toast(ex.toString(), this);
+            toast(ex.toString(), Toast.LENGTH_LONG, this);
         }
     }
 
@@ -545,12 +545,12 @@ public class LocationService extends IntentService {
             prefs.edit().putString(ActivitySettings.PREF_LAST_UPLOAD, lastUpload).apply();
 
             // Feedback
-            toast(getString(R.string.msg_uploaded, url), this);
+            toast(getString(R.string.msg_uploaded, url), Toast.LENGTH_LONG, this);
             Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(500);
         } catch (Throwable ex) {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            toast(ex.toString(), this);
+            toast(ex.toString(), Toast.LENGTH_LONG, this);
         }
     }
 
@@ -831,11 +831,11 @@ public class LocationService extends IntentService {
             updateState(this);
             if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT) {
                 if (locationType == LOCATION_WAYPOINT)
-                    toast(waypointName, this);
+                    toast(waypointName, Toast.LENGTH_LONG, this);
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(locationType == LOCATION_TRACKPOINT ? VIBRATE_SHORT : VIBRATE_LONG);
             } else if (prefs.getBoolean(ActivitySettings.PREF_DEBUG, false))
-                toast(getString(R.string.title_trackpoint), this);
+                toast(getString(R.string.title_trackpoint), Toast.LENGTH_SHORT, this);
         } else
             Log.w(TAG, "Filtered location=" + location);
     }
@@ -1109,11 +1109,11 @@ public class LocationService extends IntentService {
         return gpxFileName;
     }
 
-    private static void toast(final String text, final Context context) {
+    private static void toast(final String text, final int length, final Context context) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, text, length).show();
             }
         });
     }
