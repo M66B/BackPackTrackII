@@ -204,7 +204,7 @@
                 android:summary="@string/summary_recognition_tilting"
                 android:title="@string/title_recognition_tilting" />
             <CheckBoxPreference
-                android:defaultValue="false"
+                android:defaultValue="true"
                 android:dependency="pref_recognition_enabled"
                 android:key="pref_recognition_unknown"
                 android:summary="@string/summary_recognition_unknown"
