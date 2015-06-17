@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -96,6 +97,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_PASSIVE_MINDIST = "pref_passive_mindist";
 
     public static final String PREF_CORRECTION_ENABLED = "pref_correction_enabled";
+    public static final String PREF_CORRECTION_AVERAGE = "pref_correction_average";
 
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
     public static final String PREF_RECOGNITION_INTERVAL_STILL = "pref_recognition_interval_still";
@@ -141,6 +143,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_PASSIVE_MINDIST = "0"; // meters
 
     public static final boolean DEFAULT_CORRECTION_ENABLED = true;
+    public static final String DEFAULT_CORRECTION_AVERAGE = "5"; // samples
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
     public static final String DEFAULT_RECOGNITION_INTERVAL_STILL = "60"; // seconds
@@ -287,6 +290,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_PASSIVE_INACCURATE);
         updateTitle(prefs, PREF_PASSIVE_MINTIME);
         updateTitle(prefs, PREF_PASSIVE_MINDIST);
+
+        updateTitle(prefs, PREF_CORRECTION_AVERAGE);
 
         updateTitle(prefs, PREF_RECOGNITION_INTERVAL_STILL);
         updateTitle(prefs, PREF_RECOGNITION_INTERVAL_MOVING);
@@ -805,17 +810,30 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         View viewHistory = inflater.inflate(R.layout.location_history, null);
 
         // Show altitude graph
+        SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+        int samples = Integer.parseInt(prefs.getString(PREF_CORRECTION_AVERAGE, DEFAULT_CORRECTION_AVERAGE));
         Cursor c = db.getLocations(0, Long.MAX_VALUE, true, true, true);
         GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvLocation);
-        LineGraphSeries<DataPoint> seriesAltitude = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesAltitudeReal = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesAltitudeAvg = new LineGraphSeries<DataPoint>();
         int colTime = c.getColumnIndex("time");
         int colAltitude = c.getColumnIndex("altitude");
+        double avg = 0;
+        int n = 0;
         while (c.moveToNext()) {
             Date time = new Date(c.getLong(colTime));
-            if (!c.isNull(colAltitude))
-                seriesAltitude.appendData(new DataPoint(time, c.getDouble(colAltitude)), true, Integer.MAX_VALUE);
+            if (!c.isNull(colAltitude)) {
+                double alt = c.getDouble(colAltitude);
+                avg = (n * avg + alt) / (n + 1);
+                if (n < samples)
+                    n++;
+                seriesAltitudeReal.appendData(new DataPoint(time, alt), true, Integer.MAX_VALUE);
+                seriesAltitudeAvg.appendData(new DataPoint(time, avg), true, Integer.MAX_VALUE);
+            }
         }
-        graph.addSeries(seriesAltitude);
+        seriesAltitudeReal.setColor(Color.GRAY);
+        graph.addSeries(seriesAltitudeReal);
+        graph.addSeries(seriesAltitudeAvg);
 
         graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
         graph.getGridLabelRenderer().setNumHorizontalLabels(2);
@@ -1005,6 +1023,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             pref.setTitle(getString(R.string.title_mintime, prefs.getString(key, DEFAULT_PASSIVE_MINTIME)));
         else if (PREF_PASSIVE_MINDIST.equals(key))
             pref.setTitle(getString(R.string.title_mindist, prefs.getString(key, DEFAULT_PASSIVE_MINDIST)));
+
+        else if (PREF_CORRECTION_AVERAGE.equals(key))
+            pref.setTitle(getString(R.string.title_correction_avg, prefs.getString(key, DEFAULT_CORRECTION_AVERAGE)));
 
         else if (PREF_RECOGNITION_INTERVAL_STILL.equals(key))
             pref.setTitle(getString(R.string.title_recognition_interval_still, prefs.getString(key, DEFAULT_RECOGNITION_INTERVAL_STILL)));

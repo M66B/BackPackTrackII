@@ -39,6 +39,7 @@
     <string name="title_correction">Höhenkorrektur</string>
     <string name="title_correction_enabled">Höhenkorrektur aktiviert</string>
     <string name="title_correction_egm96">EGM96 Lizenz</string>
+    <string name="title_correction_avg">Moving average: %s samples</string>
 
     <string name="title_recognition">Aktivitätserkennung</string>
     <string name="title_recognition_enabled">Aktivitätserkennung aktiviert</string>

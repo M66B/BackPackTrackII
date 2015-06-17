@@ -39,6 +39,7 @@
     <string name="title_correction">Altitude correction</string>
     <string name="title_correction_enabled">Altitude correction enabled</string>
     <string name="title_correction_egm96">EGM96 license</string>
+    <string name="title_correction_avg">Moving average: %s samples</string>
 
     <string name="title_recognition">Activity recognition</string>
     <string name="title_recognition_enabled">Activity recognition enabled</string>
