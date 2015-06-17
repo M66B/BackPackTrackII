@@ -18,8 +18,8 @@
 
     <string name="title_tracking">Standorttracking</string>
     <string name="title_enabled">Tracking aktiviert</string>
-    <string name="title_use_network">Use network provider</string>
-    <string name="title_use_gps">Use GPS provider</string>
+    <string name="title_use_network">Nutze Netzwerk Provider</string>
+    <string name="title_use_gps">Nutze GPS Provider</string>
     <string name="title_interval">Tracking Hüufigkeit: %s Sekunden</string>
     <string name="title_steps">Zu Fuß Tracking: %s steps</string>
     <string name="title_altitude">Höhe bevorzugt</string>
