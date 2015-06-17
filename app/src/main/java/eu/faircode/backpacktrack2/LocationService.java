@@ -567,8 +567,10 @@ public class LocationService extends IntentService {
         boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
         if (recognition)
             startActivityRecognition(context);
-        else
+        else {
             startRepeatingAlarm(context);
+            context.startService(new Intent(context, StepCounterService.class));
+        }
 
         // Request passive location updates
         boolean passive = prefs.getBoolean(ActivitySettings.PREF_PASSIVE_ENABLED, ActivitySettings.DEFAULT_PASSIVE_ENABLED);
@@ -600,6 +602,9 @@ public class LocationService extends IntentService {
         PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         lm.removeUpdates(pi);
+
+        // Stop step counter
+        context.stopService(new Intent(context, StepCounterService.class));
     }
 
     private static void startActivityRecognition(final Context context) {
@@ -725,6 +730,11 @@ public class LocationService extends IntentService {
             updateState(context);
         } else
             Log.w(TAG, "No location providers");
+
+        // Keep step counter service alive
+        boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
+        if (!recognition)
+            context.startService(new Intent(context, StepCounterService.class));
     }
 
     private static void stopLocating(Context context) {
