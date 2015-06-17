@@ -103,6 +103,9 @@ public class LocationService extends IntentService {
     private static final int VIBRATE_SHORT = 250;
     private static final int VIBRATE_LONG = 500;
 
+    private static int mEGM96Pointer = -1;
+    private static int mEGM96Offset;
+
     public LocationService() {
         super(TAG);
     }
@@ -855,24 +858,31 @@ public class LocationService extends IntentService {
     private static double getEGM96Offset(Location location, Context context) throws IOException {
         InputStream is = null;
         try {
-            is = context.getAssets().open("WW15MGH.DAC");
-
             double lat = location.getLatitude();
             double lon = location.getLongitude();
 
-            int shy = (int) Math.floor((90 - lat) * 4);
-            int shx = (int) Math.floor((lon >= 0 ? lon : lon + 360) * 4);
-            int pointer = ((shy * 1440) + shx) * 2;
+            int y = (int) Math.floor((90 - lat) * 4);
+            int x = (int) Math.floor((lon >= 0 ? lon : lon + 360) * 4);
+            int p = ((y * 1440) + x) * 2;
+            int o;
 
-            is.skip(pointer);
+            if (mEGM96Pointer >= 0 && p == mEGM96Pointer)
+                o = mEGM96Offset;
+            else {
+                is = context.getAssets().open("WW15MGH.DAC");
+                is.skip(p);
 
-            ByteBuffer bb = ByteBuffer.allocate(2);
-            bb.order(ByteOrder.BIG_ENDIAN);
-            bb.put((byte) is.read());
-            bb.put((byte) is.read());
-            int offset = bb.getShort(0);
+                ByteBuffer bb = ByteBuffer.allocate(2);
+                bb.order(ByteOrder.BIG_ENDIAN);
+                bb.put((byte) is.read());
+                bb.put((byte) is.read());
+                o = bb.getShort(0);
 
-            return offset / 100d;
+                mEGM96Pointer = p;
+                mEGM96Offset = o;
+            }
+
+            return o / 100d;
         } finally {
             if (is != null) {
                 try {
