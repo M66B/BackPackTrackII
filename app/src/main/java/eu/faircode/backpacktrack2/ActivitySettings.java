@@ -76,6 +76,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_SETTINGS = "pref_settings";
 
     public static final String PREF_ENABLED = "pref_enabled";
+    public static final String PREF_USE_NETWORK = "pref_use_network";
+    public static final String PREF_USE_GPS = "pref_use_gps";
     public static final String PREF_INTERVAL = "pref_interval";
     public static final String PREF_STEPS = "pref_steps";
     public static final String PREF_ALTITUDE = "pref_altitude";
@@ -122,6 +124,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     // Preference defaults
     public static final boolean DEFAULT_ENABLED = true;
+    public static final boolean DEFAULT_USE_NETWORK = true;
+    public static final boolean DEFAULT_USE_GPS = true;
     public static final String DEFAULT_INTERVAL = "180"; // seconds
     public static final String DEFAULT_STEPS = "250"; // steps
     public static final boolean DEFAULT_ALTITUDE = true;
@@ -258,6 +262,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         Preference pref_share = findPreference(PREF_SHARE);
         Preference pref_upload = findPreference(PREF_UPLOAD);
         Preference pref_enabled = findPreference(PREF_ENABLED);
+        Preference pref_use_network = findPreference(PREF_USE_NETWORK);
+        Preference pref_use_gps = findPreference(PREF_USE_GPS);
         Preference pref_steps = findPreference(PREF_STEPS);
         Preference pref_check = findPreference(PREF_SETTINGS);
         Preference pref_location_history = findPreference(PREF_LOCATION_HISTORY);
@@ -344,6 +350,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         boolean gps = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
         boolean network = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
         pref_enabled.setEnabled(gps || network);
+        pref_use_network.setEnabled(network);
+        pref_use_gps.setEnabled(gps);
         String providers;
         if (gps || network) {
             providers = getString(R.string.msg_gps, getString(gps ? R.string.msg_yes : R.string.msg_no)) + "\n" +
@@ -488,6 +496,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Restart tracking if needed
         if (PREF_ENABLED.equals(key) ||
+                PREF_USE_NETWORK.equals(key) ||
+                PREF_USE_GPS.equals(key) ||
                 PREF_INTERVAL.equals(key) ||
                 PREF_TIMEOUT.equals(key) ||
                 PREF_CHECK_TIME.equals(key) ||

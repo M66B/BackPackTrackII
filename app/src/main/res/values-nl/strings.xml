@@ -18,6 +18,8 @@
 
     <string name="title_tracking">Locatie volgen</string>
     <string name="title_enabled">Volgen aan</string>
+    <string name="title_use_network">Gebruik netwerk provider</string>
+    <string name="title_use_gps">Gebruik GPS provider</string>
     <string name="title_interval">Volg interval: %s seconden</string>
     <string name="title_steps">Volg te voet: %s stappen</string>
     <string name="title_altitude">Bij voorkeur hoogte</string>

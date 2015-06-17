@@ -18,6 +18,8 @@
 
     <string name="title_tracking">Location tracking</string>
     <string name="title_enabled">Tracking enabled</string>
+    <string name="title_use_network">Use network provider</string>
+    <string name="title_use_gps">Use GPS provider</string>
     <string name="title_interval">Tracking interval: %s seconds</string>
     <string name="title_steps">Tracking on foot: %s steps</string>
     <string name="title_altitude">Altitude preferred</string>

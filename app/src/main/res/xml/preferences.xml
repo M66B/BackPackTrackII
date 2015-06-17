@@ -46,6 +46,14 @@
                 android:defaultValue="true"
                 android:key="pref_enabled"
                 android:title="@string/title_enabled" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_use_network"
+                android:title="@string/title_use_network" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_use_gps"
+                android:title="@string/title_use_gps" />
             <EditTextPreference
                 android:defaultValue="180"
                 android:dependency="pref_enabled"

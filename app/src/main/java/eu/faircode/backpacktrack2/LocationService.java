@@ -675,11 +675,13 @@ public class LocationService extends IntentService {
             return;
         }
 
+        boolean network = prefs.getBoolean(ActivitySettings.PREF_USE_NETWORK, ActivitySettings.DEFAULT_USE_NETWORK);
+        boolean gps = prefs.getBoolean(ActivitySettings.PREF_USE_GPS, ActivitySettings.DEFAULT_USE_GPS);
         int minTime = Integer.parseInt(prefs.getString(ActivitySettings.PREF_MINTIME, ActivitySettings.DEFAULT_MINTIME));
         int minDist = Integer.parseInt(prefs.getString(ActivitySettings.PREF_MINDIST, ActivitySettings.DEFAULT_MINDIST));
 
         // Request coarse location
-        if (lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+        if (network && lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             Intent locationIntent = new Intent(context, LocationService.class);
             locationIntent.setAction(LocationService.ACTION_LOCATION_COARSE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -688,7 +690,7 @@ public class LocationService extends IntentService {
         }
 
         // Request fine location
-        if (lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        if (gps && lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Intent locationIntent = new Intent(context, LocationService.class);
             locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -698,7 +700,7 @@ public class LocationService extends IntentService {
         }
 
         // Set location timeout
-        if (lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER) || lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        if ((network && lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) || (gps && lm.isProviderEnabled(LocationManager.GPS_PROVIDER))) {
             {
                 int check = Integer.parseInt(prefs.getString(ActivitySettings.PREF_CHECK_TIME, ActivitySettings.DEFAULT_CHECK_TIME));
                 Intent alarmIntent = new Intent(context, LocationService.class);
