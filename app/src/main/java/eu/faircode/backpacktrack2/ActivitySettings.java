@@ -187,6 +187,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     private static final int GEOCODER_RESULTS = 5;
     private static final long DAY_MS = 24L * 3600L * 1000L;
+    private static final int DAYS_HISTORY = 7;
 
     private DatabaseHelper db = null;
 
@@ -834,7 +835,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         double maxAlt = 0;
         long minTime = new Date().getTime();
         long maxTime = 0;
-        long from = new Date().getTime() / DAY_MS * DAY_MS - 30 * DAY_MS;
+        long from = new Date().getTime() / DAY_MS * DAY_MS - DAYS_HISTORY * DAY_MS;
         double avg = 0;
         int n = 0;
         int samples = Integer.parseInt(prefs.getString(PREF_ALTITUDE_AVG, DEFAULT_ALTITUDE_AVG));
@@ -1009,7 +1010,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         if (data) {
             graph.getViewport().setXAxisBoundsManual(true);
-            graph.getViewport().setMinX(new Date().getTime() / DAY_MS * DAY_MS - 7 * DAY_MS);
+            graph.getViewport().setMinX(new Date().getTime() / DAY_MS * DAY_MS - DAYS_HISTORY * DAY_MS);
             graph.getViewport().setMaxX(new Date().getTime());
 
             graph.getViewport().setYAxisBoundsManual(true);
