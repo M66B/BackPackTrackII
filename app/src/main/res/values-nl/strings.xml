@@ -139,8 +139,8 @@
     <string name="header_steps">Stappen</string>
     <string name="header_calories">Kcal</string>
 
-    <string name="msg_gps">GPS-provider: %s</string>
-    <string name="msg_network">Netwerkprovider: %s</string>
+    <string name="msg_gps">GPS provider: %s</string>
+    <string name="msg_network">Netwerk provider: %s</string>
     <string name="msg_noproviders">Zet een locatieprovider in de Android locatie-instellingen aan om deze applicatie te gebruiken</string>
     <string name="msg_never">nooit</string>
     <string name="msg_notset">niet gezet</string>
