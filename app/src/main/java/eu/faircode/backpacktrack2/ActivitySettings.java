@@ -821,10 +821,14 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
         View viewHistory = inflater.inflate(R.layout.location_history, null);
 
+        // Reference controls
+        GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvLocation);
+        TextView tvLowest = (TextView) viewHistory.findViewById(R.id.tvLowest);
+        TextView tvHighest = (TextView) viewHistory.findViewById(R.id.tvHighest);
+
         // Show altitude graph
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
         Cursor c = db.getLocations(0, Long.MAX_VALUE, true, true, true);
-        GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvLocation);
         LineGraphSeries<DataPoint> seriesAltitudeReal = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesAltitudeAvg = new LineGraphSeries<DataPoint>();
         int colTime = c.getColumnIndex("time");
@@ -881,8 +885,15 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
             graph.getViewport().setScrollable(true);
-        } else
+
+            tvLowest.setText(Math.round(minAlt) + "m");
+            tvHighest.setText(Math.round(maxAlt) + "m");
+
+        } else {
             graph.setVisibility(View.GONE);
+            tvLowest.setVisibility(View.GONE);
+            tvHighest.setVisibility(View.GONE);
+        }
 
         // Fill list
         ListView lv = (ListView) viewHistory.findViewById(R.id.lvLocationHistory);
