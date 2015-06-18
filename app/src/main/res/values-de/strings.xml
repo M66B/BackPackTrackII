@@ -131,9 +131,6 @@
     <string name="title_to">Bis Datum/Uhrzeit:</string>
     <string name="title_pick">Auswählen</string>
 
-    <string name="header_lowest">Tiefster:</string>
-    <string name="header_highest">Höchster:</string>
-
     <string name="header_altitude">Höhe</string>
     <string name="header_accuracy">Pr.</string>
     <string name="header_distance">Entf.</string>

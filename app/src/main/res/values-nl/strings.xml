@@ -131,9 +131,6 @@
     <string name="title_to">Tot datum/tijd:</string>
     <string name="title_pick">Kies</string>
 
-    <string name="header_lowest">Laagst:</string>
-    <string name="header_highest">Hoogst:</string>
-
     <string name="header_altitude">Hgt.</string>
     <string name="header_accuracy">Nwk.</string>
     <string name="header_distance">Afst.</string>

@@ -823,8 +823,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Reference controls
         GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvLocation);
-        TextView tvLowest = (TextView) viewHistory.findViewById(R.id.tvLowest);
-        TextView tvHighest = (TextView) viewHistory.findViewById(R.id.tvHighest);
 
         // Show altitude graph
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
@@ -887,14 +885,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             graph.getViewport().setScrollable(true);
             graph.getViewport().setScalable(true);
 
-            tvLowest.setText(Math.round(minAlt) + "m");
-            tvHighest.setText(Math.round(maxAlt) + "m");
-
-        } else {
+        } else
             graph.setVisibility(View.GONE);
-            tvLowest.setVisibility(View.GONE);
-            tvHighest.setVisibility(View.GONE);
-        }
 
         // Fill list
         ListView lv = (ListView) viewHistory.findViewById(R.id.lvLocationHistory);
