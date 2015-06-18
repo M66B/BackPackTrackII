@@ -137,13 +137,13 @@
                 android:summary="@string/summary_passive_enabled"
                 android:title="@string/title_passive_enabled" />
             <EditTextPreference
-                android:defaultValue="15"
+                android:defaultValue="30"
                 android:dependency="pref_passive_enabled"
                 android:inputType="number"
                 android:key="pref_passive_bearing"
                 android:summary="@string/summary_passive_bearing" />
             <EditTextPreference
-                android:defaultValue="10"
+                android:defaultValue="20"
                 android:dependency="pref_passive_enabled"
                 android:inputType="number"
                 android:key="pref_passive_altitude"

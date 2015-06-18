@@ -140,8 +140,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_MINDIST = "0"; // meters
 
     public static final boolean DEFAULT_PASSIVE_ENABLED = true;
-    public static final String DEFAULT_PASSIVE_BEARING = "15"; // degrees
-    public static final String DEFAULT_PASSIVE_ALTITUDE = "10"; // meters
+    public static final String DEFAULT_PASSIVE_BEARING = "30"; // degrees
+    public static final String DEFAULT_PASSIVE_ALTITUDE = "20"; // meters
     public static final String DEFAULT_PASSIVE_INACCURATE = "10"; // meters
     public static final String DEFAULT_PASSIVE_NEARBY = "20"; // meters
     public static final String DEFAULT_PASSIVE_MINTIME = "1"; // seconds
