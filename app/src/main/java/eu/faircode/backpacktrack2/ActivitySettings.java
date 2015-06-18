@@ -885,6 +885,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
             graph.getViewport().setScrollable(true);
+            graph.getViewport().setScalable(true);
 
             tvLowest.setText(Math.round(minAlt) + "m");
             tvHighest.setText(Math.round(maxAlt) + "m");
