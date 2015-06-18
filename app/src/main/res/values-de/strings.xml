@@ -117,7 +117,7 @@
 
     <string name="summary_support">Klicken um das Support Forum zu öffnen um Fehler zu berichten, neue Features zu beantragen oder Fragen zu stellen (Öffnet im Browser)</string>
     <string name="summary_author">Marcel Bokhorst (M66B)\nKlicken für Details (Öffnet im Browser)</string>
-    <string name="summary_license">Marcel Bokhorst (M66B)\nKlicken für Details (Öffnet im Browser)</string>
+    <string name="summary_license">GNU General Public License Version 3\nKlicken für Details (Öffnet im Browser)</string>
 
     <string name="title_trackpoint">Trackpoint</string>
     <string name="title_waypoint">Wegpunkt</string>
