@@ -140,7 +140,7 @@
     <string name="header_bearing">&#176;</string>
 
     <string name="header_steps">Schritte</string>
-    <string name="header_calories">Kcal</string>
+    <string name="header_calories">kcal</string>
 
     <string name="msg_gps">GPS Provider: %s</string>
     <string name="msg_network">Netzwerk Provider: %s</string>
