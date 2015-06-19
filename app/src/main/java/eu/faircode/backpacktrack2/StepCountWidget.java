@@ -24,7 +24,7 @@ public class StepCountWidget extends AppWidgetProvider {
             PendingIntent piSettings = PendingIntent.getActivity(context, 1, riSettings, PendingIntent.FLAG_UPDATE_CURRENT);
 
             for (int i = 0; i < appWidgetIds.length; i++) {
-                RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.stepcount_widget);
+                RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.step_widget);
                 views.setTextViewText(R.id.appwidget_text, Integer.toString(count));
                 views.setOnClickPendingIntent(R.id.appwidget_text, piSettings);
                 appWidgetManager.updateAppWidget(appWidgetIds[i], views);

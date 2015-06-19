@@ -14,7 +14,7 @@
         android:paddingLeft="6dp"
         android:paddingRight="6dp"
         android:text="@string/app_name"
-        android:textColor="@color/color_backPacktrack_green"
+        android:textColor="@color/color_teal_300"
         android:textSize="20dp"
         android:textStyle="bold" />
 

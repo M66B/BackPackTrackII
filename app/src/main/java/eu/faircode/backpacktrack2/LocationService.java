@@ -981,7 +981,7 @@ public class LocationService extends IntentService {
         else
             notificationBuilder.setSmallIcon(R.drawable.explore);
 
-        notificationBuilder.setColor(context.getResources().getColor(R.color.color_backPacktrack_green));
+        notificationBuilder.setColor(context.getResources().getColor(R.color.color_teal_300));
         notificationBuilder.setContentTitle(title);
         notificationBuilder.setContentText(text);
         notificationBuilder.setContentIntent(piSettings);
@@ -1025,7 +1025,7 @@ public class LocationService extends IntentService {
             riStop.setAction(LocationService.ACTION_STOP_LOCATING);
             PendingIntent piStop = PendingIntent.getService(context, 4, riStop, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            // Build stop intent
+            // Build accept intent
             Intent riAccept = new Intent(context, LocationService.class);
             riAccept.setAction(LocationService.ACTION_LOCATION_TIMEOUT);
             PendingIntent piAccept = PendingIntent.getService(context, 5, riAccept, PendingIntent.FLAG_UPDATE_CURRENT);
