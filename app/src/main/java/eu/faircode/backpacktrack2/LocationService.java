@@ -981,6 +981,7 @@ public class LocationService extends IntentService {
         else
             notificationBuilder.setSmallIcon(R.drawable.explore);
 
+        notificationBuilder.setColor(context.getResources().getColor(R.color.color_backPacktrack_green));
         notificationBuilder.setContentTitle(title);
         notificationBuilder.setContentText(text);
         notificationBuilder.setContentIntent(piSettings);
