@@ -31,7 +31,11 @@ You could use [OsmAnd](https://play.google.com/store/apps/details?id=net.osmand)
 You can upload your location history to a WordPress weblog using a small [WordPress plugin](https://wordpress.org/plugins/backpacktrack-for-android/).
 You could use the [Google Maps GPX Viewer](https://wordpress.org/plugins/google-maps-gpx-viewer/) plugin for visualization.
 
-If you want to see the status of the GPS, you could use [GPS Status & Toolbox](https://play.google.com/store/apps/details?id=com.eclipsim.gpsstatus2).
+If you want to see the status of the GPS, you could use the application [GPS Status & Toolbox](https://play.google.com/store/apps/details?id=com.eclipsim.gpsstatus2).
+
+As a bonus BackPackTrack includes a step counter which doesn't count false steps,
+because activity recognition will be used to count steps when you are walking only.
+Your device needs to have a hardware step counter for this to work.
 
 BackPackTrack II is a complete rewrite of [BackPackTrack](https://github.com/M66B/BackPackTrack), the first Android application I wrote in 2011.
 
