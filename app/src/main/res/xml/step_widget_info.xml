@@ -5,6 +5,6 @@
     android:minHeight="40dp"
     android:minWidth="40dp"
     android:previewImage="@drawable/backpacker"
-    android:resizeMode="horizontal|vertical"
+    android:resizeMode="none"
     android:updatePeriodMillis="0"
     android:widgetCategory="home_screen" />
