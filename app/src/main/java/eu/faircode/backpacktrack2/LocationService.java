@@ -958,8 +958,8 @@ public class LocationService extends IntentService {
 
         // Build main intent
         Intent riSettings = new Intent(context, ActivitySettings.class);
-        riSettings.setAction("android.intent.action.MAIN");
-        riSettings.addCategory("android.intent.category.LAUNCHER");
+        riSettings.setAction(Intent.ACTION_MAIN);
+        riSettings.addCategory(Intent.CATEGORY_LAUNCHER);
         riSettings.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent piSettings = PendingIntent.getActivity(context, 1, riSettings, PendingIntent.FLAG_UPDATE_CURRENT);
 
