@@ -366,8 +366,8 @@ public class LocationService extends IntentService {
         }
 
         if (update) {
-            new DatabaseHelper(this).insertLocation(location, null).close();
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
+            new DatabaseHelper(this).insertLocation(location, null).close();
             updateState(this);
             if (prefs.getBoolean(ActivitySettings.PREF_DEBUG, false))
                 toast(getString(R.string.title_trackpoint) + " " + Math.round(bchange) + "° / " + Math.round(achange) + "m", Toast.LENGTH_LONG, this);
@@ -824,8 +824,8 @@ public class LocationService extends IntentService {
             }
 
             // Persist new location
-            new DatabaseHelper(this).insertLocation(location, waypointName).close();
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
+            new DatabaseHelper(this).insertLocation(location, waypointName).close();
 
             // Feedback
             updateState(this);
