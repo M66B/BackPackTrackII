@@ -151,3 +151,7 @@ Screenshots
 <img src="screenshot1_scaled.png"/>
 
 <img src="screenshot2_scaled.png"/>
+
+<img src="screenshot3_scaled.png"/>
+
+<img src="screenshot4_scaled.png"/>
