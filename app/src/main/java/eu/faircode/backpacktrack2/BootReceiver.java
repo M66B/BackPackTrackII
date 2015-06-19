@@ -19,8 +19,8 @@ public class BootReceiver extends BroadcastReceiver {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                synchronized (context) {
-                    LocationService.startTracking(context.getApplicationContext());
+                synchronized (context.getApplicationContext()) {
+                    ActivitySettings.firstRun(context);
                 }
             }
         }).start();

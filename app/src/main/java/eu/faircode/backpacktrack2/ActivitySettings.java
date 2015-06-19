@@ -1,9 +1,11 @@
 package eu.faircode.backpacktrack2;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -254,7 +256,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 @Override
                 public void run() {
                     synchronized (ActivitySettings.this.getApplicationContext()) {
-                        LocationService.startTracking(ActivitySettings.this);
+                        firstRun(ActivitySettings.this);
                     }
                 }
             }).start();
@@ -519,6 +521,25 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     }
 
     // Helper methods
+
+    public static void firstRun(Context context) {
+        LocationService.startTracking(context);
+
+        Intent alarmIntent = new Intent(context, LocationService.class);
+        alarmIntent.setAction(LocationService.ACTION_DAILY);
+        PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.AM_PM, Calendar.AM);
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
+    }
 
     private void edit_waypoints() {
         // Get layout

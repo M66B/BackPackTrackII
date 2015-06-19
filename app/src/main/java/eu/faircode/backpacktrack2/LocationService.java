@@ -68,6 +68,7 @@ public class LocationService extends IntentService {
 
     // Actions
     public static final String ACTION_ALARM = "Alarm";
+    public static final String ACTION_DAILY = "Daily";
     public static final String ACTION_ACTIVITY = "Activity";
     public static final String ACTION_LOCATION_FINE = "LocationFine";
     public static final String ACTION_LOCATION_COARSE = "LocationCoarse";
@@ -149,6 +150,9 @@ public class LocationService extends IntentService {
 
             else if (ACTION_UPLOAD_GPX.equals(intent.getAction()))
                 handleUpload(intent);
+
+            else if (ACTION_DAILY.equals(intent.getAction()))
+                handleDaily(intent);
 
             else
                 Log.w(TAG, "Unknown action");
@@ -552,6 +556,10 @@ public class LocationService extends IntentService {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             toast(ex.toString(), Toast.LENGTH_LONG, this);
         }
+    }
+
+    private void handleDaily(Intent intent) {
+        new DatabaseHelper(this).updateSteps(new Date().getTime(), 0).close();
     }
 
     // Start/stop methods
