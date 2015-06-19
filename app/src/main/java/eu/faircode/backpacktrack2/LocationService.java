@@ -821,8 +821,9 @@ public class LocationService extends IntentService {
             // New location
             Log.w(TAG, "New location=" + location + " type=" + locationType);
 
-            if (!location.hasAltitude() &&
-                    prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_GOOGLE, ActivitySettings.DEFAULT_ALTITUDE_GOOGLE))
+            // Add elevation data
+            boolean pref_google = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_GOOGLE, ActivitySettings.DEFAULT_ALTITUDE_GOOGLE);
+            if (!location.hasAltitude() && pref_google)
                 try {
                     double elevation = GoogleElevation.getElevation(location, this);
                     location.setAltitude(elevation);

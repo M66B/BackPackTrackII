@@ -220,10 +220,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public DatabaseHelper updateLocation(int id, String name) {
+    public DatabaseHelper updateLocationName(int id, String name) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put("name", name);
+        db.update("location", cv, "ID = ?", new String[]{Integer.toString(id)});
+        return this;
+    }
+
+    public DatabaseHelper updateLocationAltitude(int id, double altitude) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("altitude", altitude);
         db.update("location", cv, "ID = ?", new String[]{Integer.toString(id)});
         return this;
     }
