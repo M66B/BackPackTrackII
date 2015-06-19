@@ -647,6 +647,19 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
                             new AsyncTask<Object, Object, Object>() {
                                 protected Object doInBackground(Object... params) {
+                                    // Add elevation info
+                                    SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+                                    if (!location.hasAltitude() &&
+                                            prefs.getBoolean(PREF_ALTITUDE_GOOGLE, DEFAULT_ALTITUDE_GOOGLE))
+                                        try {
+                                            double elevation = GoogleElevation.getElevation(location, ActivitySettings.this);
+                                            location.setAltitude(elevation);
+                                            Log.w(TAG, "Google elevation=" + elevation);
+                                        } catch (Throwable ex) {
+                                            Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                        }
+
+                                    // Persist location
                                     new DatabaseHelper(ActivitySettings.this).insertLocation(location, geocodedName).close();
                                     return null;
                                 }
