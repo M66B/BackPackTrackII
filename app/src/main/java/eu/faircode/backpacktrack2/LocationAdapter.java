@@ -69,8 +69,10 @@ public class LocationAdapter extends CursorAdapter {
         tvAltitude.setText(hasAltitude ? Long.toString(Math.round(altitude)) : "?");
         tvBearing.setText(hasBearing ? Long.toString(Math.round(bearing)) : "?");
         tvAccuracy.setText(hasAccuracy ? Long.toString(Math.round(accuracy)) : "?");
-        if (lastLocation != null && distance > 10000)
-            tvDistance.setText(Long.toString(Math.round(distance / 1000)) + "k");
+        if (lastLocation != null && distance >= 1e7)
+            tvDistance.setText(Long.toString(Math.round(distance / 1e6)) + "M");
+        else if (lastLocation != null && distance >= 1e4)
+            tvDistance.setText(Long.toString(Math.round(distance / 1e3)) + "k");
         else
             tvDistance.setText(lastLocation == null ? "?" : Long.toString(Math.round(distance)));
 
