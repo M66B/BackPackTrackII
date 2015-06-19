@@ -821,16 +821,60 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
         View viewHistory = inflater.inflate(R.layout.location_history, null);
 
-        // Reference controls
-        GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvLocation);
-
         // Show altitude graph
+        final GraphView graphView = (GraphView) viewHistory.findViewById(R.id.gvLocation);
+        showAltitudeGraph(graphView);
+
+        // Fill list
+        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvLocationHistory);
+        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
+        final LocationAdapter adapter = new LocationAdapter(ActivitySettings.this, cursor);
+        lv.setAdapter(adapter);
+
+        // Live updates
+        final DatabaseHelper.LocationAddedListener listener = new DatabaseHelper.LocationAddedListener() {
+            @Override
+            public void onLocationAdded(Location location) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
+                        adapter.changeCursor(cursor);
+                        lv.setAdapter(adapter);
+                        showAltitudeGraph(graphView);
+                    }
+                });
+            }
+        };
+        DatabaseHelper.addLocationAddedListener(listener);
+
+        // Show layout
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+        alertDialogBuilder.setTitle(R.string.title_location_history);
+        alertDialogBuilder.setIcon(R.drawable.location_60);
+        alertDialogBuilder.setView(viewHistory);
+        alertDialogBuilder
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                DatabaseHelper.removeLocationAddedListener(listener);
+            }
+        });
+        alertDialog.show();
+        // Fix keyboard input
+        alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+    }
+
+    private void showAltitudeGraph(GraphView graph) {
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
-        Cursor c = db.getLocations(0, Long.MAX_VALUE, true, true, true);
-        LineGraphSeries<DataPoint> seriesAltitudeReal = new LineGraphSeries<DataPoint>();
-        LineGraphSeries<DataPoint> seriesAltitudeAvg = new LineGraphSeries<DataPoint>();
-        int colTime = c.getColumnIndex("time");
-        int colAltitude = c.getColumnIndex("altitude");
+
         boolean data = false;
         double minAlt = 0;
         double maxAlt = 0;
@@ -839,18 +883,26 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         long from = new Date().getTime() / DAY_MS * DAY_MS - DAYS_HISTORY * DAY_MS;
         double avg = 0;
         int n = 0;
+
+        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, true);
+        int colTime = cursor.getColumnIndex("time");
+        int colAltitude = cursor.getColumnIndex("altitude");
+
         int samples = Integer.parseInt(prefs.getString(PREF_ALTITUDE_AVG, DEFAULT_ALTITUDE_AVG));
-        while (c.moveToNext())
-            if (!c.isNull(colAltitude)) {
+        LineGraphSeries<DataPoint> seriesAltitudeReal = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesAltitudeAvg = new LineGraphSeries<DataPoint>();
+
+        while (cursor.moveToNext())
+            if (!cursor.isNull(colAltitude)) {
                 data = true;
 
-                long time = c.getLong(colTime);
+                long time = cursor.getLong(colTime);
                 if (time > from && time < minTime)
                     minTime = time;
                 if (time > maxTime)
                     maxTime = time;
 
-                double alt = c.getDouble(colAltitude);
+                double alt = cursor.getDouble(colAltitude);
                 if (alt < minAlt)
                     minAlt = alt;
                 if (alt > maxAlt)
@@ -884,32 +936,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
             graph.getViewport().setScrollable(true);
             graph.getViewport().setScalable(true);
-
         } else
             graph.setVisibility(View.GONE);
-
-        // Fill list
-        ListView lv = (ListView) viewHistory.findViewById(R.id.lvLocationHistory);
-        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
-        LocationAdapter adapter = new LocationAdapter(ActivitySettings.this, cursor);
-        lv.setAdapter(adapter);
-
-        // Show layout
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
-        alertDialogBuilder.setTitle(R.string.title_location_history);
-        alertDialogBuilder.setIcon(R.drawable.location_60);
-        alertDialogBuilder.setView(viewHistory);
-        alertDialogBuilder
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                });
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
-        // Fix keyboard input
-        alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
     }
 
     private void activity_history() {
@@ -930,10 +958,26 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         });
 
         // Fill list
-        ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityHistory);
+        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityHistory);
         Cursor cursor = db.getActivities(0, Long.MAX_VALUE);
         final ActivityAdapter adapter = new ActivityAdapter(ActivitySettings.this, cursor);
         lv.setAdapter(adapter);
+
+        // Live updates
+        final DatabaseHelper.ActivityAddedListener listener = new DatabaseHelper.ActivityAddedListener() {
+            @Override
+            public void onactivityAdded(long time, int activity, int confidence) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Cursor cursor = db.getActivities(0, Long.MAX_VALUE);
+                        adapter.changeCursor(cursor);
+                        lv.setAdapter(adapter);
+                    }
+                });
+            }
+        };
+        DatabaseHelper.addActivityAddedListener(listener);
 
         // Handle delete
         ImageView ivDelete = (ImageView) viewHistory.findViewById(R.id.ivDelete);
@@ -983,6 +1027,12 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                     }
                 });
         AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                DatabaseHelper.removeActivityAddedListener(listener);
+            }
+        });
         alertDialog.show();
     }
 
@@ -992,19 +1042,70 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         View viewHistory = inflater.inflate(R.layout.step_history, null);
 
         // Show steps bar graph
-        Cursor c = db.getSteps(true);
-        GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvStep);
-        BarGraphSeries<DataPoint> seriesStep = new BarGraphSeries<DataPoint>();
+        final GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvStep);
+        showStepGraph(graph);
+
+        // Fill list
+        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvStepHistory);
+        Cursor cursor = db.getSteps(false);
+        final StepAdapter adapter = new StepAdapter(ActivitySettings.this, cursor);
+        lv.setAdapter(adapter);
+
+        // Live updates
+        final DatabaseHelper.StepCountUpdatedListener listener = new DatabaseHelper.StepCountUpdatedListener() {
+            @Override
+            public void onStepCountUpdated(int count) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Cursor cursor = db.getSteps(false);
+                        adapter.changeCursor(cursor);
+                        lv.setAdapter(adapter);
+                        showStepGraph(graph);
+                    }
+                });
+            }
+        };
+        DatabaseHelper.addStepCountUpdatedListener(listener);
+
+        // Show layout
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+        alertDialogBuilder.setTitle(R.string.title_step_history);
+        alertDialogBuilder.setIcon(R.drawable.walk_60);
+        alertDialogBuilder.setView(viewHistory);
+        alertDialogBuilder
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                DatabaseHelper.removeStepCountUpdatedListener(listener);
+            }
+        });
+        alertDialog.show();
+    }
+
+    private void showStepGraph(GraphView graph) {
         boolean data = false;
         int max = 10000;
-        int colTime = c.getColumnIndex("time");
-        int colCount = c.getColumnIndex("count");
-        while (c.moveToNext()) {
+
+        Cursor cursor = db.getSteps(true);
+        int colTime = cursor.getColumnIndex("time");
+        int colCount = cursor.getColumnIndex("count");
+
+        BarGraphSeries<DataPoint> seriesStep = new BarGraphSeries<DataPoint>();
+
+        while (cursor.moveToNext()) {
             data = true;
 
-            long time = c.getLong(colTime);
+            long time = cursor.getLong(colTime);
 
-            int count = c.getInt(colCount);
+            int count = cursor.getInt(colCount);
             if (count > max)
                 max = count;
 
@@ -1028,27 +1129,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             graph.getViewport().setScrollable(true);
         } else
             graph.setVisibility(View.GONE);
-
-        // Fill list
-        ListView lv = (ListView) viewHistory.findViewById(R.id.lvStepHistory);
-        Cursor cursor = db.getSteps(false);
-        StepAdapter adapter = new StepAdapter(ActivitySettings.this, cursor);
-        lv.setAdapter(adapter);
-
-        // Show layout
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
-        alertDialogBuilder.setTitle(R.string.title_step_history);
-        alertDialogBuilder.setIcon(R.drawable.walk_60);
-        alertDialogBuilder.setView(viewHistory);
-        alertDialogBuilder
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                });
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
     }
 
     private void updateTitle(SharedPreferences prefs, String key) {

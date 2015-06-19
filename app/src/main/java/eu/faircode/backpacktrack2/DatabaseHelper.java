@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
@@ -15,6 +18,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DB_VERSION = 3;
 
     private static final long MS_DAY = 24 * 60 * 60 * 1000L;
+
+    private static List<LocationAddedListener> mLocationAddedListeners = new ArrayList<LocationAddedListener>();
+    private static List<ActivityAddedListener> mActivityAddedListeners = new ArrayList<ActivityAddedListener>();
+    private static List<StepCountUpdatedListener> mStepCountUpdateListeners = new ArrayList<StepCountUpdatedListener>();
 
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -109,6 +116,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.insert("location", null, cv);
 
+        for (LocationAddedListener listener : mLocationAddedListeners)
+            listener.onLocationAdded(location);
+
         return this;
     }
 
@@ -122,6 +132,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.insert("activity", null, cv);
 
+        for (ActivityAddedListener listener : mActivityAddedListeners)
+            listener.onactivityAdded(time, activity, confidence);
+
         return this;
     }
 
@@ -129,12 +142,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         long day = time / MS_DAY * MS_DAY;
 
-        long count = -1;
+        int count = -1;
         Cursor c = null;
         try {
             c = db.query("step", new String[]{"count"}, "time = ?", new String[]{Long.toString(day)}, null, null, null, null);
             if (c.moveToFirst())
-                count = c.getLong(c.getColumnIndex("count"));
+                count = c.getInt(c.getColumnIndex("count"));
         } finally {
             if (c != null)
                 c.close();
@@ -142,15 +155,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (count < 0) {
             Log.w(TAG, "Creating new day time=" + day);
+            count = delta;
             ContentValues cv = new ContentValues();
             cv.put("time", day);
-            cv.put("count", delta);
+            cv.put("count", count);
             db.insert("step", null, cv);
         } else {
+            count += delta;
             ContentValues cv = new ContentValues();
-            cv.put("count", count + delta);
+            cv.put("count", count);
             db.update("step", cv, "time = ?", new String[]{Long.toString(day)});
         }
+
+        for (StepCountUpdatedListener listener : mStepCountUpdateListeners)
+            listener.onStepCountUpdated(count);
 
         return this;
     }
@@ -227,5 +245,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete("activity", null, new String[]{});
         return this;
+    }
+
+    public static void addLocationAddedListener(LocationAddedListener listener) {
+        mLocationAddedListeners.add(listener);
+    }
+
+    public static void removeLocationAddedListener(LocationAddedListener listener) {
+        mLocationAddedListeners.remove(listener);
+    }
+
+    public static void addActivityAddedListener(ActivityAddedListener listener) {
+        mActivityAddedListeners.add(listener);
+    }
+
+    public static void removeActivityAddedListener(ActivityAddedListener listener) {
+        mActivityAddedListeners.remove(listener);
+    }
+
+    public static void addStepCountUpdatedListener(StepCountUpdatedListener listener) {
+        mStepCountUpdateListeners.add(listener);
+    }
+
+    public static void removeStepCountUpdatedListener(StepCountUpdatedListener listener) {
+        mStepCountUpdateListeners.remove(listener);
+    }
+
+    public interface LocationAddedListener {
+        void onLocationAdded(Location location);
+    }
+
+    public interface ActivityAddedListener {
+        void onactivityAdded(long time, int activity, int confidence);
+    }
+
+    public interface StepCountUpdatedListener {
+        void onStepCountUpdated(int count);
     }
 }
