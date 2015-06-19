@@ -950,6 +950,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             seriesAltitudeAvg.setDataPointsRadius(3);
             seriesAltitudeReal.setColor(Color.GRAY);
 
+            graph.removeAllSeries();
             graph.addSeries(seriesAltitudeReal);
             graph.addSeries(seriesAltitudeAvg);
 
@@ -1143,6 +1144,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             graph.getViewport().setMaxY(max);
 
             seriesStep.setSpacing(10);
+
+            graph.removeAllSeries();
             graph.addSeries(seriesStep);
 
             graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(this, SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)));
