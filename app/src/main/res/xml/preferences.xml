@@ -187,6 +187,12 @@
                     android:action="android.intent.action.VIEW"
                     android:data="http://worldwind.arc.nasa.gov/worldwind-nosa-1.3.html" />
             </Preference>
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="pref_correction_enabled"
+                android:key="pref_altitude_google"
+                android:summary="@string/summary_altitude_google"
+                android:title="@string/title_altitude_google" />
             <EditTextPreference
                 android:defaultValue="5"
                 android:inputType="number"

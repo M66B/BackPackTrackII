@@ -101,6 +101,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_PASSIVE_MINDIST = "pref_passive_mindist";
 
     public static final String PREF_CORRECTION_ENABLED = "pref_correction_enabled";
+    public static final String PREF_ALTITUDE_GOOGLE = "pref_altitude_google";
     public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
 
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
@@ -150,6 +151,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_PASSIVE_MINDIST = "0"; // meters
 
     public static final boolean DEFAULT_CORRECTION_ENABLED = true;
+    public static final boolean DEFAULT_ALTITUDE_GOOGLE = false;
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;

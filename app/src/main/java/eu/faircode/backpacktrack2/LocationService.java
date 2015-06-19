@@ -821,6 +821,16 @@ public class LocationService extends IntentService {
             // New location
             Log.w(TAG, "New location=" + location + " type=" + locationType);
 
+            if (!location.hasAltitude() &&
+                    prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_GOOGLE, ActivitySettings.DEFAULT_ALTITUDE_GOOGLE))
+                try {
+                    double elevation = GoogleElevation.getElevation(location, this);
+                    location.setAltitude(elevation);
+                    Log.w(TAG, "Google elevation=" + elevation);
+                } catch (Throwable ex) {
+                    Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                }
+
             // Get waypoint name
             String waypointName = null;
             if (locationType == LOCATION_WAYPOINT) {

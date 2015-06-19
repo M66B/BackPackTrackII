@@ -2,6 +2,7 @@ package eu.faircode.backpacktrack2;
 
 import android.content.Context;
 import android.location.Location;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,13 +16,15 @@ import java.net.URL;
 import javax.net.ssl.HttpsURLConnection;
 
 public class GoogleElevation {
+    private static final String TAG = "BPT2.GoogleElevation";
     public static final int cTimeOutMs = 30 * 1000;
 
-    public static void getElevation(Location location, Context context) throws IOException, JSONException {
+    public static double getElevation(Location location, Context context) throws IOException, JSONException {
         // https://developers.google.com/maps/documentation/elevation/
-        URL url = new URL("https://maps.googleapis.com/maps/api/elevation/json?sensor=true&locations=" +
+        URL url = new URL("https://maps.googleapis.com/maps/api/elevation/json?locations=" +
                 String.valueOf(location.getLatitude()) + "," +
                 String.valueOf(location.getLongitude()));
+        Log.d(TAG, "url=" + url);
         HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
         urlConnection.setConnectTimeout(cTimeOutMs);
         urlConnection.setReadTimeout(cTimeOutMs);
@@ -44,6 +47,7 @@ public class GoogleElevation {
             String line;
             while ((line = br.readLine()) != null)
                 json.append(line);
+            Log.d(TAG, json.toString());
 
             // Decode result
             JSONObject jroot = new JSONObject(json.toString());
@@ -51,7 +55,7 @@ public class GoogleElevation {
             if ("OK".equals(status)) {
                 JSONArray results = jroot.getJSONArray("results");
                 if (results.length() > 0)
-                    location.setAltitude(results.getJSONObject(0).getDouble("elevation"));
+                    return results.getJSONObject(0).getDouble("elevation");
                 else
                     throw new IOException("JSON no results");
             } else
