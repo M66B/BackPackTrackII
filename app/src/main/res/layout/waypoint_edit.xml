@@ -7,7 +7,7 @@
 
     <ImageView
         android:id="@+id/ivAdd"
-        android:layout_width="24dip"
+        android:layout_width="24dp"
         android:layout_height="?android:attr/listPreferredItemHeightSmall"
         android:layout_gravity="center_vertical"
         android:src="@android:drawable/ic_menu_add" />

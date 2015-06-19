@@ -3,18 +3,30 @@
     android:layout_height="match_parent"
     android:background="@android:color/transparent">
 
-    <TextView
-        android:id="@+id/appwidget_text"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:background="@color/color_black_50"
-        android:paddingLeft="6dp"
-        android:paddingRight="6dp"
-        android:text="10000"
-        android:textColor="@color/color_teal_300"
-        android:textSize="20dp"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:padding="6dp">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/backpacker" />
+
+        <TextView
+            android:id="@+id/appwidget_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:text="10000"
+            android:textColor="@color/color_teal_300"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
 </RelativeLayout>

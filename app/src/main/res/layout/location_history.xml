@@ -8,16 +8,16 @@
     <com.jjoe64.graphview.GraphView
         android:id="@+id/gvLocation"
         android:layout_width="match_parent"
-        android:layout_height="150dip" />
+        android:layout_height="150dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="6dip"
+        android:layout_marginTop="6dp"
         android:orientation="horizontal">
 
         <ImageView
-            android:layout_width="24dip"
+            android:layout_width="24dp"
             android:layout_height="wrap_content" />
 
         <TextView
@@ -26,7 +26,7 @@
             android:layout_marginLeft="6dp" />
 
         <ImageView
-            android:layout_width="24dip"
+            android:layout_width="24dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="3dp" />
 
