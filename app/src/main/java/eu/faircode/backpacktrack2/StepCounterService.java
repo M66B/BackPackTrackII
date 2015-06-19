@@ -2,6 +2,8 @@ package eu.faircode.backpacktrack2;
 
 import android.annotation.TargetApi;
 import android.app.Service;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -39,7 +41,14 @@ public class StepCounterService extends Service {
                     // Update total step count
                     int stepped = steps - last;
                     new DatabaseHelper(StepCounterService.this).updateSteps(new Date().getTime(), stepped).close();
+
+                    // Update UI
                     LocationService.updateState(StepCounterService.this);
+                    Intent intent = new Intent(StepCounterService.this, StepCountWidget.class);
+                    intent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
+                    int ids[] = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(new ComponentName(getApplication(), StepCountWidget.class));
+                    intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+                    sendBroadcast(intent);
 
                     // Check accumulated steps
                     int asteps = prefs.getInt(ActivitySettings.PREF_LAST_STEPS, 0);
