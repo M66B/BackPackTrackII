@@ -984,8 +984,9 @@ public class LocationService extends IntentService {
         notificationBuilder.setContentTitle(title);
         notificationBuilder.setContentText(text);
         notificationBuilder.setContentIntent(piSettings);
-        notificationBuilder.setWhen(lastLocation == null ? System.currentTimeMillis() : lastLocation.getTime());
         notificationBuilder.setUsesChronometer(true);
+        notificationBuilder.setWhen(lastLocation == null ? System.currentTimeMillis() : lastLocation.getTime());
+        notificationBuilder.setNumber(lastLocation == null ? 0 : Math.round(lastLocation.getAccuracy()));
         notificationBuilder.setAutoCancel(false);
         notificationBuilder.setOngoing(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
