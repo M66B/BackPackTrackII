@@ -528,6 +528,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static void firstRun(Context context) {
         Log.w(TAG, "First run");
 
+        new DatabaseHelper(context).updateSteps(new Date().getTime(), 0).close();
+
         LocationService.stopTracking(context);
         LocationService.startTracking(context);
 
