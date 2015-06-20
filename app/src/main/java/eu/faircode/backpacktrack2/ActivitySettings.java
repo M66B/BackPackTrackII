@@ -866,7 +866,21 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Live updates
         final DatabaseHelper.LocationChangedListener listener = new DatabaseHelper.LocationChangedListener() {
             @Override
-            public void onLocationChanged(Location location) {
+            public void onLocationAdded(Location location) {
+                update();
+            }
+
+            @Override
+            public void onLocationUpdated() {
+                update();
+            }
+
+            @Override
+            public void onLocationDeleted() {
+                update();
+            }
+
+            private void update() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -999,7 +1013,16 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Live updates
         final DatabaseHelper.ActivityChangedListener listener = new DatabaseHelper.ActivityChangedListener() {
             @Override
-            public void onactivityChanged(long time, int activity, int confidence) {
+            public void onActivityAdded(long time, int activity, int confidence) {
+                update();
+            }
+
+            @Override
+            public void onActivityDeleted() {
+                update();
+            }
+
+            private void update() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -1087,7 +1110,16 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Live updates
         final DatabaseHelper.StepCountChangedListener listener = new DatabaseHelper.StepCountChangedListener() {
             @Override
-            public void onStepCountChanged(int count) {
+            public void onStepCountAdded(long time, int count) {
+                update();
+            }
+
+            @Override
+            public void onStepCountUpdated(long time, int count) {
+                update();
+            }
+
+            private void update() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

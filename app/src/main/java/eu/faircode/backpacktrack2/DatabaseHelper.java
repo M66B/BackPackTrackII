@@ -123,7 +123,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.insert("location", null, cv);
 
             for (LocationChangedListener listener : mLocationChangedListeners)
-                listener.onLocationChanged(location);
+                listener.onLocationAdded(location);
 
             return this;
         }
@@ -135,6 +135,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ContentValues cv = new ContentValues();
             cv.put("name", name);
             db.update("location", cv, "ID = ?", new String[]{Integer.toString(id)});
+
+            for (LocationChangedListener listener : mLocationChangedListeners)
+                listener.onLocationUpdated();
+
             return this;
         }
     }
@@ -145,6 +149,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ContentValues cv = new ContentValues();
             cv.put("altitude", altitude);
             db.update("location", cv, "ID = ?", new String[]{Integer.toString(id)});
+
+            for (LocationChangedListener listener : mLocationChangedListeners)
+                listener.onLocationUpdated();
+
             return this;
         }
     }
@@ -153,6 +161,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
             db.delete("location", "ID = ?", new String[]{Integer.toString(id)});
+
+            for (LocationChangedListener listener : mLocationChangedListeners)
+                listener.onLocationDeleted();
+
             return this;
         }
     }
@@ -162,6 +174,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.w(TAG, "Delete from=" + from + " to=" + to);
             SQLiteDatabase db = this.getWritableDatabase();
             db.delete("location", "time >= ? AND time <= ?", new String[]{Long.toString(from), Long.toString(to)});
+
+            for (LocationChangedListener listener : mLocationChangedListeners)
+                listener.onLocationDeleted();
+
             return this;
         }
     }
@@ -194,7 +210,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.insert("activity", null, cv);
 
             for (ActivityChangedListener listener : mActivityChangedListeners)
-                listener.onactivityChanged(time, activity, confidence);
+                listener.onActivityAdded(time, activity, confidence);
 
             return this;
         }
@@ -204,6 +220,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
             db.delete("activity", null, new String[]{});
+
+            for (ActivityChangedListener listener : mActivityChangedListeners)
+                listener.onActivityDeleted();
+
             return this;
         }
     }
@@ -236,20 +256,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             if (count < 0) {
                 Log.w(TAG, "Creating new day time=" + day);
-                count = delta;
                 ContentValues cv = new ContentValues();
                 cv.put("time", day);
-                cv.put("count", count);
+                cv.put("count", delta);
                 db.insert("step", null, cv);
             } else {
-                count += delta;
                 ContentValues cv = new ContentValues();
-                cv.put("count", count);
+                cv.put("count", count + delta);
                 db.update("step", cv, "time = ?", new String[]{Long.toString(day)});
             }
 
             for (StepCountChangedListener listener : mStepCountChangedListeners)
-                listener.onStepCountChanged(count);
+                if (count < 0)
+                    listener.onStepCountAdded(day, delta);
+                else
+                    listener.onStepCountUpdated(day, count + delta);
 
             return this;
         }
@@ -307,14 +328,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public interface LocationChangedListener {
-        void onLocationChanged(Location location);
+        void onLocationAdded(Location location);
+
+        void onLocationUpdated();
+
+        void onLocationDeleted();
     }
 
     public interface ActivityChangedListener {
-        void onactivityChanged(long time, int activity, int confidence);
+        void onActivityAdded(long time, int activity, int confidence);
+
+        void onActivityDeleted();
     }
 
     public interface StepCountChangedListener {
-        void onStepCountChanged(int count);
+        void onStepCountAdded(long time, int count);
+
+        void onStepCountUpdated(long time, int count);
     }
 }
