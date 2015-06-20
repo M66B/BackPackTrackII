@@ -165,7 +165,7 @@ public class LocationService extends IntentService {
     private void handleActivity(Intent intent) {
         // Get last activity
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean lastStill = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
+        boolean lastStill = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.STILL) == DetectedActivity.STILL);
 
         // Get detected activity
         ActivityRecognitionResult activityResult = ActivityRecognitionResult.extractResult(intent);
@@ -225,8 +225,9 @@ public class LocationService extends IntentService {
                     startRepeatingAlarm(this);
             }
 
+            // Start/stop step counter service
             if (filterSteps)
-                if (onfoot)
+                if (onfoot) // Keep alive
                     startService(new Intent(this, StepCounterService.class));
                 else
                     stopService(new Intent(this, StepCounterService.class));
@@ -635,7 +636,7 @@ public class LocationService extends IntentService {
                 PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN) == DetectedActivity.STILL);
+                boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.STILL) == DetectedActivity.STILL);
                 String setting = (still ? ActivitySettings.PREF_RECOGNITION_INTERVAL_STILL : ActivitySettings.PREF_RECOGNITION_INTERVAL_MOVING);
                 String standard = (still ? ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_STILL : ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_MOVING);
                 int interval = Integer.parseInt(prefs.getString(setting, standard));
@@ -752,7 +753,7 @@ public class LocationService extends IntentService {
         // Keep step counter service alive
         boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
         boolean filterSteps = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_STEPS, ActivitySettings.DEFAULT_RECOGNITION_STEPS);
-        if (!recognition || !filterSteps)
+        if (!recognition || !filterSteps) // Keep alive
             context.startService(new Intent(context, StepCounterService.class));
     }
 
@@ -931,7 +932,7 @@ public class LocationService extends IntentService {
         // Get state
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int state = prefs.getInt(ActivitySettings.PREF_STATE, STATE_IDLE);
-        int activityType = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN);
+        int activityType = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
 
         // Get title
