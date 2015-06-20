@@ -41,7 +41,8 @@
     <string name="title_altitude_settings">Altitude</string>
     <string name="title_correction_enabled">Correction enabled</string>
     <string name="title_correction_egm96">EGM96 license</string>
-    <string name="title_altitude_google">Use Google elevation data</string>
+    <string name="title_altitude_waypoint">Google elevation for waypoints</string>
+    <string name="title_altitude_trackpoint">Google elevation for trackpoints</string>
     <string name="title_altitude_avg">Moving average: %s samples</string>
 
     <string name="title_recognition">Activity recognition</string>

@@ -41,7 +41,8 @@
     <string name="title_altitude_settings">Hoogte</string>
     <string name="title_correction_enabled">Correctie aan</string>
     <string name="title_correction_egm96">EGM96 licentie</string>
-    <string name="title_altitude_google">Gebruik Google hoogtegegevens</string>
+    <string name="title_altitude_waypoint">Google hoogte voor waypoints</string>
+    <string name="title_altitude_trackpoint">Google hoogte voor trackpoints</string>
     <string name="title_altitude_avg">Voortschrijdend gemiddelde: %s monsters</string>
 
     <string name="title_recognition">Activiteitsherkenning</string>

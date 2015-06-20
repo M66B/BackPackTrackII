@@ -99,7 +99,6 @@ public class LocationService extends IntentService {
     private static final int LOCATION_TRACKPOINT = 1;
     private static final int LOCATION_WAYPOINT = 2;
     private static final int LOCATION_PERIODIC = 3;
-    private static final int LOCATION_GEOTAG = 4;
 
     private static final int VIBRATE_SHORT = 250;
     private static final int VIBRATE_LONG = 500;
@@ -814,7 +813,7 @@ public class LocationService extends IntentService {
         // Filter nearby locations
         int pref_nearby = Integer.parseInt(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
-        if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT || locationType == LOCATION_GEOTAG ||
+        if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT ||
                 lastLocation == null || lastLocation.distanceTo(location) >= pref_nearby ||
                 (lastLocation.hasAccuracy() ? lastLocation.getAccuracy() : Float.MAX_VALUE) >
                         (location.hasAccuracy() ? location.getAccuracy() : Float.MAX_VALUE)) {
@@ -822,15 +821,7 @@ public class LocationService extends IntentService {
             Log.w(TAG, "New location=" + location + " type=" + locationType);
 
             // Add elevation data
-            boolean pref_google = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_GOOGLE, ActivitySettings.DEFAULT_ALTITUDE_GOOGLE);
-            if (!location.hasAltitude() && pref_google)
-                try {
-                    double elevation = GoogleElevation.getElevation(location, this);
-                    location.setAltitude(elevation);
-                    Log.w(TAG, "Google elevation=" + elevation);
-                } catch (Throwable ex) {
-                    Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                }
+            GoogleElevation.getElevation(location, locationType == LOCATION_WAYPOINT, this);
 
             // Get waypoint name
             String waypointName = null;

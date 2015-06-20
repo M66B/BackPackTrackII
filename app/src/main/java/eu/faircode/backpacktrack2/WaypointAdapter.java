@@ -4,14 +4,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,7 +46,6 @@ public class WaypointAdapter extends CursorAdapter {
         final int id = cursor.getInt(cursor.getColumnIndex("ID"));
         final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
         final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
-        final boolean hasAltitude = !cursor.isNull(cursor.getColumnIndex("altitude"));
         final String name = cursor.getString(cursor.getColumnIndex("name"));
 
         // Get views
@@ -116,22 +112,6 @@ public class WaypointAdapter extends CursorAdapter {
                                         new AsyncTask<Object, Object, Object>() {
                                             protected Object doInBackground(Object... params) {
                                                 new DatabaseHelper(context).updateLocationName(id, geocodedName).close();
-
-                                                // Add elevation data
-                                                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                                                boolean pref_google = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_GOOGLE, ActivitySettings.DEFAULT_ALTITUDE_GOOGLE);
-                                                if (!hasAltitude && pref_google)
-                                                    try {
-                                                        Location location = new Location("");
-                                                        location.setLatitude(latitude);
-                                                        location.setLongitude(longitude);
-                                                        double elevation = GoogleElevation.getElevation(location, context);
-                                                        Log.w(TAG, "Google elevation=" + elevation);
-                                                        new DatabaseHelper(context).updateLocationAltitude(id, elevation).close();
-                                                    } catch (Throwable ex) {
-                                                        Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                                                    }
-
                                                 return null;
                                             }
 

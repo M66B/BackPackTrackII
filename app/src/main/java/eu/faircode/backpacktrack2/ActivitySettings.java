@@ -101,7 +101,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_PASSIVE_MINDIST = "pref_passive_mindist";
 
     public static final String PREF_CORRECTION_ENABLED = "pref_correction_enabled";
-    public static final String PREF_ALTITUDE_GOOGLE = "pref_altitude_google";
+    public static final String PREF_ALTITUDE_WAYPOINT = "pref_altitude_waypoint";
+    public static final String PREF_ALTITUDE_TRACKPOINT = "pref_altitude_trackpoint";
     public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
 
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
@@ -151,7 +152,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_PASSIVE_MINDIST = "0"; // meters
 
     public static final boolean DEFAULT_CORRECTION_ENABLED = true;
-    public static final boolean DEFAULT_ALTITUDE_GOOGLE = false;
+    public static final boolean DEFAULT_ALTITUDE_WAYPOINT = true;
+    public static final boolean DEFAULT_ALTITUDE_TRACKPOINT = false;
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
@@ -650,16 +652,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                             new AsyncTask<Object, Object, Object>() {
                                 protected Object doInBackground(Object... params) {
                                     // Add elevation data
-                                    SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
-                                    boolean pref_google = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_GOOGLE, ActivitySettings.DEFAULT_ALTITUDE_GOOGLE);
-                                    if (!location.hasAltitude() && pref_google)
-                                        try {
-                                            double elevation = GoogleElevation.getElevation(location, ActivitySettings.this);
-                                            location.setAltitude(elevation);
-                                            Log.w(TAG, "Google elevation=" + elevation);
-                                        } catch (Throwable ex) {
-                                            Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                                        }
+                                    if (!location.hasAltitude())
+                                        GoogleElevation.getElevation(location, true, ActivitySettings.this);
 
                                     // Persist location
                                     new DatabaseHelper(ActivitySettings.this).insertLocation(location, geocodedName).close();
