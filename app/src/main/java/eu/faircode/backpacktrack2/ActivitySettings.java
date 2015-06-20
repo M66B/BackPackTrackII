@@ -319,6 +319,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         updateTitle(prefs, PREF_BLOGUSER);
         updateTitle(prefs, PREF_BLOGPWD);
 
+        updateTitle(prefs, PREF_SUPPORT);
+
         // Handle waypoint_edit waypoints
         pref_edit.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -445,7 +447,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                     SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
                     boolean debug = !prefs.getBoolean(PREF_DEBUG, false);
                     prefs.edit().putBoolean(PREF_DEBUG, debug).apply();
-                    Toast.makeText(ActivitySettings.this, "Debug " + debug, Toast.LENGTH_SHORT).show();
                     return true;
                 }
                 return false;
@@ -468,6 +469,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             key = PREF_SHARE;
         else if (PREF_LAST_UPLOAD.equals(key))
             key = PREF_UPLOAD;
+        else if (PREF_DEBUG.equals(key))
+            key = PREF_SUPPORT;
+
         Preference pref = findPreference(key);
 
         // Remove empty string settings
@@ -1272,6 +1276,13 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 pref.setTitle(getString(R.string.title_blogpwd, getString(R.string.msg_notset)));
             else
                 pref.setTitle(getString(R.string.title_blogpwd, "********"));
+
+        else if (PREF_SUPPORT.equals(key)) {
+            String summary = getString(R.string.summary_support);
+            if (LocationService.debugMode(this))
+                summary += "\nDebug: " + getString(R.string.msg_yes);
+            pref.setSummary(summary);
+        }
     }
 
     public static boolean isConnected(Context context) {

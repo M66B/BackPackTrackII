@@ -317,7 +317,6 @@
             android:title="@string/title_version" />
         <Preference
             android:key="pref_support"
-            android:summary="@string/summary_support"
             android:title="@string/title_support">
             <intent
                 android:action="android.intent.action.VIEW"

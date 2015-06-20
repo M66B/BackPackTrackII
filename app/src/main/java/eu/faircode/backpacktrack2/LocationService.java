@@ -372,7 +372,7 @@ public class LocationService extends IntentService {
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
             new DatabaseHelper(this).insertLocation(location, null).close();
             updateState(this);
-            if (prefs.getBoolean(ActivitySettings.PREF_DEBUG, false))
+            if (debugMode(this))
                 toast(getString(R.string.title_trackpoint) + " " + Math.round(bchange) + "° / " + Math.round(achange) + "m", Toast.LENGTH_LONG, this);
         }
     }
@@ -844,7 +844,7 @@ public class LocationService extends IntentService {
                     toast(waypointName, Toast.LENGTH_LONG, this);
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(locationType == LOCATION_TRACKPOINT ? VIBRATE_SHORT : VIBRATE_LONG);
-            } else if (prefs.getBoolean(ActivitySettings.PREF_DEBUG, false))
+            } else if (debugMode(this))
                 toast(getString(R.string.title_trackpoint), Toast.LENGTH_SHORT, this);
         } else
             Log.w(TAG, "Filtered location=" + location);
@@ -1151,7 +1151,7 @@ public class LocationService extends IntentService {
             return false;
     }
 
-    private static boolean debugMode(Context context) {
+    public static boolean debugMode(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getBoolean(ActivitySettings.PREF_DEBUG, false);
     }
