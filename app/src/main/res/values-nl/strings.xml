@@ -52,6 +52,7 @@
     <string name="title_recognition_confidence">Betrouwbaarheid activiteitsherkenning: %s%%</string>
     <string name="title_recognition_tilting">Filter activiteit \'kantelen\'</string>
     <string name="title_recognition_unknown">Filter activiteit \'onbekend\'</string>
+    <string name="title_recognition_steps">Filter valse stappen</string>
     <string name="title_recognition_history">Geschiedenis aan</string>
 
     <string name="title_step_counter">Stappenteller</string>
@@ -107,6 +108,7 @@
     <string name="summary_recognition_confidence">Recognize a new activity when the confidence is higher than the selected percentage</string>
     <string name="summary_recognition_tilting">Consider the recognized activity \'tilting\' not as motion</string>
     <string name="summary_recognition_unknown">Consider the recognized activity \'unknown\' not as motion, except when previously still</string>
+    <string name="summary_recognition_steps">Count only steps when activity on foot has been recognized</string>
 
     <string name="summary_step_delta">Update the step counter every selected number of steps</string>
     <string name="summary_step_size">Your step size in centimeters to calculate the distance walked</string>

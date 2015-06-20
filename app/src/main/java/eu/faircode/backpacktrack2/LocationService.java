@@ -197,9 +197,11 @@ public class LocationService extends IntentService {
             prefs.edit().putInt(ActivitySettings.PREF_LAST_CONFIDENCE, activity.getConfidence()).apply();
             updateState(this);
 
+            // Get parameters
             boolean still = (activity.getType() == DetectedActivity.STILL);
             boolean onfoot = (activity.getType() == DetectedActivity.ON_FOOT || activity.getType() == DetectedActivity.WALKING);
-            int steps = Integer.parseInt(prefs.getString(ActivitySettings.PREF_STEPS, ActivitySettings.DEFAULT_STEPS));
+            int stepCount = Integer.parseInt(prefs.getString(ActivitySettings.PREF_STEPS, ActivitySettings.DEFAULT_STEPS));
+            boolean filterSteps = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_STEPS, ActivitySettings.DEFAULT_RECOGNITION_STEPS);
 
             // Clear accumulated steps
             if (!still && !onfoot)
@@ -219,14 +221,15 @@ public class LocationService extends IntentService {
                 if (still) {
                     stopRepeatingAlarm(this);
                     stopLocating(this);
-                } else if (!onfoot || steps == 0 || !hasStepCounter(this))
+                } else if (!onfoot || stepCount == 0 || !hasStepCounter(this))
                     startRepeatingAlarm(this);
             }
 
-            if (onfoot)
-                startService(new Intent(this, StepCounterService.class));
-            else
-                stopService(new Intent(this, StepCounterService.class));
+            if (filterSteps)
+                if (onfoot)
+                    startService(new Intent(this, StepCounterService.class));
+                else
+                    stopService(new Intent(this, StepCounterService.class));
         }
     }
 
@@ -577,9 +580,12 @@ public class LocationService extends IntentService {
 
         // Start activity recognition / repeating alarm
         boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
-        if (recognition)
+        boolean filterSteps = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_STEPS, ActivitySettings.DEFAULT_RECOGNITION_STEPS);
+        if (recognition) {
             startActivityRecognition(context);
-        else {
+            if (!filterSteps)
+                context.startService(new Intent(context, StepCounterService.class));
+        } else {
             startRepeatingAlarm(context);
             context.startService(new Intent(context, StepCounterService.class));
         }
@@ -745,7 +751,8 @@ public class LocationService extends IntentService {
 
         // Keep step counter service alive
         boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
-        if (!recognition)
+        boolean filterSteps = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_STEPS, ActivitySettings.DEFAULT_RECOGNITION_STEPS);
+        if (!recognition || !filterSteps)
             context.startService(new Intent(context, StepCounterService.class));
     }
 

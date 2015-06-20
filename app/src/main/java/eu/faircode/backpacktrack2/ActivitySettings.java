@@ -111,6 +111,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_RECOGNITION_CONFIDENCE = "pref_recognition_confidence";
     public static final String PREF_RECOGNITION_TILTING = "pref_recognition_tilting";
     public static final String PREF_RECOGNITION_UNKNOWN = "pref_recognition_unknown";
+    public static final String PREF_RECOGNITION_STEPS = "pref_recognition_steps";
     public static final String PREF_RECOGNITION_HISTORY = "pref_recognition_history";
 
     public static final String PREF_STEP_DELTA = "pref_step_delta";
@@ -162,6 +163,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String DEFAULT_RECOGNITION_CONFIDENCE = "50"; // percentage
     public static final boolean DEFAULT_RECOGNITION_TILTING = true;
     public static final boolean DEFAULT_RECOGNITION_UNKNOWN = true;
+    public static final boolean DEFAULT_RECOGNITION_STEPS = true;
     public static final boolean DEFAULT_RECOGNITION_HISTORY = false;
 
     public static final String DEFAULT_STEP_DELTA = "10"; // steps
@@ -515,7 +517,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 PREF_PASSIVE_MINDIST.equals(key) ||
                 PREF_RECOGNITION_ENABLED.equals(key) ||
                 PREF_RECOGNITION_INTERVAL_STILL.equals(key) ||
-                PREF_RECOGNITION_INTERVAL_MOVING.equals(key))
+                PREF_RECOGNITION_INTERVAL_MOVING.equals(key) ||
+                PREF_RECOGNITION_STEPS.equals(key))
             new Thread(new Runnable() {
                 @Override
                 public void run() {
