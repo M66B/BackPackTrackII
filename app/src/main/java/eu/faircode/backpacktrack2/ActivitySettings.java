@@ -177,8 +177,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_BEST_LOCATION = "pref_best_location";
     public static final String PREF_SATS_FIXED = "pref_sats_fixed";
     public static final String PREF_SATS_VISIBLE = "pref_sats_visible";
-    public static final String PREF_LAST_STEP = "pref_last_step";
-    public static final String PREF_LAST_STEPS = "pref_last_steps";
+    public static final String PREF_LAST_STEP_COUNT = "pref_last_step";
+    public static final String PREF_LAST_ACCUMULATED_STEPS = "pref_last_steps";
 
     // Remember last values
     public static final String PREF_LAST_ACTIVITY = "pref_last_activity";
@@ -483,7 +483,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Reset tracking by steps
         if (PREF_STEPS.equals(key))
-            prefs.edit().remove(ActivitySettings.PREF_LAST_STEPS).apply();
+            prefs.edit().remove(ActivitySettings.PREF_LAST_ACCUMULATED_STEPS).apply();
 
         // Reset activity
         if (PREF_RECOGNITION_ENABLED.equals(key))

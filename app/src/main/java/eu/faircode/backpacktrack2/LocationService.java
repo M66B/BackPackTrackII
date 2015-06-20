@@ -205,7 +205,7 @@ public class LocationService extends IntentService {
 
             // Clear accumulated steps
             if (!still && !onfoot)
-                prefs.edit().remove(ActivitySettings.PREF_LAST_STEPS).apply();
+                prefs.edit().remove(ActivitySettings.PREF_LAST_ACCUMULATED_STEPS).apply();
 
             // Stop/start repeating alarm
             if (lastStill != still) {

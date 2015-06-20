@@ -14,7 +14,7 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, Intent intent) {
         Log.w(TAG, "Received " + intent);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        prefs.edit().remove(ActivitySettings.PREF_LAST_STEP).apply();
+        prefs.edit().remove(ActivitySettings.PREF_LAST_STEP_COUNT).apply();
 
         new Thread(new Runnable() {
             @Override
