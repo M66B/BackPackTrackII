@@ -22,8 +22,7 @@ public class PackageChangedReceiver extends BroadcastReceiver {
                         @Override
                         public void run() {
                             synchronized (context.getApplicationContext()) {
-                                LocationService.stopTracking(context);
-                                LocationService.startTracking(context);
+                                ActivitySettings.firstRun(context);
                             }
                         }
                     }).start();

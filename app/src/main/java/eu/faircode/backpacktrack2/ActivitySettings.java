@@ -251,7 +251,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // First run
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
         if (prefs.getBoolean(PREF_FIRST, true)) {
-            Log.w(TAG, "First run");
             prefs.edit().putBoolean(PREF_FIRST, false).apply();
 
             new Thread(new Runnable() {
@@ -525,6 +524,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     // Helper methods
 
     public static void firstRun(Context context) {
+        Log.w(TAG, "First run");
+
+        LocationService.stopTracking(context);
         LocationService.startTracking(context);
 
         Intent alarmIntent = new Intent(context, LocationService.class);
