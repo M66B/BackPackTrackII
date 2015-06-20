@@ -4,6 +4,7 @@
     android:background="@android:color/transparent">
 
     <LinearLayout
+        android:id="@+id/llCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -19,9 +20,10 @@
             android:src="@drawable/backpacker" />
 
         <TextView
-            android:id="@+id/appwidget_text"
+            android:id="@+id/tvCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="3dp"
             android:text="10000"
             android:textColor="@color/color_teal_300"

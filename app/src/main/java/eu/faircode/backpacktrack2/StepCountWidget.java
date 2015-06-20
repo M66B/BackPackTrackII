@@ -25,8 +25,8 @@ public class StepCountWidget extends AppWidgetProvider {
 
             for (int i = 0; i < appWidgetIds.length; i++) {
                 RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.step_widget);
-                views.setTextViewText(R.id.appwidget_text, Integer.toString(count));
-                views.setOnClickPendingIntent(R.id.appwidget_text, piSettings);
+                views.setOnClickPendingIntent(R.id.llCount, piSettings);
+                views.setTextViewText(R.id.tvCount, Integer.toString(count));
                 appWidgetManager.updateAppWidget(appWidgetIds[i], views);
             }
         } finally {
