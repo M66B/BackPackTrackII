@@ -31,6 +31,10 @@ public class GoogleElevation {
             } else if (!prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_TRACKPOINT, ActivitySettings.DEFAULT_ALTITUDE_TRACKPOINT))
                 return false;
 
+            // Check if connectivity
+            if (!ActivitySettings.isConnected(context))
+                return false;
+
             // https://developers.google.com/maps/documentation/elevation/
             URL url = new URL("https://maps.googleapis.com/maps/api/elevation/json?locations=" +
                     String.valueOf(location.getLatitude()) + "," +

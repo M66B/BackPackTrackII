@@ -200,7 +200,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.w(TAG, "Connectivity changed");
-            findPreference(PREF_UPLOAD).setEnabled(blogConfigured() && storageMounted() && isConnected());
+            findPreference(PREF_UPLOAD).setEnabled(blogConfigured() && storageMounted() && isConnected(ActivitySettings.this));
         }
     };
 
@@ -208,8 +208,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.w(TAG, "External storage changed");
-            findPreference(PREF_SHARE).setEnabled(blogConfigured() && storageMounted() && isConnected());
-            findPreference(PREF_UPLOAD).setEnabled(blogConfigured() && storageMounted() && isConnected());
+            findPreference(PREF_SHARE).setEnabled(storageMounted());
+            findPreference(PREF_UPLOAD).setEnabled(blogConfigured() && storageMounted() && isConnected(ActivitySettings.this));
         }
     };
 
@@ -341,7 +341,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         });
 
         // Handle upload GPX
-        pref_upload.setEnabled(blogConfigured() && storageMounted() && isConnected());
+        pref_upload.setEnabled(blogConfigured() && storageMounted() && isConnected(ActivitySettings.this));
         pref_upload.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -1240,8 +1240,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 pref.setTitle(getString(R.string.title_blogpwd, "********"));
     }
 
-    private boolean isConnected() {
-        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+    public static boolean isConnected(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
     }
