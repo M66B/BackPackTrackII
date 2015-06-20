@@ -43,7 +43,7 @@ public class WaypointAdapter extends CursorAdapter {
     @Override
     public void bindView(final View view, final Context context, final Cursor cursor) {
         // Get values
-        final int id = cursor.getInt(cursor.getColumnIndex("ID"));
+        final long id = cursor.getLong(cursor.getColumnIndex("ID"));
         final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
         final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
         final String name = cursor.getString(cursor.getColumnIndex("name"));

@@ -34,11 +34,12 @@ public class LocationAdapter extends CursorAdapter {
     @Override
     public void bindView(final View view, final Context context, final Cursor cursor) {
         // Get values
+        final long id = cursor.getLong(cursor.getColumnIndex("ID"));
         long time = cursor.getLong(cursor.getColumnIndex("time"));
-        String provider = cursor.getString(cursor.getColumnIndex("provider"));
+        final String provider = cursor.getString(cursor.getColumnIndex("provider"));
         final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
         final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
-        boolean hasAltitude = !cursor.isNull(cursor.getColumnIndex("altitude"));
+        final boolean hasAltitude = !cursor.isNull(cursor.getColumnIndex("altitude"));
         boolean hasBearing = !cursor.isNull(cursor.getColumnIndex("bearing"));
         boolean hasAccuracy = !cursor.isNull(cursor.getColumnIndex("accuracy"));
         double altitude = cursor.getDouble(cursor.getColumnIndex("altitude"));
@@ -76,15 +77,30 @@ public class LocationAdapter extends CursorAdapter {
         else
             tvDistance.setText(lastLocation == null ? "?" : Long.toString(Math.round(distance)));
 
-        if (name == null)
-            view.setClickable(false);
-        else
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (name != null)
                     Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
-                }
-            });
+            }
+        });
+
+        view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Location location = new Location(provider);
+                        location.setLatitude(latitude);
+                        location.setLongitude(longitude);
+                        if (GoogleElevation.getElevation(location, name != null, context))
+                            new DatabaseHelper(context).updateLocationAltitude(id, location.getAltitude()).close();
+                    }
+                }).start();
+                return true;
+            }
+        });
 
         // Handle share location
         ivShare.setOnClickListener(new View.OnClickListener() {

@@ -129,12 +129,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public DatabaseHelper updateLocationName(int id, String name) {
+    public DatabaseHelper updateLocationName(long id, String name) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues cv = new ContentValues();
             cv.put("name", name);
-            db.update("location", cv, "ID = ?", new String[]{Integer.toString(id)});
+            db.update("location", cv, "ID = ?", new String[]{Long.toString(id)});
 
             for (LocationChangedListener listener : mLocationChangedListeners)
                 listener.onLocationUpdated();
@@ -143,12 +143,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public DatabaseHelper updateLocationAltitude(int id, double altitude) {
+    public DatabaseHelper updateLocationAltitude(long id, double altitude) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues cv = new ContentValues();
             cv.put("altitude", altitude);
-            db.update("location", cv, "ID = ?", new String[]{Integer.toString(id)});
+            db.update("location", cv, "ID = ?", new String[]{Long.toString(id)});
 
             for (LocationChangedListener listener : mLocationChangedListeners)
                 listener.onLocationUpdated();
@@ -157,10 +157,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public DatabaseHelper deleteLocation(int id) {
+    public DatabaseHelper deleteLocation(long id) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
-            db.delete("location", "ID = ?", new String[]{Integer.toString(id)});
+            db.delete("location", "ID = ?", new String[]{Long.toString(id)});
 
             for (LocationChangedListener listener : mLocationChangedListeners)
                 listener.onLocationDeleted();
