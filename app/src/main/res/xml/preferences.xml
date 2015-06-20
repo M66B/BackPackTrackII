@@ -181,7 +181,7 @@
                 android:summary="@string/summary_correction_enabled"
                 android:title="@string/title_correction_enabled" />
             <Preference
-                android:dependency="pref_correction_enabled"
+                android:dependency="pref_enabled"
                 android:summary="@string/summary_correction_egm96"
                 android:title="@string/title_correction_egm96">
                 <intent
@@ -200,6 +200,14 @@
                 android:key="pref_altitude_trackpoint"
                 android:summary="@string/summary_altitude_google"
                 android:title="@string/title_altitude_trackpoint" />
+            <Preference
+                android:dependency="pref_enabled"
+                android:summary="@string/summary_altitude_google_terms"
+                android:title="@string/title_altitude_google_terms">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="https://developers.google.com/maps/terms" />
+            </Preference>
             <EditTextPreference
                 android:defaultValue="5"
                 android:inputType="number"

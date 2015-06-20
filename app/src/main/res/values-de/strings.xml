@@ -43,6 +43,7 @@
     <string name="title_correction_egm96">EGM96 Lizenz</string>
     <string name="title_altitude_waypoint">Google Höhe für  Waypoints</string>
     <string name="title_altitude_trackpoint">Google Höhe für Trackpoints</string>
+    <string name="title_altitude_google_terms">Google Maps/Google Earth APIs Terms of Services</string>
     <string name="title_altitude_avg">Gleitender Mittelwert: %s Proben</string>
 
     <string name="title_recognition">Aktivitätserkennung</string>
@@ -101,6 +102,7 @@
     <string name="summary_correction_enabled">Höhenkorrektur mittels EGM96</string>
     <string name="summary_correction_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nKlicken für Details (Öffnet im Browser)</string>
     <string name="summary_altitude_google">Nutze Google Höhe Daten für Standorte ohne Höheninformation (typische Netzwerkstandorte)</string>
+    <string name="summary_altitude_google_terms">Tap to read (will start the browser)</string>
     <string name="summary_altitude_avg">Filtern des Rauschens der GPS-Höhe unter Verwendung eines gleitenden Mittelwerts der ausgewählten Anzahl von Proben</string>
 
     <string name="summary_recognition_enabled">Erkennen ob Sie sich bewegen oder stillstehen, und Tracking ausschalten wenn Sie stillstehen</string>

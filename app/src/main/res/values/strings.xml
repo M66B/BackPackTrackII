@@ -43,6 +43,7 @@
     <string name="title_correction_egm96">EGM96 license</string>
     <string name="title_altitude_waypoint">Google elevation for waypoints</string>
     <string name="title_altitude_trackpoint">Google elevation for trackpoints</string>
+    <string name="title_altitude_google_terms">Google Maps/Google Earth APIs Terms of Services</string>
     <string name="title_altitude_avg">Moving average: %s samples</string>
 
     <string name="title_recognition">Activity recognition</string>
@@ -101,6 +102,7 @@
     <string name="summary_correction_enabled">GPS altitude correction using EGM96</string>
     <string name="summary_correction_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nTap for more information (will start the browser)</string>
     <string name="summary_altitude_google">Request Google elevation data for locations without altitude information (typical network locations)</string>
+    <string name="summary_altitude_google_terms">Tap to read (will start the browser)</string>
     <string name="summary_altitude_avg">Filter the noise of the GPS altitude using a moving average with the selected number of samples</string>
 
     <string name="summary_recognition_enabled">Recognize if you are still or moving and disable tracking when you are still</string>
