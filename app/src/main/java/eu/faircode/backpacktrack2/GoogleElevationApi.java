@@ -17,7 +17,7 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class GoogleElevation {
+public class GoogleElevationApi {
     private static final String TAG = "BPT2.GoogleElevation";
     public static final int cTimeOutMs = 30 * 1000;
 

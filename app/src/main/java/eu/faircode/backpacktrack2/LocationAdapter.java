@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,11 +20,17 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 
 public class LocationAdapter extends CursorAdapter {
+    private Context mContext;
     private Location lastLocation;
 
     public LocationAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        mContext = context;
+        init();
+    }
+
+    public void init() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
         lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
     }
 
@@ -94,8 +102,19 @@ public class LocationAdapter extends CursorAdapter {
                         Location location = new Location(provider);
                         location.setLatitude(latitude);
                         location.setLongitude(longitude);
-                        if (GoogleElevation.getElevation(location, name != null, context))
+                        if (GoogleElevationApi.getElevation(location, name != null, context)) {
+                            // persist altitude
                             new DatabaseHelper(context).updateLocationAltitude(id, location.getAltitude()).close();
+
+                            // Notify user
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(context, context.getString(R.string.msg_updated,
+                                            name == null ? context.getString(R.string.title_waypoint) : name), Toast.LENGTH_LONG).show();
+                                }
+                            });
+                        }
                     }
                 }).start();
                 return true;

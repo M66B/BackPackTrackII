@@ -659,7 +659,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                                 protected Object doInBackground(Object... params) {
                                     // Add elevation data
                                     if (!location.hasAltitude())
-                                        GoogleElevation.getElevation(location, true, ActivitySettings.this);
+                                        GoogleElevationApi.getElevation(location, true, ActivitySettings.this);
 
                                     // Persist location
                                     new DatabaseHelper(ActivitySettings.this).insertLocation(location, geocodedName).close();
@@ -892,6 +892,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                     public void run() {
                         Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
                         adapter.changeCursor(cursor);
+                        adapter.init(); // Possible new last location
                         lv.setAdapter(adapter);
                         showAltitudeGraph(graphView);
                     }

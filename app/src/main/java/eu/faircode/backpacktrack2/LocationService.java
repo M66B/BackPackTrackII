@@ -821,7 +821,7 @@ public class LocationService extends IntentService {
             Log.w(TAG, "New location=" + location + " type=" + locationType);
 
             // Add elevation data
-            GoogleElevation.getElevation(location, locationType == LOCATION_WAYPOINT, this);
+            GoogleElevationApi.getElevation(location, locationType == LOCATION_WAYPOINT, this);
 
             // Get waypoint name
             String waypointName = null;
