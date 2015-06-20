@@ -15,7 +15,7 @@ public class StepCountWidget extends AppWidgetProvider {
         DatabaseHelper dh = null;
         try {
             dh = new DatabaseHelper(context);
-            int count = dh.getStepCount(new Date().getTime());
+            int count = dh.getSteps(new Date().getTime());
 
             Intent riSettings = new Intent(context, ActivitySettings.class);
             riSettings.setAction(Intent.ACTION_MAIN);

@@ -19,12 +19,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final long MS_DAY = 24 * 60 * 60 * 1000L;
 
-    private static List<LocationAddedListener> mLocationAddedListeners = new ArrayList<LocationAddedListener>();
-    private static List<ActivityAddedListener> mActivityAddedListeners = new ArrayList<ActivityAddedListener>();
-    private static List<StepCountUpdatedListener> mStepCountUpdateListeners = new ArrayList<StepCountUpdatedListener>();
+    private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
+    private static List<ActivityChangedListener> mActivityChangedListeners = new ArrayList<ActivityChangedListener>();
+    private static List<StepCountChangedListener> mStepCountChangedListeners = new ArrayList<StepCountChangedListener>();
+
+    private Context mContext;
 
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
+        mContext = context;
     }
 
     @Override
@@ -80,97 +83,87 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             createTableStep(db);
     }
 
+    // Location
+
     public DatabaseHelper insertLocation(Location location, String name) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
 
-        ContentValues cv = new ContentValues();
-        cv.put("time", location.getTime());
-        cv.put("provider", location.getProvider());
-        cv.put("latitude", location.getLatitude());
-        cv.put("longitude", location.getLongitude());
+            ContentValues cv = new ContentValues();
+            cv.put("time", location.getTime());
+            cv.put("provider", location.getProvider());
+            cv.put("latitude", location.getLatitude());
+            cv.put("longitude", location.getLongitude());
 
-        if (location.hasAltitude())
-            cv.put("altitude", location.getAltitude());
-        else
-            cv.putNull("altitude");
+            if (location.hasAltitude())
+                cv.put("altitude", location.getAltitude());
+            else
+                cv.putNull("altitude");
 
-        if (location.hasSpeed())
-            cv.put("speed", location.getSpeed());
-        else
-            cv.putNull("speed");
+            if (location.hasSpeed())
+                cv.put("speed", location.getSpeed());
+            else
+                cv.putNull("speed");
 
-        if (location.hasBearing())
-            cv.put("bearing", location.getBearing());
-        else
-            cv.putNull("bearing");
+            if (location.hasBearing())
+                cv.put("bearing", location.getBearing());
+            else
+                cv.putNull("bearing");
 
-        if (location.hasAccuracy())
-            cv.put("accuracy", location.getAccuracy());
-        else
-            cv.putNull("accuracy");
+            if (location.hasAccuracy())
+                cv.put("accuracy", location.getAccuracy());
+            else
+                cv.putNull("accuracy");
 
-        if (name == null)
-            cv.putNull("name");
-        else
+            if (name == null)
+                cv.putNull("name");
+            else
+                cv.put("name", name);
+
+            db.insert("location", null, cv);
+
+            for (LocationChangedListener listener : mLocationChangedListeners)
+                listener.onLocationChanged(location);
+
+            return this;
+        }
+    }
+
+    public DatabaseHelper updateLocationName(int id, String name) {
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues cv = new ContentValues();
             cv.put("name", name);
-
-        db.insert("location", null, cv);
-
-        for (LocationAddedListener listener : mLocationAddedListeners)
-            listener.onLocationAdded(location);
-
-        return this;
+            db.update("location", cv, "ID = ?", new String[]{Integer.toString(id)});
+            return this;
+        }
     }
 
-    public DatabaseHelper insertActivity(long time, int activity, int confidence) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues cv = new ContentValues();
-        cv.put("time", time);
-        cv.put("activity", activity);
-        cv.put("confidence", confidence);
-
-        db.insert("activity", null, cv);
-
-        for (ActivityAddedListener listener : mActivityAddedListeners)
-            listener.onactivityAdded(time, activity, confidence);
-
-        return this;
+    public DatabaseHelper updateLocationAltitude(int id, double altitude) {
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            cv.put("altitude", altitude);
+            db.update("location", cv, "ID = ?", new String[]{Integer.toString(id)});
+            return this;
+        }
     }
 
-    public DatabaseHelper updateSteps(long time, int delta) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        long day = time / MS_DAY * MS_DAY;
-
-        int count = -1;
-        Cursor c = null;
-        try {
-            c = db.query("step", new String[]{"count"}, "time = ?", new String[]{Long.toString(day)}, null, null, null, null);
-            if (c.moveToFirst())
-                count = c.getInt(c.getColumnIndex("count"));
-        } finally {
-            if (c != null)
-                c.close();
+    public DatabaseHelper deleteLocation(int id) {
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.delete("location", "ID = ?", new String[]{Integer.toString(id)});
+            return this;
         }
+    }
 
-        if (count < 0) {
-            Log.w(TAG, "Creating new day time=" + day);
-            count = delta;
-            ContentValues cv = new ContentValues();
-            cv.put("time", day);
-            cv.put("count", count);
-            db.insert("step", null, cv);
-        } else {
-            count += delta;
-            ContentValues cv = new ContentValues();
-            cv.put("count", count);
-            db.update("step", cv, "time = ?", new String[]{Long.toString(day)});
+    public DatabaseHelper deleteLocations(long from, long to) {
+        synchronized (mContext.getApplicationContext()) {
+            Log.w(TAG, "Delete from=" + from + " to=" + to);
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.delete("location", "time >= ? AND time <= ?", new String[]{Long.toString(from), Long.toString(to)});
+            return this;
         }
-
-        for (StepCountUpdatedListener listener : mStepCountUpdateListeners)
-            listener.onStepCountUpdated(count);
-
-        return this;
     }
 
     public Cursor getLocations(long from, long to, boolean trackpoints, boolean waypoints, boolean asc) {
@@ -187,12 +180,79 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery(query, new String[]{Long.toString(from), Long.toString(to)});
     }
 
+    // Activity
+
+    public DatabaseHelper insertActivity(long time, int activity, int confidence) {
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            ContentValues cv = new ContentValues();
+            cv.put("time", time);
+            cv.put("activity", activity);
+            cv.put("confidence", confidence);
+
+            db.insert("activity", null, cv);
+
+            for (ActivityChangedListener listener : mActivityChangedListeners)
+                listener.onactivityChanged(time, activity, confidence);
+
+            return this;
+        }
+    }
+
+    public DatabaseHelper deleteActivities() {
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.delete("activity", null, new String[]{});
+            return this;
+        }
+    }
+
     public Cursor getActivities(long from, long to) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT *, ID AS _id FROM activity";
         query += " WHERE time >= ? AND time <= ?";
         query += " ORDER BY time DESC";
         return db.rawQuery(query, new String[]{Long.toString(from), Long.toString(to)});
+    }
+
+    // Steps
+
+    public DatabaseHelper updateSteps(long time, int delta) {
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            long day = time / MS_DAY * MS_DAY;
+
+            int count = -1;
+            Cursor c = null;
+            try {
+                c = db.query("step", new String[]{"count"}, "time = ?", new String[]{Long.toString(day)}, null, null, null, null);
+                if (c.moveToFirst())
+                    count = c.getInt(c.getColumnIndex("count"));
+            } finally {
+                if (c != null)
+                    c.close();
+            }
+
+            if (count < 0) {
+                Log.w(TAG, "Creating new day time=" + day);
+                count = delta;
+                ContentValues cv = new ContentValues();
+                cv.put("time", day);
+                cv.put("count", count);
+                db.insert("step", null, cv);
+            } else {
+                count += delta;
+                ContentValues cv = new ContentValues();
+                cv.put("count", count);
+                db.update("step", cv, "time = ?", new String[]{Long.toString(day)});
+            }
+
+            for (StepCountChangedListener listener : mStepCountChangedListeners)
+                listener.onStepCountChanged(count);
+
+            return this;
+        }
     }
 
     public Cursor getSteps(boolean asc) {
@@ -204,7 +264,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery(query, new String[]{});
     }
 
-    public int getStepCount(long time) {
+    public int getSteps(long time) {
         long day = time / MS_DAY * MS_DAY;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = null;
@@ -220,74 +280,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public DatabaseHelper updateLocationName(int id, String name) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("name", name);
-        db.update("location", cv, "ID = ?", new String[]{Integer.toString(id)});
-        return this;
+    // Changes
+
+    public static void addLocationChangedListener(LocationChangedListener listener) {
+        mLocationChangedListeners.add(listener);
     }
 
-    public DatabaseHelper updateLocationAltitude(int id, double altitude) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put("altitude", altitude);
-        db.update("location", cv, "ID = ?", new String[]{Integer.toString(id)});
-        return this;
+    public static void removeLocationChangedListener(LocationChangedListener listener) {
+        mLocationChangedListeners.remove(listener);
     }
 
-    public DatabaseHelper deleteLocation(int id) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete("location", "ID = ?", new String[]{Integer.toString(id)});
-        return this;
+    public static void addActivityChangedListener(ActivityChangedListener listener) {
+        mActivityChangedListeners.add(listener);
     }
 
-    public DatabaseHelper deleteLocations(long from, long to) {
-        Log.w(TAG, "Delete from=" + from + " to=" + to);
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete("location", "time >= ? AND time <= ?", new String[]{Long.toString(from), Long.toString(to)});
-        return this;
+    public static void removeActivityChangedListener(ActivityChangedListener listener) {
+        mActivityChangedListeners.remove(listener);
     }
 
-    public DatabaseHelper deleteActivities() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete("activity", null, new String[]{});
-        return this;
+    public static void addStepCountChangedListener(StepCountChangedListener listener) {
+        mStepCountChangedListeners.add(listener);
     }
 
-    public static void addLocationAddedListener(LocationAddedListener listener) {
-        mLocationAddedListeners.add(listener);
+    public static void removeStepCountChangedListener(StepCountChangedListener listener) {
+        mStepCountChangedListeners.remove(listener);
     }
 
-    public static void removeLocationAddedListener(LocationAddedListener listener) {
-        mLocationAddedListeners.remove(listener);
+    public interface LocationChangedListener {
+        void onLocationChanged(Location location);
     }
 
-    public static void addActivityAddedListener(ActivityAddedListener listener) {
-        mActivityAddedListeners.add(listener);
+    public interface ActivityChangedListener {
+        void onactivityChanged(long time, int activity, int confidence);
     }
 
-    public static void removeActivityAddedListener(ActivityAddedListener listener) {
-        mActivityAddedListeners.remove(listener);
-    }
-
-    public static void addStepCountUpdatedListener(StepCountUpdatedListener listener) {
-        mStepCountUpdateListeners.add(listener);
-    }
-
-    public static void removeStepCountUpdatedListener(StepCountUpdatedListener listener) {
-        mStepCountUpdateListeners.remove(listener);
-    }
-
-    public interface LocationAddedListener {
-        void onLocationAdded(Location location);
-    }
-
-    public interface ActivityAddedListener {
-        void onactivityAdded(long time, int activity, int confidence);
-    }
-
-    public interface StepCountUpdatedListener {
-        void onStepCountUpdated(int count);
+    public interface StepCountChangedListener {
+        void onStepCountChanged(int count);
     }
 }

@@ -864,9 +864,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         lv.setAdapter(adapter);
 
         // Live updates
-        final DatabaseHelper.LocationAddedListener listener = new DatabaseHelper.LocationAddedListener() {
+        final DatabaseHelper.LocationChangedListener listener = new DatabaseHelper.LocationChangedListener() {
             @Override
-            public void onLocationAdded(Location location) {
+            public void onLocationChanged(Location location) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -878,7 +878,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 });
             }
         };
-        DatabaseHelper.addLocationAddedListener(listener);
+        DatabaseHelper.addLocationChangedListener(listener);
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
@@ -896,7 +896,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                DatabaseHelper.removeLocationAddedListener(listener);
+                DatabaseHelper.removeLocationChangedListener(listener);
             }
         });
         alertDialog.show();
@@ -997,9 +997,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         lv.setAdapter(adapter);
 
         // Live updates
-        final DatabaseHelper.ActivityAddedListener listener = new DatabaseHelper.ActivityAddedListener() {
+        final DatabaseHelper.ActivityChangedListener listener = new DatabaseHelper.ActivityChangedListener() {
             @Override
-            public void onactivityAdded(long time, int activity, int confidence) {
+            public void onactivityChanged(long time, int activity, int confidence) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -1010,7 +1010,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 });
             }
         };
-        DatabaseHelper.addActivityAddedListener(listener);
+        DatabaseHelper.addActivityChangedListener(listener);
 
         // Handle delete
         ImageView ivDelete = (ImageView) viewHistory.findViewById(R.id.ivDelete);
@@ -1063,7 +1063,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                DatabaseHelper.removeActivityAddedListener(listener);
+                DatabaseHelper.removeActivityChangedListener(listener);
             }
         });
         alertDialog.show();
@@ -1085,9 +1085,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         lv.setAdapter(adapter);
 
         // Live updates
-        final DatabaseHelper.StepCountUpdatedListener listener = new DatabaseHelper.StepCountUpdatedListener() {
+        final DatabaseHelper.StepCountChangedListener listener = new DatabaseHelper.StepCountChangedListener() {
             @Override
-            public void onStepCountUpdated(int count) {
+            public void onStepCountChanged(int count) {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -1099,7 +1099,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 });
             }
         };
-        DatabaseHelper.addStepCountUpdatedListener(listener);
+        DatabaseHelper.addStepCountChangedListener(listener);
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
@@ -1117,7 +1117,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                DatabaseHelper.removeStepCountUpdatedListener(listener);
+                DatabaseHelper.removeStepCountChangedListener(listener);
             }
         });
         alertDialog.show();
