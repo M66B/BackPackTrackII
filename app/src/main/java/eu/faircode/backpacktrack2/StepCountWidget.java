@@ -3,6 +3,7 @@ package eu.faircode.backpacktrack2;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.RemoteViews;
@@ -33,6 +34,14 @@ public class StepCountWidget extends AppWidgetProvider {
             if (dh != null)
                 dh.close();
         }
+    }
+
+    public static void updateWidgets(Context context) {
+        Intent intent = new Intent(context, StepCountWidget.class);
+        intent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
+        int ids[] = AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, StepCountWidget.class));
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+        context.sendBroadcast(intent);
     }
 }
 

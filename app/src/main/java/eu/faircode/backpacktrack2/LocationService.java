@@ -563,6 +563,8 @@ public class LocationService extends IntentService {
 
     private void handleDaily(Intent intent) {
         new DatabaseHelper(this).updateSteps(new Date().getTime(), 0).close();
+        updateState(this);
+        StepCountWidget.updateWidgets(this);
     }
 
     // Start/stop methods

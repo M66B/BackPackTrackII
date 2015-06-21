@@ -44,11 +44,7 @@ public class StepCounterService extends Service {
 
                     // Update UI
                     LocationService.updateState(StepCounterService.this);
-                    Intent intent = new Intent(StepCounterService.this, StepCountWidget.class);
-                    intent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
-                    int ids[] = AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(new ComponentName(getApplication(), StepCountWidget.class));
-                    intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-                    sendBroadcast(intent);
+                    StepCountWidget.updateWidgets(StepCounterService.this);
 
                     // Check accumulated steps
                     int asteps = prefs.getInt(ActivitySettings.PREF_LAST_ACCUMULATED_STEPS, 0);
