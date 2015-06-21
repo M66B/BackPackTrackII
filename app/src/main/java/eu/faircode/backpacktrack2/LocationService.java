@@ -1000,7 +1000,8 @@ public class LocationService extends IntentService {
         else
             notificationBuilder.setSmallIcon(R.drawable.explore);
 
-        notificationBuilder.setColor(context.getResources().getColor(R.color.color_teal_600));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            notificationBuilder.setColor(context.getResources().getColor(R.color.color_teal_600));
         notificationBuilder.setContentTitle(title);
         notificationBuilder.setContentText(text);
         notificationBuilder.setContentIntent(piSettings);
