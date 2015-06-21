@@ -896,7 +896,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                         Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
                         adapter.changeCursor(cursor);
                         adapter.init(); // Possible new last location
-                        lv.setAdapter(adapter);
                         showAltitudeGraph(graphView);
                     }
                 });
