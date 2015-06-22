@@ -98,7 +98,7 @@ Waypoints are mostly represented by symbols, like a little flag.
 
 GPX extensions are [non standard data elements](http://www.topografix.com/gpx/1/1/#type_extensionsType).
 
-BackPackTrack II can write the following GPX extensions:
+BackPackTrack II can write the following GPX extension elements:
 
 * Provider
 * Speed
@@ -109,36 +109,42 @@ BackPackTrack II can write the following GPX extensions:
 * Step count
 
 <a name="FAQ8"></a>
-**(8) What actions exist for Tasker or similar?**
+**(8) Can I automate things?**
+
+Yes, you can, for example with [Tasker](http://tasker.dinglisch.net/).
 
 Enable/disable tracking:
 
-* am startservice -a eu.faircode.backpacktrack2.TRACKING --ez Enable false
-* am startservice -a eu.faircode.backpacktrack2.TRACKING --ez Enable true
+* *am startservice -a eu.faircode.backpacktrack2.TRACKING --ez Enable false*
+* *am startservice -a eu.faircode.backpacktrack2.TRACKING --ez Enable true*
+
+The default is to enable tracking.
 
 Request trackpoint/waypoint:
 
-* am startservice -a eu.faircode.backpacktrack2.TRACKPOINT
-* am startservice -a eu.faircode.backpacktrack2.WAYPOINT
+* *am startservice -a eu.faircode.backpacktrack2.TRACKPOINT*
+* *am startservice -a eu.faircode.backpacktrack2.WAYPOINT*
 
 Write/upload GPX:
 
-* am startservice -a eu.faircode.backpacktrack2.WRITE_GPX
-* am startservice -a eu.faircode.backpacktrack2.UPLOAD_GPX
+* *am startservice -a eu.faircode.backpacktrack2.WRITE_GPX*
+* *am startservice -a eu.faircode.backpacktrack2.UPLOAD_GPX*
+
+Make sure you have configured your weblog URL and authorization data before trying to upload.
 
 Possible parameters:
 
-* --es TrackName "Test" (default: "BackPackTrack")
-* --ez WriteExtensions false (default: false)
-* --ez DeleteData false (default: false)
-* --es TimeFrom "1970-1-1" (default: beginning of time)
-* --es TimeTo "2015-1-1" (default: end of time)
+* *--es TrackName "Test"* (default: "BackPackTrack")
+* *--ez WriteExtensions false* (default: false)
+* *--ez DeleteData false* (default: false)
+* *--es TimeFrom "1970-1-1"* (default: beginning of time)
+* *--es TimeTo "2015-6-22"* (default: end of time)
 
 For example:
 
-am startservice -a eu.faircode.backpacktrack2.WRITE_GPX --es TrackName "Test" --ez WriteExtensions false --ez DeleteData false --es TimeFrom "1970-1-1" --es TimeTo "2015-1-1"
+*am startservice -a eu.faircode.backpacktrack2.WRITE_GPX --es TrackName "Test" --ez WriteExtensions false --ez DeleteData false --es TimeFrom "1970-1-1" --es TimeTo "2015-1-1"*
 
-
+Note that there is not any interaction with the user interface for any of the actions.
 
 Android permissions
 -------------------
