@@ -935,6 +935,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, true);
         int colTime = cursor.getColumnIndex("time");
+        int colProvider = cursor.getColumnIndex("provider");
         int colAltitude = cursor.getColumnIndex("altitude");
 
         int samples = Integer.parseInt(prefs.getString(PREF_ALTITUDE_AVG, DEFAULT_ALTITUDE_AVG));
@@ -943,26 +944,30 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         while (cursor.moveToNext())
             if (!cursor.isNull(colAltitude)) {
-                data = true;
+                String provider = cursor.getString(colProvider);
+                if (LocationManager.NETWORK_PROVIDER.equals(provider) ||
+                        LocationManager.GPS_PROVIDER.equals(provider)) {
+                    data = true;
 
-                long time = cursor.getLong(colTime);
-                if (time > from && time < minTime)
-                    minTime = time;
-                if (time > maxTime)
-                    maxTime = time;
+                    long time = cursor.getLong(colTime);
+                    if (time > from && time < minTime)
+                        minTime = time;
+                    if (time > maxTime)
+                        maxTime = time;
 
-                double alt = cursor.getDouble(colAltitude);
-                if (alt < minAlt)
-                    minAlt = alt;
-                if (alt > maxAlt)
-                    maxAlt = alt;
+                    double alt = cursor.getDouble(colAltitude);
+                    if (alt < minAlt)
+                        minAlt = alt;
+                    if (alt > maxAlt)
+                        maxAlt = alt;
 
-                avg = (n * avg + alt) / (n + 1);
-                if (n < samples)
-                    n++;
+                    avg = (n * avg + alt) / (n + 1);
+                    if (n < samples)
+                        n++;
 
-                seriesAltitudeReal.appendData(new DataPoint(new Date(time), alt), true, Integer.MAX_VALUE);
-                seriesAltitudeAvg.appendData(new DataPoint(new Date(time), avg), true, Integer.MAX_VALUE);
+                    seriesAltitudeReal.appendData(new DataPoint(new Date(time), alt), true, Integer.MAX_VALUE);
+                    seriesAltitudeAvg.appendData(new DataPoint(new Date(time), avg), true, Integer.MAX_VALUE);
+                }
             }
 
         if (data) {
