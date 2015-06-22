@@ -96,13 +96,24 @@ public class LocationAdapter extends CursorAdapter {
         view.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                // Check if enabled
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                if (name == null) {
+                    if (!prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_TRACKPOINT, ActivitySettings.DEFAULT_ALTITUDE_TRACKPOINT))
+                        return false;
+                } else {
+                    if (!prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_WAYPOINT, ActivitySettings.DEFAULT_ALTITUDE_WAYPOINT))
+                        return false;
+                }
+
+                // Get elevation
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
                         Location location = new Location(provider);
                         location.setLatitude(latitude);
                         location.setLongitude(longitude);
-                        if (GoogleElevationApi.getElevation(location, name != null, context)) {
+                        if (GoogleElevationApi.getElevation(location, context)) {
                             // persist altitude
                             new DatabaseHelper(context).updateLocationAltitude(id, location.getAltitude()).close();
 
@@ -111,12 +122,14 @@ public class LocationAdapter extends CursorAdapter {
                                 @Override
                                 public void run() {
                                     Toast.makeText(context, context.getString(R.string.msg_updated,
-                                            name == null ? context.getString(R.string.title_waypoint) : name), Toast.LENGTH_LONG).show();
+                                            name == null ? context.getString(R.string.title_waypoint) : name), Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
                     }
                 }).start();
+
+                // Feedback
                 return true;
             }
         });

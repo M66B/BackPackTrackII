@@ -21,16 +21,8 @@ public class GoogleElevationApi {
     private static final String TAG = "BPT2.GoogleElevation";
     public static final int cTimeOutMs = 30 * 1000;
 
-    public static boolean getElevation(Location location, boolean waypoint, Context context) {
+    public static boolean getElevation(Location location, Context context) {
         try {
-            // Check if enabled
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            if (waypoint) {
-                if (!prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_WAYPOINT, ActivitySettings.DEFAULT_ALTITUDE_WAYPOINT))
-                    return false;
-            } else if (!prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_TRACKPOINT, ActivitySettings.DEFAULT_ALTITUDE_TRACKPOINT))
-                return false;
-
             // Check if connectivity
             if (!ActivitySettings.isConnected(context))
                 return false;

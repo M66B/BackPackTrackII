@@ -913,8 +913,15 @@ public class LocationService extends IntentService {
             Log.w(TAG, "New location=" + location + " type=" + locationType);
 
             // Add elevation data
-            if (!location.hasAltitude())
-                GoogleElevationApi.getElevation(location, locationType == LOCATION_WAYPOINT, this);
+            if (!location.hasAltitude()) {
+                if (locationType == LOCATION_WAYPOINT) {
+                    if (prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_WAYPOINT, ActivitySettings.DEFAULT_ALTITUDE_WAYPOINT))
+                        GoogleElevationApi.getElevation(location, this);
+                } else {
+                    if (prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_TRACKPOINT, ActivitySettings.DEFAULT_ALTITUDE_TRACKPOINT))
+                        GoogleElevationApi.getElevation(location, this);
+                }
+            }
 
             // Get waypoint name
             String waypointName = null;

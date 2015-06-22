@@ -30,6 +30,7 @@ import android.os.Environment;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
@@ -653,8 +654,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                             new AsyncTask<Object, Object, Object>() {
                                 protected Object doInBackground(Object... params) {
                                     // Add elevation data
-                                    if (!location.hasAltitude())
-                                        GoogleElevationApi.getElevation(location, true, ActivitySettings.this);
+                                    if (!location.hasAltitude()) {
+                                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ActivitySettings.this);
+                                        if (prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_WAYPOINT, ActivitySettings.DEFAULT_ALTITUDE_WAYPOINT))
+                                            GoogleElevationApi.getElevation(location, ActivitySettings.this);
+                                    }
 
                                     // Persist location
                                     new DatabaseHelper(ActivitySettings.this).insertLocation(location, geocodedName, -1, -1, -1).close();
