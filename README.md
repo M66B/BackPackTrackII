@@ -103,6 +103,7 @@ Android permissions
 * READ/WRITE_EXTERNAL_STORAGE: to write GPX files to the external/shared storage
 * INTERNET: to upload GPX files (solely)
 * ACCESS_NETWORK_STATE: to disable/enable the upload menu
+* WAKE_LOCK: to keep your device awake while processing locations, steps, etc in the background
 
 Activity recognition (provided by Google Play services) does not require internet access.
 

@@ -22,6 +22,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
@@ -112,8 +113,14 @@ public class LocationService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.w(TAG, "Intent=" + intent);
+        PowerManager.WakeLock wakeLock = null;
         try {
+            PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
+            wakeLock.acquire();
+
+            Log.w(TAG, "Intent=" + intent);
+
             if (ACTION_ACTIVITY.equals(intent.getAction()))
                 handleActivity(intent);
 
@@ -157,6 +164,9 @@ public class LocationService extends IntentService {
                 Log.w(TAG, "Unknown action");
         } catch (Throwable ex) {
             Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+        } finally {
+            if (wakeLock != null)
+                wakeLock.release();
         }
     }
 
