@@ -15,7 +15,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BACKPACKTRACKII";
-    private static final int DB_VERSION = 3;
+    private static final int DB_VERSION = 4;
 
     private static final long MS_DAY = 24 * 60 * 60 * 1000L;
 
@@ -49,7 +49,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", speed REAL NULL" +
                 ", bearing REAL NULL" +
                 ", accuracy REAL NULL" +
-                ", name TEXT" + ");");
+                ", name TEXT" +
+                ", activity_type INTEGER NULL" +
+                ", activity_confidence INTEGER NULL" +
+                ", stepcount INTEGER NULL" +
+                ");");
         db.execSQL("CREATE INDEX idx_location_time ON location(time)");
         db.execSQL("CREATE INDEX idx_location_name ON location(name)");
     }
@@ -81,11 +85,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (oldVersion < 3)
             createTableStep(db);
+
+        if (oldVersion < 4) {
+            db.execSQL("ALTER TABLE location ADD COLUMN activity_type INTEGER NULL");
+            db.execSQL("ALTER TABLE location ADD COLUMN activity_confidence INTEGER NULL");
+            db.execSQL("ALTER TABLE location ADD COLUMN stepcount INTEGER NULL");
+        }
+
+        db.setVersion(DB_VERSION);
     }
 
     // Location
 
-    public DatabaseHelper insertLocation(Location location, String name) {
+    public DatabaseHelper insertLocation(Location location, String name, int activity_type, int activity_confidence, int stepcount) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
 
@@ -119,6 +131,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cv.putNull("name");
             else
                 cv.put("name", name);
+
+            if (activity_type >= 0)
+                cv.put("activity_type", activity_type);
+            if (activity_confidence >= 0)
+                cv.put("activity_confidence", activity_confidence);
+            if (stepcount >= 0)
+                cv.put("stepcount", stepcount);
 
             db.insert("location", null, cv);
 

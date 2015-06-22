@@ -93,6 +93,21 @@ It is the waypoints and trackpoints which are being exported to a GPX file.
 Most GPX visualization tools connect trackpoints by line segments, designating the path you have followed.
 Waypoints are mostly represented by symbols, like a little flag.
 
+<a name="FAQ7"></a>
+**(7) What are GPX extensions?**
+
+GPX extensions are [non standard data elements](http://www.topografix.com/gpx/1/1/#type_extensionsType).
+
+BackPackTrack II can write the following GPX extensions:
+
+* Provider
+* Speed
+* Bearing
+* Accuracy
+* Recognized activity type
+* Recognized activity confidence
+* Step count
+
 Android permissions
 -------------------
 

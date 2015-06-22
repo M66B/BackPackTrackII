@@ -130,7 +130,7 @@
 
     <string name="title_export">GPX Datei exportieren</string>
     <string name="title_track">Track Name:</string>
-    <string name="title_extensions">Benutze GPX Extensions (Provider, Geschwindigkeit, Richtung, Präzision)</string>
+    <string name="title_extensions">Benutze GPX Extensions</string>
     <string name="title_delete">Daten nach dem Export löschen</string>
     <string name="title_from">Von Datum/Uhrzeit:</string>
     <string name="title_to">Bis Datum/Uhrzeit:</string>

@@ -657,7 +657,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                                         GoogleElevationApi.getElevation(location, true, ActivitySettings.this);
 
                                     // Persist location
-                                    new DatabaseHelper(ActivitySettings.this).insertLocation(location, geocodedName).close();
+                                    new DatabaseHelper(ActivitySettings.this).insertLocation(location, geocodedName, -1, -1, -1).close();
                                     return null;
                                 }
 

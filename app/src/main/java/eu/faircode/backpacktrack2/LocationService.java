@@ -378,8 +378,21 @@ public class LocationService extends IntentService {
         }
 
         if (update) {
+            // Persist new location
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
-            new DatabaseHelper(this).insertLocation(location, null).close();
+            DatabaseHelper dh = null;
+            try {
+                dh = new DatabaseHelper(this);
+                int activity_type = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN);
+                int activity_confidence = prefs.getInt(ActivitySettings.PREF_LAST_CONFIDENCE, -1);
+                int stepcount = dh.getSteps(location.getTime());
+                dh.insertLocation(location, null, activity_type, activity_confidence, stepcount).close();
+            } finally {
+                if (dh != null)
+                    dh.close();
+            }
+
+            // Feedback
             updateState(this);
             if (debugMode(this))
                 toast(getString(R.string.title_trackpoint) + " " + Math.round(bchange) + "° / " + Math.round(achange) + "m", Toast.LENGTH_LONG, this);
@@ -477,7 +490,7 @@ public class LocationService extends IntentService {
             location.setLongitude(lon);
             if (name == null)
                 name = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
-            new DatabaseHelper(this).insertLocation(location, name).close();
+            new DatabaseHelper(this).insertLocation(location, name, -1, -1, -1).close();
             toast(getString(R.string.msg_added, name), Toast.LENGTH_LONG, this);
         }
     }
@@ -853,7 +866,17 @@ public class LocationService extends IntentService {
 
             // Persist new location
             prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
-            new DatabaseHelper(this).insertLocation(location, waypointName).close();
+            DatabaseHelper dh = null;
+            try {
+                dh = new DatabaseHelper(this);
+                int activity_type = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN);
+                int activity_confidence = prefs.getInt(ActivitySettings.PREF_LAST_CONFIDENCE, -1);
+                int stepcount = dh.getSteps(location.getTime());
+                dh.insertLocation(location, waypointName, activity_type, activity_confidence, stepcount).close();
+            } finally {
+                if (dh != null)
+                    dh.close();
+            }
 
             // Feedback
             updateState(this);
@@ -1128,7 +1151,7 @@ public class LocationService extends IntentService {
             databaseHelper = new DatabaseHelper(context);
             trackPoints = databaseHelper.getLocations(from, to, true, false, true);
             wayPoints = databaseHelper.getLocations(from, to, false, true, true);
-            GPXFileWriter.writeGpxFile(new File(gpxFileName), trackName, extensions, trackPoints, wayPoints);
+            GPXFileWriter.writeGpxFile(new File(gpxFileName), trackName, extensions, trackPoints, wayPoints, context);
         } finally {
             if (wayPoints != null)
                 wayPoints.close();
