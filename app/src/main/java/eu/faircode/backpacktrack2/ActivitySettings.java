@@ -827,10 +827,12 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 .setPositiveButton(android.R.string.ok,
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                prefs.edit().putString(PREF_LAST_TRACK, tvTrackName.getText().toString()).apply();
-                                prefs.edit().putBoolean(PREF_LAST_EXTENSIONS, cbExtensions.isChecked()).apply();
-                                prefs.edit().putLong(PREF_LAST_FROM, from.getTimeInMillis()).apply();
-                                prefs.edit().putLong(PREF_LAST_TO, to.getTimeInMillis()).apply();
+                                if (!cbDelete.isChecked()) {
+                                    prefs.edit().putString(PREF_LAST_TRACK, tvTrackName.getText().toString()).apply();
+                                    prefs.edit().putBoolean(PREF_LAST_EXTENSIONS, cbExtensions.isChecked()).apply();
+                                    prefs.edit().putLong(PREF_LAST_FROM, from.getTimeInMillis()).apply();
+                                    prefs.edit().putLong(PREF_LAST_TO, to.getTimeInMillis()).apply();
+                                }
                                 intent.putExtra(LocationService.EXTRA_TRACK, tvTrackName.getText().toString());
                                 intent.putExtra(LocationService.EXTRA_EXTENSIONS, cbExtensions.isChecked());
                                 intent.putExtra(LocationService.EXTRA_DELETE, cbDelete.isChecked());
