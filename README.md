@@ -45,6 +45,8 @@ Works on Android 4.1 (Jelly Bean) and later.
 
 You can ask questions [here](http://forum.xda-developers.com/android/apps-games/app-backpacktrack-ii-t3123682).
 
+If you like BackPackTrack II, you can let me know through a small [PayPal donation](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=GLEM6UVPH9A64).
+
 Frequently asked questions
 --------------------------
 
