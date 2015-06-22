@@ -21,7 +21,6 @@
     <string name="title_use_network">Nutze Netzwerk Provider</string>
     <string name="title_use_gps">Nutze GPS Provider</string>
     <string name="title_interval">Tracking Hüufigkeit: %s Sekunden</string>
-    <string name="title_steps">Zu Fuß Tracking: %s steps</string>
     <string name="title_altitude">Höhe bevorzugt</string>
     <string name="title_tp_accuracy">Bevorzugte Trackpoint Präzision: %s Meter</string>
     <string name="title_wp_accuracy">Bevorzugtke Wegpunkt Präzision: %s Meter</string>
@@ -84,7 +83,6 @@
     <string name="summary_loc_settings">Klicken um Android Standorteinstellungen zu öffnen</string>
 
     <string name="summary_interval">Versuche eine neue Position jede Anzahl von Sekunden zu bestimmen</string>
-    <string name="summary_steps">Versuche eine neue Position jede ausgewählte Anzal von Stritten zu bestimmen (0 eingeben zum deaktivieren)</string>
     <string name="summary_altitude">Bevorzuge eine ungenauere Position mit Höheninformationen zu einer genaueren Position ohne Höheninformationen</string>
     <string name="summary_accuracy">Beende die Standortbestimmung nach dem eine Position mit der ausgewählten Präzision ermittelt wurde</string>
     <string name="summary_timeout">Beende immer die Standortbestimmung nach der ausgewählten Sekundenanzahl</string>

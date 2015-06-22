@@ -210,12 +210,7 @@ public class LocationService extends IntentService {
             // Get parameters
             boolean still = (activity.getType() == DetectedActivity.STILL);
             boolean onfoot = (activity.getType() == DetectedActivity.ON_FOOT || activity.getType() == DetectedActivity.WALKING);
-            int stepCount = Integer.parseInt(prefs.getString(ActivitySettings.PREF_STEPS, ActivitySettings.DEFAULT_STEPS));
-            boolean filterSteps = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_STEPS, ActivitySettings.DEFAULT_RECOGNITION_STEPS);
-
-            // Clear accumulated steps
-            if (!still && !onfoot)
-                prefs.edit().remove(ActivitySettings.PREF_LAST_ACCUMULATED_STEPS).apply();
+            boolean recognizeSteps = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_STEPS, ActivitySettings.DEFAULT_RECOGNITION_STEPS);
 
             // Stop/start repeating alarm
             if (lastStill != still) {
@@ -231,12 +226,12 @@ public class LocationService extends IntentService {
                 if (still) {
                     stopRepeatingAlarm(this);
                     stopLocating(this);
-                } else if (!onfoot || stepCount == 0 || !hasStepCounter(this))
+                } else
                     startRepeatingAlarm(this);
             }
 
             // Start/stop step counter service
-            if (filterSteps)
+            if (recognizeSteps)
                 if (onfoot) // Keep alive
                     startService(new Intent(this, StepCounterService.class));
                 else
@@ -764,8 +759,10 @@ public class LocationService extends IntentService {
 
         // Keep step counter service alive
         boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
-        boolean filterSteps = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_STEPS, ActivitySettings.DEFAULT_RECOGNITION_STEPS);
-        if (!recognition || !filterSteps) // Keep alive
+        boolean recognizeSteps = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_STEPS, ActivitySettings.DEFAULT_RECOGNITION_STEPS);
+        int activity = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
+        boolean onfoot = (activity == DetectedActivity.ON_FOOT || activity == DetectedActivity.WALKING);
+        if (!recognition || !recognizeSteps || onfoot) // Keep alive
             context.startService(new Intent(context, StepCounterService.class));
     }
 
