@@ -706,7 +706,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         final boolean ampm = android.text.format.DateFormat.is24HourFormat(this);
 
         // Set last track name/extensions
-        tvTrackName.setText(prefs.getString(PREF_LAST_TRACK, "BackPackTrack"));
+        tvTrackName.setText(prefs.getString(PREF_LAST_TRACK, LocationService.DEFAULT_TRACK_NAME));
         cbExtensions.setChecked(prefs.getBoolean(PREF_LAST_EXTENSIONS, false));
 
         // Get default from
@@ -833,11 +833,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                                     prefs.edit().putLong(PREF_LAST_FROM, from.getTimeInMillis()).apply();
                                     prefs.edit().putLong(PREF_LAST_TO, to.getTimeInMillis()).apply();
                                 }
-                                intent.putExtra(LocationService.EXTRA_TRACK, tvTrackName.getText().toString());
-                                intent.putExtra(LocationService.EXTRA_EXTENSIONS, cbExtensions.isChecked());
-                                intent.putExtra(LocationService.EXTRA_DELETE, cbDelete.isChecked());
-                                intent.putExtra(LocationService.EXTRA_FROM, from.getTimeInMillis());
-                                intent.putExtra(LocationService.EXTRA_TO, to.getTimeInMillis());
+                                intent.putExtra(LocationService.EXTRA_TRACK_NAME, tvTrackName.getText().toString());
+                                intent.putExtra(LocationService.EXTRA_WRITE_EXTENSIONS, cbExtensions.isChecked());
+                                intent.putExtra(LocationService.EXTRA_DELETE_DATA, cbDelete.isChecked());
+                                intent.putExtra(LocationService.EXTRA_TIME_FROM, from.getTimeInMillis());
+                                intent.putExtra(LocationService.EXTRA_TIME_TO, to.getTimeInMillis());
                                 startService(intent);
                             }
                         })

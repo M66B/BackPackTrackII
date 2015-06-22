@@ -88,7 +88,16 @@
         <service
             android:name=".LocationService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="true">
+            <intent-filter>
+                <action android:name="eu.faircode.backpacktrack2.TRACKING" />
+                <action android:name="eu.faircode.backpacktrack2.TRACKPOINT" />
+                <action android:name="eu.faircode.backpacktrack2.WAYPOINT" />
+                <action android:name="eu.faircode.backpacktrack2.WRITE_GPX" />
+                <action android:name="eu.faircode.backpacktrack2.UPLOAD_GPX" />
+            </intent-filter>
+
+        </service>
         <service
             android:name=".GpsStatusService"
             android:enabled="true"

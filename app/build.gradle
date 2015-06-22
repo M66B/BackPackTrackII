@@ -26,4 +26,12 @@ dependencies {
     compile 'de.timroes:aXMLRPC:1.8.0'
     compile 'org.jdom:jdom2:2.0.6'
     compile 'com.jjoe64:graphview:4.0.1'
+    compile 'joda-time:joda-time:2.8.1'
+}
+
+android {
+    packagingOptions {
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+    }
 }

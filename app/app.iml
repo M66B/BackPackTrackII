@@ -96,6 +96,7 @@
     <orderEntry type="library" exported="" name="graphview-4.0.1" level="project" />
     <orderEntry type="library" exported="" name="support-v4-22.0.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-base-7.5.0" level="project" />
+    <orderEntry type="library" exported="" name="joda-time-2.8.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-22.0.0" level="project" />
     <orderEntry type="library" exported="" name="aXMLRPC-1.8.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-location-7.5.0" level="project" />

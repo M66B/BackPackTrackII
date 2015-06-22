@@ -19,6 +19,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -45,6 +46,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+
+import org.joda.time.DateTime;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -84,13 +87,22 @@ public class LocationService extends IntentService {
     public static final String ACTION_SHARE_GPX = "ShareGPX";
     public static final String ACTION_UPLOAD_GPX = "UploadGPX";
 
+    private static final String EXPORTED_ACTION_TRACKING = "eu.faircode.backpacktrack2.TRACKING";
+    private static final String EXPORTED_ACTION_TRACKPOINT = "eu.faircode.backpacktrack2.TRACKPOINT";
+    private static final String EXPORTED_ACTION_WAYPOINT = "eu.faircode.backpacktrack2.WAYPOINT";
+    private static final String EXPORTED_ACTION_WRITE_GPX = "eu.faircode.backpacktrack2.WRITE_GPX";
+    private static final String EXPORTED_ACTION_UPLOAD_GPX = "eu.faircode.backpacktrack2.UPLOAD_GPX";
+
     // Extras
-    public static final String EXTRA_TRACK = "Track";
-    public static final String EXTRA_EXTENSIONS = "Extensions";
-    public static final String EXTRA_DELETE = "Delete";
-    public static final String EXTRA_FROM = "From";
-    public static final String EXTRA_TO = "To";
+    public static final String EXTRA_ENABLE = "Enable";
+    public static final String EXTRA_TRACK_NAME = "TrackName";
+    public static final String EXTRA_WRITE_EXTENSIONS = "WriteExtensions";
+    public static final String EXTRA_DELETE_DATA = "DeleteData";
+    public static final String EXTRA_TIME_FROM = "TimeFrom";
+    public static final String EXTRA_TIME_TO = "TimeTo";
     public static final String EXTRA_GEOURI = "Geopoint";
+
+    public static final String DEFAULT_TRACK_NAME = "BackPackTrack";
 
     // Constants
     private static final int STATE_IDLE = 1;
@@ -121,7 +133,10 @@ public class LocationService extends IntentService {
 
             Log.w(TAG, "Intent=" + intent);
 
-            if (ACTION_ACTIVITY.equals(intent.getAction()))
+            if (EXPORTED_ACTION_TRACKING.equals(intent.getAction()))
+                handleTrackingEnable(intent);
+
+            else if (ACTION_ACTIVITY.equals(intent.getAction()))
                 handleActivity(intent);
 
             else if (ACTION_TRACKPOINT.equals(intent.getAction()) ||
@@ -129,7 +144,15 @@ public class LocationService extends IntentService {
                     ACTION_ALARM.equals(intent.getAction()))
                 handleLocationRequest(intent);
 
-            else if (ACTION_LOCATION_FINE.equals(intent.getAction()) ||
+            else if (EXPORTED_ACTION_TRACKPOINT.equals(intent.getAction())) {
+                intent.setAction(ACTION_TRACKPOINT);
+                handleLocationRequest(intent);
+
+            } else if (EXPORTED_ACTION_WAYPOINT.equals(intent.getAction())) {
+                intent.setAction(ACTION_WAYPOINT);
+                handleLocationRequest(intent);
+
+            } else if (ACTION_LOCATION_FINE.equals(intent.getAction()) ||
                     ACTION_LOCATION_COARSE.equals(intent.getAction()))
                 handleLocationUpdate(intent);
 
@@ -157,7 +180,15 @@ public class LocationService extends IntentService {
             else if (ACTION_UPLOAD_GPX.equals(intent.getAction()))
                 handleUpload(intent);
 
-            else if (ACTION_DAILY.equals(intent.getAction()))
+            else if (EXPORTED_ACTION_WRITE_GPX.equals(intent.getAction())) {
+                convertTime(intent);
+                handleShare(intent);
+
+            } else if (EXPORTED_ACTION_UPLOAD_GPX.equals(intent.getAction())) {
+                convertTime(intent);
+                handleUpload(intent);
+
+            } else if (ACTION_DAILY.equals(intent.getAction()))
                 handleDaily(intent);
 
             else
@@ -171,6 +202,16 @@ public class LocationService extends IntentService {
     }
 
     // Handle intents methods
+
+    private void handleTrackingEnable(Intent intent) {
+        boolean enable = intent.getBooleanExtra(EXTRA_ENABLE, true);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.edit().putBoolean(ActivitySettings.PREF_ENABLED, enable).apply();
+        if (enable)
+            startTracking(this);
+        else
+            stopTracking(this);
+    }
 
     private void handleActivity(Intent intent) {
         // Get last activity
@@ -498,19 +539,14 @@ public class LocationService extends IntentService {
     private void handleShare(Intent intent) {
         try {
             // Write GPX file
-            String trackName = intent.getStringExtra(EXTRA_TRACK);
-            boolean extensions = intent.getBooleanExtra(EXTRA_EXTENSIONS, false);
-            boolean delete = intent.getBooleanExtra(EXTRA_DELETE, false);
-            long from = intent.getLongExtra(EXTRA_FROM, 0);
-            long to = intent.getLongExtra(EXTRA_TO, 0);
+            String trackName = intent.getStringExtra(EXTRA_TRACK_NAME);
+            if (trackName == null)
+                trackName = DEFAULT_TRACK_NAME;
+            boolean extensions = intent.getBooleanExtra(EXTRA_WRITE_EXTENSIONS, false);
+            boolean delete = intent.getBooleanExtra(EXTRA_DELETE_DATA, false);
+            long from = intent.getLongExtra(EXTRA_TIME_FROM, 0);
+            long to = intent.getLongExtra(EXTRA_TIME_TO, Long.MAX_VALUE);
             String gpxFileName = writeGPXFile(trackName, extensions, from, to, this);
-
-            // View file
-            Intent viewIntent = new Intent();
-            viewIntent.setAction(Intent.ACTION_VIEW);
-            viewIntent.setDataAndType(Uri.fromFile(new File(gpxFileName)), "application/gpx+xml");
-            viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(viewIntent);
 
             // Persist last share time
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -520,6 +556,15 @@ public class LocationService extends IntentService {
             // Delete data on request
             if (delete)
                 new DatabaseHelper(this).deleteLocations(from, to).close();
+
+            // View file
+            if (ACTION_SHARE_GPX.equals(intent.getAction())) {
+                Intent viewIntent = new Intent();
+                viewIntent.setAction(Intent.ACTION_VIEW);
+                viewIntent.setDataAndType(Uri.fromFile(new File(gpxFileName)), "application/gpx+xml");
+                viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(viewIntent);
+            }
         } catch (Throwable ex) {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             toast(ex.toString(), Toast.LENGTH_LONG, this);
@@ -529,10 +574,13 @@ public class LocationService extends IntentService {
     private void handleUpload(Intent intent) {
         try {
             // Write GPX file
-            String trackName = intent.getStringExtra(EXTRA_TRACK);
-            boolean extensions = intent.getBooleanExtra(EXTRA_EXTENSIONS, false);
-            long from = intent.getLongExtra(EXTRA_FROM, 0);
-            long to = intent.getLongExtra(EXTRA_TO, 0);
+            String trackName = intent.getStringExtra(EXTRA_TRACK_NAME);
+            if (trackName == null)
+                trackName = DEFAULT_TRACK_NAME;
+            boolean extensions = intent.getBooleanExtra(EXTRA_WRITE_EXTENSIONS, false);
+            boolean delete = intent.getBooleanExtra(EXTRA_DELETE_DATA, false);
+            long from = intent.getLongExtra(EXTRA_TIME_FROM, 0);
+            long to = intent.getLongExtra(EXTRA_TIME_TO, Long.MAX_VALUE);
             String gpxFileName = writeGPXFile(trackName, extensions, from, to, this);
 
             // Get GPX file content
@@ -569,10 +617,16 @@ public class LocationService extends IntentService {
             String lastUpload = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
             prefs.edit().putString(ActivitySettings.PREF_LAST_UPLOAD, lastUpload).apply();
 
+            // Delete data on request
+            if (delete)
+                new DatabaseHelper(this).deleteLocations(from, to).close();
+
             // Feedback
-            toast(getString(R.string.msg_uploaded, url), Toast.LENGTH_LONG, this);
-            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            vibrator.vibrate(500);
+            if (ACTION_UPLOAD_GPX.equals(intent.getAction())) {
+                toast(getString(R.string.msg_uploaded, url), Toast.LENGTH_LONG, this);
+                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                vibrator.vibrate(500);
+            }
         } catch (Throwable ex) {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             toast(ex.toString(), Toast.LENGTH_LONG, this);
@@ -827,6 +881,14 @@ public class LocationService extends IntentService {
     }
 
     // Helper methods
+
+    private static void convertTime(Intent intent) {
+        Bundle extras = intent.getExtras();
+        if (extras.get(EXTRA_TIME_FROM) instanceof String)
+            intent.putExtra(EXTRA_TIME_FROM, new DateTime((String) extras.get(EXTRA_TIME_FROM)).getMillis());
+        if (extras.get(EXTRA_TIME_TO) instanceof String)
+            intent.putExtra(EXTRA_TIME_TO, new DateTime((String) extras.get(EXTRA_TIME_TO)).getMillis());
+    }
 
     private boolean isBetterLocation(Location prev, Location current) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -1139,11 +1201,13 @@ public class LocationService extends IntentService {
     }
 
     private static String writeGPXFile(String trackName, boolean extensions, long from, long to, Context context) throws IOException {
-        Log.w(TAG, "Writing track=" + trackName + " from=" + from + " to=" + to);
         File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separatorChar + "BackPackTrackII");
         folder.mkdirs();
         String gpxFileName = folder.getAbsolutePath() + File.separatorChar + trackName + ".gpx";
-        Log.w(TAG, "Writing file=" + gpxFileName);
+        Log.w(TAG, "Writing file=" + gpxFileName +
+                " extensions=" + extensions +
+                " from=" + SimpleDateFormat.getDateTimeInstance().format(new Date(from)) +
+                " to=" + SimpleDateFormat.getDateTimeInstance().format(new Date(to)));
         DatabaseHelper databaseHelper = null;
         Cursor trackPoints = null;
         Cursor wayPoints = null;

@@ -108,6 +108,38 @@ BackPackTrack II can write the following GPX extensions:
 * Recognized activity confidence
 * Step count
 
+<a name="FAQ8"></a>
+**(8) What actions exist for Tasker or similar?**
+
+Enable/disable tracking:
+
+* am startservice -a eu.faircode.backpacktrack2.TRACKING --ez Enable false
+* am startservice -a eu.faircode.backpacktrack2.TRACKING --ez Enable true
+
+Request trackpoint/waypoint:
+
+* am startservice -a eu.faircode.backpacktrack2.TRACKPOINT
+* am startservice -a eu.faircode.backpacktrack2.WAYPOINT
+
+Write/upload GPX:
+
+* am startservice -a eu.faircode.backpacktrack2.WRITE_GPX
+* am startservice -a eu.faircode.backpacktrack2.UPLOAD_GPX
+
+Possible parameters:
+
+* --es TrackName "Test" (default: "BackPackTrack")
+* --ez WriteExtensions false (default: false)
+* --ez DeleteData false (default: false)
+* --es TimeFrom "1970-1-1" (default: beginning of time)
+* --es TimeTo "2015-1-1" (default: end of time)
+
+For example:
+
+am startservice -a eu.faircode.backpacktrack2.WRITE_GPX --es TrackName "Test" --ez WriteExtensions false --ez DeleteData false --es TimeFrom "1970-1-1" --es TimeTo "2015-1-1"
+
+
+
 Android permissions
 -------------------
 
