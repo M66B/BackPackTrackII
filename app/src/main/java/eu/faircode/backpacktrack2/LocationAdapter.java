@@ -122,7 +122,7 @@ public class LocationAdapter extends CursorAdapter {
                                 @Override
                                 public void run() {
                                     Toast.makeText(context, context.getString(R.string.msg_updated,
-                                            name == null ? context.getString(R.string.title_waypoint) : name), Toast.LENGTH_SHORT).show();
+                                            name == null ? context.getString(R.string.title_trackpoint) : name), Toast.LENGTH_SHORT).show();
                                 }
                             });
                         }
