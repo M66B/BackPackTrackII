@@ -9,15 +9,16 @@ import android.location.Location;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BACKPACKTRACKII";
-    private static final int DB_VERSION = 4;
-
-    private static final long MS_DAY = 24 * 60 * 60 * 1000L;
+    private static final int DB_VERSION = 6;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityChangedListener> mActivityChangedListeners = new ArrayList<ActivityChangedListener>();
@@ -91,6 +92,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("ALTER TABLE location ADD COLUMN activity_confidence INTEGER NULL");
             db.execSQL("ALTER TABLE location ADD COLUMN stepcount INTEGER NULL");
         }
+
+        if (oldVersion < 5)
+            db.execSQL("UPDATE step SET time = time - " + TimeZone.getDefault().getOffset(new Date().getTime()));
 
         db.setVersion(DB_VERSION);
     }
@@ -260,7 +264,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public DatabaseHelper updateSteps(long time, int delta) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
-            long day = time / MS_DAY * MS_DAY;
+            long day = getDay(time);
 
             int count = -1;
             Cursor c = null;
@@ -305,7 +309,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public int getSteps(long time) {
-        long day = time / MS_DAY * MS_DAY;
+        long day = getDay(time);
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = null;
         try {
@@ -318,6 +322,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (c != null)
                 c.close();
         }
+    }
+
+    private long getDay(long ms) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(ms);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
     }
 
     // Changes

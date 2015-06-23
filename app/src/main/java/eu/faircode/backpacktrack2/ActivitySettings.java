@@ -1116,7 +1116,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Fill list
         final ListView lv = (ListView) viewHistory.findViewById(R.id.lvStepHistory);
         Cursor cursor = db.getSteps(false);
-        final StepAdapter adapter = new StepAdapter(ActivitySettings.this, cursor);
+        final StepCountAdapter adapter = new StepCountAdapter(ActivitySettings.this, cursor);
         lv.setAdapter(adapter);
 
         // Live updates

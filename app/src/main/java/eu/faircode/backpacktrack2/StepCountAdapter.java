@@ -12,11 +12,11 @@ import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 
-public class StepAdapter extends CursorAdapter {
+public class StepCountAdapter extends CursorAdapter {
     private int stepsize;
     private int weight;
 
-    public StepAdapter(Context context, Cursor cursor) {
+    public StepCountAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         stepsize = Integer.parseInt(prefs.getString(ActivitySettings.PREF_STEP_SIZE, ActivitySettings.DEFAULT_STEP_SIZE));
@@ -46,7 +46,7 @@ public class StepAdapter extends CursorAdapter {
         // http://www.runnersworld.com/weight-loss/how-many-calories-are-you-really-burning
 
         // Set values
-        tvTime.setText(SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(time));
+        tvTime.setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT).format(time));
         tvCount.setText(Long.toString(count));
         tvDistance.setText(Long.toString(Math.round(distance)));
         tvCalories.setText(Long.toString(Math.round(calories)));
