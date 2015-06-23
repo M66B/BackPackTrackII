@@ -440,7 +440,7 @@ public class LocationService extends IntentService {
             // Feedback
             updateState(this);
             if (debugMode(this))
-                toast(getString(R.string.title_trackpoint) + " " + Math.round(bchange) + "° / " + Math.round(achange) + "m", Toast.LENGTH_LONG, this);
+                toast(getString(R.string.title_trackpoint) + " " + Math.round(bchange) + "° / " + Math.round(achange) + "m", Toast.LENGTH_SHORT, this);
         }
     }
 
