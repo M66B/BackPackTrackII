@@ -146,42 +146,42 @@ For example:
 
 *am startservice -a eu.faircode.backpacktrack2.WRITE_GPX --es TrackName "Test" --ez WriteExtensions false --ez DeleteData false --es TimeFrom "1970-1-1" --es TimeTo "2015-1-1"*
 
-Tasker usecase examples
+Tasker use case examples
 
-Starting/stoping tracking based on a location:
+Starting/stopping tracking based on a location:
 
-Create a task and give it a name
-Select Code - Run Shell
-Command: *am startservice -a eu.faircode.backpacktrack2.TRACKING --ez Enable true*
-Select option "Use Root"
-Create a Profile and select Location. 
-Enter the desired LAT/LONG coordinates, select a radius and whether to use Network and/or GPS location.
-Link it to the Task create above.
+* Create a task and give it a name
+* Select Code - Run Shell
+* Command: *am startservice -a eu.faircode.backpacktrack2.TRACKING --ez Enable true*
+* Select option "Use Root"
+* Create a Profile and select Location.
+* Enter the desired LAT/LONG coordinates, select a radius and whether to use Network and/or GPS location.
+* Link it to the Task create above.
 
 Additionally an exit task can be created to stop tracking once you arrive back at the same location
-Command: *am startservice -a eu.faircode.backpacktrack2.TRACKING --ez Enable false*
 
-Creating a lauchner shortcut to write a GPX file:
+* Command: *am startservice -a eu.faircode.backpacktrack2.TRACKING --ez Enable false*
 
-Create a task and give it a name
-Select Code - Run Shell
-Command: *am startservice -a eu.faircode.backpacktrack2.WRITE_GPX --es TrackName "Test" --ez WriteExtensions false --ez DeleteData false --es TimeFrom "1970-1-1" --es TimeTo "2015-1-1"*
-Select option "Use Root"
-Select an icon for the task
+Creating a launcher shortcut to write a GPX file:
+
+* Create a task and give it a name
+* Select Code - Run Shell
+* Command: *am startservice -a eu.faircode.backpacktrack2.WRITE_GPX --es TrackName "Test" --ez WriteExtensions false --ez DeleteData false --es TimeFrom "1970-1-1" --es TimeTo "2015-1-1"*
+* Select option "Use Root"
+* Select an icon for the task
+
 Use your laucher's options for adding a Tasker widget to the homescreen
 
 Capture a Trackpoint when a photo is taken:
 
-Create a task and give it a name
-Select Code - Run Shell
-Command: *am startservice -a eu.faircode.backpacktrack2.TRACKPOINT*
-Select option "Use Root"
-Create a profile and select Event
-Select System - Intent Recieved
-Under Action enter: *android.hardware.action:NEW_PICTURE*
-Link it to the Task create above.
-
-Note that there is not any interaction with the user interface for any of the actions.
+* Create a task and give it a name
+* Select Code - Run Shell
+* Command: *am startservice -a eu.faircode.backpacktrack2.TRACKPOINT*
+* Select option "Use Root"
+* Create a profile and select Event
+* Select System - Intent Recieved
+* Under Action enter: *android.hardware.action:NEW_PICTURE*
+* Link it to the Task create above.
 
 Android permissions
 -------------------
