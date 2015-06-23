@@ -4,8 +4,9 @@
 
     <string name="title_action">Aktionen</string>
     <string name="title_edit">Wegpunkte bearbeiten</string>
-    <string name="title_share">GPX Datei teilen</string>
-    <string name="title_upload">GPX Datei Hochladen</string>
+    <string name="title_share_gpx">GPX Datei teilen</string>
+    <string name="title_share_kml">KML Datei teilen</string>
+    <string name="title_upload_gpx">GPX Datei Hochladen</string>
     <string name="title_location_history">Positionsverlauf</string>
     <string name="title_activity_history">Aktivitätenverlauf</string>
     <string name="title_step_history">Schrittverlauf</string>
@@ -75,8 +76,9 @@
     <string name="title_license">Lizenz</string>
 
     <string name="summary_edit">Wegpunkte hinzufügen, ändern oder entfernen</string>
-    <string name="summary_share">Klicken um eine GPX Datei zu erstellen und teilen\nLetzte Teilung: %s</string>
-    <string name="summary_upload">Klicken um eine GPX Dateien zu erstellen und auf ein WordPress Weblog hochzuladen\nLetzter Upload: %s</string>
+    <string name="summary_share_gpx">Klicken um eine GPX Datei zu erstellen und teilen\nLetzte Teilung: %s</string>
+    <string name="summary_share_kml">Klicken um eine KML Datei zu erstellen und teilen\nLetzte Teilung: %s</string>
+    <string name="summary_upload_gpx">Klicken um eine GPX Dateien zu erstellen und auf ein WordPress Weblog hochzuladen\nLetzter Upload: %s</string>
     <string name="summary_location_history">Zeige den Positionsverlauf um zu verifizieren, dass alles funktioniert</string>
     <string name="summary_activity_history">Zeige den Aktivitätenverlauf um zu verifizieren, dass alles funktioniert</string>
     <string name="summary_step_history">Zeige die täglich Schrittzahl, gelaufene Strecke und verbrante Kalorien</string>
@@ -128,7 +130,6 @@
     <string name="title_waypoint">Wegpunkt</string>
     <string name="title_accept">Akzeptieren</string>
 
-    <string name="title_export">GPX Datei exportieren</string>
     <string name="title_track">Track Name:</string>
     <string name="title_extensions">Benutze GPX Extensions</string>
     <string name="title_delete">Daten nach dem Export löschen</string>

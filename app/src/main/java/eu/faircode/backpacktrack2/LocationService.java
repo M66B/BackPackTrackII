@@ -85,6 +85,7 @@ public class LocationService extends IntentService {
     public static final String ACTION_WAYPOINT = "WayPoint";
     public static final String ACTION_GEOPOINT = "Geopoint";
     public static final String ACTION_SHARE_GPX = "ShareGPX";
+    public static final String ACTION_SHARE_KML = "ShareKML";
     public static final String ACTION_UPLOAD_GPX = "UploadGPX";
 
     private static final String EXPORTED_ACTION_TRACKING = "eu.faircode.backpacktrack2.TRACKING";
@@ -175,18 +176,21 @@ public class LocationService extends IntentService {
                 handleGeopoint(intent);
 
             else if (ACTION_SHARE_GPX.equals(intent.getAction()))
-                handleShare(intent);
+                handleShareGPX(intent);
+
+            else if (ACTION_SHARE_KML.equals(intent.getAction()))
+                handleShareKML(intent);
 
             else if (ACTION_UPLOAD_GPX.equals(intent.getAction()))
-                handleUpload(intent);
+                handleUploadGPX(intent);
 
             else if (EXPORTED_ACTION_WRITE_GPX.equals(intent.getAction())) {
                 convertTime(intent);
-                handleShare(intent);
+                handleShareGPX(intent);
 
             } else if (EXPORTED_ACTION_UPLOAD_GPX.equals(intent.getAction())) {
                 convertTime(intent);
-                handleUpload(intent);
+                handleUploadGPX(intent);
 
             } else if (ACTION_DAILY.equals(intent.getAction()))
                 handleDaily(intent);
@@ -536,7 +540,7 @@ public class LocationService extends IntentService {
         }
     }
 
-    private void handleShare(Intent intent) {
+    private void handleShareGPX(Intent intent) {
         try {
             // Write GPX file
             String trackName = intent.getStringExtra(EXTRA_TRACK_NAME);
@@ -550,8 +554,7 @@ public class LocationService extends IntentService {
 
             // Persist last share time
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            String lastShare = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
-            prefs.edit().putString(ActivitySettings.PREF_LAST_SHARE, lastShare).apply();
+            prefs.edit().putLong(ActivitySettings.PREF_LAST_SHARE_GPX, new Date().getTime()).apply();
 
             // Delete data on request
             if (delete)
@@ -571,7 +574,10 @@ public class LocationService extends IntentService {
         }
     }
 
-    private void handleUpload(Intent intent) {
+    private void handleShareKML(Intent intent) {
+    }
+
+    private void handleUploadGPX(Intent intent) {
         try {
             // Write GPX file
             String trackName = intent.getStringExtra(EXTRA_TRACK_NAME);
@@ -614,8 +620,7 @@ public class LocationService extends IntentService {
             Log.w(TAG, "Uploaded url=" + url);
 
             // Persist last upload time
-            String lastUpload = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
-            prefs.edit().putString(ActivitySettings.PREF_LAST_UPLOAD, lastUpload).apply();
+            prefs.edit().putLong(ActivitySettings.PREF_LAST_UPLOAD_GPX, new Date().getTime()).apply();
 
             // Delete data on request
             if (delete)

@@ -4,8 +4,9 @@
 
     <string name="title_action">Actions</string>
     <string name="title_edit">Edit waypoints</string>
-    <string name="title_share">Share GPX file</string>
-    <string name="title_upload">Upload GPX file</string>
+    <string name="title_share_gpx">Share GPX file</string>
+    <string name="title_share_kml">Share KML file</string>
+    <string name="title_upload_gpx">Upload GPX file</string>
     <string name="title_location_history">Location history</string>
     <string name="title_activity_history">Activity history</string>
     <string name="title_step_history">Walk history</string>
@@ -75,8 +76,9 @@
     <string name="title_license">License</string>
 
     <string name="summary_edit">Add, change or delete waypoints</string>
-    <string name="summary_share">Tap to write and share a GPX file\nLast share: %s</string>
-    <string name="summary_upload">Tap to write and upload a GPX file to a WordPress weblog\nLast upload: %s</string>
+    <string name="summary_share_gpx">Tap to write and share a GPX file\nLast share: %s</string>
+    <string name="summary_share_kml">Tap to write and share a KML file\nLast share: %s</string>
+    <string name="summary_upload_gpx">Tap to write and upload a GPX file to a WordPress weblog\nLast upload: %s</string>
     <string name="summary_location_history">Show the location history to verify everything works</string>
     <string name="summary_activity_history">Show the activity history to verify everything works</string>
     <string name="summary_step_history">Show the daily number of steps taken, distance walked and calories burned</string>
@@ -128,7 +130,6 @@
     <string name="title_waypoint">Waypoint</string>
     <string name="title_accept">Accept</string>
 
-    <string name="title_export">Export GPX file</string>
     <string name="title_track">Track name:</string>
     <string name="title_extensions">Use GPX extensions</string>
     <string name="title_delete">Delete data after exporting</string>

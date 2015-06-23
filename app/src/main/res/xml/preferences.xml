@@ -11,14 +11,19 @@
             android:title="@string/title_edit" />
         <Preference
             android:icon="@drawable/send_60"
-            android:key="pref_share"
-            android:summary="@string/summary_share"
-            android:title="@string/title_share" />
+            android:key="pref_share_gpx"
+            android:summary="@string/summary_share_gpx"
+            android:title="@string/title_share_gpx" />
+        <Preference
+            android:icon="@drawable/public_60"
+            android:key="pref_share_kml"
+            android:summary="@string/summary_share_kml"
+            android:title="@string/title_share_kml" />
         <Preference
             android:icon="@drawable/backup_60"
-            android:key="pref_upload"
-            android:summary="@string/summary_upload"
-            android:title="@string/title_upload" />
+            android:key="pref_upload_gpx"
+            android:summary="@string/summary_upload_gpx"
+            android:title="@string/title_upload_gpx" />
         <Preference
             android:icon="@drawable/location_60"
             android:key="pref_location_history"

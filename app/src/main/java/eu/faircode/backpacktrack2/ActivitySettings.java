@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -70,8 +71,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     // Preference names
     public static final String PREF_EDIT = "pref_edit";
-    public static final String PREF_SHARE = "pref_share";
-    public static final String PREF_UPLOAD = "pref_upload";
+    public static final String PREF_SHARE_GPX = "pref_share_gpx";
+    public static final String PREF_SHARE_KML = "pref_share_kml";
+    public static final String PREF_UPLOAD_GPX = "pref_upload_gpx";
     public static final String PREF_LOCATION_HISTORY = "pref_location_history";
     public static final String PREF_ACTIVITY_HISTORY = "pref_activity_history";
     public static final String PREF_STEP_HISTORY = "pref_step_history";
@@ -182,8 +184,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_LAST_ACTIVITY = "pref_last_activity";
     public static final String PREF_LAST_CONFIDENCE = "pref_last_confidence";
     public static final String PREF_LAST_LOCATION = "pref_last_location";
-    public static final String PREF_LAST_SHARE = "pref_last_share";
-    public static final String PREF_LAST_UPLOAD = "pref_last_upload";
+    public static final String PREF_LAST_SHARE_GPX = "pref_last_share_gpx";
+    public static final String PREF_LAST_SHARE_KML = "pref_last_share_kml";
+    public static final String PREF_LAST_UPLOAD_GPX = "pref_last_gpx_upload";
 
     public static final String PREF_LAST_TRACK = "pref_last_track";
     public static final String PREF_LAST_EXTENSIONS = "pref_last_extensions";
@@ -200,7 +203,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.w(TAG, "Connectivity changed");
-            findPreference(PREF_UPLOAD).setEnabled(blogConfigured() && storageMounted() && isConnected(ActivitySettings.this));
+            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && storageMounted() && isConnected(ActivitySettings.this));
         }
     };
 
@@ -208,8 +211,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.w(TAG, "External storage changed");
-            findPreference(PREF_SHARE).setEnabled(storageMounted());
-            findPreference(PREF_UPLOAD).setEnabled(blogConfigured() && storageMounted() && isConnected(ActivitySettings.this));
+            findPreference(PREF_SHARE_GPX).setEnabled(storageMounted());
+            findPreference(PREF_SHARE_KML).setEnabled(storageMounted());
+            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && storageMounted() && isConnected(ActivitySettings.this));
         }
     };
 
@@ -267,8 +271,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Get preferences
         Preference pref_edit = findPreference(PREF_EDIT);
-        Preference pref_share = findPreference(PREF_SHARE);
-        Preference pref_upload = findPreference(PREF_UPLOAD);
+        Preference pref_share_gpx = findPreference(PREF_SHARE_GPX);
+        Preference pref_share_kml = findPreference(PREF_SHARE_KML);
+        Preference pref_upload_gpx = findPreference(PREF_UPLOAD_GPX);
         Preference pref_enabled = findPreference(PREF_ENABLED);
         Preference pref_check = findPreference(PREF_SETTINGS);
         Preference pref_location_history = findPreference(PREF_LOCATION_HISTORY);
@@ -281,8 +286,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         Preference pref_version = findPreference(PREF_VERSION);
 
         // Set titles/summaries
-        updateTitle(prefs, PREF_SHARE);
-        updateTitle(prefs, PREF_UPLOAD);
+        updateTitle(prefs, PREF_SHARE_GPX);
+        updateTitle(prefs, PREF_SHARE_KML);
+        updateTitle(prefs, PREF_UPLOAD_GPX);
 
         updateTitle(prefs, PREF_INTERVAL);
         updateTitle(prefs, PREF_ALTITUDE);
@@ -330,25 +336,37 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         });
 
         // Handle share GPX
-        pref_share.setEnabled(storageMounted());
-        pref_share.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        pref_share_gpx.setEnabled(storageMounted());
+        pref_share_gpx.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 Intent intent = new Intent(ActivitySettings.this, LocationService.class);
                 intent.setAction(LocationService.ACTION_SHARE_GPX);
-                export(intent);
+                export(intent, R.string.title_share_gpx);
+                return true;
+            }
+        });
+
+        // Handle share KML
+        pref_share_kml.setEnabled(storageMounted());
+        pref_share_kml.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent intent = new Intent(ActivitySettings.this, LocationService.class);
+                intent.setAction(LocationService.ACTION_SHARE_KML);
+                export(intent, R.string.title_share_kml);
                 return true;
             }
         });
 
         // Handle upload GPX
-        pref_upload.setEnabled(blogConfigured() && storageMounted() && isConnected(ActivitySettings.this));
-        pref_upload.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        pref_upload_gpx.setEnabled(blogConfigured() && storageMounted() && isConnected(ActivitySettings.this));
+        pref_upload_gpx.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 Intent intent = new Intent(ActivitySettings.this, LocationService.class);
                 intent.setAction(LocationService.ACTION_UPLOAD_GPX);
-                export(intent);
+                export(intent, R.string.title_upload_gpx);
                 return true;
             }
         });
@@ -464,10 +482,12 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-        if (PREF_LAST_SHARE.equals(key))
-            key = PREF_SHARE;
-        else if (PREF_LAST_UPLOAD.equals(key))
-            key = PREF_UPLOAD;
+        if (PREF_LAST_SHARE_GPX.equals(key))
+            key = PREF_SHARE_GPX;
+        else if (PREF_LAST_SHARE_KML.equals(key))
+            key = PREF_SHARE_KML;
+        else if (PREF_LAST_UPLOAD_GPX.equals(key))
+            key = PREF_UPLOAD_GPX;
         else if (PREF_DEBUG.equals(key))
             key = PREF_SUPPORT;
 
@@ -477,6 +497,10 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         if (pref instanceof EditTextPreference)
             if ("".equals(prefs.getString(key, null)))
                 prefs.edit().remove(key).apply();
+
+        // Follow extern change (Tasker)
+        if (PREF_ENABLED.equals(key))
+            ((CheckBoxPreference) pref).setChecked(prefs.getBoolean(PREF_ENABLED, DEFAULT_ENABLED));
 
         // Reset activity
         if (PREF_RECOGNITION_ENABLED.equals(key))
@@ -491,8 +515,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 if (!blogurl.endsWith("/"))
                     blogurl += "/";
                 prefs.edit().putString(key, blogurl).apply();
+                ((EditTextPreference) pref).setText(blogurl);
             }
-            findPreference(PREF_UPLOAD).setEnabled(blogurl != null);
+            findPreference(PREF_UPLOAD_GPX).setEnabled(blogurl != null);
         }
 
         // Update preference titles
@@ -687,7 +712,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         }.execute();
     }
 
-    private void export(final Intent intent) {
+    private void export(final Intent intent, int resTitle) {
         final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
         // Get layout
@@ -825,7 +850,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-        alertDialogBuilder.setTitle(R.string.title_export);
+        alertDialogBuilder.setTitle(resTitle);
         alertDialogBuilder.setView(view);
         alertDialogBuilder
                 .setPositiveButton(android.R.string.ok,
@@ -1213,12 +1238,21 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     private void updateTitle(SharedPreferences prefs, String key) {
         Preference pref = findPreference(key);
 
-        if (PREF_SHARE.equals(key))
-            pref.setSummary(getString(R.string.summary_share, prefs.getString(PREF_LAST_SHARE, getString(R.string.msg_never))));
-        else if (PREF_UPLOAD.equals(key))
-            pref.setSummary(getString(R.string.summary_upload, prefs.getString(PREF_LAST_UPLOAD, getString(R.string.msg_never))));
+        if (PREF_SHARE_GPX.equals(key)) {
+            long time = prefs.getLong(PREF_LAST_SHARE_GPX, -1);
+            String ftime = (time > 0 ? SimpleDateFormat.getDateTimeInstance().format(time) : getString(R.string.msg_never));
+            pref.setSummary(getString(R.string.summary_share_gpx, ftime));
+        } else if (PREF_SHARE_KML.equals(key)) {
+            long time = prefs.getLong(PREF_LAST_SHARE_KML, -1);
+            String ftime = (time > 0 ? SimpleDateFormat.getDateTimeInstance().format(time) : getString(R.string.msg_never));
+            pref.setSummary(getString(R.string.summary_share_kml, ftime));
 
-        else if (PREF_INTERVAL.equals(key))
+        } else if (PREF_UPLOAD_GPX.equals(key)) {
+            long time = prefs.getLong(PREF_LAST_UPLOAD_GPX, -1);
+            String ftime = (time > 0 ? SimpleDateFormat.getDateTimeInstance().format(time) : getString(R.string.msg_never));
+            pref.setSummary(getString(R.string.summary_upload_gpx, ftime));
+
+        } else if (PREF_INTERVAL.equals(key))
             pref.setTitle(getString(R.string.title_interval, prefs.getString(key, DEFAULT_INTERVAL)));
         else if (PREF_TP_ACCURACY.equals(key))
             pref.setTitle(getString(R.string.title_tp_accuracy, prefs.getString(key, DEFAULT_TP_ACCURACY)));
