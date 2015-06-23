@@ -16,7 +16,7 @@ Passive locations will be recorded if the bearing changes by more than 30 degree
 or if the altitude changes by more than 20 meter (both configurable).
 
 Locations will be filtered based on distance from your last location and based on location accuracy.
-The default is to filter locations within 100 meter of the last location and locations with an accuracy of worse than 100 meter.
+The default is to filter locations within 100 meter of the last location and locations with an accuracy of less than 100 meter.
 
 The altitude of GPS locations will be corrected using the [EGM96](http://en.wikipedia.org/wiki/EGM96) model,
 which can make a significant difference in some areas.
@@ -26,15 +26,15 @@ Waypoints will be automatically reverse geocoded if there is an internet connect
 otherwise this can be done later using the waypoint editor.
 
 You can export your location history as a GPX file for visualization in another application.
-You could use [OsmAnd](https://play.google.com/store/apps/details?id=net.osmand) for this purpose.
+You can use [OsmAnd](https://play.google.com/store/apps/details?id=net.osmand) for this purpose.
 
 You can upload your location history to a WordPress weblog using a small [WordPress plugin](https://wordpress.org/plugins/backpacktrack-for-android/).
-You could use the [Google Maps GPX Viewer](https://wordpress.org/plugins/google-maps-gpx-viewer/) plugin for visualization.
+You can use the [Google Maps GPX Viewer](https://wordpress.org/plugins/google-maps-gpx-viewer/) plugin for visualization.
 
-If you want to see the status of the GPS, you could use the application [GPS Status & Toolbox](https://play.google.com/store/apps/details?id=com.eclipsim.gpsstatus2).
+If you want to see the status of the GPS, you can use the application [GPS Status & Toolbox](https://play.google.com/store/apps/details?id=com.eclipsim.gpsstatus2).
 
 As a bonus BackPackTrack includes a step counter which doesn't count false steps,
-because activity recognition will be used to count steps when you are walking only.
+because activity recognition will be used to count steps only while you are walking.
 Your device needs to have a hardware step counter for this to work.
 
 BackPackTrack II is a complete rewrite of [BackPackTrack](https://github.com/M66B/BackPackTrack), the first Android application I wrote in 2011.
@@ -62,7 +62,7 @@ The version information shows if a usable version of Google Play services is ins
 **(2) How can I stop this application?**
 
 BackPackTrack II is meant to continuously record your location, so there is no exit or quit option/menu.
-If you want to stop tracking, you can uncheck the check box labelled with *Tracking enabled*.
+If you want to stop tracking, you can uncheck the check box labelled *Tracking enabled* found in the location tracking sub-menu.
 
 <a name="FAQ3"></a>
 **(3) What is needed to make (reverse) geocoding work?**
@@ -145,6 +145,41 @@ Possible parameters:
 For example:
 
 *am startservice -a eu.faircode.backpacktrack2.WRITE_GPX --es TrackName "Test" --ez WriteExtensions false --ez DeleteData false --es TimeFrom "1970-1-1" --es TimeTo "2015-1-1"*
+
+Tasker usecase examples
+
+Starting/stoping tracking based on a location:
+
+Create a task and give it a name
+Select Code - Run Shell
+Command: *am startservice -a eu.faircode.backpacktrack2.TRACKING --ez Enable true*
+Select option "Use Root"
+Create a Profile and select Location. 
+Enter the desired LAT/LONG coordinates, select a radius and whether to use Network and/or GPS location.
+Link it to the Task create above.
+
+Additionally an exit task can be created to stop tracking once you arrive back at the same location
+Command: *am startservice -a eu.faircode.backpacktrack2.TRACKING --ez Enable false*
+
+Creating a lauchner shortcut to write a GPX file:
+
+Create a task and give it a name
+Select Code - Run Shell
+Command: *am startservice -a eu.faircode.backpacktrack2.WRITE_GPX --es TrackName "Test" --ez WriteExtensions false --ez DeleteData false --es TimeFrom "1970-1-1" --es TimeTo "2015-1-1"*
+Select option "Use Root"
+Select an icon for the task
+Use your laucher's options for adding a Tasker widget to the homescreen
+
+Capture a Trackpoint when a photo is taken:
+
+Create a task and give it a name
+Select Code - Run Shell
+Command: *am startservice -a eu.faircode.backpacktrack2.TRACKPOINT*
+Select option "Use Root"
+Create a profile and select Event
+Select System - Intent Recieved
+Under Action enter: *android.hardware.action:NEW_PICTURE*
+Link it to the Task create above.
 
 Note that there is not any interaction with the user interface for any of the actions.
 
