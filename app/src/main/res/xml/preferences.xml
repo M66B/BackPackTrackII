@@ -15,7 +15,7 @@
             android:summary="@string/summary_share_gpx"
             android:title="@string/title_share_gpx" />
         <Preference
-            android:icon="@drawable/public_60"
+            android:icon="@drawable/language_60"
             android:key="pref_share_kml"
             android:summary="@string/summary_share_kml"
             android:title="@string/title_share_kml" />
