@@ -549,8 +549,6 @@ public class LocationService extends IntentService {
         try {
             // Write file
             String trackName = intent.getStringExtra(EXTRA_TRACK_NAME);
-            if (trackName == null)
-                trackName = DEFAULT_TRACK_NAME;
             boolean extensions = intent.getBooleanExtra(EXTRA_WRITE_EXTENSIONS, false);
             boolean delete = intent.getBooleanExtra(EXTRA_DELETE_DATA, false);
             long from = intent.getLongExtra(EXTRA_TIME_FROM, 0);
@@ -590,8 +588,6 @@ public class LocationService extends IntentService {
         try {
             // Write GPX file
             String trackName = intent.getStringExtra(EXTRA_TRACK_NAME);
-            if (trackName == null)
-                trackName = DEFAULT_TRACK_NAME;
             boolean extensions = intent.getBooleanExtra(EXTRA_WRITE_EXTENSIONS, false);
             boolean delete = intent.getBooleanExtra(EXTRA_DELETE_DATA, false);
             long from = intent.getLongExtra(EXTRA_TIME_FROM, 0);
@@ -897,6 +893,7 @@ public class LocationService extends IntentService {
     // Helper methods
 
     private static void convertTime(Intent intent) {
+        intent.putExtra(EXTRA_TRACK_NAME, DEFAULT_TRACK_NAME);
         Bundle extras = intent.getExtras();
         if (extras.get(EXTRA_TIME_FROM) instanceof String)
             intent.putExtra(EXTRA_TIME_FROM, new DateTime((String) extras.get(EXTRA_TIME_FROM)).getMillis());
