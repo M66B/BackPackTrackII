@@ -26,7 +26,7 @@ Waypoints will be automatically reverse geocoded if there is an internet connect
 otherwise this can be done later using the waypoint editor.
 
 You can export your location history as a GPX or KML file for visualization in another application.
-You count use [OsmAnd](https://play.google.com/store/apps/details?id=net.osmand) or [Google Earth](https://play.google.com/store/apps/details?id=com.google.earth) for this purpose.
+You could use [OsmAnd](https://play.google.com/store/apps/details?id=net.osmand) or [Google Earth](https://play.google.com/store/apps/details?id=com.google.earth) for this purpose.
 
 You can upload your location history to a WordPress weblog using a small [WordPress plugin](https://wordpress.org/plugins/backpacktrack-for-android/).
 You could use the [Google Maps GPX Viewer](https://wordpress.org/plugins/google-maps-gpx-viewer/) plugin for visualization.
