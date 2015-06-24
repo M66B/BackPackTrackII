@@ -141,11 +141,11 @@ Possible parameters:
 * *--ez WriteExtensions false* (default: false)
 * *--ez DeleteData false* (default: false)
 * *--es TimeFrom "1970-1-1"* (default: beginning of time)
-* *--es TimeTo "2015-6-22"* (default: end of time)
+* *--es TimeTo "2016-1-1"* (default: end of time)
 
 For example:
 
-*am startservice -a eu.faircode.backpacktrack2.WRITE_GPX --es TrackName "Test" --ez WriteExtensions false --ez DeleteData false --es TimeFrom "1970-1-1" --es TimeTo "2015-1-1"*
+*am startservice -a eu.faircode.backpacktrack2.WRITE_GPX --es TrackName "Test" --ez WriteExtensions false --ez DeleteData false --es TimeFrom "1970-1-1" --es TimeTo "2016-1-1"*
 
 Tasker use case examples
 
