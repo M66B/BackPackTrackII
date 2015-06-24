@@ -131,7 +131,7 @@
     <string name="title_accept">Accepteren</string>
 
     <string name="title_track">Tracknaam:</string>
-    <string name="title_extensions">Gebruik GPX-extensies</string>
+    <string name="title_extensions">Gebruik extensies</string>
     <string name="title_delete">Verwijder gegevens na exporteren</string>
     <string name="title_from">Van datum/tijd:</string>
     <string name="title_to">Tot datum/tijd:</string>

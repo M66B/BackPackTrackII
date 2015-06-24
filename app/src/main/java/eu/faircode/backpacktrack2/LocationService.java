@@ -92,6 +92,7 @@ public class LocationService extends IntentService {
     private static final String EXPORTED_ACTION_TRACKPOINT = "eu.faircode.backpacktrack2.TRACKPOINT";
     private static final String EXPORTED_ACTION_WAYPOINT = "eu.faircode.backpacktrack2.WAYPOINT";
     private static final String EXPORTED_ACTION_WRITE_GPX = "eu.faircode.backpacktrack2.WRITE_GPX";
+    private static final String EXPORTED_ACTION_WRITE_KML = "eu.faircode.backpacktrack2.WRITE_KML";
     private static final String EXPORTED_ACTION_UPLOAD_GPX = "eu.faircode.backpacktrack2.UPLOAD_GPX";
 
     // Extras
@@ -176,17 +177,21 @@ public class LocationService extends IntentService {
                 handleGeopoint(intent);
 
             else if (ACTION_SHARE_GPX.equals(intent.getAction()))
-                handleShareGPX(intent);
+                handleShare(intent);
 
             else if (ACTION_SHARE_KML.equals(intent.getAction()))
-                handleShareKML(intent);
+                handleShare(intent);
 
             else if (ACTION_UPLOAD_GPX.equals(intent.getAction()))
                 handleUploadGPX(intent);
 
             else if (EXPORTED_ACTION_WRITE_GPX.equals(intent.getAction())) {
                 convertTime(intent);
-                handleShareGPX(intent);
+                handleShare(intent);
+
+            } else if (EXPORTED_ACTION_WRITE_KML.equals(intent.getAction())) {
+                convertTime(intent);
+                handleShare(intent);
 
             } else if (EXPORTED_ACTION_UPLOAD_GPX.equals(intent.getAction())) {
                 convertTime(intent);
@@ -540,9 +545,9 @@ public class LocationService extends IntentService {
         }
     }
 
-    private void handleShareGPX(Intent intent) {
+    private void handleShare(Intent intent) {
         try {
-            // Write GPX file
+            // Write file
             String trackName = intent.getStringExtra(EXTRA_TRACK_NAME);
             if (trackName == null)
                 trackName = DEFAULT_TRACK_NAME;
@@ -550,21 +555,28 @@ public class LocationService extends IntentService {
             boolean delete = intent.getBooleanExtra(EXTRA_DELETE_DATA, false);
             long from = intent.getLongExtra(EXTRA_TIME_FROM, 0);
             long to = intent.getLongExtra(EXTRA_TIME_TO, Long.MAX_VALUE);
-            String gpxFileName = writeGPXFile(trackName, extensions, from, to, this);
+            boolean gpx = ACTION_SHARE_GPX.equals(intent.getAction()) || EXPORTED_ACTION_WRITE_GPX.equals(intent.getAction());
+            String fileName = writeFile(gpx, trackName, extensions, from, to, this);
 
             // Persist last share time
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            prefs.edit().putLong(ActivitySettings.PREF_LAST_SHARE_GPX, new Date().getTime()).apply();
+            if (gpx)
+                prefs.edit().putLong(ActivitySettings.PREF_LAST_SHARE_GPX, new Date().getTime()).apply();
+            else
+                prefs.edit().putLong(ActivitySettings.PREF_LAST_SHARE_KML, new Date().getTime()).apply();
 
             // Delete data on request
             if (delete)
                 new DatabaseHelper(this).deleteLocations(from, to).close();
 
             // View file
-            if (ACTION_SHARE_GPX.equals(intent.getAction())) {
+            if (ACTION_SHARE_GPX.equals(intent.getAction()) || ACTION_SHARE_KML.equals(intent.getAction())) {
                 Intent viewIntent = new Intent();
                 viewIntent.setAction(Intent.ACTION_VIEW);
-                viewIntent.setDataAndType(Uri.fromFile(new File(gpxFileName)), "application/gpx+xml");
+                if (gpx)
+                    viewIntent.setDataAndType(Uri.fromFile(new File(fileName)), "application/gpx+xml");
+                else
+                    viewIntent.setDataAndType(Uri.fromFile(new File(fileName)), "application/vnd.google-earth.kml+xml");
                 viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(viewIntent);
             }
@@ -572,9 +584,6 @@ public class LocationService extends IntentService {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             toast(ex.toString(), Toast.LENGTH_LONG, this);
         }
-    }
-
-    private void handleShareKML(Intent intent) {
     }
 
     private void handleUploadGPX(Intent intent) {
@@ -587,7 +596,7 @@ public class LocationService extends IntentService {
             boolean delete = intent.getBooleanExtra(EXTRA_DELETE_DATA, false);
             long from = intent.getLongExtra(EXTRA_TIME_FROM, 0);
             long to = intent.getLongExtra(EXTRA_TIME_TO, Long.MAX_VALUE);
-            String gpxFileName = writeGPXFile(trackName, extensions, from, to, this);
+            String gpxFileName = writeFile(true, trackName, extensions, from, to, this);
 
             // Get GPX file content
             File gpx = new File(gpxFileName);
@@ -1212,11 +1221,11 @@ public class LocationService extends IntentService {
         nm.cancel(0);
     }
 
-    private static String writeGPXFile(String trackName, boolean extensions, long from, long to, Context context) throws IOException {
+    private static String writeFile(boolean gpx, String trackName, boolean extensions, long from, long to, Context context) throws IOException {
         File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separatorChar + "BackPackTrackII");
         folder.mkdirs();
-        String gpxFileName = folder.getAbsolutePath() + File.separatorChar + trackName + ".gpx";
-        Log.w(TAG, "Writing file=" + gpxFileName +
+        String fileName = folder.getAbsolutePath() + File.separatorChar + trackName + (gpx ? ".gpx" : ".kml");
+        Log.w(TAG, "Writing file=" + fileName +
                 " extensions=" + extensions +
                 " from=" + SimpleDateFormat.getDateTimeInstance().format(new Date(from)) +
                 " to=" + SimpleDateFormat.getDateTimeInstance().format(new Date(to)));
@@ -1227,7 +1236,10 @@ public class LocationService extends IntentService {
             databaseHelper = new DatabaseHelper(context);
             trackPoints = databaseHelper.getLocations(from, to, true, false, true);
             wayPoints = databaseHelper.getLocations(from, to, false, true, true);
-            GPXFileWriter.writeGpxFile(new File(gpxFileName), trackName, extensions, trackPoints, wayPoints, context);
+            if (gpx)
+                GPXFileWriter.writeGPXFile(new File(fileName), trackName, extensions, trackPoints, wayPoints, context);
+            else
+                KMLFileWriter.writeKMLFile(new File(fileName), trackName, extensions, trackPoints, wayPoints, context);
         } finally {
             if (wayPoints != null)
                 wayPoints.close();
@@ -1236,7 +1248,7 @@ public class LocationService extends IntentService {
             if (databaseHelper != null)
                 databaseHelper.close();
         }
-        return gpxFileName;
+        return fileName;
     }
 
     private static void toast(final String text, final int length, final Context context) {

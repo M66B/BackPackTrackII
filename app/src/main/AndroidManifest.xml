@@ -94,6 +94,7 @@
                 <action android:name="eu.faircode.backpacktrack2.TRACKPOINT" />
                 <action android:name="eu.faircode.backpacktrack2.WAYPOINT" />
                 <action android:name="eu.faircode.backpacktrack2.WRITE_GPX" />
+                <action android:name="eu.faircode.backpacktrack2.WRITE_KML" />
                 <action android:name="eu.faircode.backpacktrack2.UPLOAD_GPX" />
             </intent-filter>
 

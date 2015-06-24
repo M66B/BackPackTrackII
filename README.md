@@ -127,9 +127,10 @@ Request trackpoint/waypoint:
 * *am startservice -a eu.faircode.backpacktrack2.TRACKPOINT*
 * *am startservice -a eu.faircode.backpacktrack2.WAYPOINT*
 
-Write/upload GPX:
+Write/upload GPX/KML:
 
 * *am startservice -a eu.faircode.backpacktrack2.WRITE_GPX*
+* *am startservice -a eu.faircode.backpacktrack2.WRITE_KML*
 * *am startservice -a eu.faircode.backpacktrack2.UPLOAD_GPX*
 
 Make sure you have configured your weblog URL and authorization data before trying to upload.

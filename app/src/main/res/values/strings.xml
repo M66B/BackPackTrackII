@@ -131,7 +131,7 @@
     <string name="title_accept">Accept</string>
 
     <string name="title_track">Track name:</string>
-    <string name="title_extensions">Use GPX extensions</string>
+    <string name="title_extensions">Use extensions</string>
     <string name="title_delete">Delete data after exporting</string>
     <string name="title_from">From date/time:</string>
     <string name="title_to">To date/time:</string>
