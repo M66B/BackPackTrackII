@@ -73,6 +73,9 @@ public class KMLFileWriter {
             if (fw != null)
                 fw.close();
         }
+
+        // https://developers.google.com/kml/schema/kml22gx.xsd
+        // xmllint --noout --schema kml22gx.xsd BackPackTrack.kml
     }
 
     private static Element getTrackpoints(String trackName, boolean extensions, Cursor c, Namespace gx, Context context) {
@@ -80,13 +83,6 @@ public class KMLFileWriter {
         int colLongitude = c.getColumnIndex("longitude");
         int colAltitude = c.getColumnIndex("altitude");
         int colTime = c.getColumnIndex("time");
-        int colAccuracy = c.getColumnIndex("accuracy");
-        int colProvider = c.getColumnIndex("provider");
-        int colSpeed = c.getColumnIndex("speed");
-        int colBearing = c.getColumnIndex("bearing");
-        int colActivityType = c.getColumnIndex("activity_type");
-        int colActivityConfidence = c.getColumnIndex("activity_confidence");
-        int colStepcount = c.getColumnIndex("stepcount");
 
         Element placemark = new Element("Placemark", NS);
 
@@ -94,23 +90,60 @@ public class KMLFileWriter {
         styleUrl.addContent("#style");
         placemark.addContent(styleUrl);
 
-        Element linestring = new Element("LineString", NS);
-        Element coordinates = new Element("coordinates", NS);
         StringBuilder sb = new StringBuilder();
+        Collection<Element> listWhen = new ArrayList<>();
+        Collection<Element> listCoord = new ArrayList<>();
         while (c.moveToNext()) {
-            if (sb.length() != 0)
-                sb.append(" ");
-            sb.append(Double.toString(c.getDouble(colLongitude)) + "," + Double.toString(c.getDouble(colLatitude)));
-            if (!c.isNull(c.getColumnIndex("altitude")))
-                sb.append("," + DF.format(c.getDouble(colAltitude)));
-            sb.append("\n");
+            if (extensions) {
+                Element when = new Element("when", NS);
+                when.addContent(SDF.format(new Date(c.getLong(colTime))));
+                listWhen.add(when);
 
-            // TODO: time, hdop, extensions (provider, speed, bearing, accuracy, activity_type, activity_confidence, stepcount)
+                Element coord = new Element("coord", gx);
+                String lla = Double.toString(c.getDouble(colLongitude)) + " " + Double.toString(c.getDouble(colLatitude));
+                if (!c.isNull(c.getColumnIndex("altitude")))
+                    lla += " " + DF.format(c.getDouble(colAltitude));
+                coord.addContent(lla);
+                listCoord.add(coord);
+            } else {
+                if (sb.length() != 0)
+                    sb.append(" ");
+                sb.append(Double.toString(c.getDouble(colLongitude)));
+                sb.append(",");
+                sb.append(Double.toString(c.getDouble(colLatitude)));
+                if (!c.isNull(c.getColumnIndex("altitude"))) {
+                    sb.append(",");
+                    sb.append(DF.format(c.getDouble(colAltitude)));
+                }
+                sb.append("\n");
+            }
         }
 
-        coordinates.addContent(sb.toString());
-        linestring.addContent(coordinates);
-        placemark.addContent(linestring);
+        if (extensions) {
+            Element track = new Element("Track", gx);
+
+            Element altitudeMode = new Element("altitudeMode", NS);
+            altitudeMode.addContent("absolute");
+            track.addContent(altitudeMode);
+
+            track.addContent(listWhen);
+            track.addContent(listCoord);
+
+            placemark.addContent(track);
+        } else {
+            Element linestring = new Element("LineString", NS);
+
+            Element altitudeMode = new Element("altitudeMode", NS);
+            altitudeMode.addContent("absolute");
+            linestring.addContent(altitudeMode);
+
+            Element coordinates = new Element("coordinates", NS);
+            coordinates.addContent(sb.toString());
+            linestring.addContent(coordinates);
+
+            placemark.addContent(linestring);
+        }
+
 
         return placemark;
     }
@@ -123,10 +156,6 @@ public class KMLFileWriter {
         int colAltitude = c.getColumnIndex("altitude");
         int colTime = c.getColumnIndex("time");
         int colName = c.getColumnIndex("name");
-        int colAccuracy = c.getColumnIndex("accuracy");
-        int colProvider = c.getColumnIndex("provider");
-        int colSpeed = c.getColumnIndex("speed");
-        int colBearing = c.getColumnIndex("bearing");
 
         while (c.moveToNext()) {
             Element placemark = new Element("Placemark", NS);
@@ -135,12 +164,23 @@ public class KMLFileWriter {
             name.addContent(c.getString(colName));
             placemark.addContent(name);
 
-            Element point = new Element("Point", NS);
-            Element timestamp = new Element("TimeStamp", gx);
-            Element when = new Element("when", gx);
+            Element timestamp = new Element("TimeStamp", NS);
+            Element when = new Element("when", NS);
             when.addContent(SDF.format(new Date(c.getLong(colTime))));
             timestamp.addContent(when);
-            point.addContent(timestamp);
+            placemark.addContent(timestamp);
+
+            if (extensions)
+                placemark.addContent(getExtensions(c, context));
+
+            Element point = new Element("Point", NS);
+
+            // MSL
+            if (!c.isNull(c.getColumnIndex("altitude"))) {
+                Element altitudeMode = new Element("altitudeMode", NS);
+                altitudeMode.addContent("absolute");
+                point.addContent(altitudeMode);
+            }
 
             Element coordinates = new Element("coordinates", NS);
             String co = Double.toString(c.getDouble(colLongitude)) + "," + Double.toString(c.getDouble(colLatitude));
@@ -148,12 +188,88 @@ public class KMLFileWriter {
                 co += "," + DF.format(c.getDouble(colAltitude));
             coordinates.addContent(co);
             point.addContent(coordinates);
-
             placemark.addContent(point);
+
             placemarks.add(placemark);
-            // TODO: hdop, extensions (provider, speed, bearing, accuracy, activity_type, activity_confidence, stepcount)
         }
 
         return placemarks;
+    }
+
+    private static Element getExtensions(Cursor c, Context context) {
+        int colProvider = c.getColumnIndex("provider");
+        int colSpeed = c.getColumnIndex("speed");
+        int colBearing = c.getColumnIndex("bearing");
+        int colAccuracy = c.getColumnIndex("accuracy");
+        int colActivityType = c.getColumnIndex("activity_type");
+        int colActivityConfidence = c.getColumnIndex("activity_confidence");
+        int colStepcount = c.getColumnIndex("stepcount");
+
+        Element extendedData = new Element("ExtendedData", NS);
+
+        if (!c.isNull(colProvider)) {
+            Element data = new Element("Data", NS);
+            data.setAttribute(new Attribute("name", "provider"));
+            Element value = new Element("value", NS);
+            value.addContent(c.getString(colProvider));
+            data.addContent(value);
+            extendedData.addContent(data);
+        }
+
+        if (!c.isNull(colSpeed)) {
+            Element data = new Element("Data", NS);
+            data.setAttribute(new Attribute("name", "speed"));
+            Element value = new Element("value", NS);
+            value.addContent(DF.format(c.getDouble(colSpeed)));
+            data.addContent(value);
+            extendedData.addContent(data);
+        }
+
+        if (!c.isNull(colBearing)) {
+            Element data = new Element("Data", NS);
+            data.setAttribute(new Attribute("name", "bearing"));
+            Element value = new Element("value", NS);
+            value.addContent(DF.format(DF.format(c.getDouble(colBearing))));
+            data.addContent(value);
+            extendedData.addContent(data);
+        }
+
+        if (!c.isNull(colAccuracy)) {
+            Element data = new Element("Data", NS);
+            data.setAttribute(new Attribute("name", "accuracy"));
+            Element value = new Element("value", NS);
+            value.addContent(DF.format(DF.format(c.getDouble(colAccuracy))));
+            data.addContent(value);
+            extendedData.addContent(data);
+        }
+
+        if (!c.isNull(colActivityType)) {
+            Element data = new Element("Data", NS);
+            data.setAttribute(new Attribute("name", "activity_type"));
+            Element value = new Element("value", NS);
+            value.addContent(LocationService.getActivityName(c.getInt(colActivityType), context));
+            data.addContent(value);
+            extendedData.addContent(data);
+        }
+
+        if (!c.isNull(colActivityConfidence)) {
+            Element data = new Element("Data", NS);
+            data.setAttribute(new Attribute("name", "activity_confidence"));
+            Element value = new Element("value", NS);
+            value.addContent(Integer.toString(c.getInt(colActivityConfidence)));
+            data.addContent(value);
+            extendedData.addContent(data);
+        }
+
+        if (!c.isNull(colStepcount)) {
+            Element data = new Element("Data", NS);
+            data.setAttribute(new Attribute("name", "stepcount"));
+            Element value = new Element("value", NS);
+            value.addContent(Integer.toString(c.getInt(colStepcount)));
+            data.addContent(value);
+            extendedData.addContent(data);
+        }
+
+        return extendedData;
     }
 }
