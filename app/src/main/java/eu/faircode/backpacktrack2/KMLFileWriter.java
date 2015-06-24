@@ -90,6 +90,7 @@ public class KMLFileWriter {
         int colLongitude = c.getColumnIndex("longitude");
         int colAltitude = c.getColumnIndex("altitude");
         int colTime = c.getColumnIndex("time");
+        int colBearing = c.getColumnIndex("bearing");
 
         Element placemark = new Element("Placemark", NS);
 
@@ -100,6 +101,7 @@ public class KMLFileWriter {
         StringBuilder sb = new StringBuilder();
         Collection<Element> listWhen = new ArrayList<>();
         Collection<Element> listCoord = new ArrayList<>();
+        Collection<Element> listAngles = new ArrayList<>();
         while (c.moveToNext()) {
             if (extensions) {
                 Element when = new Element("when", NS);
@@ -108,17 +110,22 @@ public class KMLFileWriter {
 
                 Element coord = new Element("coord", gx);
                 String lla = Double.toString(c.getDouble(colLongitude)) + " " + Double.toString(c.getDouble(colLatitude));
-                if (!c.isNull(c.getColumnIndex("altitude")))
+                if (!c.isNull(colAltitude))
                     lla += " " + DF.format(c.getDouble(colAltitude));
                 coord.addContent(lla);
                 listCoord.add(coord);
+
+                Element angles = new Element("angles", gx);
+                if (!c.isNull(colBearing))
+                    angles.addContent(DF.format(c.getDouble(colBearing)) + " 0 0");
+                listAngles.add(angles);
             } else {
                 if (sb.length() != 0)
                     sb.append(" ");
                 sb.append(Double.toString(c.getDouble(colLongitude)));
                 sb.append(",");
                 sb.append(Double.toString(c.getDouble(colLatitude)));
-                if (!c.isNull(c.getColumnIndex("altitude"))) {
+                if (!c.isNull(colAltitude)) {
                     sb.append(",");
                     sb.append(DF.format(c.getDouble(colAltitude)));
                 }
@@ -135,6 +142,7 @@ public class KMLFileWriter {
 
             track.addContent(listWhen);
             track.addContent(listCoord);
+            track.addContent(listAngles);
 
             placemark.addContent(track);
         } else {
@@ -183,7 +191,7 @@ public class KMLFileWriter {
             Element point = new Element("Point", NS);
 
             // MSL
-            if (!c.isNull(c.getColumnIndex("altitude"))) {
+            if (!c.isNull(colAltitude)) {
                 Element altitudeMode = new Element("altitudeMode", NS);
                 altitudeMode.addContent("absolute");
                 point.addContent(altitudeMode);
@@ -191,7 +199,7 @@ public class KMLFileWriter {
 
             Element coordinates = new Element("coordinates", NS);
             String co = Double.toString(c.getDouble(colLongitude)) + "," + Double.toString(c.getDouble(colLatitude));
-            if (!c.isNull(c.getColumnIndex("altitude")))
+            if (!c.isNull(colAltitude))
                 co += "," + DF.format(c.getDouble(colAltitude));
             coordinates.addContent(co);
             point.addContent(coordinates);
