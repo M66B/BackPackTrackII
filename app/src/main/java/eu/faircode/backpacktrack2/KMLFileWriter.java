@@ -36,12 +36,20 @@ public class KMLFileWriter {
         Element kml = new Element("kml", NS);
         Namespace gx = Namespace.getNamespace("gx", "http://www.google.com/kml/ext/2.2");
         kml.addNamespaceDeclaration(gx);
+        Namespace atom = Namespace.getNamespace("atom", "http://www.w3.org/2005/Atom");
+        kml.addNamespaceDeclaration(atom);
 
         Element document = new Element("Document", NS);
 
         Element name = new Element("name", NS);
         name.addContent(trackName);
         document.addContent(name);
+
+        Element author = new Element("author", atom);
+        Element authorName = new Element("name", atom);
+        authorName.addContent("BackPackTrackII");
+        author.addContent(authorName);
+        document.addContent(author);
 
         Element style = new Element("Style", NS);
         style.setAttribute(new Attribute("id", "style"));
