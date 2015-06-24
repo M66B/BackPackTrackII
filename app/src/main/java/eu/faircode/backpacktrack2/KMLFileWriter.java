@@ -55,7 +55,6 @@ public class KMLFileWriter {
         style.addContent(linestyle);
         document.addContent(style);
 
-        // TODO: creator "BackPackTrackII"
         Collection<Element> placemarks = new ArrayList<>();
         placemarks.add(getTrackpoints(trackName, extensions, cTrackPoints, gx, context));
         placemarks.addAll(getWayPoints(extensions, cWayPoints, gx, context));
