@@ -1100,6 +1100,7 @@ public class LocationService extends IntentService {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             notificationBuilder.setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.backpacker_grey));
+
         if (activityType == DetectedActivity.STILL)
             notificationBuilder.setSmallIcon(R.drawable.pause);
         else if (activityType == DetectedActivity.ON_FOOT || activityType == DetectedActivity.WALKING)
