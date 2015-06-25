@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
 import android.util.Log;
 
+import com.google.android.gms.location.DetectedActivity;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -18,7 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BACKPACKTRACKII";
-    private static final int DB_VERSION = 6;
+    private static final int DB_VERSION = 7;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityChangedListener> mActivityChangedListeners = new ArrayList<ActivityChangedListener>();
@@ -37,6 +39,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createTableLocation(db);
         createTableActivity(db);
         createTableStep(db);
+        createTableActivityDuration(db);
     }
 
     private void createTableLocation(SQLiteDatabase db) {
@@ -77,6 +80,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE INDEX idx_step_time ON step(time)");
     }
 
+    private void createTableActivityDuration(SQLiteDatabase db) {
+        Log.w(TAG, "Adding table activityduration");
+        db.execSQL("CREATE TABLE activityduration (" +
+                " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
+                ", time INTEGER NOT NULL" +
+                ", still INTEGER NOT NULL" +
+                ", onfoot INTEGER NOT NULL" +
+                ", running INTEGER NOT NULL" +
+                ", onbicycle INTEGER NOT NULL" +
+                ", invehicle INTEGER NOT NULL" +
+                ", unknown INTEGER NOT NULL" + ");");
+        db.execSQL("CREATE INDEX idx_activityduration_time ON activityduration(time)");
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(TAG, "Upgrading from version " + oldVersion + " to " + newVersion);
@@ -95,6 +112,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (oldVersion < 5)
             db.execSQL("UPDATE step SET time = time - " + TimeZone.getDefault().getOffset(new Date().getTime()));
+
+        if (oldVersion < 7)
+            createTableActivityDuration(db);
 
         db.setVersion(DB_VERSION);
     }
@@ -323,6 +343,68 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 c.close();
         }
     }
+
+    // Daily activity
+
+    public DatabaseHelper updateActivityDuration(long time, int activity, long duration) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        long day = getDay(time);
+
+        String column;
+        switch (activity) {
+            case DetectedActivity.STILL:
+                column = "still";
+                break;
+            case DetectedActivity.ON_FOOT:
+            case DetectedActivity.WALKING:
+                column = "onfoot";
+                break;
+            case DetectedActivity.RUNNING:
+                column = "running";
+                break;
+            case DetectedActivity.ON_BICYCLE:
+                column = "onbicycle";
+                break;
+            case DetectedActivity.IN_VEHICLE:
+                column = "invehicle";
+                break;
+            default:
+                column = "unknown";
+                break;
+        }
+
+        int prev = -1;
+        Cursor c = null;
+        try {
+            c = db.query("activityduration", new String[]{column}, "time = ?", new String[]{Long.toString(day)}, null, null, null, null);
+            if (c.moveToFirst())
+                prev = c.getInt(c.getColumnIndex(column));
+        } finally {
+            if (c != null)
+                c.close();
+        }
+
+        if (prev < 0) {
+            Log.w(TAG, "Creating new day time=" + day);
+            ContentValues cv = new ContentValues();
+            cv.put("time", day);
+            cv.put("still", 0);
+            cv.put("onfoot", 0);
+            cv.put("running", 0);
+            cv.put("onbicycle", 0);
+            cv.put("invehicle", 0);
+            cv.put("unknown", 0);
+            db.insert("activityduration", null, cv);
+        }
+
+        ContentValues cv = new ContentValues();
+        cv.put(column, prev + duration);
+        db.update("activityduration", cv, "time = ?", new String[]{Long.toString(day)});
+
+        return this;
+    }
+
+    // Helper methods
 
     private long getDay(long ms) {
         Calendar calendar = Calendar.getInstance();

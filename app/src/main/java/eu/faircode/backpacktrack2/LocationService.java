@@ -225,7 +225,9 @@ public class LocationService extends IntentService {
     private void handleActivity(Intent intent) {
         // Get last activity
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean lastStill = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.STILL) == DetectedActivity.STILL);
+        int lastActivity = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
+        long lastTime = prefs.getLong(ActivitySettings.PREF_LAST_ACTIVITY_TIME, -1);
+        boolean lastStill = (lastActivity == DetectedActivity.STILL);
 
         // Get detected activity
         ActivityRecognitionResult activityResult = ActivityRecognitionResult.extractResult(intent);
@@ -253,8 +255,16 @@ public class LocationService extends IntentService {
         int pref_confidence = Integer.parseInt(prefs.getString(ActivitySettings.PREF_RECOGNITION_CONFIDENCE, ActivitySettings.DEFAULT_RECOGNITION_CONFIDENCE));
         if (activity.getConfidence() > pref_confidence) {
             // Persist probable activity
+            long time = new Date().getTime();
             prefs.edit().putInt(ActivitySettings.PREF_LAST_ACTIVITY, activity.getType()).apply();
             prefs.edit().putInt(ActivitySettings.PREF_LAST_CONFIDENCE, activity.getConfidence()).apply();
+            prefs.edit().putLong(ActivitySettings.PREF_LAST_ACTIVITY_TIME, time).apply();
+
+            // Update activity duration
+            if (lastTime >= 0)
+                new DatabaseHelper(this).updateActivityDuration(lastTime, lastActivity, time - lastTime).close();
+
+            // Feedback
             updateState(this);
 
             // Get parameters
