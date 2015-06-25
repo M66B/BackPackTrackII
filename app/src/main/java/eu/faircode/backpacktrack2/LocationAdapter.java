@@ -48,7 +48,6 @@ public class LocationAdapter extends CursorAdapter {
     @Override
     public void bindView(final View view, final Context context, final Cursor cursor) {
         // Get values
-        final long id = cursor.getLong(cursor.getColumnIndex("ID"));
         final long time = cursor.getLong(cursor.getColumnIndex("time"));
         final String provider = cursor.getString(cursor.getColumnIndex("provider"));
         final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
@@ -136,7 +135,6 @@ public class LocationAdapter extends CursorAdapter {
                         DatabaseHelper dh = null;
                         Cursor c = null;
                         boolean first = true;
-                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                         try {
                             dh = new DatabaseHelper(context);
                             c = dh.getLocations(from.getTimeInMillis(), to.getTimeInMillis(), true, true, true);
@@ -146,16 +144,6 @@ public class LocationAdapter extends CursorAdapter {
                                 final String provider = c.getString(cursor.getColumnIndex("provider"));
                                 double latitude = c.getDouble(cursor.getColumnIndex("latitude"));
                                 double longitude = c.getDouble(cursor.getColumnIndex("longitude"));
-                                final String name = c.getString(cursor.getColumnIndex("name"));
-
-                                // Check if enabled
-                                if (name == null) {
-                                    if (!prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_TRACKPOINT, ActivitySettings.DEFAULT_ALTITUDE_TRACKPOINT))
-                                        continue;
-                                } else {
-                                    if (!prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_WAYPOINT, ActivitySettings.DEFAULT_ALTITUDE_WAYPOINT))
-                                        continue;
-                                }
 
                                 Location location = new Location(provider);
                                 location.setLatitude(latitude);
