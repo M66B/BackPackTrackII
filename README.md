@@ -236,6 +236,8 @@ The following libraries are being used:
 * [Play Services](http://developer.android.com/google/play-services/) (activity recognition)
 * [aXMLRPC](https://github.com/timroes/aXMLRPC) (XML-RPC)
 * [jdom2](http://www.jdom.org/) (GPX)
+* [GraphView](http://www.android-graphview.org/) (graphs)
+* [Joda-Time](http://www.joda.org/joda-time/) (time calculations)
 
 Screenshots
 -----------
