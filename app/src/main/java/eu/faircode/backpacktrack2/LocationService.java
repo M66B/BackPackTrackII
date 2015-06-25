@@ -893,7 +893,8 @@ public class LocationService extends IntentService {
     // Helper methods
 
     private static void convertTime(Intent intent) {
-        intent.putExtra(EXTRA_TRACK_NAME, DEFAULT_TRACK_NAME);
+        if (intent.getExtras() == null || intent.getExtras().getString(EXTRA_TRACK_NAME, null) == null)
+            intent.putExtra(EXTRA_TRACK_NAME, DEFAULT_TRACK_NAME);
         Bundle extras = intent.getExtras();
         if (extras.get(EXTRA_TIME_FROM) instanceof String)
             intent.putExtra(EXTRA_TIME_FROM, new DateTime((String) extras.get(EXTRA_TIME_FROM)).getMillis());
