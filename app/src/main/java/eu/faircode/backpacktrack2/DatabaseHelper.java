@@ -397,9 +397,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.insert("activityduration", null, cv);
         }
 
-        ContentValues cv = new ContentValues();
-        cv.put(column, prev + duration);
-        db.update("activityduration", cv, "time = ?", new String[]{Long.toString(day)});
+        if (duration > 0) {
+            ContentValues cv = new ContentValues();
+            cv.put(column, prev + duration);
+            db.update("activityduration", cv, "time = ?", new String[]{Long.toString(day)});
+        }
 
         return this;
     }

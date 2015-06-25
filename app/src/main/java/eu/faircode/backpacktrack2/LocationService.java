@@ -654,7 +654,22 @@ public class LocationService extends IntentService {
     }
 
     private void handleDaily(Intent intent) {
-        new DatabaseHelper(this).updateSteps(new Date().getTime(), 0).close();
+        long time = new Date().getTime();
+
+        // Reset step counter
+        new DatabaseHelper(this).updateSteps(time, 0).close();
+
+        // Finalize last activity
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int lastActivity = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
+        long lastTime = prefs.getLong(ActivitySettings.PREF_LAST_ACTIVITY_TIME, -1);
+        if (lastTime >= 0) {
+            new DatabaseHelper(this).updateActivityDuration(lastTime, lastActivity, time - lastTime).close();
+            prefs.edit().putLong(ActivitySettings.PREF_LAST_ACTIVITY_TIME, time).apply();
+            new DatabaseHelper(this).updateActivityDuration(time, lastActivity, 0).close();
+        }
+
+        // Feedback
         updateState(this);
         StepCountWidget.updateWidgets(this);
     }
