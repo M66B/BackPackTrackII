@@ -51,6 +51,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.location.DetectedActivity;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
@@ -554,7 +555,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static void firstRun(Context context) {
         Log.w(TAG, "First run");
 
-        new DatabaseHelper(context).updateSteps(new Date().getTime(), 0).close();
+        long time = new Date().getTime();
+        new DatabaseHelper(context).updateSteps(time, 0).close();
+        new DatabaseHelper(context).updateActivityDuration(time, DetectedActivity.UNKNOWN, 0);
         StepCountWidget.updateWidgets(context);
 
         LocationService.stopTracking(context);
