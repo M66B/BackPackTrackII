@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +18,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 public class LocationAdapter extends CursorAdapter {
+    private static final String TAG = "BPT2.LocationAdapter";
+
     private Context mContext;
     private Location lastLocation;
+    private boolean elevationBusy = false;
 
     public LocationAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
@@ -43,7 +49,7 @@ public class LocationAdapter extends CursorAdapter {
     public void bindView(final View view, final Context context, final Cursor cursor) {
         // Get values
         final long id = cursor.getLong(cursor.getColumnIndex("ID"));
-        long time = cursor.getLong(cursor.getColumnIndex("time"));
+        final long time = cursor.getLong(cursor.getColumnIndex("time"));
         final String provider = cursor.getString(cursor.getColumnIndex("provider"));
         final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
         final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
@@ -96,36 +102,97 @@ public class LocationAdapter extends CursorAdapter {
         view.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                // Check if enabled
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                if (name == null) {
-                    if (!prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_TRACKPOINT, ActivitySettings.DEFAULT_ALTITUDE_TRACKPOINT))
+
+                synchronized (LocationAdapter.this) {
+                    if (elevationBusy)
                         return false;
-                } else {
-                    if (!prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_WAYPOINT, ActivitySettings.DEFAULT_ALTITUDE_WAYPOINT))
-                        return false;
+                    else
+                        elevationBusy = true;
                 }
 
-                // Get elevation
+                // Get elevation for day
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        Location location = new Location(provider);
-                        location.setLatitude(latitude);
-                        location.setLongitude(longitude);
-                        if (GoogleElevationApi.getElevation(location, context)) {
-                            // persist altitude
-                            new DatabaseHelper(context).updateLocationAltitude(id, location.getAltitude()).close();
+                        // Get range
+                        Calendar from = Calendar.getInstance();
+                        from.setTimeInMillis(time);
+                        from.set(Calendar.HOUR_OF_DAY, 0);
+                        from.set(Calendar.MINUTE, 0);
+                        from.set(Calendar.SECOND, 0);
+                        from.set(Calendar.MILLISECOND, 0);
 
-                            // Notify user
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(context, context.getString(R.string.msg_updated,
-                                            name == null ? context.getString(R.string.title_trackpoint) : name), Toast.LENGTH_SHORT).show();
+                        Calendar to = Calendar.getInstance();
+                        to.setTimeInMillis(time);
+                        to.set(Calendar.HOUR_OF_DAY, 23);
+                        to.set(Calendar.MINUTE, 59);
+                        to.set(Calendar.SECOND, 59);
+                        to.set(Calendar.MILLISECOND, 999);
+
+                        DateFormat df = SimpleDateFormat.getDateTimeInstance();
+                        Log.w(TAG, "Getting altitude " + df.format(from.getTime()) + " ... " + df.format(to.getTime()));
+
+                        // Get altitudes for range
+                        DatabaseHelper dh = null;
+                        Cursor c = null;
+                        boolean first = true;
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                        try {
+                            dh = new DatabaseHelper(context);
+                            c = dh.getLocations(from.getTimeInMillis(), to.getTimeInMillis(), true, true, true);
+                            while (c.moveToNext()) {
+                                long id = c.getLong(cursor.getColumnIndex("ID"));
+                                long time = c.getLong(cursor.getColumnIndex("time"));
+                                final String provider = c.getString(cursor.getColumnIndex("provider"));
+                                double latitude = c.getDouble(cursor.getColumnIndex("latitude"));
+                                double longitude = c.getDouble(cursor.getColumnIndex("longitude"));
+                                final String name = c.getString(cursor.getColumnIndex("name"));
+
+                                // Check if enabled
+                                if (name == null) {
+                                    if (!prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_TRACKPOINT, ActivitySettings.DEFAULT_ALTITUDE_TRACKPOINT))
+                                        continue;
+                                } else {
+                                    if (!prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_WAYPOINT, ActivitySettings.DEFAULT_ALTITUDE_WAYPOINT))
+                                        continue;
                                 }
-                            });
+
+                                Location location = new Location(provider);
+                                location.setLatitude(latitude);
+                                location.setLongitude(longitude);
+                                location.setTime(time);
+                                if (GoogleElevationApi.getElevation(location, context)) {
+                                    if (first)
+                                        first = false;
+                                    else
+                                        try {
+                                            // Max. 5 requests/second
+                                            Thread.sleep(200);
+                                        } catch (InterruptedException ignored) {
+                                        }
+                                    Log.w(TAG, "New altitude for location=" + location);
+                                    dh.updateLocationAltitude(id, location.getAltitude());
+                                } else
+                                    break;
+                            }
+                        } finally {
+                            if (c != null)
+                                c.close();
+                            if (dh != null)
+                                dh.close();
                         }
+
+                        synchronized (LocationAdapter.this) {
+                            elevationBusy = false;
+                        }
+
+                        // Notify user
+                        new Handler(Looper.getMainLooper()).post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(context, context.getString(R.string.msg_updated, context.getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
                 }).start();
 
