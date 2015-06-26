@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <ImageView
+            android:layout_width="24dip"
+            android:layout_height="24dip"
+            android:layout_marginLeft="12dp"
+            android:src="@drawable/pause" />
+
+        <ImageView
+            android:layout_width="24dip"
+            android:layout_height="24dip"
+            android:layout_marginLeft="12dp"
+            android:src="@drawable/walk" />
+
+        <ImageView
+            android:layout_width="24dip"
+            android:layout_height="24dip"
+            android:layout_marginLeft="12dp"
+            android:src="@drawable/run" />
+
+        <ImageView
+            android:layout_width="24dip"
+            android:layout_height="24dip"
+            android:layout_marginLeft="12dp"
+            android:src="@drawable/bike" />
+
+        <ImageView
+            android:layout_width="24dip"
+            android:layout_height="24dip"
+            android:layout_marginLeft="12dp"
+            android:src="@drawable/car" />
+
+        <ImageView
+            android:layout_width="24dip"
+            android:layout_height="24dip"
+            android:layout_marginLeft="12dp"
+            android:src="@drawable/explore" />
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/lvActivityDuration"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp" />
+
+</LinearLayout>

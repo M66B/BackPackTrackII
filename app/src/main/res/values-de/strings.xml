@@ -9,6 +9,7 @@
     <string name="title_upload_gpx">GPX Datei Hochladen</string>
     <string name="title_location_history">Positionsverlauf</string>
     <string name="title_activity_history">Aktivitätenverlauf</string>
+    <string name="title_activity_duration">Activity duration</string>
     <string name="title_step_history">Schrittverlauf</string>
     <string name="title_loc_settings">Standorteinstellungen</string>
 
@@ -81,6 +82,7 @@
     <string name="summary_upload_gpx">Klicken um eine GPX Dateien zu erstellen und auf ein WordPress Weblog hochzuladen\nLetzter Upload: %s</string>
     <string name="summary_location_history">Zeige den Positionsverlauf um zu verifizieren, dass alles funktioniert</string>
     <string name="summary_activity_history">Zeige den Aktivitätenverlauf um zu verifizieren, dass alles funktioniert</string>
+    <string name="summary_activity_duration">Show the accumulated daily activity duration</string>
     <string name="summary_step_history">Zeige die täglich Schrittzahl, gelaufene Strecke und verbrante Kalorien</string>
     <string name="summary_loc_settings">Klicken um Android Standorteinstellungen zu öffnen</string>
 

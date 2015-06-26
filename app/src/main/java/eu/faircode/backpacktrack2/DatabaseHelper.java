@@ -24,6 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityChangedListener> mActivityChangedListeners = new ArrayList<ActivityChangedListener>();
+    private static List<ActivityDurationChangedListener> mActivityDurationChangedListeners = new ArrayList<ActivityDurationChangedListener>();
     private static List<StepCountChangedListener> mStepCountChangedListeners = new ArrayList<StepCountChangedListener>();
 
     private Context mContext;
@@ -395,15 +396,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cv.put("invehicle", 0);
             cv.put("unknown", 0);
             db.insert("activityduration", null, cv);
+
+            for (ActivityDurationChangedListener listener : mActivityDurationChangedListeners)
+                listener.onActivityAdded(day);
         }
 
         if (duration > 0) {
             ContentValues cv = new ContentValues();
             cv.put(column, prev + duration);
             db.update("activityduration", cv, "time = ?", new String[]{Long.toString(day)});
+            if (prev >= 0) {
+                for (ActivityDurationChangedListener listener : mActivityDurationChangedListeners)
+                    listener.onActivityUpdated(day, activity, prev + duration);
+            }
         }
 
         return this;
+    }
+
+    public Cursor getActivityDurations(boolean asc) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT *, ID AS _id FROM activityduration";
+        query += " ORDER BY time";
+        if (!asc)
+            query += " DESC";
+        return db.rawQuery(query, new String[]{});
     }
 
     // Helper methods
@@ -436,6 +453,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         mActivityChangedListeners.remove(listener);
     }
 
+    public static void addActivityDurationChangedListener(ActivityDurationChangedListener listener) {
+        mActivityDurationChangedListeners.add(listener);
+    }
+
+    public static void removeActivityDurationChangedListener(ActivityDurationChangedListener listener) {
+        mActivityDurationChangedListeners.remove(listener);
+    }
+
     public static void addStepCountChangedListener(StepCountChangedListener listener) {
         mStepCountChangedListeners.add(listener);
     }
@@ -456,6 +481,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         void onActivityAdded(long time, int activity, int confidence);
 
         void onActivityDeleted();
+    }
+
+    public interface ActivityDurationChangedListener {
+        void onActivityAdded(long time);
+
+        void onActivityUpdated(long time, int activity, long duration);
     }
 
     public interface StepCountChangedListener {

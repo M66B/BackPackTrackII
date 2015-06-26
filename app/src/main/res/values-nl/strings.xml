@@ -9,6 +9,7 @@
     <string name="title_upload_gpx">Upload GPX-bestand</string>
     <string name="title_location_history">Locatiegeschiedenis</string>
     <string name="title_activity_history">Activiteitsgeschiedenis</string>
+    <string name="title_activity_duration">Activiteitsduur</string>
     <string name="title_step_history">Wandelgeschiedenis</string>
     <string name="title_loc_settings">Locatie-instellingen</string>
 
@@ -81,6 +82,7 @@
     <string name="summary_upload_gpx">Tap to write and upload a GPX file to a WordPress weblog\nLast upload: %s</string>
     <string name="summary_location_history">Show the location history to verify everything works</string>
     <string name="summary_activity_history">Show the activity history to verify everything works</string>
+    <string name="summary_activity_duration">Show the accumulated daily activity duration</string>
     <string name="summary_step_history">Show the daily number of steps taken, distance walked and calories burned</string>
     <string name="summary_loc_settings">Tap to open the Android location settings</string>
 
