@@ -164,13 +164,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (stepcount >= 0)
                 cv.put("stepcount", stepcount);
 
-            try {
-                db.beginTransaction();
-                db.insert("location", null, cv);
-            } finally {
-                if (db.inTransaction())
-                    db.endTransaction();
-            }
+            db.insert("location", null, cv);
 
             for (LocationChangedListener listener : mLocationChangedListeners)
                 listener.onLocationAdded(location);
@@ -182,17 +176,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public DatabaseHelper updateLocationName(long id, String name) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
-
             ContentValues cv = new ContentValues();
             cv.put("name", name);
-
-            try {
-                db.beginTransaction();
-                db.update("location", cv, "ID = ?", new String[]{Long.toString(id)});
-            } finally {
-                if (db.inTransaction())
-                    db.endTransaction();
-            }
+            db.update("location", cv, "ID = ?", new String[]{Long.toString(id)});
 
             for (LocationChangedListener listener : mLocationChangedListeners)
                 listener.onLocationUpdated();
@@ -204,17 +190,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public DatabaseHelper updateLocationAltitude(long id, double altitude) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
-
             ContentValues cv = new ContentValues();
             cv.put("altitude", altitude);
-
-            try {
-                db.beginTransaction();
-                db.update("location", cv, "ID = ?", new String[]{Long.toString(id)});
-            } finally {
-                if (db.inTransaction())
-                    db.endTransaction();
-            }
+            db.update("location", cv, "ID = ?", new String[]{Long.toString(id)});
 
             for (LocationChangedListener listener : mLocationChangedListeners)
                 listener.onLocationUpdated();
@@ -226,13 +204,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public DatabaseHelper deleteLocation(long id) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
-            try {
-                db.beginTransaction();
-                db.delete("location", "ID = ?", new String[]{Long.toString(id)});
-            } finally {
-                if (db.inTransaction())
-                    db.endTransaction();
-            }
+            db.delete("location", "ID = ?", new String[]{Long.toString(id)});
 
             for (LocationChangedListener listener : mLocationChangedListeners)
                 listener.onLocationDeleted();
@@ -245,13 +217,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         synchronized (mContext.getApplicationContext()) {
             Log.w(TAG, "Delete from=" + from + " to=" + to);
             SQLiteDatabase db = this.getWritableDatabase();
-            try {
-                db.beginTransaction();
-                db.delete("location", "time >= ? AND time <= ?", new String[]{Long.toString(from), Long.toString(to)});
-            } finally {
-                if (db.inTransaction())
-                    db.endTransaction();
-            }
+            db.delete("location", "time >= ? AND time <= ?", new String[]{Long.toString(from), Long.toString(to)});
 
             for (LocationChangedListener listener : mLocationChangedListeners)
                 listener.onLocationDeleted();
@@ -285,13 +251,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cv.put("activity", activity);
             cv.put("confidence", confidence);
 
-            try {
-                db.beginTransaction();
-                db.insert("activity", null, cv);
-            } finally {
-                if (db.inTransaction())
-                    db.endTransaction();
-            }
+            db.insert("activity", null, cv);
 
             for (ActivityChangedListener listener : mActivityChangedListeners)
                 listener.onActivityAdded(time, activity, confidence);
@@ -303,13 +263,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public DatabaseHelper deleteActivities() {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
-            try {
-                db.beginTransaction();
-                db.delete("activity", null, new String[]{});
-            } finally {
-                if (db.inTransaction())
-                    db.endTransaction();
-            }
+            db.delete("activity", null, new String[]{});
 
             for (ActivityChangedListener listener : mActivityChangedListeners)
                 listener.onActivityDeleted();
@@ -331,7 +285,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public DatabaseHelper updateSteps(long time, int delta) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
-
             long day = getDay(time);
 
             int count = -1;
@@ -345,31 +298,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     c.close();
             }
 
-
             if (count < 0) {
                 Log.w(TAG, "Creating new day time=" + day);
                 ContentValues cv = new ContentValues();
                 cv.put("time", day);
                 cv.put("count", delta);
-
-                try {
-                    db.beginTransaction();
-                    db.insert("step", null, cv);
-                } finally {
-                    if (db.inTransaction())
-                        db.endTransaction();
-                }
+                db.insert("step", null, cv);
             } else {
                 ContentValues cv = new ContentValues();
                 cv.put("count", count + delta);
-
-                try {
-                    db.beginTransaction();
-                    db.update("step", cv, "time = ?", new String[]{Long.toString(day)});
-                } finally {
-                    if (db.inTransaction())
-                        db.endTransaction();
-                }
+                db.update("step", cv, "time = ?", new String[]{Long.toString(day)});
             }
 
             for (StepCountChangedListener listener : mStepCountChangedListeners)
@@ -457,14 +395,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cv.put("onbicycle", 0);
             cv.put("invehicle", 0);
             cv.put("unknown", 0);
-
-            try {
-                db.beginTransaction();
-                db.insert("activityduration", null, cv);
-            } finally {
-                if (db.inTransaction())
-                    db.endTransaction();
-            }
+            db.insert("activityduration", null, cv);
 
             for (ActivityDurationChangedListener listener : mActivityDurationChangedListeners)
                 listener.onActivityAdded(day);
@@ -473,15 +404,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (duration > 0) {
             ContentValues cv = new ContentValues();
             cv.put(column, prev + duration);
-
-            try {
-                db.beginTransaction();
-                db.update("activityduration", cv, "time = ?", new String[]{Long.toString(day)});
-            } finally {
-                if (db.inTransaction())
-                    db.endTransaction();
-            }
-
+            db.update("activityduration", cv, "time = ?", new String[]{Long.toString(day)});
             if (prev >= 0) {
                 for (ActivityDurationChangedListener listener : mActivityDurationChangedListeners)
                     listener.onActivityUpdated(day, activity, prev + duration);
