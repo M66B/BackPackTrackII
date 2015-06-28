@@ -268,8 +268,9 @@ public class LocationService extends IntentService {
             updateState(this);
 
             // Get parameters
-            boolean still = (activity.getType() == DetectedActivity.STILL);
-            boolean onfoot = (activity.getType() == DetectedActivity.ON_FOOT || activity.getType() == DetectedActivity.WALKING);
+            int act = activity.getType();
+            boolean still = (act == DetectedActivity.STILL);
+            boolean onfoot = (act == DetectedActivity.ON_FOOT || act == DetectedActivity.WALKING || act == DetectedActivity.RUNNING);
             boolean recognizeSteps = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_STEPS, ActivitySettings.DEFAULT_RECOGNITION_STEPS);
 
             // Stop/start repeating alarm
@@ -863,7 +864,7 @@ public class LocationService extends IntentService {
         boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
         boolean recognizeSteps = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_STEPS, ActivitySettings.DEFAULT_RECOGNITION_STEPS);
         int activity = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
-        boolean onfoot = (activity == DetectedActivity.ON_FOOT || activity == DetectedActivity.WALKING);
+        boolean onfoot = (activity == DetectedActivity.ON_FOOT || activity == DetectedActivity.WALKING || activity == DetectedActivity.RUNNING);
         if (!recognition || !recognizeSteps || onfoot) // Keep alive
             context.startService(new Intent(context, StepCounterService.class));
     }
