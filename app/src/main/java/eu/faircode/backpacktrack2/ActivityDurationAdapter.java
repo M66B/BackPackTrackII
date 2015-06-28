@@ -55,7 +55,7 @@ public class ActivityDurationAdapter extends CursorAdapter {
         duration = duration % (3600 * 1000);
         long minutes = duration / (60 * 1000);
         if (hours == 0 && minutes == 0)
-            return "-";
+            return "";
         else
             return hours + ":" + (minutes < 10 ? "0" : "") + minutes;
     }
