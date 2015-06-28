@@ -18,6 +18,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="6dp"
         android:layout_weight="1"
+        android:drawableRight="@android:drawable/ic_input_delete"
         android:gravity="center_vertical"
         android:textAppearance="?android:attr/textAppearance" />
 

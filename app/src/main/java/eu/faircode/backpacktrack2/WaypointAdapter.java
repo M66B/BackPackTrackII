@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
@@ -71,6 +72,25 @@ public class WaypointAdapter extends CursorAdapter {
             }
         });
 
+        // Handle clear text
+        // http://stackoverflow.com/questions/3554377/handling-click-events-on-a-drawable-within-an-edittext
+        etName.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                final int DRAWABLE_LEFT = 0;
+                final int DRAWABLE_TOP = 1;
+                final int DRAWABLE_RIGHT = 2;
+                final int DRAWABLE_BOTTOM = 3;
+
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= (etName.getRight() - etName.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        etName.setText("");
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
         // Handle reverse geocode
         if (Geocoder.isPresent())
             ivGeocode.setOnClickListener(new View.OnClickListener() {
