@@ -7,7 +7,7 @@
     <ImageView
         android:id="@+id/ivShare"
         android:layout_width="24dp"
-        android:layout_height="?android:attr/listPreferredItemHeightSmall"
+        android:layout_height="24dp"
         android:layout_gravity="center_vertical"
         android:src="@android:drawable/ic_menu_share" />
 
@@ -24,7 +24,7 @@
     <ImageView
         android:id="@+id/ivGeocode"
         android:layout_width="24dp"
-        android:layout_height="?android:attr/listPreferredItemHeightSmall"
+        android:layout_height="24dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="6dp"
         android:src="@android:drawable/ic_menu_mylocation" />
@@ -32,7 +32,7 @@
     <ImageView
         android:id="@+id/ivSave"
         android:layout_width="24dp"
-        android:layout_height="?android:attr/listPreferredItemHeightSmall"
+        android:layout_height="24dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="6dp"
         android:src="@android:drawable/ic_menu_save" />
@@ -40,7 +40,7 @@
     <ImageView
         android:id="@+id/ivDelete"
         android:layout_width="24dp"
-        android:layout_height="?android:attr/listPreferredItemHeightSmall"
+        android:layout_height="24dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="6dp"
         android:src="@android:drawable/ic_menu_delete" />

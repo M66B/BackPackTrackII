@@ -77,7 +77,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
     public static final String PREF_UPLOAD_GPX = "pref_upload_gpx";
     public static final String PREF_LOCATION_HISTORY = "pref_location_history";
     public static final String PREF_ACTIVITY_HISTORY = "pref_activity_history";
-    public static final String PREF_ACTIVITY_DURATION = "pref_activity_duration";
     public static final String PREF_STEP_HISTORY = "pref_step_history";
     public static final String PREF_SETTINGS = "pref_settings";
 
@@ -281,7 +280,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         Preference pref_check = findPreference(PREF_SETTINGS);
         Preference pref_location_history = findPreference(PREF_LOCATION_HISTORY);
         Preference pref_activity_history = findPreference(PREF_ACTIVITY_HISTORY);
-        Preference pref_activity_duration = findPreference(PREF_ACTIVITY_DURATION);
         Preference pref_recognize_steps = findPreference(PREF_RECOGNITION_STEPS);
         Preference pref_step_history = findPreference(PREF_STEP_HISTORY);
         Preference pref_step_update = findPreference(PREF_STEP_DELTA);
@@ -406,15 +404,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             }
         });
 
-        // Handle activity duration
-        pref_activity_duration.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                activity_duration();
-                return true;
-            }
-        });
-
         // Handle step count history
         pref_step_history.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -434,7 +423,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Check for Play services
         boolean playServices = LocationService.hasPlayServices(this);
         findPreference(PREF_ACTIVITY_HISTORY).setEnabled(playServices);
-        findPreference(PREF_ACTIVITY_DURATION).setEnabled(playServices);
         findPreference(PREF_RECOGNITION_ENABLED).setEnabled(playServices);
         findPreference(PREF_RECOGNITION_INTERVAL_STILL).setEnabled(playServices);
         findPreference(PREF_RECOGNITION_INTERVAL_MOVING).setEnabled(playServices);
@@ -1045,6 +1033,64 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
         View viewHistory = inflater.inflate(R.layout.activity_history, null);
 
+        // Handle view list
+        ImageView ivList = (ImageView) viewHistory.findViewById(R.id.ivList);
+        ivList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                activity_list();
+            }
+        });
+
+        // Fill list
+        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityDuration);
+        Cursor cursor = db.getActivityDurations(false);
+        final ActivityDurationAdapter adapter = new ActivityDurationAdapter(ActivitySettings.this, cursor);
+        lv.setAdapter(adapter);
+
+        // Live updates
+        final DatabaseHelper.ActivityDurationChangedListener listener = new DatabaseHelper.ActivityDurationChangedListener() {
+            @Override
+            public void onActivityAdded(long time) {
+                Cursor cursor = db.getActivityDurations(false);
+                adapter.changeCursor(cursor);
+            }
+
+            @Override
+            public void onActivityUpdated(long time, int activity, long duration) {
+                Cursor cursor = db.getActivityDurations(false);
+                adapter.changeCursor(cursor);
+            }
+        };
+        DatabaseHelper.addActivityDurationChangedListener(listener);
+
+        // Show layout
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+        alertDialogBuilder.setTitle(R.string.title_activity_history);
+        alertDialogBuilder.setIcon(R.drawable.history_60);
+        alertDialogBuilder.setView(viewHistory);
+        alertDialogBuilder
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                DatabaseHelper.removeActivityDurationChangedListener(listener);
+            }
+        });
+        alertDialog.show();
+    }
+
+    private void activity_list() {
+        // Get layout
+        LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
+        View viewHistory = inflater.inflate(R.layout.activity_list, null);
+
         // Set/handle history enabled
         final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
         boolean enabled = prefs.getBoolean(PREF_RECOGNITION_HISTORY, DEFAULT_RECOGNITION_HISTORY);
@@ -1140,55 +1186,6 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
                 DatabaseHelper.removeActivityChangedListener(listener);
-            }
-        });
-        alertDialog.show();
-    }
-
-    private void activity_duration() {
-        // Get layout
-        LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
-        View viewHistory = inflater.inflate(R.layout.activity_duration, null);
-
-        // Fill list
-        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityDuration);
-        Cursor cursor = db.getActivityDurations(false);
-        final ActivityDurationAdapter adapter = new ActivityDurationAdapter(ActivitySettings.this, cursor);
-        lv.setAdapter(adapter);
-
-        // Live updates
-        final DatabaseHelper.ActivityDurationChangedListener listener = new DatabaseHelper.ActivityDurationChangedListener() {
-            @Override
-            public void onActivityAdded(long time) {
-                Cursor cursor = db.getActivityDurations(false);
-                adapter.changeCursor(cursor);
-            }
-
-            @Override
-            public void onActivityUpdated(long time, int activity, long duration) {
-                Cursor cursor = db.getActivityDurations(false);
-                adapter.changeCursor(cursor);
-            }
-        };
-        DatabaseHelper.addActivityDurationChangedListener(listener);
-
-        // Show layout
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
-        alertDialogBuilder.setTitle(R.string.title_activity_duration);
-        alertDialogBuilder.setIcon(R.drawable.history_60);
-        alertDialogBuilder.setView(viewHistory);
-        alertDialogBuilder
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                });
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialogInterface) {
-                DatabaseHelper.removeActivityDurationChangedListener(listener);
             }
         });
         alertDialog.show();

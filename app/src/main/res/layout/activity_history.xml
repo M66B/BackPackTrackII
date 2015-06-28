@@ -10,24 +10,54 @@
         android:layout_height="match_parent"
         android:orientation="horizontal">
 
-        <CheckBox
-            android:id="@+id/cbHistoryEnabled"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="1"
-            android:text="@string/title_recognition_history" />
 
         <ImageView
-            android:id="@+id/ivDelete"
-            android:layout_width="24dip"
-            android:layout_height="?android:attr/listPreferredItemHeightSmall"
-            android:layout_gravity="center_vertical"
-            android:src="@android:drawable/ic_menu_delete" />
+            android:id="@+id/ivList"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginRight="36dp"
+            android:src="@drawable/toc" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="12dp"
+            android:src="@drawable/pause" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="12dp"
+            android:src="@drawable/walk" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="12dp"
+            android:src="@drawable/run" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="12dp"
+            android:src="@drawable/bike" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="12dp"
+            android:src="@drawable/car" />
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="12dp"
+            android:src="@drawable/explore" />
+
     </LinearLayout>
 
     <ListView
-        android:id="@+id/lvActivityHistory"
+        android:id="@+id/lvActivityDuration"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp" />

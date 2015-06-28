@@ -35,11 +35,6 @@
             android:summary="@string/summary_activity_history"
             android:title="@string/title_activity_history" />
         <Preference
-            android:icon="@drawable/history_60"
-            android:key="pref_activity_duration"
-            android:summary="@string/summary_activity_duration"
-            android:title="@string/title_activity_duration" />
-        <Preference
             android:icon="@drawable/walk_60"
             android:key="pref_step_history"
             android:summary="@string/summary_step_history"

@@ -254,9 +254,3 @@ Screenshots
 <img src="screenshot3_scaled.png"/>
 
 <img src="screenshot4_scaled.png"/>
-
-<img src="screenshot5_scaled.png"/>
-
-<img src="screenshot6_scaled.png"/>
-
-<img src="screenshot7_scaled.png"/>
