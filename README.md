@@ -147,6 +147,11 @@ For example:
 
 *am startservice -a eu.faircode.backpacktrack2.WRITE_GPX --es TrackName "Test" --ez WriteExtensions false --ez DeleteData false --es TimeFrom "1970-1-1" --es TimeTo "2016-1-1"*
 
+Get Google elevation data:
+
+* *am startservice -a eu.faircode.backpacktrack2.GET_ALTITUDE --es TimeFrom "2015-6-27" --es TimeTo "2015-6-28"*
+
+
 Tasker use case examples
 
 Starting/stopping tracking based on a location:
