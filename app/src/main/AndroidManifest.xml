@@ -96,6 +96,7 @@
                 <action android:name="eu.faircode.backpacktrack2.WRITE_GPX" />
                 <action android:name="eu.faircode.backpacktrack2.WRITE_KML" />
                 <action android:name="eu.faircode.backpacktrack2.UPLOAD_GPX" />
+                <action android:name="eu.faircode.backpacktrack2.GET_ALTITUDE" />
             </intent-filter>
 
         </service>

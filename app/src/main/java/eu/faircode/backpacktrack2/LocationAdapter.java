@@ -132,43 +132,7 @@ public class LocationAdapter extends CursorAdapter {
                         Log.w(TAG, "Getting altitude " + df.format(from.getTime()) + " ... " + df.format(to.getTime()));
 
                         // Get altitudes for range
-                        DatabaseHelper dh = null;
-                        Cursor c = null;
-                        boolean first = true;
-                        try {
-                            dh = new DatabaseHelper(context);
-                            c = dh.getLocations(from.getTimeInMillis(), to.getTimeInMillis(), true, true, true);
-                            while (c.moveToNext()) {
-                                long id = c.getLong(cursor.getColumnIndex("ID"));
-                                long time = c.getLong(cursor.getColumnIndex("time"));
-                                final String provider = c.getString(cursor.getColumnIndex("provider"));
-                                double latitude = c.getDouble(cursor.getColumnIndex("latitude"));
-                                double longitude = c.getDouble(cursor.getColumnIndex("longitude"));
-
-                                Location location = new Location(provider);
-                                location.setLatitude(latitude);
-                                location.setLongitude(longitude);
-                                location.setTime(time);
-                                if (GoogleElevationApi.getElevation(location, context)) {
-                                    if (first)
-                                        first = false;
-                                    else
-                                        try {
-                                            // Max. 5 requests/second
-                                            Thread.sleep(200);
-                                        } catch (InterruptedException ignored) {
-                                        }
-                                    Log.w(TAG, "New altitude for location=" + location);
-                                    dh.updateLocationAltitude(id, location.getAltitude());
-                                } else
-                                    break;
-                            }
-                        } finally {
-                            if (c != null)
-                                c.close();
-                            if (dh != null)
-                                dh.close();
-                        }
+                        getAltitude(from.getTimeInMillis(), to.getTimeInMillis(), context);
 
                         synchronized (LocationAdapter.this) {
                             elevationBusy = false;
@@ -203,5 +167,53 @@ public class LocationAdapter extends CursorAdapter {
                 }
             }
         });
+    }
+
+    public static void getAltitude(long from, long to, Context context) {
+
+        DatabaseHelper dh = null;
+        Cursor cursor = null;
+        boolean first = true;
+        try {
+            dh = new DatabaseHelper(context);
+            cursor = dh.getLocations(from, to, true, true, true);
+
+            int colID = cursor.getColumnIndex("ID");
+            int colTime = cursor.getColumnIndex("time");
+            int colProvider = cursor.getColumnIndex("provider");
+            int colLatitude = cursor.getColumnIndex("latitude");
+            int colLongitude = cursor.getColumnIndex("longitude");
+
+            while (cursor.moveToNext()) {
+                long id = cursor.getLong(colID);
+                long time = cursor.getLong(colTime);
+                final String provider = cursor.getString(colProvider);
+                double latitude = cursor.getDouble(colLatitude);
+                double longitude = cursor.getDouble(colLongitude);
+
+                Location location = new Location(provider);
+                location.setLatitude(latitude);
+                location.setLongitude(longitude);
+                location.setTime(time);
+                if (GoogleElevationApi.getElevation(location, context)) {
+                    if (first)
+                        first = false;
+                    else
+                        try {
+                            // Max. 5 requests/second
+                            Thread.sleep(200);
+                        } catch (InterruptedException ignored) {
+                        }
+                    Log.w(TAG, "New altitude for location=" + location);
+                    dh.updateLocationAltitude(id, location.getAltitude());
+                } else
+                    break;
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close();
+            if (dh != null)
+                dh.close();
+        }
     }
 }

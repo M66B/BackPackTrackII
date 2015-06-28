@@ -60,6 +60,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -94,6 +95,7 @@ public class LocationService extends IntentService {
     private static final String EXPORTED_ACTION_WRITE_GPX = "eu.faircode.backpacktrack2.WRITE_GPX";
     private static final String EXPORTED_ACTION_WRITE_KML = "eu.faircode.backpacktrack2.WRITE_KML";
     private static final String EXPORTED_ACTION_UPLOAD_GPX = "eu.faircode.backpacktrack2.UPLOAD_GPX";
+    private static final String EXPORTED_ACTION_GET_ALTITUDE = "eu.faircode.backpacktrack2.GET_ALTITUDE";
 
     // Extras
     public static final String EXTRA_ENABLE = "Enable";
@@ -196,6 +198,10 @@ public class LocationService extends IntentService {
             } else if (EXPORTED_ACTION_UPLOAD_GPX.equals(intent.getAction())) {
                 convertTime(intent);
                 handleUploadGPX(intent);
+
+            } else if (EXPORTED_ACTION_GET_ALTITUDE.equals(intent.getAction())) {
+                convertTime(intent);
+                handleGetAltitude(intent);
 
             } else if (ACTION_DAILY.equals(intent.getAction()))
                 handleDaily(intent);
@@ -652,6 +658,27 @@ public class LocationService extends IntentService {
             Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             toast(ex.toString(), Toast.LENGTH_LONG, this);
         }
+    }
+
+    private void handleGetAltitude(Intent intent) {
+        Calendar cfrom = Calendar.getInstance();
+        cfrom.add(Calendar.DAY_OF_YEAR, -1); // yesterday
+        cfrom.set(Calendar.HOUR_OF_DAY, 0);
+        cfrom.set(Calendar.MINUTE, 0);
+        cfrom.set(Calendar.SECOND, 0);
+        cfrom.set(Calendar.MILLISECOND, 0);
+
+        Calendar cto = Calendar.getInstance();
+        cto.add(Calendar.DAY_OF_YEAR, -1); // yesterday
+        cto.set(Calendar.HOUR_OF_DAY, 23);
+        cto.set(Calendar.MINUTE, 59);
+        cto.set(Calendar.SECOND, 59);
+        cto.set(Calendar.MILLISECOND, 999);
+
+        long from = intent.getLongExtra(EXTRA_TIME_FROM, cfrom.getTimeInMillis());
+        long to = intent.getLongExtra(EXTRA_TIME_TO, cto.getTimeInMillis());
+
+        LocationAdapter.getAltitude(from, to, this);
     }
 
     private void handleDaily(Intent intent) {
