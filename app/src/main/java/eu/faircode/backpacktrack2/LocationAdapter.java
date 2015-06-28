@@ -21,6 +21,7 @@ import android.widget.Toast;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class LocationAdapter extends CursorAdapter {
     private static final String TAG = "BPT2.LocationAdapter";
@@ -128,9 +129,6 @@ public class LocationAdapter extends CursorAdapter {
                         to.set(Calendar.SECOND, 59);
                         to.set(Calendar.MILLISECOND, 999);
 
-                        DateFormat df = SimpleDateFormat.getDateTimeInstance();
-                        Log.w(TAG, "Getting altitude " + df.format(from.getTime()) + " ... " + df.format(to.getTime()));
-
                         // Get altitudes for range
                         getAltitude(from.getTimeInMillis(), to.getTimeInMillis(), context);
 
@@ -170,6 +168,9 @@ public class LocationAdapter extends CursorAdapter {
     }
 
     public static void getAltitude(long from, long to, Context context) {
+        Log.w(TAG, "Get altitude" +
+                " from=" + SimpleDateFormat.getDateTimeInstance().format(new Date(from)) +
+                " to=" + SimpleDateFormat.getDateTimeInstance().format(new Date(to)));
 
         DatabaseHelper dh = null;
         Cursor cursor = null;
