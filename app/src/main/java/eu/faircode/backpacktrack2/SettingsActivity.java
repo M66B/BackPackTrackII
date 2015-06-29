@@ -557,7 +557,7 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 
         long time = new Date().getTime();
         new DatabaseHelper(context).updateSteps(time, 0).close();
-        new DatabaseHelper(context).updateActivityDuration(time, DetectedActivity.UNKNOWN, 0);
+        new DatabaseHelper(context).updateActivityDuration(time, DetectedActivity.UNKNOWN, 0).close();
         StepCountWidget.updateWidgets(context);
 
         LocationService.stopTracking(context);
