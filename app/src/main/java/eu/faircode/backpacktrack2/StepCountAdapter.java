@@ -19,8 +19,8 @@ public class StepCountAdapter extends CursorAdapter {
     public StepCountAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        stepsize = Integer.parseInt(prefs.getString(ActivitySettings.PREF_STEP_SIZE, ActivitySettings.DEFAULT_STEP_SIZE));
-        weight = Integer.parseInt(prefs.getString(ActivitySettings.PREF_WEIGHT, ActivitySettings.DEFAULT_WEIGHT));
+        stepsize = Integer.parseInt(prefs.getString(SettingsActivity.PREF_STEP_SIZE, SettingsActivity.DEFAULT_STEP_SIZE));
+        weight = Integer.parseInt(prefs.getString(SettingsActivity.PREF_WEIGHT, SettingsActivity.DEFAULT_WEIGHT));
     }
 
     @Override

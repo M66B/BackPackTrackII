@@ -18,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -38,7 +37,7 @@ public class LocationAdapter extends CursorAdapter {
 
     public void init() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+        lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsActivity.PREF_LAST_LOCATION, null));
     }
 
     @Override

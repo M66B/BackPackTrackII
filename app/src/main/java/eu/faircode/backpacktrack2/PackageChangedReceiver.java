@@ -22,7 +22,7 @@ public class PackageChangedReceiver extends BroadcastReceiver {
                         @Override
                         public void run() {
                             synchronized (context.getApplicationContext()) {
-                                ActivitySettings.firstRun(context);
+                                SettingsActivity.firstRun(context);
                             }
                         }
                     }).start();

@@ -1,13 +1,10 @@
 package eu.faircode.backpacktrack2;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.location.Location;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -24,7 +21,7 @@ public class GoogleElevationApi {
     public static boolean getElevation(Location location, Context context) {
         try {
             // Check if connectivity
-            if (!ActivitySettings.isConnected(context))
+            if (!SettingsActivity.isConnected(context))
                 return false;
 
             // https://developers.google.com/maps/documentation/elevation/

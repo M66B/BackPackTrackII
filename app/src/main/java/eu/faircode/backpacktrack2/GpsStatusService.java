@@ -33,8 +33,8 @@ public class GpsStatusService extends Service {
                 // Persist fixed/visible satellites
                 Log.w(TAG, "Satellites fixed/visible=" + fixed + "/" + visible);
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsStatusService.this);
-                prefs.edit().putInt(ActivitySettings.PREF_SATS_FIXED, fixed).apply();
-                prefs.edit().putInt(ActivitySettings.PREF_SATS_VISIBLE, visible).apply();
+                prefs.edit().putInt(SettingsActivity.PREF_SATS_FIXED, fixed).apply();
+                prefs.edit().putInt(SettingsActivity.PREF_SATS_VISIBLE, visible).apply();
 
                 // Send state changed intent
                 Intent geotaggedIntent = new Intent(GpsStatusService.this, LocationService.class);
@@ -49,8 +49,8 @@ public class GpsStatusService extends Service {
         super.onCreate();
         Log.w(TAG, "Requesting GPS status updates");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsStatusService.this);
-        prefs.edit().remove(ActivitySettings.PREF_SATS_FIXED).apply();
-        prefs.edit().remove(ActivitySettings.PREF_SATS_VISIBLE).apply();
+        prefs.edit().remove(SettingsActivity.PREF_SATS_FIXED).apply();
+        prefs.edit().remove(SettingsActivity.PREF_SATS_VISIBLE).apply();
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         lm.addGpsStatusListener(mGpsStatusListener);
     }
@@ -59,8 +59,8 @@ public class GpsStatusService extends Service {
     public void onDestroy() {
         Log.w(TAG, "Stopping GPS status updates");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsStatusService.this);
-        prefs.edit().remove(ActivitySettings.PREF_SATS_FIXED).apply();
-        prefs.edit().remove(ActivitySettings.PREF_SATS_VISIBLE).apply();
+        prefs.edit().remove(SettingsActivity.PREF_SATS_FIXED).apply();
+        prefs.edit().remove(SettingsActivity.PREF_SATS_VISIBLE).apply();
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         lm.removeGpsStatusListener(mGpsStatusListener);
         super.onDestroy();

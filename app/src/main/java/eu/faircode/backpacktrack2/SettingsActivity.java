@@ -67,7 +67,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-public class ActivitySettings extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class SettingsActivity extends PreferenceActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "BPT2.Settings";
 
     // Preference names
@@ -205,7 +205,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.w(TAG, "Connectivity changed");
-            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && storageMounted() && isConnected(ActivitySettings.this));
+            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && storageMounted() && isConnected(SettingsActivity.this));
         }
     };
 
@@ -215,7 +215,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             Log.w(TAG, "External storage changed");
             findPreference(PREF_SHARE_GPX).setEnabled(storageMounted());
             findPreference(PREF_SHARE_KML).setEnabled(storageMounted());
-            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && storageMounted() && isConnected(ActivitySettings.this));
+            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && storageMounted() && isConnected(SettingsActivity.this));
         }
     };
 
@@ -264,8 +264,8 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    synchronized (ActivitySettings.this.getApplicationContext()) {
-                        firstRun(ActivitySettings.this);
+                    synchronized (SettingsActivity.this.getApplicationContext()) {
+                        firstRun(SettingsActivity.this);
                     }
                 }
             }).start();
@@ -342,7 +342,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         pref_share_gpx.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Intent intent = new Intent(ActivitySettings.this, LocationService.class);
+                Intent intent = new Intent(SettingsActivity.this, LocationService.class);
                 intent.setAction(LocationService.ACTION_SHARE_GPX);
                 export(intent, R.string.title_share_gpx);
                 return true;
@@ -354,7 +354,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         pref_share_kml.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Intent intent = new Intent(ActivitySettings.this, LocationService.class);
+                Intent intent = new Intent(SettingsActivity.this, LocationService.class);
                 intent.setAction(LocationService.ACTION_SHARE_KML);
                 export(intent, R.string.title_share_kml);
                 return true;
@@ -362,11 +362,11 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         });
 
         // Handle upload GPX
-        pref_upload_gpx.setEnabled(blogConfigured() && storageMounted() && isConnected(ActivitySettings.this));
+        pref_upload_gpx.setEnabled(blogConfigured() && storageMounted() && isConnected(SettingsActivity.this));
         pref_upload_gpx.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Intent intent = new Intent(ActivitySettings.this, LocationService.class);
+                Intent intent = new Intent(SettingsActivity.this, LocationService.class);
                 intent.setAction(LocationService.ACTION_UPLOAD_GPX);
                 export(intent, R.string.title_upload_gpx);
                 return true;
@@ -542,9 +542,9 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    synchronized (ActivitySettings.this.getApplicationContext()) {
-                        LocationService.stopTracking(ActivitySettings.this);
-                        LocationService.startTracking(ActivitySettings.this);
+                    synchronized (SettingsActivity.this.getApplicationContext()) {
+                        LocationService.stopTracking(SettingsActivity.this);
+                        LocationService.startTracking(SettingsActivity.this);
                     }
                 }
             }).start();
@@ -580,13 +580,13 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     private void edit_waypoints() {
         // Get layout
-        final LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
+        final LayoutInflater inflater = LayoutInflater.from(SettingsActivity.this);
         View viewEdit = inflater.inflate(R.layout.waypoint_edit, null);
 
         // Fill list
         ListView lv = (ListView) viewEdit.findViewById(R.id.lvEdit);
         Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
-        final WaypointAdapter adapter = new WaypointAdapter(ActivitySettings.this, cursor, db);
+        final WaypointAdapter adapter = new WaypointAdapter(SettingsActivity.this, cursor, db);
         lv.setAdapter(adapter);
 
         // Handle waypoint_add
@@ -598,7 +598,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                     final View viewEdit = inflater.inflate(R.layout.waypoint_add, null);
                     final EditText address = (EditText) viewEdit.findViewById(R.id.etAdd);
 
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
                     alertDialogBuilder.setTitle(R.string.title_geocode);
                     alertDialogBuilder.setView(viewEdit);
                     alertDialogBuilder
@@ -625,7 +625,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
             ivAdd.setVisibility(View.GONE);
 
         // Show layout
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
         alertDialogBuilder.setTitle(R.string.title_edit);
         alertDialogBuilder.setView(viewEdit);
         alertDialogBuilder
@@ -648,7 +648,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         new AsyncTask<Object, Object, List<Address>>() {
             protected List<Address> doInBackground(Object... params) {
                 try {
-                    Geocoder geocoder = new Geocoder(ActivitySettings.this);
+                    Geocoder geocoder = new Geocoder(SettingsActivity.this);
                     return geocoder.getFromLocationName(name, GEOCODER_RESULTS);
                 } catch (IOException ex) {
                     Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
@@ -669,7 +669,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                         }
 
                     // Show address selector
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
                     alertDialogBuilder.setTitle(getString(R.string.title_geocode));
                     alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int item) {
@@ -684,13 +684,13 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                                 protected Object doInBackground(Object... params) {
                                     // Add elevation data
                                     if (!location.hasAltitude()) {
-                                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ActivitySettings.this);
-                                        if (prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_WAYPOINT, ActivitySettings.DEFAULT_ALTITUDE_WAYPOINT))
-                                            GoogleElevationApi.getElevation(location, ActivitySettings.this);
+                                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(SettingsActivity.this);
+                                        if (prefs.getBoolean(SettingsActivity.PREF_ALTITUDE_WAYPOINT, SettingsActivity.DEFAULT_ALTITUDE_WAYPOINT))
+                                            GoogleElevationApi.getElevation(location, SettingsActivity.this);
                                     }
 
                                     // Persist location
-                                    new DatabaseHelper(ActivitySettings.this).insertLocation(location, geocodedName, -1, -1, -1).close();
+                                    new DatabaseHelper(SettingsActivity.this).insertLocation(location, geocodedName, -1, -1, -1).close();
                                     return null;
                                 }
 
@@ -698,7 +698,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                                 protected void onPostExecute(Object result) {
                                     Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
                                     adapter.changeCursor(cursor);
-                                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_added, geocodedName), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(SettingsActivity.this, getString(R.string.msg_added, geocodedName), Toast.LENGTH_LONG).show();
                                 }
                             }.execute();
                         }
@@ -711,7 +711,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                     });
                     alertDialogBuilder.show();
                 } else
-                    Toast.makeText(ActivitySettings.this, getString(R.string.msg_nolocation, name), Toast.LENGTH_LONG).show();
+                    Toast.makeText(SettingsActivity.this, getString(R.string.msg_nolocation, name), Toast.LENGTH_LONG).show();
             }
         }.execute();
     }
@@ -886,7 +886,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     private void location_history() {
         // Get layout
-        LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
+        LayoutInflater inflater = LayoutInflater.from(SettingsActivity.this);
         View viewHistory = inflater.inflate(R.layout.location_history, null);
 
         // Show altitude graph
@@ -896,7 +896,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Fill list
         final ListView lv = (ListView) viewHistory.findViewById(R.id.lvLocationHistory);
         Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
-        final LocationAdapter adapter = new LocationAdapter(ActivitySettings.this, cursor);
+        final LocationAdapter adapter = new LocationAdapter(SettingsActivity.this, cursor);
         lv.setAdapter(adapter);
 
         // Live updates
@@ -931,7 +931,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         DatabaseHelper.addLocationChangedListener(listener);
 
         // Show layout
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
         alertDialogBuilder.setTitle(R.string.title_location_history);
         alertDialogBuilder.setIcon(R.drawable.location_60);
         alertDialogBuilder.setView(viewHistory);
@@ -1031,7 +1031,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     private void activity_history() {
         // Get layout
-        LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
+        LayoutInflater inflater = LayoutInflater.from(SettingsActivity.this);
         View viewHistory = inflater.inflate(R.layout.activity_history, null);
 
         // Handle view list
@@ -1046,7 +1046,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Fill list
         final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityDuration);
         Cursor cursor = db.getActivityDurations(false);
-        final ActivityDurationAdapter adapter = new ActivityDurationAdapter(ActivitySettings.this, cursor);
+        final ActivityDurationAdapter adapter = new ActivityDurationAdapter(SettingsActivity.this, cursor);
         lv.setAdapter(adapter);
 
         // Live updates
@@ -1066,7 +1066,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         DatabaseHelper.addActivityDurationChangedListener(listener);
 
         // Show layout
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
         alertDialogBuilder.setTitle(R.string.title_activity_history);
         alertDialogBuilder.setIcon(R.drawable.history_60);
         alertDialogBuilder.setView(viewHistory);
@@ -1089,7 +1089,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     private void activity_list() {
         // Get layout
-        LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
+        LayoutInflater inflater = LayoutInflater.from(SettingsActivity.this);
         View viewHistory = inflater.inflate(R.layout.activity_list, null);
 
         // Set/handle history enabled
@@ -1107,7 +1107,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Fill list
         final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityHistory);
         Cursor cursor = db.getActivityTypes(0, Long.MAX_VALUE);
-        final ActivityTypeAdapter adapter = new ActivityTypeAdapter(ActivitySettings.this, cursor);
+        final ActivityTypeAdapter adapter = new ActivityTypeAdapter(SettingsActivity.this, cursor);
         lv.setAdapter(adapter);
 
         // Live updates
@@ -1140,7 +1140,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         ivDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
                 alertDialogBuilder.setTitle(getString(R.string.msg_delete, getString(R.string.title_activity_history)));
                 alertDialogBuilder
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -1148,7 +1148,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                             public void onClick(DialogInterface dialog, int which) {
                                 new AsyncTask<Object, Object, Object>() {
                                     protected Object doInBackground(Object... params) {
-                                        new DatabaseHelper(ActivitySettings.this).deleteActivityTypes().close();
+                                        new DatabaseHelper(SettingsActivity.this).deleteActivityTypes().close();
                                         return null;
                                     }
 
@@ -1171,7 +1171,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         });
 
         // Show layout
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
         alertDialogBuilder.setTitle(R.string.title_activity_history);
         alertDialogBuilder.setIcon(R.drawable.history_60);
         alertDialogBuilder.setView(viewHistory);
@@ -1194,7 +1194,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
     private void step_history() {
         // Get layout
-        LayoutInflater inflater = LayoutInflater.from(ActivitySettings.this);
+        LayoutInflater inflater = LayoutInflater.from(SettingsActivity.this);
         View viewHistory = inflater.inflate(R.layout.step_history, null);
 
         // Show steps bar graph
@@ -1204,7 +1204,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         // Fill list
         final ListView lv = (ListView) viewHistory.findViewById(R.id.lvStepHistory);
         Cursor cursor = db.getSteps(false);
-        final StepCountAdapter adapter = new StepCountAdapter(ActivitySettings.this, cursor);
+        final StepCountAdapter adapter = new StepCountAdapter(SettingsActivity.this, cursor);
         lv.setAdapter(adapter);
 
         // Live updates
@@ -1234,7 +1234,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         DatabaseHelper.addStepCountChangedListener(listener);
 
         // Show layout
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(ActivitySettings.this);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SettingsActivity.this);
         alertDialogBuilder.setTitle(R.string.title_step_history);
         alertDialogBuilder.setIcon(R.drawable.walk_60);
         alertDialogBuilder.setView(viewHistory);

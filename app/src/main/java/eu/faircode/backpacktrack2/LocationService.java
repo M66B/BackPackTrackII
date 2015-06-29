@@ -221,7 +221,7 @@ public class LocationService extends IntentService {
     private void handleTrackingEnable(Intent intent) {
         boolean enable = intent.getBooleanExtra(EXTRA_ENABLE, true);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.edit().putBoolean(ActivitySettings.PREF_ENABLED, enable).apply();
+        prefs.edit().putBoolean(SettingsActivity.PREF_ENABLED, enable).apply();
         if (enable)
             startTracking(this);
         else
@@ -231,8 +231,8 @@ public class LocationService extends IntentService {
     private void handleActivity(Intent intent) {
         // Get last activity
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        int lastActivity = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
-        long lastTime = prefs.getLong(ActivitySettings.PREF_LAST_ACTIVITY_TIME, -1);
+        int lastActivity = prefs.getInt(SettingsActivity.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
+        long lastTime = prefs.getLong(SettingsActivity.PREF_LAST_ACTIVITY_TIME, -1);
         boolean lastStill = (lastActivity == DetectedActivity.STILL);
 
         // Get detected activity
@@ -251,7 +251,7 @@ public class LocationService extends IntentService {
         Log.w(TAG, "Activity=" + activity);
 
         // Persist probably activities
-        if (prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_HISTORY, ActivitySettings.DEFAULT_RECOGNITION_HISTORY)) {
+        if (prefs.getBoolean(SettingsActivity.PREF_RECOGNITION_HISTORY, SettingsActivity.DEFAULT_RECOGNITION_HISTORY)) {
             DatabaseHelper dh = null;
             try {
                 dh = new DatabaseHelper(this);
@@ -265,27 +265,27 @@ public class LocationService extends IntentService {
         }
 
         // Filter unknown activity
-        boolean pref_unknown = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_UNKNOWN, ActivitySettings.DEFAULT_RECOGNITION_UNKNOWN);
+        boolean pref_unknown = prefs.getBoolean(SettingsActivity.PREF_RECOGNITION_UNKNOWN, SettingsActivity.DEFAULT_RECOGNITION_UNKNOWN);
         if (pref_unknown && activity.getType() == DetectedActivity.UNKNOWN && !lastStill) {
             Log.w(TAG, "Filtering " + activity);
             return;
         }
 
         // Filter tilting activity
-        boolean pref_tilting = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_TILTING, ActivitySettings.DEFAULT_RECOGNITION_TILTING);
+        boolean pref_tilting = prefs.getBoolean(SettingsActivity.PREF_RECOGNITION_TILTING, SettingsActivity.DEFAULT_RECOGNITION_TILTING);
         if (pref_tilting && activity.getType() == DetectedActivity.TILTING) {
             Log.w(TAG, "Filtering " + activity);
             return;
         }
 
         // Check confidence
-        int pref_confidence = Integer.parseInt(prefs.getString(ActivitySettings.PREF_RECOGNITION_CONFIDENCE, ActivitySettings.DEFAULT_RECOGNITION_CONFIDENCE));
+        int pref_confidence = Integer.parseInt(prefs.getString(SettingsActivity.PREF_RECOGNITION_CONFIDENCE, SettingsActivity.DEFAULT_RECOGNITION_CONFIDENCE));
         if (activity.getConfidence() > pref_confidence) {
             // Persist probable activity
             long time = new Date().getTime();
-            prefs.edit().putInt(ActivitySettings.PREF_LAST_ACTIVITY, activity.getType()).apply();
-            prefs.edit().putInt(ActivitySettings.PREF_LAST_CONFIDENCE, activity.getConfidence()).apply();
-            prefs.edit().putLong(ActivitySettings.PREF_LAST_ACTIVITY_TIME, time).apply();
+            prefs.edit().putInt(SettingsActivity.PREF_LAST_ACTIVITY, activity.getType()).apply();
+            prefs.edit().putInt(SettingsActivity.PREF_LAST_CONFIDENCE, activity.getConfidence()).apply();
+            prefs.edit().putLong(SettingsActivity.PREF_LAST_ACTIVITY_TIME, time).apply();
 
             // Update activity duration
             if (lastTime >= 0)
@@ -298,13 +298,13 @@ public class LocationService extends IntentService {
             int act = activity.getType();
             boolean still = (act == DetectedActivity.STILL);
             boolean onfoot = (act == DetectedActivity.ON_FOOT || act == DetectedActivity.WALKING || act == DetectedActivity.RUNNING);
-            boolean recognizeSteps = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_STEPS, ActivitySettings.DEFAULT_RECOGNITION_STEPS);
+            boolean recognizeSteps = prefs.getBoolean(SettingsActivity.PREF_RECOGNITION_STEPS, SettingsActivity.DEFAULT_RECOGNITION_STEPS);
 
             // Stop/start repeating alarm
             if (lastStill != still) {
                 // Restart activity recognition if needed
-                int intervalStill = Integer.parseInt(prefs.getString(ActivitySettings.PREF_RECOGNITION_INTERVAL_STILL, ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_STILL));
-                int intervalMoving = Integer.parseInt(prefs.getString(ActivitySettings.PREF_RECOGNITION_INTERVAL_MOVING, ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_MOVING));
+                int intervalStill = Integer.parseInt(prefs.getString(SettingsActivity.PREF_RECOGNITION_INTERVAL_STILL, SettingsActivity.DEFAULT_RECOGNITION_INTERVAL_STILL));
+                int intervalMoving = Integer.parseInt(prefs.getString(SettingsActivity.PREF_RECOGNITION_INTERVAL_MOVING, SettingsActivity.DEFAULT_RECOGNITION_INTERVAL_MOVING));
                 if (intervalStill != intervalMoving) {
                     stopActivityRecognition(this);
                     startActivityRecognition(this);
@@ -335,11 +335,11 @@ public class LocationService extends IntentService {
         // Persist location type
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (ACTION_TRACKPOINT.equals(intent.getAction()))
-            prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_TRACKPOINT).apply();
+            prefs.edit().putInt(SettingsActivity.PREF_LOCATION_TYPE, LOCATION_TRACKPOINT).apply();
         else if (ACTION_WAYPOINT.equals((intent.getAction())))
-            prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_WAYPOINT).apply();
+            prefs.edit().putInt(SettingsActivity.PREF_LOCATION_TYPE, LOCATION_WAYPOINT).apply();
         else if (ACTION_ALARM.equals(intent.getAction()))
-            prefs.edit().putInt(ActivitySettings.PREF_LOCATION_TYPE, LOCATION_PERIODIC).apply();
+            prefs.edit().putInt(SettingsActivity.PREF_LOCATION_TYPE, LOCATION_PERIODIC).apply();
 
         // Try to acquire a new location
         startLocating(this);
@@ -349,14 +349,14 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Process location update
-        int locationType = prefs.getInt(ActivitySettings.PREF_LOCATION_TYPE, -1);
+        int locationType = prefs.getInt(SettingsActivity.PREF_LOCATION_TYPE, -1);
         Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
         Log.w(TAG, "Update location=" + location + " type=" + locationType);
         if (location == null || (location.getLatitude() == 0.0 && location.getLongitude() == 0.0))
             return;
 
         // Filter inaccurate location
-        int pref_inaccurate = Integer.parseInt(prefs.getString(ActivitySettings.PREF_INACCURATE, ActivitySettings.DEFAULT_INACCURATE));
+        int pref_inaccurate = Integer.parseInt(prefs.getString(SettingsActivity.PREF_INACCURATE, SettingsActivity.DEFAULT_INACCURATE));
         if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
             Log.w(TAG, "Filtering inaccurate location=" + location);
             return;
@@ -366,16 +366,16 @@ public class LocationService extends IntentService {
         correctAltitude(location, this);
 
         // Persist better location
-        Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
+        Location bestLocation = LocationDeserializer.deserialize(prefs.getString(SettingsActivity.PREF_BEST_LOCATION, null));
         if (isBetterLocation(bestLocation, location)) {
             Log.w(TAG, "Better location=" + location);
-            prefs.edit().putInt(ActivitySettings.PREF_STATE, STATE_ACQUIRED).apply();
-            prefs.edit().putString(ActivitySettings.PREF_BEST_LOCATION, LocationSerializer.serialize(location)).apply();
+            prefs.edit().putInt(SettingsActivity.PREF_STATE, STATE_ACQUIRED).apply();
+            prefs.edit().putString(SettingsActivity.PREF_BEST_LOCATION, LocationSerializer.serialize(location)).apply();
             updateState(this);
         }
 
         // Check altitude
-        boolean pref_altitude = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE, ActivitySettings.DEFAULT_ALTITUDE);
+        boolean pref_altitude = prefs.getBoolean(SettingsActivity.PREF_ALTITUDE, SettingsActivity.DEFAULT_ALTITUDE);
         if (!location.hasAltitude() && pref_altitude) {
             Log.w(TAG, "No altitude, but preferred, location=" + location);
             return;
@@ -384,9 +384,9 @@ public class LocationService extends IntentService {
         // Check accuracy
         int pref_accuracy;
         if (locationType == LOCATION_WAYPOINT)
-            pref_accuracy = Integer.parseInt(prefs.getString(ActivitySettings.PREF_WP_ACCURACY, ActivitySettings.DEFAULT_WP_ACCURACY));
+            pref_accuracy = Integer.parseInt(prefs.getString(SettingsActivity.PREF_WP_ACCURACY, SettingsActivity.DEFAULT_WP_ACCURACY));
         else
-            pref_accuracy = Integer.parseInt(prefs.getString(ActivitySettings.PREF_TP_ACCURACY, ActivitySettings.DEFAULT_TP_ACCURACY));
+            pref_accuracy = Integer.parseInt(prefs.getString(SettingsActivity.PREF_TP_ACCURACY, SettingsActivity.DEFAULT_TP_ACCURACY));
         if (!location.hasAccuracy() || location.getAccuracy() > pref_accuracy) {
             Log.w(TAG, "Accuracy not reached, location=" + location);
             return;
@@ -414,14 +414,14 @@ public class LocationService extends IntentService {
         }
 
         // Filter inaccurate passive locations
-        int pref_inaccurate = Integer.parseInt(prefs.getString(ActivitySettings.PREF_PASSIVE_INACCURATE, ActivitySettings.DEFAULT_PASSIVE_INACCURATE));
+        int pref_inaccurate = Integer.parseInt(prefs.getString(SettingsActivity.PREF_PASSIVE_INACCURATE, SettingsActivity.DEFAULT_PASSIVE_INACCURATE));
         if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
             Log.w(TAG, "Filtering inaccurate passive location=" + location);
             return;
         }
 
         // Get last location
-        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(SettingsActivity.PREF_LAST_LOCATION, null));
         if (lastLocation == null) {
             Log.w(TAG, "Passive location without last location, location=" + location);
             return;
@@ -431,7 +431,7 @@ public class LocationService extends IntentService {
         correctAltitude(location, this);
 
         // Filter nearby passive locations
-        int pref_nearby = Integer.parseInt(prefs.getString(ActivitySettings.PREF_PASSIVE_NEARBY, ActivitySettings.DEFAULT_PASSIVE_NEARBY));
+        int pref_nearby = Integer.parseInt(prefs.getString(SettingsActivity.PREF_PASSIVE_NEARBY, SettingsActivity.DEFAULT_PASSIVE_NEARBY));
         if (lastLocation.distanceTo(location) < pref_nearby &&
                 (lastLocation.hasAccuracy() ? lastLocation.getAccuracy() : Float.MAX_VALUE) <=
                         (location.hasAccuracy() ? location.getAccuracy() : Float.MAX_VALUE)) {
@@ -445,7 +445,7 @@ public class LocationService extends IntentService {
 
         // Handle bearing change
         if (location.hasBearing()) {
-            int pref_bearing_change = Integer.parseInt(prefs.getString(ActivitySettings.PREF_PASSIVE_BEARING, ActivitySettings.DEFAULT_PASSIVE_BEARING));
+            int pref_bearing_change = Integer.parseInt(prefs.getString(SettingsActivity.PREF_PASSIVE_BEARING, SettingsActivity.DEFAULT_PASSIVE_BEARING));
             bchange = Math.abs(lastLocation.getBearing() - location.getBearing());
             if (bchange > 180)
                 bchange = 360 - bchange;
@@ -457,7 +457,7 @@ public class LocationService extends IntentService {
 
         // Handle altitude change
         if (location.hasAltitude()) {
-            int pref_altitude_change = Integer.parseInt(prefs.getString(ActivitySettings.PREF_PASSIVE_ALTITUDE, ActivitySettings.DEFAULT_PASSIVE_ALTITUDE));
+            int pref_altitude_change = Integer.parseInt(prefs.getString(SettingsActivity.PREF_PASSIVE_ALTITUDE, SettingsActivity.DEFAULT_PASSIVE_ALTITUDE));
             achange = Math.abs(lastLocation.getAltitude() - location.getAltitude());
             if (!lastLocation.hasAltitude() || achange > pref_altitude_change) {
                 Log.w(TAG, "Altitude changed to " + location.getAltitude());
@@ -467,12 +467,12 @@ public class LocationService extends IntentService {
 
         if (update) {
             // Persist new location
-            prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
+            prefs.edit().putString(SettingsActivity.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
             DatabaseHelper dh = null;
             try {
                 dh = new DatabaseHelper(this);
-                int activity_type = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN);
-                int activity_confidence = prefs.getInt(ActivitySettings.PREF_LAST_CONFIDENCE, -1);
+                int activity_type = prefs.getInt(SettingsActivity.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN);
+                int activity_confidence = prefs.getInt(SettingsActivity.PREF_LAST_CONFIDENCE, -1);
                 int stepcount = dh.getSteps(location.getTime());
                 dh.insertLocation(location, null, activity_type, activity_confidence, stepcount).close();
             } finally {
@@ -491,9 +491,9 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         try {
-            int fixed = prefs.getInt(ActivitySettings.PREF_SATS_FIXED, 0);
-            int visible = prefs.getInt(ActivitySettings.PREF_SATS_VISIBLE, 0);
-            int checksat = Integer.parseInt(prefs.getString(ActivitySettings.PREF_CHECK_SAT, ActivitySettings.DEFAULT_CHECK_SAT));
+            int fixed = prefs.getInt(SettingsActivity.PREF_SATS_FIXED, 0);
+            int visible = prefs.getInt(SettingsActivity.PREF_SATS_VISIBLE, 0);
+            int checksat = Integer.parseInt(prefs.getString(SettingsActivity.PREF_CHECK_SAT, SettingsActivity.DEFAULT_CHECK_SAT));
             Log.w(TAG, "Check satellites fixed/visible=" + fixed + "/" + visible + " required=" + checksat);
 
             // Check if there is any chance for a GPS fix
@@ -520,8 +520,8 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Process location time-out
-        int locationType = prefs.getInt(ActivitySettings.PREF_LOCATION_TYPE, -1);
-        Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
+        int locationType = prefs.getInt(SettingsActivity.PREF_LOCATION_TYPE, -1);
+        Location bestLocation = LocationDeserializer.deserialize(prefs.getString(SettingsActivity.PREF_BEST_LOCATION, null));
         Log.w(TAG, "Timeout best location=" + bestLocation + " type=" + locationType);
 
         stopLocating(this);
@@ -597,9 +597,9 @@ public class LocationService extends IntentService {
             // Persist last share time
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
             if (gpx)
-                prefs.edit().putLong(ActivitySettings.PREF_LAST_SHARE_GPX, new Date().getTime()).apply();
+                prefs.edit().putLong(SettingsActivity.PREF_LAST_SHARE_GPX, new Date().getTime()).apply();
             else
-                prefs.edit().putLong(ActivitySettings.PREF_LAST_SHARE_KML, new Date().getTime()).apply();
+                prefs.edit().putLong(SettingsActivity.PREF_LAST_SHARE_KML, new Date().getTime()).apply();
 
             // Delete data on request
             if (delete)
@@ -641,10 +641,10 @@ public class LocationService extends IntentService {
 
             // Get parameters
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            String blogUrl = prefs.getString(ActivitySettings.PREF_BLOGURL, "");
-            int blogId = Integer.parseInt(prefs.getString(ActivitySettings.PREF_BLOGID, "1"));
-            String userName = prefs.getString(ActivitySettings.PREF_BLOGUSER, "");
-            String passWord = prefs.getString(ActivitySettings.PREF_BLOGPWD, "");
+            String blogUrl = prefs.getString(SettingsActivity.PREF_BLOGURL, "");
+            int blogId = Integer.parseInt(prefs.getString(SettingsActivity.PREF_BLOGID, "1"));
+            String userName = prefs.getString(SettingsActivity.PREF_BLOGUSER, "");
+            String passWord = prefs.getString(SettingsActivity.PREF_BLOGPWD, "");
 
             // Create XML-RPC client
             XMLRPCClient client = new XMLRPCClient(new URL(blogUrl + "xmlrpc.php"));
@@ -663,7 +663,7 @@ public class LocationService extends IntentService {
             Log.w(TAG, "Uploaded url=" + url);
 
             // Persist last upload time
-            prefs.edit().putLong(ActivitySettings.PREF_LAST_UPLOAD_GPX, new Date().getTime()).apply();
+            prefs.edit().putLong(SettingsActivity.PREF_LAST_UPLOAD_GPX, new Date().getTime()).apply();
 
             // Delete data on request
             if (delete)
@@ -710,11 +710,11 @@ public class LocationService extends IntentService {
 
         // Finalize last activity
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        int lastActivity = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
-        long lastTime = prefs.getLong(ActivitySettings.PREF_LAST_ACTIVITY_TIME, -1);
+        int lastActivity = prefs.getInt(SettingsActivity.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
+        long lastTime = prefs.getLong(SettingsActivity.PREF_LAST_ACTIVITY_TIME, -1);
         if (lastTime >= 0) {
             new DatabaseHelper(this).updateActivityDuration(lastTime, lastActivity, time - lastTime).close();
-            prefs.edit().putLong(ActivitySettings.PREF_LAST_ACTIVITY_TIME, time).apply();
+            prefs.edit().putLong(SettingsActivity.PREF_LAST_ACTIVITY_TIME, time).apply();
             new DatabaseHelper(this).updateActivityDuration(time, lastActivity, 0).close();
         }
 
@@ -730,7 +730,7 @@ public class LocationService extends IntentService {
 
         // Check if enabled
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        if (!prefs.getBoolean(ActivitySettings.PREF_ENABLED, ActivitySettings.DEFAULT_ENABLED)) {
+        if (!prefs.getBoolean(SettingsActivity.PREF_ENABLED, SettingsActivity.DEFAULT_ENABLED)) {
             Log.w(TAG, "Tracking disabled");
             return;
         }
@@ -738,8 +738,8 @@ public class LocationService extends IntentService {
         updateState(context);
 
         // Start activity recognition / repeating alarm
-        boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
-        boolean filterSteps = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_STEPS, ActivitySettings.DEFAULT_RECOGNITION_STEPS);
+        boolean recognition = prefs.getBoolean(SettingsActivity.PREF_RECOGNITION_ENABLED, SettingsActivity.DEFAULT_RECOGNITION_ENABLED);
+        boolean filterSteps = prefs.getBoolean(SettingsActivity.PREF_RECOGNITION_STEPS, SettingsActivity.DEFAULT_RECOGNITION_STEPS);
         if (recognition) {
             startActivityRecognition(context);
             if (!filterSteps)
@@ -750,14 +750,14 @@ public class LocationService extends IntentService {
         }
 
         // Request passive location updates
-        boolean passive = prefs.getBoolean(ActivitySettings.PREF_PASSIVE_ENABLED, ActivitySettings.DEFAULT_PASSIVE_ENABLED);
+        boolean passive = prefs.getBoolean(SettingsActivity.PREF_PASSIVE_ENABLED, SettingsActivity.DEFAULT_PASSIVE_ENABLED);
         if (passive) {
             Intent locationIntent = new Intent(context, LocationService.class);
             locationIntent.setAction(LocationService.ACTION_LOCATION_PASSIVE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-            int minTime = Integer.parseInt(prefs.getString(ActivitySettings.PREF_PASSIVE_MINTIME, ActivitySettings.DEFAULT_PASSIVE_MINTIME));
-            int minDist = Integer.parseInt(prefs.getString(ActivitySettings.PREF_PASSIVE_MINDIST, ActivitySettings.DEFAULT_PASSIVE_MINDIST));
+            int minTime = Integer.parseInt(prefs.getString(SettingsActivity.PREF_PASSIVE_MINTIME, SettingsActivity.DEFAULT_PASSIVE_MINTIME));
+            int minDist = Integer.parseInt(prefs.getString(SettingsActivity.PREF_PASSIVE_MINDIST, SettingsActivity.DEFAULT_PASSIVE_MINDIST));
             lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, minTime * 1000, minDist, pi);
             Log.w(TAG, "Requested passive location updates");
         }
@@ -794,9 +794,9 @@ public class LocationService extends IntentService {
                 PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                boolean still = (prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.STILL) == DetectedActivity.STILL);
-                String setting = (still ? ActivitySettings.PREF_RECOGNITION_INTERVAL_STILL : ActivitySettings.PREF_RECOGNITION_INTERVAL_MOVING);
-                String standard = (still ? ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_STILL : ActivitySettings.DEFAULT_RECOGNITION_INTERVAL_MOVING);
+                boolean still = (prefs.getInt(SettingsActivity.PREF_LAST_ACTIVITY, DetectedActivity.STILL) == DetectedActivity.STILL);
+                String setting = (still ? SettingsActivity.PREF_RECOGNITION_INTERVAL_STILL : SettingsActivity.PREF_RECOGNITION_INTERVAL_MOVING);
+                String standard = (still ? SettingsActivity.DEFAULT_RECOGNITION_INTERVAL_STILL : SettingsActivity.DEFAULT_RECOGNITION_INTERVAL_MOVING);
                 int interval = Integer.parseInt(prefs.getString(setting, standard));
 
                 ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(gac, interval * 1000, pi);
@@ -816,8 +816,8 @@ public class LocationService extends IntentService {
                 ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(gac, pi);
 
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                prefs.edit().remove(ActivitySettings.PREF_LAST_ACTIVITY).apply();
-                prefs.edit().remove(ActivitySettings.PREF_LAST_CONFIDENCE).apply();
+                prefs.edit().remove(SettingsActivity.PREF_LAST_ACTIVITY).apply();
+                prefs.edit().remove(SettingsActivity.PREF_LAST_CONFIDENCE).apply();
                 Log.w(TAG, "Canceled activity updates");
             }
         }
@@ -830,7 +830,7 @@ public class LocationService extends IntentService {
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        int interval = Integer.parseInt(prefs.getString(ActivitySettings.PREF_INTERVAL, ActivitySettings.DEFAULT_INTERVAL));
+        int interval = Integer.parseInt(prefs.getString(SettingsActivity.PREF_INTERVAL, SettingsActivity.DEFAULT_INTERVAL));
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 1000, interval * 1000, pi);
         Log.w(TAG, "Start repeating alarm frequency=" + interval + "s");
     }
@@ -852,15 +852,15 @@ public class LocationService extends IntentService {
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         // Mark active
-        if (prefs.getInt(ActivitySettings.PREF_STATE, STATE_IDLE) != STATE_IDLE) {
+        if (prefs.getInt(SettingsActivity.PREF_STATE, STATE_IDLE) != STATE_IDLE) {
             Log.w(TAG, "Already active");
             return;
         }
 
-        boolean network = prefs.getBoolean(ActivitySettings.PREF_USE_NETWORK, ActivitySettings.DEFAULT_USE_NETWORK);
-        boolean gps = prefs.getBoolean(ActivitySettings.PREF_USE_GPS, ActivitySettings.DEFAULT_USE_GPS);
-        int minTime = Integer.parseInt(prefs.getString(ActivitySettings.PREF_MINTIME, ActivitySettings.DEFAULT_MINTIME));
-        int minDist = Integer.parseInt(prefs.getString(ActivitySettings.PREF_MINDIST, ActivitySettings.DEFAULT_MINDIST));
+        boolean network = prefs.getBoolean(SettingsActivity.PREF_USE_NETWORK, SettingsActivity.DEFAULT_USE_NETWORK);
+        boolean gps = prefs.getBoolean(SettingsActivity.PREF_USE_GPS, SettingsActivity.DEFAULT_USE_GPS);
+        int minTime = Integer.parseInt(prefs.getString(SettingsActivity.PREF_MINTIME, SettingsActivity.DEFAULT_MINTIME));
+        int minDist = Integer.parseInt(prefs.getString(SettingsActivity.PREF_MINDIST, SettingsActivity.DEFAULT_MINDIST));
 
         // Request coarse location
         if (network && lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
@@ -884,7 +884,7 @@ public class LocationService extends IntentService {
         // Set location timeout
         if ((network && lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) || (gps && lm.isProviderEnabled(LocationManager.GPS_PROVIDER))) {
             {
-                int check = Integer.parseInt(prefs.getString(ActivitySettings.PREF_CHECK_TIME, ActivitySettings.DEFAULT_CHECK_TIME));
+                int check = Integer.parseInt(prefs.getString(SettingsActivity.PREF_CHECK_TIME, SettingsActivity.DEFAULT_CHECK_TIME));
                 Intent alarmIntent = new Intent(context, LocationService.class);
                 alarmIntent.setAction(LocationService.ACTION_LOCATION_CHECK);
                 PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -894,7 +894,7 @@ public class LocationService extends IntentService {
             }
 
             {
-                int timeout = Integer.parseInt(prefs.getString(ActivitySettings.PREF_TIMEOUT, ActivitySettings.DEFAULT_TIMEOUT));
+                int timeout = Integer.parseInt(prefs.getString(SettingsActivity.PREF_TIMEOUT, SettingsActivity.DEFAULT_TIMEOUT));
                 Intent alarmIntent = new Intent(context, LocationService.class);
                 alarmIntent.setAction(LocationService.ACTION_LOCATION_TIMEOUT);
                 PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -903,15 +903,15 @@ public class LocationService extends IntentService {
                 Log.w(TAG, "Set timeout=" + timeout + "s");
             }
 
-            prefs.edit().putInt(ActivitySettings.PREF_STATE, STATE_ACQUIRING).apply();
+            prefs.edit().putInt(SettingsActivity.PREF_STATE, STATE_ACQUIRING).apply();
             updateState(context);
         } else
             Log.w(TAG, "No location providers");
 
         // Keep step counter service alive
-        boolean recognition = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_ENABLED, ActivitySettings.DEFAULT_RECOGNITION_ENABLED);
-        boolean recognizeSteps = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_STEPS, ActivitySettings.DEFAULT_RECOGNITION_STEPS);
-        int activity = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
+        boolean recognition = prefs.getBoolean(SettingsActivity.PREF_RECOGNITION_ENABLED, SettingsActivity.DEFAULT_RECOGNITION_ENABLED);
+        boolean recognizeSteps = prefs.getBoolean(SettingsActivity.PREF_RECOGNITION_STEPS, SettingsActivity.DEFAULT_RECOGNITION_STEPS);
+        int activity = prefs.getInt(SettingsActivity.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
         boolean onfoot = (activity == DetectedActivity.ON_FOOT || activity == DetectedActivity.WALKING || activity == DetectedActivity.RUNNING);
         if (!recognition || !recognizeSteps || onfoot) // Keep alive
             context.startService(new Intent(context, StepCounterService.class));
@@ -958,9 +958,9 @@ public class LocationService extends IntentService {
             am.cancel(pi);
         }
 
-        prefs.edit().putInt(ActivitySettings.PREF_STATE, STATE_IDLE).apply();
-        prefs.edit().remove(ActivitySettings.PREF_LOCATION_TYPE).apply();
-        prefs.edit().remove(ActivitySettings.PREF_BEST_LOCATION).apply();
+        prefs.edit().putInt(SettingsActivity.PREF_STATE, STATE_IDLE).apply();
+        prefs.edit().remove(SettingsActivity.PREF_LOCATION_TYPE).apply();
+        prefs.edit().remove(SettingsActivity.PREF_BEST_LOCATION).apply();
         updateState(context);
     }
 
@@ -978,7 +978,7 @@ public class LocationService extends IntentService {
 
     private boolean isBetterLocation(Location prev, Location current) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean pref_altitude = prefs.getBoolean(ActivitySettings.PREF_ALTITUDE, ActivitySettings.DEFAULT_ALTITUDE);
+        boolean pref_altitude = prefs.getBoolean(SettingsActivity.PREF_ALTITUDE, SettingsActivity.DEFAULT_ALTITUDE);
         return (prev == null ||
                 ((!pref_altitude || !prev.hasAltitude() || current.hasAltitude()) &&
                         (current.hasAccuracy() ? current.getAccuracy() : Float.MAX_VALUE) <
@@ -989,8 +989,8 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         // Filter nearby locations
-        int pref_nearby = Integer.parseInt(prefs.getString(ActivitySettings.PREF_NEARBY, ActivitySettings.DEFAULT_NEARBY));
-        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+        int pref_nearby = Integer.parseInt(prefs.getString(SettingsActivity.PREF_NEARBY, SettingsActivity.DEFAULT_NEARBY));
+        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(SettingsActivity.PREF_LAST_LOCATION, null));
         if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT ||
                 lastLocation == null || lastLocation.distanceTo(location) >= pref_nearby ||
                 (lastLocation.hasAccuracy() ? lastLocation.getAccuracy() : Float.MAX_VALUE) >
@@ -1001,10 +1001,10 @@ public class LocationService extends IntentService {
             // Add elevation data
             if (!location.hasAltitude()) {
                 if (locationType == LOCATION_WAYPOINT) {
-                    if (prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_WAYPOINT, ActivitySettings.DEFAULT_ALTITUDE_WAYPOINT))
+                    if (prefs.getBoolean(SettingsActivity.PREF_ALTITUDE_WAYPOINT, SettingsActivity.DEFAULT_ALTITUDE_WAYPOINT))
                         GoogleElevationApi.getElevation(location, this);
                 } else {
-                    if (prefs.getBoolean(ActivitySettings.PREF_ALTITUDE_TRACKPOINT, ActivitySettings.DEFAULT_ALTITUDE_TRACKPOINT))
+                    if (prefs.getBoolean(SettingsActivity.PREF_ALTITUDE_TRACKPOINT, SettingsActivity.DEFAULT_ALTITUDE_TRACKPOINT))
                         GoogleElevationApi.getElevation(location, this);
                 }
             }
@@ -1020,12 +1020,12 @@ public class LocationService extends IntentService {
             }
 
             // Persist new location
-            prefs.edit().putString(ActivitySettings.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
+            prefs.edit().putString(SettingsActivity.PREF_LAST_LOCATION, LocationSerializer.serialize(location)).apply();
             DatabaseHelper dh = null;
             try {
                 dh = new DatabaseHelper(this);
-                int activity_type = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN);
-                int activity_confidence = prefs.getInt(ActivitySettings.PREF_LAST_CONFIDENCE, -1);
+                int activity_type = prefs.getInt(SettingsActivity.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN);
+                int activity_confidence = prefs.getInt(SettingsActivity.PREF_LAST_CONFIDENCE, -1);
                 int stepcount = dh.getSteps(location.getTime());
                 dh.insertLocation(location, waypointName, activity_type, activity_confidence, stepcount).close();
             } finally {
@@ -1049,7 +1049,7 @@ public class LocationService extends IntentService {
     private static void correctAltitude(Location location, Context context) {
         if (LocationManager.GPS_PROVIDER.equals(location.getProvider())) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-            if (prefs.getBoolean(ActivitySettings.PREF_CORRECTION_ENABLED, ActivitySettings.DEFAULT_CORRECTION_ENABLED))
+            if (prefs.getBoolean(SettingsActivity.PREF_CORRECTION_ENABLED, SettingsActivity.DEFAULT_CORRECTION_ENABLED))
                 try {
                     double offset = getEGM96Offset(location, context);
                     Log.w(TAG, "Offset=" + offset);
@@ -1118,9 +1118,9 @@ public class LocationService extends IntentService {
     public static void updateState(Context context) {
         // Get state
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        int state = prefs.getInt(ActivitySettings.PREF_STATE, STATE_IDLE);
-        int activityType = prefs.getInt(ActivitySettings.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
-        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_LAST_LOCATION, null));
+        int state = prefs.getInt(SettingsActivity.PREF_STATE, STATE_IDLE);
+        int activityType = prefs.getInt(SettingsActivity.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
+        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(SettingsActivity.PREF_LAST_LOCATION, null));
 
         // Get title
         String activity = getActivityName(activityType, context);
@@ -1156,14 +1156,14 @@ public class LocationService extends IntentService {
         else if (state == STATE_ACQUIRING)
             text = context.getString(R.string.msg_acquiring);
         else if (state == STATE_ACQUIRED) {
-            Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
+            Location bestLocation = LocationDeserializer.deserialize(prefs.getString(SettingsActivity.PREF_BEST_LOCATION, null));
             text = context.getString(R.string.msg_acquired,
                     SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(new Date(bestLocation.getTime())),
                     getProviderName(bestLocation, context));
         }
 
         // Build main intent
-        Intent riSettings = new Intent(context, ActivitySettings.class);
+        Intent riSettings = new Intent(context, SettingsActivity.class);
         riSettings.setAction(Intent.ACTION_MAIN);
         riSettings.addCategory(Intent.CATEGORY_LAUNCHER);
         riSettings.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -1220,8 +1220,8 @@ public class LocationService extends IntentService {
                     piWaypoint);
         } else {
             // Indeterminate progress
-            int fixed = prefs.getInt(ActivitySettings.PREF_SATS_FIXED, 0);
-            int visible = prefs.getInt(ActivitySettings.PREF_SATS_VISIBLE, 0);
+            int fixed = prefs.getInt(SettingsActivity.PREF_SATS_FIXED, 0);
+            int visible = prefs.getInt(SettingsActivity.PREF_SATS_VISIBLE, 0);
             if (visible == 0)
                 notificationBuilder.setProgress(0, 0, true);
             else
@@ -1240,7 +1240,7 @@ public class LocationService extends IntentService {
             // Add actions
             notificationBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(android.R.string.cancel),
                     piStop);
-            Location bestLocation = LocationDeserializer.deserialize(prefs.getString(ActivitySettings.PREF_BEST_LOCATION, null));
+            Location bestLocation = LocationDeserializer.deserialize(prefs.getString(SettingsActivity.PREF_BEST_LOCATION, null));
             if (bestLocation != null)
                 notificationBuilder.addAction(android.R.drawable.ic_menu_save, context.getString(R.string.title_accept),
                         piAccept);
@@ -1355,7 +1355,7 @@ public class LocationService extends IntentService {
 
     public static boolean debugMode(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getBoolean(ActivitySettings.PREF_DEBUG, false);
+        return prefs.getBoolean(SettingsActivity.PREF_DEBUG, false);
     }
 
     // Serialization

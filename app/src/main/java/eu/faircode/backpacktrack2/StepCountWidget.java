@@ -18,7 +18,7 @@ public class StepCountWidget extends AppWidgetProvider {
             dh = new DatabaseHelper(context);
             int count = dh.getSteps(new Date().getTime());
 
-            Intent riSettings = new Intent(context, ActivitySettings.class);
+            Intent riSettings = new Intent(context, SettingsActivity.class);
             riSettings.setAction(Intent.ACTION_MAIN);
             riSettings.addCategory(Intent.CATEGORY_LAUNCHER);
             riSettings.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);

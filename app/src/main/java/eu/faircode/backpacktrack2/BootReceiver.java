@@ -15,17 +15,17 @@ public class BootReceiver extends BroadcastReceiver {
         Log.w(TAG, "Received " + intent);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        prefs.edit().remove(ActivitySettings.PREF_LAST_ACTIVITY).apply();
-        prefs.edit().remove(ActivitySettings.PREF_LAST_CONFIDENCE).apply();
-        prefs.edit().remove(ActivitySettings.PREF_LAST_ACTIVITY_TIME).apply();
+        prefs.edit().remove(SettingsActivity.PREF_LAST_ACTIVITY).apply();
+        prefs.edit().remove(SettingsActivity.PREF_LAST_CONFIDENCE).apply();
+        prefs.edit().remove(SettingsActivity.PREF_LAST_ACTIVITY_TIME).apply();
         //prefs.edit().remove(ActivitySettings.PREF_LAST_LOCATION).apply();
-        prefs.edit().remove(ActivitySettings.PREF_LAST_STEP_COUNT).apply();
+        prefs.edit().remove(SettingsActivity.PREF_LAST_STEP_COUNT).apply();
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 synchronized (context.getApplicationContext()) {
-                    ActivitySettings.firstRun(context);
+                    SettingsActivity.firstRun(context);
                 }
             }
         }).start();
