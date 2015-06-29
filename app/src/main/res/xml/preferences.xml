@@ -330,11 +330,16 @@
             android:title="@string/title_version" />
         <Preference
             android:key="pref_support"
+            android:summary="@string/summary_support"
             android:title="@string/title_support">
             <intent
                 android:action="android.intent.action.VIEW"
                 android:data="http://forum.xda-developers.com/showthread.php?t=3123682" />
         </Preference>
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_debug"
+            android:title="@string/title_debug" />
         <Preference
             android:summary="@string/summary_author"
             android:title="@string/title_author">

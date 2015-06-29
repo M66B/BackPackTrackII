@@ -37,7 +37,7 @@ public class LocationAdapter extends CursorAdapter {
 
     public void init() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsActivity.PREF_LAST_LOCATION, null));
+        lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
     }
 
     @Override

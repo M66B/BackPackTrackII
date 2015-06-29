@@ -21,7 +21,7 @@ public class GoogleElevationApi {
     public static boolean getElevation(Location location, Context context) {
         try {
             // Check if connectivity
-            if (!SettingsActivity.isConnected(context))
+            if (!SettingsFragment.isConnected(context))
                 return false;
 
             // https://developers.google.com/maps/documentation/elevation/

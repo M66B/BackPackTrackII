@@ -31,11 +31,11 @@ public class StepCounterService extends Service {
 
             // Check delta
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(StepCounterService.this);
-            int last = prefs.getInt(SettingsActivity.PREF_LAST_STEP_COUNT, -1);
-            int delta = Integer.parseInt(prefs.getString(SettingsActivity.PREF_STEP_DELTA, SettingsActivity.DEFAULT_STEP_DELTA));
+            int last = prefs.getInt(SettingsFragment.PREF_LAST_STEP_COUNT, -1);
+            int delta = Integer.parseInt(prefs.getString(SettingsFragment.PREF_STEP_DELTA, SettingsFragment.DEFAULT_STEP_DELTA));
             if (last < 0 || steps - last >= delta) {
                 // Update last step count
-                prefs.edit().putInt(SettingsActivity.PREF_LAST_STEP_COUNT, steps).apply();
+                prefs.edit().putInt(SettingsFragment.PREF_LAST_STEP_COUNT, steps).apply();
 
                 if (last >= 0) {
                     // Update total step count
@@ -64,7 +64,7 @@ public class StepCounterService extends Service {
         super.onCreate();
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.edit().remove(SettingsActivity.PREF_LAST_STEP_COUNT).apply();
+        prefs.edit().remove(SettingsFragment.PREF_LAST_STEP_COUNT).apply();
 
         SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor stepCounter = sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
@@ -83,7 +83,7 @@ public class StepCounterService extends Service {
         sm.unregisterListener(mStepCounterListener);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.edit().remove(SettingsActivity.PREF_LAST_STEP_COUNT).apply();
+        prefs.edit().remove(SettingsFragment.PREF_LAST_STEP_COUNT).apply();
 
         super.onDestroy();
     }

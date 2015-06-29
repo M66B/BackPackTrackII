@@ -72,6 +72,7 @@
     <string name="title_legend">Legend</string>
     <string name="title_version">Version</string>
     <string name="title_support">Support</string>
+    <string name="title_debug">Debug mode</string>
     <string name="title_author">Author</string>
     <string name="title_license">License</string>
 
