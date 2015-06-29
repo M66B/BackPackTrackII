@@ -102,6 +102,7 @@ public class LocationService extends IntentService {
     public static final String EXTRA_TRACK_NAME = "TrackName";
     public static final String EXTRA_WRITE_EXTENSIONS = "WriteExtensions";
     public static final String EXTRA_DELETE_DATA = "DeleteData";
+    public static final String EXTRA_TIME = "Time";
     public static final String EXTRA_TIME_FROM = "TimeFrom";
     public static final String EXTRA_TIME_TO = "TimeTo";
     public static final String EXTRA_GEOURI = "Geopoint";
@@ -603,7 +604,8 @@ public class LocationService extends IntentService {
     }
 
     private void handleMotion(Intent intent) {
-        new DatabaseHelper(this).insertActivityType(new Date().getTime(), -1, 100).close();
+        long time = intent.getLongExtra(EXTRA_TIME, new Date().getTime());
+        new DatabaseHelper(this).insertActivityType(time, -1, 100).close();
     }
 
     private void handleShare(Intent intent) {

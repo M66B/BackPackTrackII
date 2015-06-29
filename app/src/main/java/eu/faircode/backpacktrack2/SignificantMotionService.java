@@ -11,6 +11,8 @@ import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.util.Date;
+
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class SignificantMotionService extends Service {
     private static final String TAG = "BPT2.SignificantMotion";
@@ -25,6 +27,8 @@ public class SignificantMotionService extends Service {
             if (event.values.length > 0 && event.values[0] == 1.0) {
                 Intent intent = new Intent(SignificantMotionService.this, LocationService.class);
                 intent.setAction(LocationService.ACTION_MOTION);
+                // event.timestamp is nanoseconds since system start
+                intent.putExtra(LocationService.EXTRA_TIME, new Date().getTime());
                 startService(intent);
 
                 detectSignificantMotion();
