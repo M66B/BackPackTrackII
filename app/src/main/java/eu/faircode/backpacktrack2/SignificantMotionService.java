@@ -22,9 +22,10 @@ public class SignificantMotionService extends Service {
         @Override
         public void onTrigger(TriggerEvent event) {
             Log.w(TAG, event.toString());
-            if (event.values[0] == 1) {
+            if (event.values.length > 0 && event.values[0] == 1.0) {
                 Intent intent = new Intent(SignificantMotionService.this, LocationService.class);
                 intent.setAction(LocationService.ACTION_MOTION);
+                intent.putExtra(LocationService.EXTRA_TIME, Math.round(event.timestamp / 1000000D));
                 startService(intent);
 
                 detectSignificantMotion();
