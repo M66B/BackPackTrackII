@@ -138,7 +138,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (oldVersion < 7)
             createTableActivityDuration(db);
 
-        if (oldVersion < 8) {
+        if (oldVersion == 7) {
             db.beginTransaction();
             try {
                 db.execSQL("ALTER TABLE activity RENAME TO activitytype");
