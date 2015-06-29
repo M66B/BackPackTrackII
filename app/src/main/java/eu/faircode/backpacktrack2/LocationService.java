@@ -366,6 +366,13 @@ public class LocationService extends IntentService {
             return;
         }
 
+        // Filter old locations
+        Location lastLocation = LocationDeserializer.deserialize(prefs.getString(SettingsActivity.PREF_LAST_LOCATION, null));
+        if (lastLocation != null && location.getTime() <= lastLocation.getTime()) {
+            Log.w(TAG, "Location is older than last location, location=" + location);
+            return;
+        }
+
         // Correct altitude
         correctAltitude(location, this);
 
@@ -428,6 +435,12 @@ public class LocationService extends IntentService {
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(SettingsActivity.PREF_LAST_LOCATION, null));
         if (lastLocation == null) {
             Log.w(TAG, "Passive location without last location, location=" + location);
+            return;
+        }
+
+        // Filter old locations
+        if (location.getTime() <= lastLocation.getTime()) {
+            Log.w(TAG, "Passive location is older than last location, location=" + location);
             return;
         }
 
