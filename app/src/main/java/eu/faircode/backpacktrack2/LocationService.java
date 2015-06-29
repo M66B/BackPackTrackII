@@ -328,6 +328,9 @@ public class LocationService extends IntentService {
                 else
                     stopService(new Intent(this, StepCounterService.class));
         }
+
+        // Keep significant motion service alive
+        startService(new Intent(this, SignificantMotionService.class));
     }
 
     private void handleLocationRequest(Intent intent) {
