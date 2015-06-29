@@ -25,7 +25,7 @@ public class ActivityDurationAdapter extends CursorAdapter {
         // Get values
         long time = cursor.getLong(cursor.getColumnIndex("time"));
         long still = cursor.getInt(cursor.getColumnIndex("still"));
-        long onfoot = cursor.getInt(cursor.getColumnIndex("onfoot"));
+        long walking = cursor.getInt(cursor.getColumnIndex("walking"));
         long running = cursor.getInt(cursor.getColumnIndex("running"));
         long onbicycle = cursor.getInt(cursor.getColumnIndex("onbicycle"));
         long invehicle = cursor.getInt(cursor.getColumnIndex("invehicle"));
@@ -43,7 +43,7 @@ public class ActivityDurationAdapter extends CursorAdapter {
         // Set values
         tvTime.setText(SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT).format(time));
         tvStill.setText(format(still));
-        tvOnfoot.setText(format(onfoot));
+        tvOnfoot.setText(format(walking));
         tvRunning.setText(format(running));
         tvOnbicycle.setText(format(onbicycle));
         tvInvehicle.setText(format(invehicle));

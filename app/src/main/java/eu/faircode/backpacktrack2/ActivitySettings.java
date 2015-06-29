@@ -1106,12 +1106,12 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
 
         // Fill list
         final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityHistory);
-        Cursor cursor = db.getActivities(0, Long.MAX_VALUE);
-        final ActivityAdapter adapter = new ActivityAdapter(ActivitySettings.this, cursor);
+        Cursor cursor = db.getActivityTypes(0, Long.MAX_VALUE);
+        final ActivityTypeAdapter adapter = new ActivityTypeAdapter(ActivitySettings.this, cursor);
         lv.setAdapter(adapter);
 
         // Live updates
-        final DatabaseHelper.ActivityChangedListener listener = new DatabaseHelper.ActivityChangedListener() {
+        final DatabaseHelper.ActivityTypeChangedListener listener = new DatabaseHelper.ActivityTypeChangedListener() {
             @Override
             public void onActivityAdded(long time, int activity, int confidence) {
                 update();
@@ -1126,14 +1126,14 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Cursor cursor = db.getActivities(0, Long.MAX_VALUE);
+                        Cursor cursor = db.getActivityTypes(0, Long.MAX_VALUE);
                         adapter.changeCursor(cursor);
                         lv.setAdapter(adapter);
                     }
                 });
             }
         };
-        DatabaseHelper.addActivityChangedListener(listener);
+        DatabaseHelper.addActivityTypeChangedListener(listener);
 
         // Handle delete
         ImageView ivDelete = (ImageView) viewHistory.findViewById(R.id.ivDelete);
@@ -1148,13 +1148,13 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
                             public void onClick(DialogInterface dialog, int which) {
                                 new AsyncTask<Object, Object, Object>() {
                                     protected Object doInBackground(Object... params) {
-                                        new DatabaseHelper(ActivitySettings.this).deleteActivities().close();
+                                        new DatabaseHelper(ActivitySettings.this).deleteActivityTypes().close();
                                         return null;
                                     }
 
                                     @Override
                                     protected void onPostExecute(Object result) {
-                                        adapter.changeCursor(db.getActivities(0, Long.MAX_VALUE));
+                                        adapter.changeCursor(db.getActivityTypes(0, Long.MAX_VALUE));
                                     }
                                 }.execute();
                             }
@@ -1186,7 +1186,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                DatabaseHelper.removeActivityChangedListener(listener);
+                DatabaseHelper.removeActivityTypeChangedListener(listener);
             }
         });
         alertDialog.show();

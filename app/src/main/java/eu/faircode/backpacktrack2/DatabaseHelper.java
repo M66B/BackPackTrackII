@@ -20,10 +20,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BACKPACKTRACKII";
-    private static final int DB_VERSION = 7;
+    private static final int DB_VERSION = 8;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
-    private static List<ActivityChangedListener> mActivityChangedListeners = new ArrayList<ActivityChangedListener>();
+    private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
     private static List<ActivityDurationChangedListener> mActivityDurationChangedListeners = new ArrayList<ActivityDurationChangedListener>();
     private static List<StepCountChangedListener> mStepCountChangedListeners = new ArrayList<StepCountChangedListener>();
 
@@ -38,9 +38,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         Log.w(TAG, "Creating database");
         createTableLocation(db);
-        createTableActivity(db);
-        createTableStep(db);
+        createTableActivityType(db);
         createTableActivityDuration(db);
+        createTableStep(db);
     }
 
     private void createTableLocation(SQLiteDatabase db) {
@@ -63,13 +63,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE INDEX idx_location_name ON location(name)");
     }
 
-    private void createTableActivity(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE activity (" +
+    private void createTableActivityType(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE activitytype (" +
                 " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
                 ", time INTEGER NOT NULL" +
                 ", activity INTEGER NOT NULL" +
                 ", confidence INTEGER NOT NULL" + ");");
         db.execSQL("CREATE INDEX idx_activity_time ON activity(time)");
+    }
+
+    private void createTableActivityDuration(SQLiteDatabase db) {
+        Log.w(TAG, "Adding table activityduration");
+        db.execSQL("CREATE TABLE activityduration (" +
+                " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
+                ", time INTEGER NOT NULL" +
+                ", still INTEGER NOT NULL" +
+                ", walking INTEGER NOT NULL" +
+                ", running INTEGER NOT NULL" +
+                ", onbicycle INTEGER NOT NULL" +
+                ", invehicle INTEGER NOT NULL" +
+                ", unknown INTEGER NOT NULL" + ");");
+        db.execSQL("CREATE INDEX idx_activityduration_time ON activityduration(time)");
     }
 
     private void createTableStep(SQLiteDatabase db) {
@@ -81,34 +95,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE INDEX idx_step_time ON step(time)");
     }
 
-    private void createTableActivityDuration(SQLiteDatabase db) {
-        Log.w(TAG, "Adding table activityduration");
-        db.execSQL("CREATE TABLE activityduration (" +
-                " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
-                ", time INTEGER NOT NULL" +
-                ", still INTEGER NOT NULL" +
-                ", onfoot INTEGER NOT NULL" +
-                ", running INTEGER NOT NULL" +
-                ", onbicycle INTEGER NOT NULL" +
-                ", invehicle INTEGER NOT NULL" +
-                ", unknown INTEGER NOT NULL" + ");");
-        db.execSQL("CREATE INDEX idx_activityduration_time ON activityduration(time)");
-    }
-
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(TAG, "Upgrading from version " + oldVersion + " to " + newVersion);
 
         if (oldVersion < 2)
-            createTableActivity(db);
+            createTableActivityType(db);
 
         if (oldVersion < 3)
             createTableStep(db);
 
         if (oldVersion < 4) {
-            db.execSQL("ALTER TABLE location ADD COLUMN activity_type INTEGER NULL");
-            db.execSQL("ALTER TABLE location ADD COLUMN activity_confidence INTEGER NULL");
-            db.execSQL("ALTER TABLE location ADD COLUMN stepcount INTEGER NULL");
+            db.beginTransaction();
+            try {
+                db.execSQL("ALTER TABLE location ADD COLUMN activity_type INTEGER NULL");
+                db.execSQL("ALTER TABLE location ADD COLUMN activity_confidence INTEGER NULL");
+                db.execSQL("ALTER TABLE location ADD COLUMN stepcount INTEGER NULL");
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
         }
 
         if (oldVersion < 5)
@@ -116,6 +122,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (oldVersion < 7)
             createTableActivityDuration(db);
+
+        if (oldVersion < 8) {
+            db.beginTransaction();
+            try {
+                db.execSQL("ALTER TABLE activity RENAME TO activitytype");
+                db.execSQL("ALTER TABLE activityduration RENAME TO activityduration_orig");
+                db.execSQL("DROP INDEX idx_activityduration_time");
+                createTableActivityDuration(db);
+                db.execSQL(
+                        "INSERT INTO activityduration (time, still, walking, running, onbicycle, invehicle, unknown)" +
+                                " SELECT time, still, onfoot, running, onbicycle, invehicle, unknown FROM activityduration_orig");
+                db.execSQL("DROP TABLE activityduration_orig");
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
+        }
 
         db.setVersion(DB_VERSION);
     }
@@ -242,7 +265,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Activity
 
-    public DatabaseHelper insertActivity(long time, int activity, int confidence) {
+    public DatabaseHelper insertActivityType(long time, int activity, int confidence) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
 
@@ -251,33 +274,114 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cv.put("activity", activity);
             cv.put("confidence", confidence);
 
-            db.insert("activity", null, cv);
+            db.insert("activitytype", null, cv);
         }
 
-        for (ActivityChangedListener listener : mActivityChangedListeners)
+        for (ActivityTypeChangedListener listener : mActivityTypeChangedListeners)
             listener.onActivityAdded(time, activity, confidence);
 
         return this;
     }
 
-    public DatabaseHelper deleteActivities() {
+    public DatabaseHelper deleteActivityTypes() {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
-            db.delete("activity", null, new String[]{});
+            db.delete("activitytype", null, new String[]{});
         }
 
-        for (ActivityChangedListener listener : mActivityChangedListeners)
+        for (ActivityTypeChangedListener listener : mActivityTypeChangedListeners)
             listener.onActivityDeleted();
 
         return this;
     }
 
-    public Cursor getActivities(long from, long to) {
+    public Cursor getActivityTypes(long from, long to) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT *, ID AS _id FROM activity";
+        String query = "SELECT *, ID AS _id FROM activitytype";
         query += " WHERE time >= ? AND time <= ?";
         query += " ORDER BY time DESC";
         return db.rawQuery(query, new String[]{Long.toString(from), Long.toString(to)});
+    }
+
+    // Activity duration
+
+    public DatabaseHelper updateActivityDuration(long time, int activity, long duration) {
+        int prev = -1;
+        long day = getDay(time);
+
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            String column;
+            switch (activity) {
+                case DetectedActivity.STILL:
+                    column = "still";
+                    break;
+                case DetectedActivity.ON_FOOT:
+                case DetectedActivity.WALKING:
+                    column = "walking";
+                    break;
+                case DetectedActivity.RUNNING:
+                    column = "running";
+                    break;
+                case DetectedActivity.ON_BICYCLE:
+                    column = "onbicycle";
+                    break;
+                case DetectedActivity.IN_VEHICLE:
+                    column = "invehicle";
+                    break;
+                default:
+                    column = "unknown";
+                    break;
+            }
+
+            Cursor c = null;
+            try {
+                c = db.query("activityduration", new String[]{column}, "time = ?", new String[]{Long.toString(day)}, null, null, null, null);
+                if (c.moveToFirst())
+                    prev = c.getInt(c.getColumnIndex(column));
+            } finally {
+                if (c != null)
+                    c.close();
+            }
+
+            if (prev < 0) {
+                Log.w(TAG, "Creating new day time=" + day);
+                ContentValues cv = new ContentValues();
+                cv.put("time", day);
+                cv.put("still", 0);
+                cv.put("walking", 0);
+                cv.put("running", 0);
+                cv.put("onbicycle", 0);
+                cv.put("invehicle", 0);
+                cv.put("unknown", 0);
+                db.insert("activityduration", null, cv);
+            }
+
+            if (duration > 0) {
+                ContentValues cv = new ContentValues();
+                cv.put(column, prev + duration);
+                db.update("activityduration", cv, "time = ?", new String[]{Long.toString(day)});
+            }
+        }
+
+        if (prev < 0)
+            for (ActivityDurationChangedListener listener : mActivityDurationChangedListeners)
+                listener.onActivityAdded(day);
+        else if (duration > 0)
+            for (ActivityDurationChangedListener listener : mActivityDurationChangedListeners)
+                listener.onActivityUpdated(day, activity, prev + duration);
+
+        return this;
+    }
+
+    public Cursor getActivityDurations(boolean asc) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT *, ID AS _id FROM activityduration";
+        query += " ORDER BY time";
+        if (!asc)
+            query += " DESC";
+        return db.rawQuery(query, new String[]{});
     }
 
     // Steps
@@ -346,87 +450,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    // Daily activity
-
-    public DatabaseHelper updateActivityDuration(long time, int activity, long duration) {
-        int prev = -1;
-        long day = getDay(time);
-
-        synchronized (mContext.getApplicationContext()) {
-            SQLiteDatabase db = this.getWritableDatabase();
-
-            String column;
-            switch (activity) {
-                case DetectedActivity.STILL:
-                    column = "still";
-                    break;
-                case DetectedActivity.ON_FOOT:
-                case DetectedActivity.WALKING:
-                    column = "onfoot";
-                    break;
-                case DetectedActivity.RUNNING:
-                    column = "running";
-                    break;
-                case DetectedActivity.ON_BICYCLE:
-                    column = "onbicycle";
-                    break;
-                case DetectedActivity.IN_VEHICLE:
-                    column = "invehicle";
-                    break;
-                default:
-                    column = "unknown";
-                    break;
-            }
-
-            Cursor c = null;
-            try {
-                c = db.query("activityduration", new String[]{column}, "time = ?", new String[]{Long.toString(day)}, null, null, null, null);
-                if (c.moveToFirst())
-                    prev = c.getInt(c.getColumnIndex(column));
-            } finally {
-                if (c != null)
-                    c.close();
-            }
-
-            if (prev < 0) {
-                Log.w(TAG, "Creating new day time=" + day);
-                ContentValues cv = new ContentValues();
-                cv.put("time", day);
-                cv.put("still", 0);
-                cv.put("onfoot", 0);
-                cv.put("running", 0);
-                cv.put("onbicycle", 0);
-                cv.put("invehicle", 0);
-                cv.put("unknown", 0);
-                db.insert("activityduration", null, cv);
-            }
-
-            if (duration > 0) {
-                ContentValues cv = new ContentValues();
-                cv.put(column, prev + duration);
-                db.update("activityduration", cv, "time = ?", new String[]{Long.toString(day)});
-            }
-        }
-
-        if (prev < 0)
-            for (ActivityDurationChangedListener listener : mActivityDurationChangedListeners)
-                listener.onActivityAdded(day);
-        else if (duration > 0)
-            for (ActivityDurationChangedListener listener : mActivityDurationChangedListeners)
-                listener.onActivityUpdated(day, activity, prev + duration);
-
-        return this;
-    }
-
-    public Cursor getActivityDurations(boolean asc) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT *, ID AS _id FROM activityduration";
-        query += " ORDER BY time";
-        if (!asc)
-            query += " DESC";
-        return db.rawQuery(query, new String[]{});
-    }
-
     // Helper methods
 
     private long getDay(long ms) {
@@ -449,12 +472,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         mLocationChangedListeners.remove(listener);
     }
 
-    public static void addActivityChangedListener(ActivityChangedListener listener) {
-        mActivityChangedListeners.add(listener);
+    public static void addActivityTypeChangedListener(ActivityTypeChangedListener listener) {
+        mActivityTypeChangedListeners.add(listener);
     }
 
-    public static void removeActivityChangedListener(ActivityChangedListener listener) {
-        mActivityChangedListeners.remove(listener);
+    public static void removeActivityTypeChangedListener(ActivityTypeChangedListener listener) {
+        mActivityTypeChangedListeners.remove(listener);
     }
 
     public static void addActivityDurationChangedListener(ActivityDurationChangedListener listener) {
@@ -481,7 +504,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         void onLocationDeleted();
     }
 
-    public interface ActivityChangedListener {
+    public interface ActivityTypeChangedListener {
         void onActivityAdded(long time, int activity, int confidence);
 
         void onActivityDeleted();

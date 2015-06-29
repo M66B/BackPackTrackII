@@ -10,8 +10,8 @@ import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 
-public class ActivityAdapter extends CursorAdapter {
-    public ActivityAdapter(Context context, Cursor cursor) {
+public class ActivityTypeAdapter extends CursorAdapter {
+    public ActivityTypeAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
     }
 

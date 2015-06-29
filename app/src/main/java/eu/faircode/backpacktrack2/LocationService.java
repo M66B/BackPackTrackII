@@ -239,9 +239,30 @@ public class LocationService extends IntentService {
         ActivityRecognitionResult activityResult = ActivityRecognitionResult.extractResult(intent);
         DetectedActivity activity = activityResult.getMostProbableActivity();
 
+        // Get walking or running
+        if (activity.getType() == DetectedActivity.ON_FOOT)
+            for (DetectedActivity act : activityResult.getProbableActivities()) {
+                if (act.getType() == DetectedActivity.WALKING || act.getType() == DetectedActivity.RUNNING) {
+                    activity = act;
+                    break;
+                }
+            }
+
         Log.w(TAG, "Activity=" + activity);
-        if (prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_HISTORY, ActivitySettings.DEFAULT_RECOGNITION_HISTORY))
-            new DatabaseHelper(this).insertActivity(new Date().getTime(), activity.getType(), activity.getConfidence()).close();
+
+        // Persist probably activities
+        if (prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_HISTORY, ActivitySettings.DEFAULT_RECOGNITION_HISTORY)) {
+            DatabaseHelper dh = null;
+            try {
+                dh = new DatabaseHelper(this);
+                long time = new Date().getTime();
+                for (DetectedActivity act : activityResult.getProbableActivities())
+                    dh.insertActivityType(time, act.getType(), act.getConfidence());
+            } finally {
+                if (dh != null)
+                    dh.close();
+            }
+        }
 
         // Filter unknown activity
         boolean pref_unknown = prefs.getBoolean(ActivitySettings.PREF_RECOGNITION_UNKNOWN, ActivitySettings.DEFAULT_RECOGNITION_UNKNOWN);
