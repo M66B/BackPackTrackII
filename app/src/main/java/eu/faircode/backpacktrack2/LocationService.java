@@ -13,6 +13,8 @@ import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.hardware.TriggerEvent;
+import android.hardware.TriggerEventListener;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -85,6 +87,7 @@ public class LocationService extends IntentService {
     public static final String ACTION_TRACKPOINT = "TrackPoint";
     public static final String ACTION_WAYPOINT = "WayPoint";
     public static final String ACTION_GEOPOINT = "Geopoint";
+    public static final String ACTION_MOTION = "Motion";
     public static final String ACTION_SHARE_GPX = "ShareGPX";
     public static final String ACTION_SHARE_KML = "ShareKML";
     public static final String ACTION_UPLOAD_GPX = "UploadGPX";
@@ -122,6 +125,7 @@ public class LocationService extends IntentService {
 
     private static int mEGM96Pointer = -1;
     private static int mEGM96Offset;
+    private static SignificantMotionListener mSignificantMotionListener = null;
 
     public LocationService() {
         super(TAG);
@@ -177,6 +181,9 @@ public class LocationService extends IntentService {
 
             else if (ACTION_GEOPOINT.equals(intent.getAction()))
                 handleGeopoint(intent);
+
+            else if (ACTION_MOTION.equals(intent.getAction()))
+                handleMotion(intent);
 
             else if (ACTION_SHARE_GPX.equals(intent.getAction()))
                 handleShare(intent);
@@ -583,6 +590,11 @@ public class LocationService extends IntentService {
         }
     }
 
+    private void handleMotion(Intent intent) {
+        new DatabaseHelper(this).insertActivityType(new Date().getTime(), -1, 100).close();
+        startSignificantMotion(this);
+    }
+
     private void handleShare(Intent intent) {
         try {
             // Write file
@@ -761,6 +773,9 @@ public class LocationService extends IntentService {
             lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, minTime * 1000, minDist, pi);
             Log.w(TAG, "Requested passive location updates");
         }
+
+        // Start significant motion dectector
+        startSignificantMotion(context);
     }
 
     public static void stopTracking(final Context context) {
@@ -782,6 +797,9 @@ public class LocationService extends IntentService {
 
         // Stop step counter
         context.stopService(new Intent(context, StepCounterService.class));
+
+        // Stop significant motion dectector
+        startSignificantMotion(context);
     }
 
     private static void startActivityRecognition(final Context context) {
@@ -843,6 +861,27 @@ public class LocationService extends IntentService {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
         Log.w(TAG, "Stop repeating alarm");
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    private static void startSignificantMotion(Context context) {
+        if (hasSignificantMotion(context)) {
+            Log.w(TAG, "Starting significant motion detector");
+            SensorManager sm = (SensorManager) context.getSystemService(SENSOR_SERVICE);
+            Sensor smSensor = sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
+            mSignificantMotionListener = new SignificantMotionListener(context);
+            sm.requestTriggerSensor(mSignificantMotionListener, smSensor);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    private static void stopSignificantMotion(Context context) {
+        if (mSignificantMotionListener != null) {
+            Log.w(TAG, "Stopping significant motion detector");
+            SensorManager sm = (SensorManager) context.getSystemService(SENSOR_SERVICE);
+            Sensor smSensor = sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
+            sm.cancelTriggerSensor(mSignificantMotionListener, smSensor);
+        }
     }
 
     public static void startLocating(Context context) {
@@ -1268,8 +1307,11 @@ public class LocationService extends IntentService {
                 return context.getString(R.string.in_vehicle);
             case DetectedActivity.UNKNOWN:
                 return context.getString(R.string.unknown);
+            case -1:
+                return context.getString(R.string.motion);
+            default:
+                return context.getString(R.string.undefined);
         }
-        return context.getString(R.string.undefined);
     }
 
     private static String getWindDirectionName(float bearing, Context context) {
@@ -1356,6 +1398,27 @@ public class LocationService extends IntentService {
     public static boolean debugMode(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getBoolean(SettingsActivity.PREF_DEBUG, false);
+    }
+
+    // Helper classes
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+    private static class SignificantMotionListener extends TriggerEventListener {
+        private Context mContext;
+
+        SignificantMotionListener(Context context) {
+            mContext = context;
+        }
+
+        @Override
+        public void onTrigger(TriggerEvent event) {
+            if (event.values[0] == 1) {
+                Intent intent = new Intent(mContext, LocationService.class);
+                intent.setAction(LocationService.ACTION_MOTION);
+                mContext.startService(intent);
+                startSignificantMotion(mContext);
+            }
+        }
     }
 
     // Serialization
