@@ -942,7 +942,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         double maxAlt = 0;
         long minTime = new Date().getTime();
         long maxTime = 0;
-        long from = new Date().getTime() / DAY_MS * DAY_MS - DAYS_HISTORY * DAY_MS;
+        long from = new Date().getTime() - DAYS_HISTORY * DAY_MS;
         double avg = 0;
         int n = 0;
 
@@ -1267,7 +1267,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         if (data) {
             graph.getViewport().setXAxisBoundsManual(true);
-            graph.getViewport().setMinX(new Date().getTime() / DAY_MS * DAY_MS - DAYS_HISTORY * DAY_MS);
+            graph.getViewport().setMinX(new Date().getTime() - DAYS_HISTORY * DAY_MS);
             graph.getViewport().setMaxX(new Date().getTime());
 
             graph.getViewport().setYAxisBoundsManual(true);
