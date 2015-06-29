@@ -151,6 +151,7 @@ Get Google elevation data:
 
 * *am startservice -a eu.faircode.backpacktrack2.GET_ALTITUDE --es TimeFrom "2015-6-27" --es TimeTo "2015-6-28"*
 
+When no time from/to is specified, the default is yesterday.
 
 Tasker use case examples
 
