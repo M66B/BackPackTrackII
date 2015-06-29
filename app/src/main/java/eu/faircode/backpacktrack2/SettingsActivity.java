@@ -1053,14 +1053,22 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         final DatabaseHelper.ActivityDurationChangedListener listener = new DatabaseHelper.ActivityDurationChangedListener() {
             @Override
             public void onActivityAdded(long time) {
-                Cursor cursor = db.getActivityDurations(false);
-                adapter.changeCursor(cursor);
+                update();
             }
 
             @Override
             public void onActivityUpdated(long time, int activity, long duration) {
-                Cursor cursor = db.getActivityDurations(false);
-                adapter.changeCursor(cursor);
+                update();
+            }
+
+            private void update() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Cursor cursor = db.getActivityDurations(false);
+                        adapter.changeCursor(cursor);
+                    }
+                });
             }
         };
         DatabaseHelper.addActivityDurationChangedListener(listener);
