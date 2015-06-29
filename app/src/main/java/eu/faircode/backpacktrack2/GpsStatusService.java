@@ -37,9 +37,9 @@ public class GpsStatusService extends Service {
                 prefs.edit().putInt(SettingsActivity.PREF_SATS_VISIBLE, visible).apply();
 
                 // Send state changed intent
-                Intent geotaggedIntent = new Intent(GpsStatusService.this, LocationService.class);
-                geotaggedIntent.setAction(LocationService.ACTION_STATE_CHANGED);
-                startService(geotaggedIntent);
+                Intent intent = new Intent(GpsStatusService.this, LocationService.class);
+                intent.setAction(LocationService.ACTION_STATE_CHANGED);
+                startService(intent);
             }
         }
     };
