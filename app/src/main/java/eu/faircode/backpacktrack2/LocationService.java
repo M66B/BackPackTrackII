@@ -1145,7 +1145,7 @@ public class LocationService extends IntentService {
         return listline;
     }
 
-    public static void updateState(Context context) {
+    private static void updateState(Context context) {
         // Get state
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int state = prefs.getInt(SettingsActivity.PREF_STATE, STATE_IDLE);

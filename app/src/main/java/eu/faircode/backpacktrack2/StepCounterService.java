@@ -43,8 +43,12 @@ public class StepCounterService extends Service {
                     new DatabaseHelper(StepCounterService.this).updateSteps(new Date().getTime(), stepped).close();
 
                     // Update UI
-                    LocationService.updateState(StepCounterService.this);
                     StepCountWidget.updateWidgets(StepCounterService.this);
+
+                    // Send state changed intent
+                    Intent intent = new Intent(StepCounterService.this, LocationService.class);
+                    intent.setAction(LocationService.ACTION_STATE_CHANGED);
+                    startService(intent);
                 }
             }
         }
