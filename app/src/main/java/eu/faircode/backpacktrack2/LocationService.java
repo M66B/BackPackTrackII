@@ -726,9 +726,6 @@ public class LocationService extends IntentService {
     }
 
     private void handleDaily(Intent intent) {
-        // Optimize database
-        new DatabaseHelper(this).vacuum().close();
-
         // Reset step counter
         long time = new Date().getTime();
         new DatabaseHelper(this).updateSteps(time, 0).close();
@@ -746,6 +743,9 @@ public class LocationService extends IntentService {
         // Feedback
         updateState(this);
         StepCountWidget.updateWidgets(this);
+
+        // Optimize database
+        new DatabaseHelper(this).vacuum().close();
     }
 
     // Start/stop methods
