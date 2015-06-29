@@ -9,12 +9,14 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.util.Date;
 
+@TargetApi(Build.VERSION_CODES.KITKAT)
 public class StepCounterService extends Service {
     private static final String TAG = "BPT2.StepCounterService";
 
@@ -54,9 +56,9 @@ public class StepCounterService extends Service {
     };
 
     @Override
-    @TargetApi(19)
     public void onCreate() {
         super.onCreate();
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit().remove(SettingsActivity.PREF_LAST_STEP_COUNT).apply();
 
@@ -78,6 +80,7 @@ public class StepCounterService extends Service {
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit().remove(SettingsActivity.PREF_LAST_STEP_COUNT).apply();
+
         super.onDestroy();
     }
 

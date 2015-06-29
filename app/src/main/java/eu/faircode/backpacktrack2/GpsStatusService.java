@@ -47,6 +47,7 @@ public class GpsStatusService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
         Log.w(TAG, "Requesting GPS status updates");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsStatusService.this);
         prefs.edit().remove(SettingsActivity.PREF_SATS_FIXED).apply();
@@ -63,6 +64,7 @@ public class GpsStatusService extends Service {
         prefs.edit().remove(SettingsActivity.PREF_SATS_VISIBLE).apply();
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         lm.removeGpsStatusListener(mGpsStatusListener);
+
         super.onDestroy();
     }
 

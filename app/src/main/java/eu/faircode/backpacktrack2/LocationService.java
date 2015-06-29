@@ -1,6 +1,5 @@
 package eu.faircode.backpacktrack2;
 
-import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
@@ -13,8 +12,6 @@ import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.hardware.TriggerEvent;
-import android.hardware.TriggerEventListener;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -125,7 +122,6 @@ public class LocationService extends IntentService {
 
     private static int mEGM96Pointer = -1;
     private static int mEGM96Offset;
-    private static SignificantMotionListener mSignificantMotionListener = null;
 
     public LocationService() {
         super(TAG);
@@ -592,7 +588,6 @@ public class LocationService extends IntentService {
 
     private void handleMotion(Intent intent) {
         new DatabaseHelper(this).insertActivityType(new Date().getTime(), -1, 100).close();
-        startSignificantMotion(this);
     }
 
     private void handleShare(Intent intent) {
@@ -776,8 +771,8 @@ public class LocationService extends IntentService {
             Log.w(TAG, "Requested passive location updates");
         }
 
-        // Start significant motion dectector
-        startSignificantMotion(context);
+        // Start significant motion detector
+        context.startService(new Intent(context, SignificantMotionService.class));
     }
 
     public static void stopTracking(final Context context) {
@@ -800,8 +795,8 @@ public class LocationService extends IntentService {
         // Stop step counter
         context.stopService(new Intent(context, StepCounterService.class));
 
-        // Stop significant motion dectector
-        startSignificantMotion(context);
+        // Stop significant motion detector
+        context.stopService(new Intent(context, SignificantMotionService.class));
     }
 
     private static void startActivityRecognition(final Context context) {
@@ -863,27 +858,6 @@ public class LocationService extends IntentService {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
         Log.w(TAG, "Stop repeating alarm");
-    }
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private static void startSignificantMotion(Context context) {
-        if (hasSignificantMotion(context)) {
-            Log.w(TAG, "Starting significant motion detector");
-            SensorManager sm = (SensorManager) context.getSystemService(SENSOR_SERVICE);
-            Sensor smSensor = sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
-            mSignificantMotionListener = new SignificantMotionListener(context);
-            sm.requestTriggerSensor(mSignificantMotionListener, smSensor);
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private static void stopSignificantMotion(Context context) {
-        if (mSignificantMotionListener != null) {
-            Log.w(TAG, "Stopping significant motion detector");
-            SensorManager sm = (SensorManager) context.getSystemService(SENSOR_SERVICE);
-            Sensor smSensor = sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION);
-            sm.cancelTriggerSensor(mSignificantMotionListener, smSensor);
-        }
     }
 
     public static void startLocating(Context context) {
@@ -1155,7 +1129,6 @@ public class LocationService extends IntentService {
         return listline;
     }
 
-    @TargetApi(21)
     public static void updateState(Context context) {
         // Get state
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -1346,13 +1319,13 @@ public class LocationService extends IntentService {
                 " extensions=" + extensions +
                 " from=" + SimpleDateFormat.getDateTimeInstance().format(new Date(from)) +
                 " to=" + SimpleDateFormat.getDateTimeInstance().format(new Date(to)));
-        DatabaseHelper databaseHelper = null;
+        DatabaseHelper dh = null;
         Cursor trackPoints = null;
         Cursor wayPoints = null;
         try {
-            databaseHelper = new DatabaseHelper(context);
-            trackPoints = databaseHelper.getLocations(from, to, true, false, true);
-            wayPoints = databaseHelper.getLocations(from, to, false, true, true);
+            dh = new DatabaseHelper(context);
+            trackPoints = dh.getLocations(from, to, true, false, true);
+            wayPoints = dh.getLocations(from, to, false, true, true);
             if (gpx)
                 GPXFileWriter.writeGPXFile(new File(fileName), trackName, extensions, trackPoints, wayPoints, context);
             else
@@ -1362,8 +1335,8 @@ public class LocationService extends IntentService {
                 wayPoints.close();
             if (trackPoints != null)
                 trackPoints.close();
-            if (databaseHelper != null)
-                databaseHelper.close();
+            if (dh != null)
+                dh.close();
         }
         return fileName;
     }
@@ -1400,27 +1373,6 @@ public class LocationService extends IntentService {
     public static boolean debugMode(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getBoolean(SettingsActivity.PREF_DEBUG, false);
-    }
-
-    // Helper classes
-
-    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private static class SignificantMotionListener extends TriggerEventListener {
-        private Context mContext;
-
-        SignificantMotionListener(Context context) {
-            mContext = context;
-        }
-
-        @Override
-        public void onTrigger(TriggerEvent event) {
-            if (event.values[0] == 1) {
-                Intent intent = new Intent(mContext, LocationService.class);
-                intent.setAction(LocationService.ACTION_MOTION);
-                mContext.startService(intent);
-                startSignificantMotion(mContext);
-            }
-        }
     }
 
     // Serialization
