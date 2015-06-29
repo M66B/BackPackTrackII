@@ -465,6 +465,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public DatabaseHelper vacuum() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Log.w(TAG, "Running vacuum");
+        db.execSQL("VACUUM");
+        return this;
+    }
+
     // Helper methods
 
     private long getDay(long ms) {

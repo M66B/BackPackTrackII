@@ -715,9 +715,11 @@ public class LocationService extends IntentService {
     }
 
     private void handleDaily(Intent intent) {
-        long time = new Date().getTime();
+        // Optimize database
+        new DatabaseHelper(this).vacuum().close();
 
         // Reset step counter
+        long time = new Date().getTime();
         new DatabaseHelper(this).updateSteps(time, 0).close();
 
         // Finalize last activity
