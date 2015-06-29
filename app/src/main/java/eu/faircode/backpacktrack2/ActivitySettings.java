@@ -958,7 +958,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
         boolean data = false;
-        double minAlt = 0;
+        double minAlt = 10000;
         double maxAlt = 0;
         long minTime = new Date().getTime();
         long maxTime = 0;
@@ -967,6 +967,7 @@ public class ActivitySettings extends PreferenceActivity implements SharedPrefer
         int n = 0;
 
         Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, true);
+
         int colTime = cursor.getColumnIndex("time");
         int colProvider = cursor.getColumnIndex("provider");
         int colAltitude = cursor.getColumnIndex("altitude");
