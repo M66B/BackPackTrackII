@@ -10,6 +10,7 @@ import android.util.Log;
 
 import com.google.android.gms.location.DetectedActivity;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,7 +20,7 @@ import java.util.TimeZone;
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
-    private static final String DB_NAME = "BACKPACKTRACKII";
+    private static final String DB_NAME = "BackPackTrackII";
     private static final int DB_VERSION = 8;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
@@ -32,11 +33,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
         mContext = context;
+
+        File oldName = context.getDatabasePath("BACKPACKTRACKII");
+        if (oldName.exists()) {
+            File newName = new File(oldName.getParentFile(), DB_NAME);
+            Log.w(TAG, "Renaming " + oldName.getAbsolutePath() + " to " + newName.getAbsolutePath());
+            oldName.renameTo(newName);
+        }
+
+        oldName = context.getDatabasePath("BACKPACKTRACKII-journal");
+        if (oldName.exists()) {
+            File newName = new File(oldName.getParentFile(), DB_NAME + "-journal");
+            Log.w(TAG, "Renaming " + oldName.getAbsolutePath() + " to " + newName.getAbsolutePath());
+            oldName.renameTo(newName);
+        }
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.w(TAG, "Creating database");
+        Log.w(TAG, "Creating database " + DB_NAME + ":" + DB_VERSION);
         createTableLocation(db);
         createTableActivityType(db);
         createTableActivityDuration(db);
