@@ -604,8 +604,11 @@ public class LocationService extends IntentService {
     }
 
     private void handleMotion(Intent intent) {
-        long time = intent.getLongExtra(EXTRA_TIME, new Date().getTime());
-        new DatabaseHelper(this).insertActivityType(time, -1, 100).close();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_HISTORY, SettingsFragment.DEFAULT_RECOGNITION_HISTORY)) {
+            long time = intent.getLongExtra(EXTRA_TIME, new Date().getTime());
+            new DatabaseHelper(this).insertActivityType(time, -1, 100).close();
+        }
     }
 
     private void handleShare(Intent intent) {
