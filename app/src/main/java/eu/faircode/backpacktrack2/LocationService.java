@@ -1198,7 +1198,7 @@ public class LocationService extends IntentService {
         }
 
         // Build main intent
-        Intent riSettings = new Intent(context, SettingsFragment.class);
+        Intent riSettings = new Intent(context, SettingsActivity.class);
         riSettings.setAction(Intent.ACTION_MAIN);
         riSettings.addCategory(Intent.CATEGORY_LAUNCHER);
         riSettings.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
