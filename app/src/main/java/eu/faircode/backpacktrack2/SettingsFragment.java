@@ -1087,12 +1087,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Handle view list
         ImageView ivList = (ImageView) viewHistory.findViewById(R.id.ivList);
-        ivList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                activity_list();
-            }
-        });
+        if (LocationService.debugMode(getActivity()))
+            ivList.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    activity_list();
+                }
+            });
+        else
+            ivList.setVisibility(View.INVISIBLE);
 
         // Fill list
         final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityDuration);
