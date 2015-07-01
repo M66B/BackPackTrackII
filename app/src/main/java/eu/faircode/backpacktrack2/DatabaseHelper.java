@@ -609,9 +609,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public interface ActivityDurationChangedListener {
-        void onActivityAdded(long time);
+        void onActivityAdded(long day);
 
-        void onActivityUpdated(long time, int activity, long duration);
+        void onActivityUpdated(long day, int activity, long duration);
     }
 
     public interface ActivityLogChangedListener {

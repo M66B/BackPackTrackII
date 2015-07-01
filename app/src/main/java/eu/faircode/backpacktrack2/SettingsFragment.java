@@ -1113,14 +1113,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         });
 
         // Live updates
-        final DatabaseHelper.ActivityLogChangedListener listener = new DatabaseHelper.ActivityLogChangedListener() {
+        final DatabaseHelper.ActivityDurationChangedListener listener = new DatabaseHelper.ActivityDurationChangedListener() {
             @Override
-            public void onActivityAdded(long start, long finish, int activity) {
+            public void onActivityAdded(long day) {
                 update();
             }
 
             @Override
-            public void onActivityUpdated(long start, long finish, int activity) {
+            public void onActivityUpdated(long day, int activity, long duration) {
                 update();
             }
 
@@ -1134,7 +1134,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 });
             }
         };
-        DatabaseHelper.addActivityLogChangedListener(listener);
+        DatabaseHelper.addActivityDurationChangedListener(listener);
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
@@ -1152,7 +1152,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                DatabaseHelper.removeActivityLogChangedListener(listener);
+                DatabaseHelper.removeActivityDurationChangedListener(listener);
             }
         });
         alertDialog.show();
@@ -1278,14 +1278,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         lv.setAdapter(adapter);
 
         // Live updates
-        final DatabaseHelper.ActivityTypeChangedListener listener = new DatabaseHelper.ActivityTypeChangedListener() {
+        final DatabaseHelper.ActivityLogChangedListener listener = new DatabaseHelper.ActivityLogChangedListener() {
             @Override
-            public void onActivityAdded(long time, int activity, int confidence) {
+            public void onActivityAdded(long start, long finish, int activity) {
                 update();
             }
 
             @Override
-            public void onActivityDeleted() {
+            public void onActivityUpdated(long start, long finish, int activity) {
                 update();
             }
 
@@ -1300,7 +1300,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 });
             }
         };
-        DatabaseHelper.addActivityTypeChangedListener(listener);
+        DatabaseHelper.addActivityLogChangedListener(listener);
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
@@ -1318,7 +1318,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                DatabaseHelper.removeActivityTypeChangedListener(listener);
+                DatabaseHelper.removeActivityLogChangedListener(listener);
             }
         });
         alertDialog.show();
