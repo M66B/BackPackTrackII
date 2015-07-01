@@ -293,7 +293,7 @@ public class LocationService extends IntentService {
 
             // Update activity duration
             if (lastTime >= 0)
-                new DatabaseHelper(this).updateActivityDuration(lastTime, lastActivity, time - lastTime).close();
+                new DatabaseHelper(this).updateActivity(lastTime, lastActivity, time - lastTime).close();
 
             // Feedback
             updateState(this);
@@ -740,9 +740,9 @@ public class LocationService extends IntentService {
         int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
         long lastTime = prefs.getLong(SettingsFragment.PREF_LAST_ACTIVITY_TIME, -1);
         if (lastTime >= 0) {
-            new DatabaseHelper(this).updateActivityDuration(lastTime, lastActivity, time - lastTime).close();
+            new DatabaseHelper(this).updateActivity(lastTime, lastActivity, time - lastTime).close();
             prefs.edit().putLong(SettingsFragment.PREF_LAST_ACTIVITY_TIME, time).apply();
-            new DatabaseHelper(this).updateActivityDuration(time, lastActivity, 0).close();
+            new DatabaseHelper(this).updateActivity(time, lastActivity, 0).close();
         }
 
         // Feedback

@@ -21,7 +21,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 8;
+    private static final int DB_VERSION = 9;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
@@ -55,6 +55,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createTableLocation(db);
         createTableActivityType(db);
         createTableActivityDuration(db);
+        createTableActivityLog(db);
         createTableStep(db);
     }
 
@@ -99,6 +100,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", invehicle INTEGER NOT NULL" +
                 ", unknown INTEGER NOT NULL" + ");");
         db.execSQL("CREATE INDEX idx_activityduration_time ON activityduration(time)");
+    }
+
+    private void createTableActivityLog(SQLiteDatabase db) {
+        db.execSQL("CREATE TABLE activitylog (" +
+                " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
+                ", start INTEGER NOT NULL" +
+                ", finish INTEGER NOT NULL" +
+                ", activity INTEGER NOT NULL" + ");");
+        db.execSQL("CREATE INDEX idx_activitylog_start ON activitylog(start)");
+        db.execSQL("CREATE INDEX idx_activitylog_finish ON activitylog(finish)");
+        db.execSQL("CREATE INDEX idx_activitylog_activity ON activitylog(activity)");
     }
 
     private void createTableStep(SQLiteDatabase db) {
@@ -154,6 +166,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.endTransaction();
             }
         }
+
+        if (oldVersion < 9)
+            createTableActivityLog(db);
 
         db.setVersion(DB_VERSION);
     }
@@ -320,10 +335,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Activity duration
 
-    public DatabaseHelper updateActivityDuration(long time, int activity, long duration) {
+    public DatabaseHelper updateActivity(long time, int activity, long duration) {
+        // Activity duration
         int prev = -1;
         long day = getDay(time);
-
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
 
@@ -386,6 +401,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         else if (duration > 0)
             for (ActivityDurationChangedListener listener : mActivityDurationChangedListeners)
                 listener.onActivityUpdated(day, activity, prev + duration);
+
+        // Activity log
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            long start = -1;
+            Cursor c = null;
+            try {
+                c = db.query("activitylog", new String[]{"start"}, "finish = ? AND activity = ?",
+                        new String[]{Long.toString(time), Integer.toString(activity)}, null, null, null, null);
+                if (c.moveToFirst())
+                    start = c.getInt(c.getColumnIndex("start"));
+            } finally {
+                if (c != null)
+                    c.close();
+            }
+
+            if (start >= 0) {
+                ContentValues cv = new ContentValues();
+                cv.put("finish", time + duration);
+                db.update("activitylog", cv, "start = ?", new String[]{Long.toString(start)});
+            } else {
+                ContentValues cv = new ContentValues();
+                cv.put("start", time);
+                cv.put("finish", time + duration);
+                cv.put("activity", activity);
+                db.insert("activitylog", null, cv);
+            }
+        }
 
         return this;
     }
