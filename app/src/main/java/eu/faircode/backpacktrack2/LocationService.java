@@ -727,7 +727,7 @@ public class LocationService extends IntentService {
         long from = intent.getLongExtra(EXTRA_TIME_FROM, cfrom.getTimeInMillis());
         long to = intent.getLongExtra(EXTRA_TIME_TO, cto.getTimeInMillis());
 
-        LocationAdapter.getAltitude(from, to, this);
+        getAltitude(from, to, this);
     }
 
     private void handleDaily(Intent intent) {
@@ -1360,6 +1360,57 @@ public class LocationService extends IntentService {
                 dh.close();
         }
         return fileName;
+    }
+
+    public static void getAltitude(long from, long to, Context context) {
+        Log.w(TAG, "Get altitude" +
+                " from=" + SimpleDateFormat.getDateTimeInstance().format(new Date(from)) +
+                " to=" + SimpleDateFormat.getDateTimeInstance().format(new Date(to)));
+
+        DatabaseHelper dh = null;
+        Cursor cursor = null;
+        boolean first = true;
+        try {
+            dh = new DatabaseHelper(context);
+            cursor = dh.getLocations(from, to, true, true, true);
+
+            int colID = cursor.getColumnIndex("ID");
+            int colTime = cursor.getColumnIndex("time");
+            int colProvider = cursor.getColumnIndex("provider");
+            int colLatitude = cursor.getColumnIndex("latitude");
+            int colLongitude = cursor.getColumnIndex("longitude");
+
+            while (cursor.moveToNext()) {
+                long id = cursor.getLong(colID);
+                long time = cursor.getLong(colTime);
+                final String provider = cursor.getString(colProvider);
+                double latitude = cursor.getDouble(colLatitude);
+                double longitude = cursor.getDouble(colLongitude);
+
+                Location location = new Location(provider);
+                location.setLatitude(latitude);
+                location.setLongitude(longitude);
+                location.setTime(time);
+                if (GoogleElevationApi.getElevation(location, context)) {
+                    if (first)
+                        first = false;
+                    else
+                        try {
+                            // Max. 5 requests/second
+                            Thread.sleep(200);
+                        } catch (InterruptedException ignored) {
+                        }
+                    Log.w(TAG, "New altitude for location=" + location);
+                    dh.updateLocationAltitude(id, location.getAltitude());
+                } else
+                    break;
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close();
+            if (dh != null)
+                dh.close();
+        }
     }
 
     private static void toast(final String text, final int length, final Context context) {

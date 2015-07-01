@@ -50,7 +50,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.google.android.gms.location.DetectedActivity;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
@@ -199,6 +198,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private static final int DAYS_HISTORY = 7;
 
     private DatabaseHelper db = null;
+    private boolean elevationBusy = false;
 
     private BroadcastReceiver mConnectivityChangeReceiver = new BroadcastReceiver() {
         @Override
@@ -564,7 +564,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         View viewEdit = inflater.inflate(R.layout.waypoint_edit, null);
 
         // Fill list
-        ListView lv = (ListView) viewEdit.findViewById(R.id.lvEdit);
+        final ListView lv = (ListView) viewEdit.findViewById(R.id.lvEdit);
         Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
         final WaypointAdapter adapter = new WaypointAdapter(getActivity(), cursor, db);
         lv.setAdapter(adapter);
@@ -879,6 +879,77 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final LocationAdapter adapter = new LocationAdapter(getActivity(), cursor);
         lv.setAdapter(adapter);
 
+        // Handle list item click
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Cursor cursor = (Cursor) lv.getItemAtPosition(position);
+                if (cursor != null) {
+                    String name = cursor.getString(cursor.getColumnIndex("name"));
+                    if (name != null)
+                        Toast.makeText(getActivity(), name, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // Handle list item long click
+        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Cursor cursor = (Cursor) lv.getItemAtPosition(position);
+                if (cursor != null) {
+                    final long time = cursor.getLong(cursor.getColumnIndex("time"));
+
+                    synchronized (getActivity()) {
+                        if (elevationBusy)
+                            return false;
+                        else
+                            elevationBusy = true;
+                    }
+
+                    // Get elevation for day
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Get range
+                            Calendar from = Calendar.getInstance();
+                            from.setTimeInMillis(time);
+                            from.set(Calendar.HOUR_OF_DAY, 0);
+                            from.set(Calendar.MINUTE, 0);
+                            from.set(Calendar.SECOND, 0);
+                            from.set(Calendar.MILLISECOND, 0);
+
+                            Calendar to = Calendar.getInstance();
+                            to.setTimeInMillis(time);
+                            to.set(Calendar.HOUR_OF_DAY, 23);
+                            to.set(Calendar.MINUTE, 59);
+                            to.set(Calendar.SECOND, 59);
+                            to.set(Calendar.MILLISECOND, 999);
+
+                            // Get altitudes for range
+                            LocationService.getAltitude(from.getTimeInMillis(), to.getTimeInMillis(), getActivity());
+
+                            synchronized (getActivity()) {
+                                elevationBusy = false;
+                            }
+
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getActivity(), getString(R.string.msg_updated, getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }).start();
+
+                    // Feedback
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
         // Live updates
         final DatabaseHelper.LocationChangedListener listener = new DatabaseHelper.LocationChangedListener() {
             @Override
@@ -1034,8 +1105,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Cursor cursor = (Cursor) lv.getItemAtPosition(position);
-                long time = cursor.getLong(cursor.getColumnIndex("time"));
-                activity_log(time, time + 24 * 3600 * 1000L);
+                if (cursor != null) {
+                    long time = cursor.getLong(cursor.getColumnIndex("time"));
+                    activity_log(time, time + 24 * 3600 * 1000L);
+                }
             }
         });
 

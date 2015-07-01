@@ -6,10 +6,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Looper;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 public class LocationAdapter extends CursorAdapter {
     private static final String TAG = "BPT2.LocationAdapter";
@@ -90,66 +85,6 @@ public class LocationAdapter extends CursorAdapter {
         else
             tvDistance.setText(lastLocation == null ? "?" : Long.toString(Math.round(distance)));
 
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (name != null)
-                    Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        view.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-
-                synchronized (LocationAdapter.this) {
-                    if (elevationBusy)
-                        return false;
-                    else
-                        elevationBusy = true;
-                }
-
-                // Get elevation for day
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Get range
-                        Calendar from = Calendar.getInstance();
-                        from.setTimeInMillis(time);
-                        from.set(Calendar.HOUR_OF_DAY, 0);
-                        from.set(Calendar.MINUTE, 0);
-                        from.set(Calendar.SECOND, 0);
-                        from.set(Calendar.MILLISECOND, 0);
-
-                        Calendar to = Calendar.getInstance();
-                        to.setTimeInMillis(time);
-                        to.set(Calendar.HOUR_OF_DAY, 23);
-                        to.set(Calendar.MINUTE, 59);
-                        to.set(Calendar.SECOND, 59);
-                        to.set(Calendar.MILLISECOND, 999);
-
-                        // Get altitudes for range
-                        getAltitude(from.getTimeInMillis(), to.getTimeInMillis(), context);
-
-                        synchronized (LocationAdapter.this) {
-                            elevationBusy = false;
-                        }
-
-                        // Notify user
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(context, context.getString(R.string.msg_updated, context.getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                }).start();
-
-                // Feedback
-                return true;
-            }
-        });
-
         // Handle share location
         ivShare.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,56 +99,5 @@ public class LocationAdapter extends CursorAdapter {
                 }
             }
         });
-    }
-
-    public static void getAltitude(long from, long to, Context context) {
-        Log.w(TAG, "Get altitude" +
-                " from=" + SimpleDateFormat.getDateTimeInstance().format(new Date(from)) +
-                " to=" + SimpleDateFormat.getDateTimeInstance().format(new Date(to)));
-
-        DatabaseHelper dh = null;
-        Cursor cursor = null;
-        boolean first = true;
-        try {
-            dh = new DatabaseHelper(context);
-            cursor = dh.getLocations(from, to, true, true, true);
-
-            int colID = cursor.getColumnIndex("ID");
-            int colTime = cursor.getColumnIndex("time");
-            int colProvider = cursor.getColumnIndex("provider");
-            int colLatitude = cursor.getColumnIndex("latitude");
-            int colLongitude = cursor.getColumnIndex("longitude");
-
-            while (cursor.moveToNext()) {
-                long id = cursor.getLong(colID);
-                long time = cursor.getLong(colTime);
-                final String provider = cursor.getString(colProvider);
-                double latitude = cursor.getDouble(colLatitude);
-                double longitude = cursor.getDouble(colLongitude);
-
-                Location location = new Location(provider);
-                location.setLatitude(latitude);
-                location.setLongitude(longitude);
-                location.setTime(time);
-                if (GoogleElevationApi.getElevation(location, context)) {
-                    if (first)
-                        first = false;
-                    else
-                        try {
-                            // Max. 5 requests/second
-                            Thread.sleep(200);
-                        } catch (InterruptedException ignored) {
-                        }
-                    Log.w(TAG, "New altitude for location=" + location);
-                    dh.updateLocationAltitude(id, location.getAltitude());
-                } else
-                    break;
-            }
-        } finally {
-            if (cursor != null)
-                cursor.close();
-            if (dh != null)
-                dh.close();
-        }
     }
 }
