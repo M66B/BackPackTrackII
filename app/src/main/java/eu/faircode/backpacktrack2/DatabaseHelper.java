@@ -26,6 +26,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
     private static List<ActivityDurationChangedListener> mActivityDurationChangedListeners = new ArrayList<ActivityDurationChangedListener>();
+    private static List<ActivityLogChangedListener> mActivityLogChangedListeners = new ArrayList<ActivityLogChangedListener>();
     private static List<StepCountChangedListener> mStepCountChangedListeners = new ArrayList<StepCountChangedListener>();
 
     private Context mContext;
@@ -403,10 +404,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 listener.onActivityUpdated(day, activity, prev + duration);
 
         // Activity log
+        long start = -1;
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
 
-            long start = -1;
             Cursor c = null;
             try {
                 c = db.query("activitylog", new String[]{"start"}, "finish = ? AND activity = ?",
@@ -418,29 +419,46 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     c.close();
             }
 
-            if (start >= 0) {
-                ContentValues cv = new ContentValues();
-                cv.put("finish", time + duration);
-                db.update("activitylog", cv, "start = ?", new String[]{Long.toString(start)});
-            } else {
+            if (start < 0) {
                 ContentValues cv = new ContentValues();
                 cv.put("start", time);
                 cv.put("finish", time + duration);
                 cv.put("activity", activity);
                 db.insert("activitylog", null, cv);
+            } else {
+                ContentValues cv = new ContentValues();
+                cv.put("finish", time + duration);
+                db.update("activitylog", cv, "start = ?", new String[]{Long.toString(start)});
             }
         }
+
+        if (start < 0)
+            for (ActivityLogChangedListener listener : mActivityLogChangedListeners)
+                listener.onActivityAdded(time, time + duration, activity);
+        else
+            for (ActivityLogChangedListener listener : mActivityLogChangedListeners)
+                listener.onActivityUpdated(start, time + duration, activity);
 
         return this;
     }
 
-    public Cursor getActivityDurations(boolean asc) {
+    public Cursor getActivityDurations(long from, long to, boolean asc) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT *, ID AS _id FROM activityduration";
         query += " ORDER BY time";
         if (!asc)
             query += " DESC";
         return db.rawQuery(query, new String[]{});
+    }
+
+    public Cursor getActivityLog(long from, long to, boolean asc) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT *, ID AS _id FROM activitylog";
+        query += " WHERE start <= ? AND finish >= ?";
+        query += " ORDER BY start";
+        if (!asc)
+            query += " DESC";
+        return db.rawQuery(query, new String[]{Long.toString(to), Long.toString(from)});
     }
 
     // Steps
@@ -554,6 +572,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         mActivityDurationChangedListeners.remove(listener);
     }
 
+    public static void addActivityLogChangedListener(ActivityLogChangedListener listener) {
+        mActivityLogChangedListeners.add(listener);
+    }
+
+    public static void removeActivityLogChangedListener(ActivityLogChangedListener listener) {
+        mActivityLogChangedListeners.remove(listener);
+    }
+
     public static void addStepCountChangedListener(StepCountChangedListener listener) {
         mStepCountChangedListeners.add(listener);
     }
@@ -580,6 +606,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         void onActivityAdded(long time);
 
         void onActivityUpdated(long time, int activity, long duration);
+    }
+
+    public interface ActivityLogChangedListener {
+        void onActivityAdded(long start, long finish, int activity);
+
+        void onActivityUpdated(long start, long finish, int activity);
     }
 
     public interface StepCountChangedListener {

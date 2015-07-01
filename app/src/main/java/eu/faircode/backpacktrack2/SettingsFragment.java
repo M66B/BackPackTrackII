@@ -38,6 +38,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -1024,19 +1025,29 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Fill list
         final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityDuration);
-        Cursor cursor = db.getActivityDurations(false);
+        Cursor cursor = db.getActivityDurations(0, Long.MAX_VALUE, false);
         final ActivityDurationAdapter adapter = new ActivityDurationAdapter(getActivity(), cursor);
         lv.setAdapter(adapter);
 
-        // Live updates
-        final DatabaseHelper.ActivityDurationChangedListener listener = new DatabaseHelper.ActivityDurationChangedListener() {
+        // Handle list item click
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onActivityAdded(long time) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Cursor cursor = (Cursor) lv.getItemAtPosition(position);
+                long time = cursor.getLong(cursor.getColumnIndex("time"));
+                activity_log(time, time + 24 * 3600 * 1000L);
+            }
+        });
+
+        // Live updates
+        final DatabaseHelper.ActivityLogChangedListener listener = new DatabaseHelper.ActivityLogChangedListener() {
+            @Override
+            public void onActivityAdded(long start, long finish, int activity) {
                 update();
             }
 
             @Override
-            public void onActivityUpdated(long time, int activity, long duration) {
+            public void onActivityUpdated(long start, long finish, int activity) {
                 update();
             }
 
@@ -1044,13 +1055,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Cursor cursor = db.getActivityDurations(false);
+                        Cursor cursor = db.getActivityDurations(0, Long.MAX_VALUE, false);
                         adapter.changeCursor(cursor);
                     }
                 });
             }
         };
-        DatabaseHelper.addActivityDurationChangedListener(listener);
+        DatabaseHelper.addActivityLogChangedListener(listener);
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
@@ -1068,7 +1079,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
-                DatabaseHelper.removeActivityDurationChangedListener(listener);
+                DatabaseHelper.removeActivityLogChangedListener(listener);
             }
         });
         alertDialog.show();
@@ -1156,6 +1167,67 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 alertDialog.show();
             }
         });
+
+        // Show layout
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+        alertDialogBuilder.setTitle(R.string.title_activity_history);
+        alertDialogBuilder.setIcon(R.drawable.history_60);
+        alertDialogBuilder.setView(viewHistory);
+        alertDialogBuilder
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                DatabaseHelper.removeActivityTypeChangedListener(listener);
+            }
+        });
+        alertDialog.show();
+    }
+
+    private void activity_log(final long from, final long to) {
+        // Get layout
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        View viewHistory = inflater.inflate(R.layout.activity_log, null);
+
+        TextView tvDate = (TextView) viewHistory.findViewById(R.id.tvDate);
+        tvDate.setText(SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(from));
+
+        // Fill list
+        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityLog);
+        Cursor cursor = db.getActivityLog(from, to, false);
+        final ActivityLogAdapter adapter = new ActivityLogAdapter(getActivity(), cursor);
+        lv.setAdapter(adapter);
+
+        // Live updates
+        final DatabaseHelper.ActivityTypeChangedListener listener = new DatabaseHelper.ActivityTypeChangedListener() {
+            @Override
+            public void onActivityAdded(long time, int activity, int confidence) {
+                update();
+            }
+
+            @Override
+            public void onActivityDeleted() {
+                update();
+            }
+
+            private void update() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Cursor cursor = db.getActivityLog(from, to, false);
+                        adapter.changeCursor(cursor);
+                        lv.setAdapter(adapter);
+                    }
+                });
+            }
+        };
+        DatabaseHelper.addActivityTypeChangedListener(listener);
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
