@@ -33,9 +33,10 @@ You could use the [Google Maps GPX Viewer](https://wordpress.org/plugins/google-
 
 If you want to see the status of the GPS, you could use the application [GPS Status & Toolbox](https://play.google.com/store/apps/details?id=com.eclipsim.gpsstatus2).
 
-As a bonus BackPackTrack includes a step counter which doesn't count false steps,
-because activity recognition will be used to count steps only while you are walking.
-Your device needs to have a hardware step counter for this to work.
+As a bonus BackPackTrack includes:
+
+* an activity history, so you can see when you were doing what
+* a step counter which doesn't count false steps, because activity recognition will be used to count steps only while you are walking. Your device needs to have a hardware step counter for this to work.
 
 BackPackTrack II is a complete rewrite of [BackPackTrack](https://github.com/M66B/BackPackTrack), the first Android application I wrote in 2011.
 
