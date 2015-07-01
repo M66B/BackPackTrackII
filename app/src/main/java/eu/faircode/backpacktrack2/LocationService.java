@@ -284,7 +284,7 @@ public class LocationService extends IntentService {
 
         // Check confidence
         int pref_confidence = Integer.parseInt(prefs.getString(SettingsFragment.PREF_RECOGNITION_CONFIDENCE, SettingsFragment.DEFAULT_RECOGNITION_CONFIDENCE));
-        if (activity.getConfidence() > pref_confidence) {
+        if (activity.getConfidence() >= pref_confidence) {
             // Persist probable activity
             long time = new Date().getTime();
             prefs.edit().putInt(SettingsFragment.PREF_LAST_ACTIVITY, activity.getType()).apply();
