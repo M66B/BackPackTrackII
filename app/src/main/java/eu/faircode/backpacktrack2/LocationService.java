@@ -358,7 +358,7 @@ public class LocationService extends IntentService {
         }
 
         // Keep significant motion service alive
-        startService(new Intent(this, SignificantMotionService.class));
+        //startService(new Intent(this, SignificantMotionService.class));
     }
 
     private void handleLocationRequest(Intent intent) {
@@ -820,7 +820,7 @@ public class LocationService extends IntentService {
         }
 
         // Start significant motion detector
-        context.startService(new Intent(context, SignificantMotionService.class));
+        //context.startService(new Intent(context, SignificantMotionService.class));
     }
 
     public static void stopTracking(final Context context) {
@@ -844,7 +844,7 @@ public class LocationService extends IntentService {
         context.stopService(new Intent(context, StepCounterService.class));
 
         // Stop significant motion detector
-        context.stopService(new Intent(context, SignificantMotionService.class));
+        //context.stopService(new Intent(context, SignificantMotionService.class));
     }
 
     private static void startActivityRecognition(final Context context) {
