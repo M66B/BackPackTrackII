@@ -162,7 +162,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_RECOGNITION_INTERVAL_MOVING = "60"; // seconds
     public static final String DEFAULT_RECOGNITION_CONFIDENCE = "50"; // percentage
     public static final boolean DEFAULT_RECOGNITION_TILTING = true;
-    public static final boolean DEFAULT_RECOGNITION_UNKNOWN = true;
+    public static final boolean DEFAULT_RECOGNITION_UNKNOWN = false;
     public static final boolean DEFAULT_RECOGNITION_STEPS = true;
     public static final boolean DEFAULT_RECOGNITION_HISTORY = false;
 

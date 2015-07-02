@@ -245,12 +245,46 @@ public class LocationService extends IntentService {
 
         // Get walking or running
         if (activity.getType() == DetectedActivity.ON_FOOT)
-            for (DetectedActivity act : activityResult.getProbableActivities()) {
+            for (DetectedActivity act : activityResult.getProbableActivities())
                 if (act.getType() == DetectedActivity.WALKING || act.getType() == DetectedActivity.RUNNING) {
+                    Log.w(TAG, "Replacing " + activity + " by " + act);
                     activity = act;
                     break;
                 }
+
+        // Filter unknown activity
+        boolean pref_unknown = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_UNKNOWN, SettingsFragment.DEFAULT_RECOGNITION_UNKNOWN);
+        if (pref_unknown && activity.getType() == DetectedActivity.UNKNOWN) {
+            boolean found = false;
+            for (DetectedActivity act : activityResult.getProbableActivities())
+                if (act.getType() != DetectedActivity.UNKNOWN) {
+                    Log.w(TAG, "Replacing " + activity + " by " + act);
+                    activity = act;
+                    found = true;
+                    break;
+                }
+            if (!found) {
+                Log.w(TAG, "Filtering " + activity);
+                return;
             }
+        }
+
+        // Filter tilting activity
+        boolean pref_tilting = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_TILTING, SettingsFragment.DEFAULT_RECOGNITION_TILTING);
+        if (pref_tilting && activity.getType() == DetectedActivity.TILTING) {
+            boolean found = false;
+            for (DetectedActivity act : activityResult.getProbableActivities())
+                if (act.getType() != DetectedActivity.TILTING) {
+                    Log.w(TAG, "Replacing " + activity + " by " + act);
+                    activity = act;
+                    found = true;
+                    break;
+                }
+            if (!found) {
+                Log.w(TAG, "Filtering " + activity);
+                return;
+            }
+        }
 
         Log.w(TAG, "Activity=" + activity);
 
@@ -266,20 +300,6 @@ public class LocationService extends IntentService {
                 if (dh != null)
                     dh.close();
             }
-        }
-
-        // Filter unknown activity
-        boolean pref_unknown = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_UNKNOWN, SettingsFragment.DEFAULT_RECOGNITION_UNKNOWN);
-        if (pref_unknown && activity.getType() == DetectedActivity.UNKNOWN && !lastStill) {
-            Log.w(TAG, "Filtering " + activity);
-            return;
-        }
-
-        // Filter tilting activity
-        boolean pref_tilting = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_TILTING, SettingsFragment.DEFAULT_RECOGNITION_TILTING);
-        if (pref_tilting && activity.getType() == DetectedActivity.TILTING) {
-            Log.w(TAG, "Filtering " + activity);
-            return;
         }
 
         // Check confidence
