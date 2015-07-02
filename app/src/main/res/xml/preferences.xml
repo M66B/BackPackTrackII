@@ -241,13 +241,19 @@
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="pref_recognition_enabled"
-                android:key="pref_recognition_tilting"
+                android:key="pref_recognition_filter_tilting"
                 android:summary="@string/summary_recognition_tilting"
                 android:title="@string/title_recognition_tilting" />
             <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="pref_recognition_enabled"
+                android:key="pref_recognition_replace_unknown"
+                android:summary="@string/summary_recognition_known"
+                android:title="@string/title_recognition_known" />
+            <CheckBoxPreference
                 android:defaultValue="false"
                 android:dependency="pref_recognition_enabled"
-                android:key="pref_recognition_unknown"
+                android:key="pref_recognition_filter_unknown"
                 android:summary="@string/summary_recognition_unknown"
                 android:title="@string/title_recognition_unknown" />
             <CheckBoxPreference

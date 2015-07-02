@@ -233,60 +233,21 @@ public class LocationService extends IntentService {
     }
 
     private void handleActivity(Intent intent) {
-        // Get last activity
+        // Get preferences
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int pref_confidence = Integer.parseInt(prefs.getString(SettingsFragment.PREF_RECOGNITION_CONFIDENCE, SettingsFragment.DEFAULT_RECOGNITION_CONFIDENCE));
+        boolean pref_tilting = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_TILTING, SettingsFragment.DEFAULT_RECOGNITION_TILTING);
+        boolean pref_known = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_KNOWN, SettingsFragment.DEFAULT_RECOGNITION_KNOWN);
+        boolean pref_unknown = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_UNKNOWN, SettingsFragment.DEFAULT_RECOGNITION_UNKNOWN);
+
+        // Get last activity
         int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
         long lastTime = prefs.getLong(SettingsFragment.PREF_LAST_ACTIVITY_TIME, -1);
         boolean lastStill = (lastActivity == DetectedActivity.STILL);
 
         // Get detected activity
         ActivityRecognitionResult activityResult = ActivityRecognitionResult.extractResult(intent);
-        DetectedActivity activity = activityResult.getMostProbableActivity();
-
-        // Get walking or running
-        if (activity.getType() == DetectedActivity.ON_FOOT)
-            for (DetectedActivity act : activityResult.getProbableActivities())
-                if (act.getType() == DetectedActivity.WALKING || act.getType() == DetectedActivity.RUNNING) {
-                    Log.w(TAG, "Replacing " + activity + " by " + act);
-                    activity = act;
-                    break;
-                }
-
-        // Filter unknown activity
-        boolean pref_unknown = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_UNKNOWN, SettingsFragment.DEFAULT_RECOGNITION_UNKNOWN);
-        if (pref_unknown && activity.getType() == DetectedActivity.UNKNOWN) {
-            boolean found = false;
-            for (DetectedActivity act : activityResult.getProbableActivities())
-                if (act.getType() != DetectedActivity.UNKNOWN) {
-                    Log.w(TAG, "Replacing " + activity + " by " + act);
-                    activity = act;
-                    found = true;
-                    break;
-                }
-            if (!found) {
-                Log.w(TAG, "Filtering " + activity);
-                return;
-            }
-        }
-
-        // Filter tilting activity
-        boolean pref_tilting = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_TILTING, SettingsFragment.DEFAULT_RECOGNITION_TILTING);
-        if (pref_tilting && activity.getType() == DetectedActivity.TILTING) {
-            boolean found = false;
-            for (DetectedActivity act : activityResult.getProbableActivities())
-                if (act.getType() != DetectedActivity.TILTING) {
-                    Log.w(TAG, "Replacing " + activity + " by " + act);
-                    activity = act;
-                    found = true;
-                    break;
-                }
-            if (!found) {
-                Log.w(TAG, "Filtering " + activity);
-                return;
-            }
-        }
-
-        Log.w(TAG, "Activity=" + activity);
+        List<DetectedActivity> listProbable = activityResult.getProbableActivities();
 
         // Persist probably activities
         if (prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_HISTORY, SettingsFragment.DEFAULT_RECOGNITION_HISTORY)) {
@@ -294,7 +255,7 @@ public class LocationService extends IntentService {
             try {
                 dh = new DatabaseHelper(this);
                 long time = new Date().getTime();
-                for (DetectedActivity act : activityResult.getProbableActivities())
+                for (DetectedActivity act : listProbable)
                     dh.insertActivityType(time, act.getType(), act.getConfidence());
             } finally {
                 if (dh != null)
@@ -302,8 +263,54 @@ public class LocationService extends IntentService {
             }
         }
 
+        DetectedActivity activity = listProbable.get(0);
+
+        // Filter tilting activity
+        if (pref_tilting && activity.getType() == DetectedActivity.TILTING) {
+            boolean found = false;
+            for (DetectedActivity act : listProbable)
+                if (act.getType() != DetectedActivity.TILTING) {
+                    Log.w(TAG, "Replacing " + activity + " by " + act);
+                    listProbable.remove(activity);
+                    activity = act;
+                    found = true;
+                    break;
+                }
+            if (!found) {
+                Log.w(TAG, "Filtering " + activity);
+                return;
+            }
+        }
+
+        // Replace unknown activity
+        if (pref_known && activity.getType() == DetectedActivity.UNKNOWN)
+            for (DetectedActivity act : listProbable)
+                if (act.getType() != DetectedActivity.UNKNOWN && act.getConfidence() >= pref_confidence) {
+                    Log.w(TAG, "Replacing " + activity + " by " + act);
+                    listProbable.remove(activity);
+                    activity = act;
+                    break;
+                }
+
+        // Get walking or running
+        if (activity.getType() == DetectedActivity.ON_FOOT)
+            for (DetectedActivity act : activityResult.getProbableActivities())
+                if (act.getType() == DetectedActivity.WALKING || act.getType() == DetectedActivity.RUNNING) {
+                    Log.w(TAG, "Replacing " + activity + " by " + act);
+                    listProbable.remove(activity);
+                    activity = act;
+                    break;
+                }
+
+        // Filter unknown activity
+        if (pref_unknown && activity.getType() == DetectedActivity.UNKNOWN) {
+            Log.w(TAG, "Filtering " + activity);
+            return;
+        }
+
+        Log.w(TAG, "Activity=" + activity);
+
         // Check confidence
-        int pref_confidence = Integer.parseInt(prefs.getString(SettingsFragment.PREF_RECOGNITION_CONFIDENCE, SettingsFragment.DEFAULT_RECOGNITION_CONFIDENCE));
         if (activity.getConfidence() >= pref_confidence) {
             // Persist probable activity
             long time = new Date().getTime();

@@ -52,6 +52,7 @@
     <string name="title_recognition_interval_moving">Aktivitätserkennung bei Bewegung: %s Sekunden</string>
     <string name="title_recognition_confidence">Aktivitätserkennung Präzision: %s%%</string>
     <string name="title_recognition_tilting">Aktivität \'kippen\' filtern</string>
+    <string name="title_recognition_known">Replace activity \'unknown\'</string>
     <string name="title_recognition_unknown">Aktivität \'unbekannt\' filtern</string>
     <string name="title_recognition_steps">Falsche Schritte filtern</string>
     <string name="title_recognition_history">Verlauf aktiviert</string>
@@ -110,6 +111,7 @@
     <string name="summary_recognition_interval">Aktivität jede Anzahl von Sekunden ermitteln</string>
     <string name="summary_recognition_confidence">Eine neue Aktivität erkennen wenn die Präzision höher ist als die ausgewählte Prozentzahl</string>
     <string name="summary_recognition_tilting">Behandele die Aktivität \'kippen\' als stillstehend</string>
+    <string name="summary_recognition_known">Replace the recognized activity \'unknown\' by a likely known activity</string>
     <string name="summary_recognition_unknown">Behandele die Aktivität \'unbekannt\' als stillstehend</string>
     <string name="summary_recognition_steps">Zähle Schritte nur wenn Aktivität Zu Fuß erkannt wurde</string>
 
