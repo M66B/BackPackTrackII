@@ -1077,7 +1077,7 @@ public class LocationService extends IntentService {
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(locationType == LOCATION_TRACKPOINT ? VIBRATE_SHORT : VIBRATE_LONG);
             } else if (debugMode(this))
-                toast(getString(R.string.title_trackpoint), Toast.LENGTH_SHORT, this);
+                toast(getString(R.string.title_trackpoint) + " " + location.getProvider(), Toast.LENGTH_SHORT, this);
         } else
             Log.w(TAG, "Filtered location=" + location);
     }
