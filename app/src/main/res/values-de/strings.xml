@@ -148,8 +148,8 @@
     <string name="header_steps">Schritte</string>
     <string name="header_calories">Kcal</string>
 
-    <string name="msg_gps">GPS Provider: %s</string>
-    <string name="msg_network">Netzwerk Provider: %s</string>
+    <string name="msg_gps">GPS Provider verfügbar: %s</string>
+    <string name="msg_network">Netzwerk Provider verfügbar: %s</string>
     <string name="msg_noproviders">Einen Standort Provider in den Android Standorteinstellungen aktivieren um diese Applikation zu nutzen</string>
     <string name="msg_never">nie</string>
     <string name="msg_notset">nicht gesezt</string>
