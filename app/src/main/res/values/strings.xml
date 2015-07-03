@@ -148,8 +148,8 @@
     <string name="header_steps">Steps</string>
     <string name="header_calories">kcal</string>
 
-    <string name="msg_gps">GPS provider: %s</string>
-    <string name="msg_network">Network provider: %s</string>
+    <string name="msg_gps">GPS provider available: %s</string>
+    <string name="msg_network">Network provider available: %s</string>
     <string name="msg_noproviders">Enable a location provider in the Android location settings to use this application</string>
     <string name="msg_never">never</string>
     <string name="msg_notset">not set</string>
