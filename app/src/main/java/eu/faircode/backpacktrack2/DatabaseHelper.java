@@ -425,14 +425,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             DateFormat df = SimpleDateFormat.getTimeInstance();
 
             if (start < 0) {
-                Log.w(TAG, "Inserting activity=" + activity + " start=" + df.format(time) + " finish=" + df.format(time + duration));
                 ContentValues cv = new ContentValues();
                 cv.put("start", time);
                 cv.put("finish", time + duration);
                 cv.put("activity", activity);
                 db.insert("activitylog", null, cv);
             } else {
-                Log.w(TAG, "Updating activity=" + activity + " start=" + df.format(start) + " finish=" + df.format(time + duration));
                 ContentValues cv = new ContentValues();
                 cv.put("finish", time + duration);
                 db.update("activitylog", cv, "start = ?", new String[]{Long.toString(start)});
