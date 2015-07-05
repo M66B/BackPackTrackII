@@ -118,8 +118,10 @@ public class LocationService extends IntentService {
     private static final int LOCATION_WAYPOINT = 2;
     private static final int LOCATION_PERIODIC = 3;
 
-    private static final int VIBRATE_SHORT = 250;
-    private static final int VIBRATE_LONG = 500;
+    private static final int VIBRATE_SHORT = 250; // milliseconds
+    private static final int VIBRATE_LONG = 500; // milliseconds
+
+    private static final int ALARM_DUE_TIME = 5 * 1000; // milliseconds
 
     private static int mEGM96Pointer = -1;
     private static int mEGM96Offset;
@@ -897,8 +899,8 @@ public class LocationService extends IntentService {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_INTERVAL, SettingsFragment.DEFAULT_INTERVAL));
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 1000, interval * 1000, pi);
-        Log.w(TAG, "Start repeating alarm frequency=" + interval + "s");
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + ALARM_DUE_TIME, interval * 1000, pi);
+        Log.w(TAG, "Start repeating alarm frequency=" + interval + "s" + " due=" + ALARM_DUE_TIME + "ms");
     }
 
     private static void stopRepeatingAlarm(Context context) {
