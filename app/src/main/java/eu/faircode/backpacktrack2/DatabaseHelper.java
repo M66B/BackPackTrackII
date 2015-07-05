@@ -88,7 +88,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", time INTEGER NOT NULL" +
                 ", activity INTEGER NOT NULL" +
                 ", confidence INTEGER NOT NULL" + ");");
-        db.execSQL("CREATE INDEX idx_activity_time ON activity(time)");
+        db.execSQL("CREATE INDEX idx_activitytype_time ON activitytype(time)");
     }
 
     private void createTableActivityDuration(SQLiteDatabase db) {
@@ -157,6 +157,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.beginTransaction();
             try {
                 db.execSQL("ALTER TABLE activity RENAME TO activitytype");
+                // Index activity_time not renamed
                 db.execSQL("ALTER TABLE activityduration RENAME TO activityduration_orig");
                 db.execSQL("DROP INDEX idx_activityduration_time");
                 createTableActivityDuration(db);
