@@ -55,7 +55,7 @@
     <string name="title_recognition_known">Replace activity \'unknown\'</string>
     <string name="title_recognition_unknown">Filter activity \'unknown\'</string>
     <string name="title_recognition_steps">Filter false steps</string>
-    <string name="title_recognition_history">History enabled</string>
+    <string name="title_recognition_unknown_steps">Count steps for \'unknown\' activity</string>
 
     <string name="title_step_counter">Step counter</string>
     <string name="title_step_delta">Update: %s steps</string>
@@ -114,6 +114,7 @@
     <string name="summary_recognition_known">Replace the recognized activity \'unknown\' by a likely known activity</string>
     <string name="summary_recognition_unknown">Consider the recognized activity \'unknown\' not as motion</string>
     <string name="summary_recognition_steps">Count only steps when activity on foot has been recognized</string>
+    <string name="summary_recognition_unknown_steps">Count steps when an \'unknown\' activity has been recognized</string>
 
     <string name="summary_step_delta">Update the step counter every selected number of steps</string>
     <string name="summary_step_size">Your step size in centimeters to calculate the distance walked</string>
@@ -144,6 +145,8 @@
     <string name="header_accuracy">Acc.</string>
     <string name="header_distance">Dist.</string>
     <string name="header_bearing">&#176;</string>
+
+    <string name="title_recognition_history">History enabled</string>
 
     <string name="header_steps">Steps</string>
     <string name="header_calories">kcal</string>

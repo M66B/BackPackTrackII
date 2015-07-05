@@ -262,6 +262,12 @@
                 android:key="pref_recognition_steps"
                 android:summary="@string/summary_recognition_steps"
                 android:title="@string/title_recognition_steps" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="pref_recognition_enabled"
+                android:key="pref_recognition_unknown_steps"
+                android:summary="@string/summary_recognition_unknown_steps"
+                android:title="@string/title_recognition_unknown_steps" />
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_step_counter">
             <EditTextPreference

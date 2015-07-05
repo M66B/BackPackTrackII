@@ -329,7 +329,10 @@ public class LocationService extends IntentService {
             int act = activity.getType();
             boolean still = (act == DetectedActivity.STILL);
             boolean onfoot = (act == DetectedActivity.ON_FOOT || act == DetectedActivity.WALKING || act == DetectedActivity.RUNNING);
-            boolean recognizeSteps = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_STEPS, SettingsFragment.DEFAULT_RECOGNITION_STEPS);
+            boolean pref_recognize_steps = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_STEPS, SettingsFragment.DEFAULT_RECOGNITION_STEPS);
+            boolean pref_unknown_steps = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_UNKNOWN_STEPS, SettingsFragment.DEFAULT_RECOGNITION_UNKNOWN_STEPS);
+            if (pref_unknown_steps && act == DetectedActivity.UNKNOWN)
+                onfoot = true;
 
             // Stop/start repeating alarm
             if (lastStill != still) {
@@ -350,7 +353,7 @@ public class LocationService extends IntentService {
             }
 
             // Start/stop step counter service
-            if (recognizeSteps)
+            if (pref_recognize_steps)
                 if (onfoot) // Keep alive
                     startService(new Intent(this, StepCounterService.class));
                 else
@@ -974,8 +977,11 @@ public class LocationService extends IntentService {
         // Keep step counter service alive
         boolean recognition = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_ENABLED, SettingsFragment.DEFAULT_RECOGNITION_ENABLED);
         boolean recognizeSteps = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_STEPS, SettingsFragment.DEFAULT_RECOGNITION_STEPS);
+        boolean pref_unknown_steps = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_UNKNOWN_STEPS, SettingsFragment.DEFAULT_RECOGNITION_UNKNOWN_STEPS);
         int activity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
         boolean onfoot = (activity == DetectedActivity.ON_FOOT || activity == DetectedActivity.WALKING || activity == DetectedActivity.RUNNING);
+        if (pref_unknown_steps && activity == DetectedActivity.UNKNOWN)
+            onfoot = true;
         if (!recognition || !recognizeSteps || onfoot) // Keep alive
             context.startService(new Intent(context, StepCounterService.class));
     }
