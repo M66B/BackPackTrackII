@@ -285,7 +285,7 @@ public class LocationService extends IntentService {
         // Replace unknown activity
         if (pref_known && activity.getType() == DetectedActivity.UNKNOWN)
             for (DetectedActivity act : listProbable)
-                if (act.getType() != DetectedActivity.UNKNOWN && act.getConfidence() >= pref_confidence) {
+                if (act.getType() != DetectedActivity.UNKNOWN && act.getConfidence() > pref_confidence) {
                     Log.w(TAG, "Replacing " + activity + " by " + act);
                     listProbable.remove(activity);
                     activity = act;
@@ -311,7 +311,7 @@ public class LocationService extends IntentService {
         Log.w(TAG, "Activity=" + activity);
 
         // Check confidence
-        if (activity.getConfidence() >= pref_confidence) {
+        if (activity.getConfidence() > pref_confidence) {
             // Persist probable activity
             long time = new Date().getTime();
             prefs.edit().putInt(SettingsFragment.PREF_LAST_ACTIVITY, activity.getType()).apply();
