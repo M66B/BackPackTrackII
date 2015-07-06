@@ -488,7 +488,7 @@ public class LocationService extends IntentService {
         // Movement detected
         int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
         if (lastActivity == DetectedActivity.STILL) {
-            new DatabaseHelper(this).insertActivityType(new Date().getTime(), -1, 100).close();
+            new DatabaseHelper(this).insertActivityType(new Date().getTime(), -2, 100).close();
             startLocating(this);
         }
 
@@ -1341,6 +1341,8 @@ public class LocationService extends IntentService {
                 return context.getString(R.string.unknown);
             case -1:
                 return context.getString(R.string.motion);
+            case -2:
+                return context.getString(R.string.displacement);
             default:
                 return context.getString(R.string.undefined);
         }

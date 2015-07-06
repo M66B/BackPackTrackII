@@ -191,6 +191,7 @@
     <string name="unknown">Unbekannt</string>
     <string name="undefined">Nicht definiert</string>
     <string name="motion">Bewegung</string>
+    <string name="displacement">Displacement</string>
 
     <string name="direction_0">N</string>
     <string name="direction_30">NNO</string>

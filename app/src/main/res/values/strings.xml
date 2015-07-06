@@ -191,6 +191,7 @@
     <string name="unknown">Unknown</string>
     <string name="undefined">Undefined</string>
     <string name="motion">Motion</string>
+    <string name="displacement">Displacement</string>
 
     <string name="direction_0">N</string>
     <string name="direction_30">NNE</string>
