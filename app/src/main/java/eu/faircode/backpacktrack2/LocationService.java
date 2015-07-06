@@ -486,10 +486,13 @@ public class LocationService extends IntentService {
         }
 
         // Movement detected
-        int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
-        if (lastActivity == DetectedActivity.STILL) {
-            new DatabaseHelper(this).insertActivityType(new Date().getTime(), -2, 100).close();
-            startLocating(this);
+        boolean pref_displacement = prefs.getBoolean(SettingsFragment.PREF_PASSIVE_DISPLACEMENT, SettingsFragment.DEFAULT_PASSIVE_DISPLACEMENT);
+        if (pref_displacement) {
+            int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
+            if (lastActivity == DetectedActivity.STILL) {
+                new DatabaseHelper(this).insertActivityType(new Date().getTime(), -2, 100).close();
+                startLocating(this);
+            }
         }
 
         float bchange = 0;

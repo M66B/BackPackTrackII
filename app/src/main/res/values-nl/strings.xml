@@ -37,6 +37,7 @@
     <string name="title_passive_enabled">Passieve locaties aan</string>
     <string name="title_passive_bearing">Richtingsverandering: %s graden</string>
     <string name="title_passive_altitude">Hoogteverandering: %s meter</string>
+    <string name="title_passive_displacement">Verplaatsing is beweging</string>
 
     <string name="title_altitude_settings">Hoogte</string>
     <string name="title_correction_enabled">Correctie aan</string>
@@ -100,6 +101,7 @@
     <string name="summary_passive_enabled">Use location updates requested by other applications</string>
     <string name="summary_passive_bearing">Use passive location updates when bearing changes for more than the selected number of degrees</string>
     <string name="summary_passive_altitude">Use passive location updates when altitude changes for more than the selected number of meters</string>
+    <string name="summary_passive_displacement">Consider displacement as motion to start locating</string>
 
     <string name="summary_correction_enabled">GPS altitude correction using EGM96</string>
     <string name="summary_correction_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nTap for more information (will start the browser)</string>

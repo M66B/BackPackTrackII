@@ -37,6 +37,7 @@
     <string name="title_passive_enabled">Passive Standorte aktiviert</string>
     <string name="title_passive_bearing">Richtungsänderung: %s Grad</string>
     <string name="title_passive_altitude">Höhenveränderung: %s Meter</string>
+    <string name="title_passive_displacement">Displacement is motion</string>
 
     <string name="title_altitude_settings">Höhe</string>
     <string name="title_correction_enabled">Korrektur aktiviert</string>
@@ -100,6 +101,7 @@
     <string name="summary_passive_enabled">Benutze Positionsabfragen von anderen Applikationen</string>
     <string name="summary_passive_bearing">Benutze passive Standortabfragen wen sich die Richtung um mehr als die ausgewählte Gradzahl ändert</string>
     <string name="summary_passive_altitude">Benutze passive Standortabfragen wen sich die Höhe um mehr als die ausgewählte Anzahl von Meter ändert</string>
+    <string name="summary_passive_displacement">Consider displacement as motion to start locating</string>
 
     <string name="summary_correction_enabled">Höhenkorrektur mittels EGM96</string>
     <string name="summary_correction_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nKlicken für Details (Öffnet im Browser)</string>

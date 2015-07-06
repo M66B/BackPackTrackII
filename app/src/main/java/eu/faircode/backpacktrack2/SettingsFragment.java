@@ -100,6 +100,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_PASSIVE_NEARBY = "pref_passive_nearby";
     public static final String PREF_PASSIVE_MINTIME = "pref_passive_mintime";
     public static final String PREF_PASSIVE_MINDIST = "pref_passive_mindist";
+    public static final String PREF_PASSIVE_DISPLACEMENT = "pref_passive_displacement";
 
     public static final String PREF_CORRECTION_ENABLED = "pref_correction_enabled";
     public static final String PREF_ALTITUDE_WAYPOINT = "pref_altitude_waypoint";
@@ -154,6 +155,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_PASSIVE_NEARBY = "20"; // meters
     public static final String DEFAULT_PASSIVE_MINTIME = "1"; // seconds
     public static final String DEFAULT_PASSIVE_MINDIST = "0"; // meters
+    public static final boolean DEFAULT_PASSIVE_DISPLACEMENT = true;
 
     public static final boolean DEFAULT_CORRECTION_ENABLED = true;
     public static final boolean DEFAULT_ALTITUDE_WAYPOINT = true;

@@ -171,6 +171,12 @@
                 android:inputType="number"
                 android:key="pref_passive_mindist"
                 android:summary="@string/summary_mindist" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="pref_passive_enabled"
+                android:key="pref_passive_displacement"
+                android:summary="@string/summary_passive_displacement"
+                android:title="@string/title_passive_displacement" />
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_altitude_settings">
             <CheckBoxPreference
