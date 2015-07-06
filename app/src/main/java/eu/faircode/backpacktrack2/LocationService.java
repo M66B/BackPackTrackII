@@ -453,12 +453,6 @@ public class LocationService extends IntentService {
         if (location == null || (location.getLatitude() == 0.0 && location.getLongitude() == 0.0))
             return;
 
-        // Check if bearing or altitude available
-        if (!location.hasBearing() && !location.hasAltitude()) {
-            Log.w(TAG, "Passive location without bearing/altitude, location=" + location);
-            return;
-        }
-
         // Filter inaccurate passive locations
         int pref_inaccurate = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PASSIVE_INACCURATE, SettingsFragment.DEFAULT_PASSIVE_INACCURATE));
         if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
@@ -489,6 +483,13 @@ public class LocationService extends IntentService {
                         (location.hasAccuracy() ? location.getAccuracy() : Float.MAX_VALUE)) {
             Log.w(TAG, "Filtering nearby passive location=" + location);
             return;
+        }
+
+        // Movement detected
+        int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
+        if (lastActivity == DetectedActivity.STILL) {
+            new DatabaseHelper(this).insertActivityType(new Date().getTime(), -1, 100).close();
+            startLocating(this);
         }
 
         float bchange = 0;
