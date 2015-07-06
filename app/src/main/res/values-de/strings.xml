@@ -37,7 +37,7 @@
     <string name="title_passive_enabled">Passive Standorte aktiviert</string>
     <string name="title_passive_bearing">Richtungsänderung: %s Grad</string>
     <string name="title_passive_altitude">Höhenveränderung: %s Meter</string>
-    <string name="title_passive_displacement">Displacement is motion</string>
+    <string name="title_passive_displacement">Verschiebung ist Bewegung</string>
 
     <string name="title_altitude_settings">Höhe</string>
     <string name="title_correction_enabled">Korrektur aktiviert</string>
@@ -56,8 +56,8 @@
     <string name="title_recognition_known">Aktivität \'unbekannt\' ersetzen</string>
     <string name="title_recognition_unknown">Aktivität \'unbekannt\' filtern</string>
     <string name="title_recognition_steps">Falsche Schritte filtern</string>
-    <string name="title_recognition_unknown_steps">Count steps for \'unknown\' activity</string>
-    <string name="title_recognition_significant">Use significant motion detector</string>
+    <string name="title_recognition_unknown_steps">Zähle Schritte für \'unbekannte\' Aktivität</string>
+    <string name="title_recognition_significant">Benutze signifikate Bewegungssenor</string>
 
     <string name="title_step_counter">Schrittzähler</string>
     <string name="title_step_delta">Update: %s Schritte</string>
@@ -102,7 +102,7 @@
     <string name="summary_passive_enabled">Benutze Positionsabfragen von anderen Applikationen</string>
     <string name="summary_passive_bearing">Benutze passive Standortabfragen wen sich die Richtung um mehr als die ausgewählte Gradzahl ändert</string>
     <string name="summary_passive_altitude">Benutze passive Standortabfragen wen sich die Höhe um mehr als die ausgewählte Anzahl von Meter ändert</string>
-    <string name="summary_passive_displacement">Consider displacement as motion to start locating</string>
+    <string name="summary_passive_displacement">Betrache Verschiebung als Bewegung um eine Ortung zu starten</string>
 
     <string name="summary_correction_enabled">Höhenkorrektur mittels EGM96</string>
     <string name="summary_correction_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nKlicken für Details (Öffnet im Browser)</string>
@@ -117,8 +117,8 @@
     <string name="summary_recognition_known">Ersetze die erkannte Aktivität \'unbekannt\' mit einer möglichen bekannten Aktivität</string>
     <string name="summary_recognition_unknown">Behandele die Aktivität \'unbekannt\' als stillstehend</string>
     <string name="summary_recognition_steps">Zähle Schritte nur wenn Aktivität Zu Fuß erkannt wurde</string>
-    <string name="summary_recognition_unknown_steps">Count steps when an \'unknown\' activity has been recognized</string>
-    <string name="summary_recognition_significant">Consider significant motion to start locating</string>
+    <string name="summary_recognition_unknown_steps">Zähle Schritte wenn eine \'unbekannte\' Aktivität erkannt wurde</string>
+    <string name="summary_recognition_significant">Bettrache signifikante Bewegung um eine Ortung zu starten</string>
 
     <string name="summary_step_delta">Schrittzähler jede Anzahl von Schritte aktualizierenn</string>
     <string name="summary_step_size">Ihre Schrittgröße in Zentimeter um die gelaufe Strecke zu ermitteln</string>
@@ -195,7 +195,7 @@
     <string name="unknown">Unbekannt</string>
     <string name="undefined">Nicht definiert</string>
     <string name="motion">Bewegung</string>
-    <string name="displacement">Displacement</string>
+    <string name="displacement">Verschiebung</string>
 
     <string name="direction_0">N</string>
     <string name="direction_30">NNO</string>
