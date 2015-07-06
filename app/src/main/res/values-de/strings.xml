@@ -57,6 +57,7 @@
     <string name="title_recognition_unknown">Aktivität \'unbekannt\' filtern</string>
     <string name="title_recognition_steps">Falsche Schritte filtern</string>
     <string name="title_recognition_unknown_steps">Count steps for \'unknown\' activity</string>
+    <string name="title_recognition_significant">Use significant motion detector</string>
 
     <string name="title_step_counter">Schrittzähler</string>
     <string name="title_step_delta">Update: %s Schritte</string>
@@ -117,6 +118,7 @@
     <string name="summary_recognition_unknown">Behandele die Aktivität \'unbekannt\' als stillstehend</string>
     <string name="summary_recognition_steps">Zähle Schritte nur wenn Aktivität Zu Fuß erkannt wurde</string>
     <string name="summary_recognition_unknown_steps">Count steps when an \'unknown\' activity has been recognized</string>
+    <string name="summary_recognition_significant">Consider significant motion to start locating</string>
 
     <string name="summary_step_delta">Schrittzähler jede Anzahl von Schritte aktualizierenn</string>
     <string name="summary_step_size">Ihre Schrittgröße in Zentimeter um die gelaufe Strecke zu ermitteln</string>

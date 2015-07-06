@@ -363,7 +363,9 @@ public class LocationService extends IntentService {
         }
 
         // Keep significant motion service alive
-        //startService(new Intent(this, SignificantMotionService.class));
+        boolean pref_significant = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_SIGNIFICANT, SettingsFragment.DEFAULT_RECOGNITION_SIGNIFICANT);
+        if (pref_significant)
+            startService(new Intent(this, SignificantMotionService.class));
     }
 
     private void handleLocationRequest(Intent intent) {
@@ -644,6 +646,7 @@ public class LocationService extends IntentService {
         if (prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_HISTORY, SettingsFragment.DEFAULT_RECOGNITION_HISTORY)) {
             long time = intent.getLongExtra(EXTRA_TIME, new Date().getTime());
             new DatabaseHelper(this).insertActivityType(time, -1, 100).close();
+            startLocating(this);
         }
     }
 
@@ -829,7 +832,9 @@ public class LocationService extends IntentService {
         }
 
         // Start significant motion detector
-        //context.startService(new Intent(context, SignificantMotionService.class));
+        boolean pref_significant = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_SIGNIFICANT, SettingsFragment.DEFAULT_RECOGNITION_SIGNIFICANT);
+        if (pref_significant)
+            context.startService(new Intent(context, SignificantMotionService.class));
     }
 
     public static void stopTracking(final Context context) {
@@ -853,7 +858,7 @@ public class LocationService extends IntentService {
         context.stopService(new Intent(context, StepCounterService.class));
 
         // Stop significant motion detector
-        //context.stopService(new Intent(context, SignificantMotionService.class));
+        context.stopService(new Intent(context, SignificantMotionService.class));
     }
 
     private static void startActivityRecognition(final Context context) {
