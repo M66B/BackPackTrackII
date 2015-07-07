@@ -437,7 +437,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         findPreference(PREF_RECOGNITION_CONFIDENCE).setEnabled(playServices);
 
         // Check for significant motion detector
-        pref_significant.setEnabled(LocationService.hasSignificantMotion(getActivity()));
+        pref_significant.setEnabled(LocationService.hasSignificantMotion(getActivity()) && LocationService.debugMode(getActivity()));
 
         // Handle Play store link
         Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getActivity().getPackageName()));
