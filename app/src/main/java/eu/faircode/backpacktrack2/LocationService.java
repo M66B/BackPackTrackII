@@ -72,6 +72,7 @@ public class LocationService extends IntentService {
 
     // Actions
     public static final String ACTION_ALARM = "Alarm";
+    public static final String ACTION_GUARD = "Guard";
     public static final String ACTION_DAILY = "Daily";
     public static final String ACTION_ACTIVITY = "Activity";
     public static final String ACTION_LOCATION_FINE = "LocationFine";
@@ -209,7 +210,10 @@ public class LocationService extends IntentService {
                 convertTime(intent);
                 handleGetAltitude(intent);
 
-            } else if (ACTION_DAILY.equals(intent.getAction()))
+            } else if (ACTION_GUARD.equals(intent.getAction()))
+                handleGuard(intent);
+
+            else if (ACTION_DAILY.equals(intent.getAction()))
                 handleDaily(intent);
 
             else
@@ -494,6 +498,7 @@ public class LocationService extends IntentService {
             if (lastActivity == DetectedActivity.STILL) {
                 new DatabaseHelper(this).insertActivityType(new Date().getTime(), -2, 100).close();
                 startLocating(this);
+                startGuard(this);
             }
         }
 
@@ -650,6 +655,7 @@ public class LocationService extends IntentService {
             long time = intent.getLongExtra(EXTRA_TIME, new Date().getTime());
             new DatabaseHelper(this).insertActivityType(time, -1, 100).close();
             startLocating(this);
+            startGuard(this);
         }
     }
 
@@ -770,6 +776,13 @@ public class LocationService extends IntentService {
         long to = intent.getLongExtra(EXTRA_TIME_TO, cto.getTimeInMillis());
 
         getAltitude(from, to, this);
+    }
+
+    private void handleGuard(Intent intent) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
+        if (lastActivity == DetectedActivity.STILL)
+            stopLocating(this);
     }
 
     private void handleDaily(Intent intent) {
@@ -901,6 +914,17 @@ public class LocationService extends IntentService {
                 Log.w(TAG, "Canceled activity updates");
             }
         }
+    }
+
+    private static void startGuard(Context context) {
+        Intent guardIntent = new Intent(context, LocationService.class);
+        guardIntent.setAction(LocationService.ACTION_GUARD);
+        PendingIntent pi = PendingIntent.getService(context, 0, guardIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_RECOGNITION_INTERVAL_STILL, SettingsFragment.DEFAULT_RECOGNITION_INTERVAL_STILL));
+        am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + interval * 1000, pi);
+        Log.w(TAG, "Started guard interval=" + interval + "s");
     }
 
     private static void startRepeatingAlarm(Context context) {
