@@ -352,10 +352,10 @@ public class LocationService extends IntentService {
 
                 // Stop/start locating
                 if (still) {
-                    stopRepeatingAlarm(this);
+                    stopPeriodicLocating(this);
                     stopLocating(this);
                 } else
-                    startRepeatingAlarm(this);
+                    startPeriodicLocating(this);
             }
 
             // Start/stop step counter service
@@ -367,8 +367,9 @@ public class LocationService extends IntentService {
         }
 
         // Keep significant motion service alive
+        boolean recognition = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_ENABLED, SettingsFragment.DEFAULT_RECOGNITION_ENABLED);
         boolean pref_significant = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_SIGNIFICANT, SettingsFragment.DEFAULT_RECOGNITION_SIGNIFICANT);
-        if (pref_significant)
+        if (recognition && pref_significant)
             startService(new Intent(this, SignificantMotionService.class));
     }
 
@@ -492,12 +493,16 @@ public class LocationService extends IntentService {
         }
 
         // Movement detected
+        boolean recognition = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_ENABLED, SettingsFragment.DEFAULT_RECOGNITION_ENABLED);
         boolean pref_displacement = prefs.getBoolean(SettingsFragment.PREF_PASSIVE_DISPLACEMENT, SettingsFragment.DEFAULT_PASSIVE_DISPLACEMENT);
-        if (pref_displacement) {
+        if (recognition && pref_displacement) {
             int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
             if (lastActivity == DetectedActivity.STILL) {
-                new DatabaseHelper(this).insertActivityType(new Date().getTime(), -2, 100).close();
-                startLocating(this);
+                if (prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_HISTORY, SettingsFragment.DEFAULT_RECOGNITION_HISTORY))
+                    new DatabaseHelper(this).insertActivityType(new Date().getTime(), -2, 100).close();
+
+                stopPeriodicLocating(this);
+                startPeriodicLocating(this);
                 startGuard(this);
             }
         }
@@ -654,9 +659,11 @@ public class LocationService extends IntentService {
         if (prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_HISTORY, SettingsFragment.DEFAULT_RECOGNITION_HISTORY)) {
             long time = intent.getLongExtra(EXTRA_TIME, new Date().getTime());
             new DatabaseHelper(this).insertActivityType(time, -1, 100).close();
-            startLocating(this);
-            startGuard(this);
         }
+
+        stopPeriodicLocating(this);
+        startPeriodicLocating(this);
+        startGuard(this);
     }
 
     private void handleShare(Intent intent) {
@@ -780,9 +787,14 @@ public class LocationService extends IntentService {
 
     private void handleGuard(Intent intent) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
-        if (lastActivity == DetectedActivity.STILL)
-            stopLocating(this);
+        boolean recognition = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_ENABLED, SettingsFragment.DEFAULT_RECOGNITION_ENABLED);
+        if (recognition) {
+            int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
+            if (lastActivity == DetectedActivity.STILL) {
+                stopPeriodicLocating(this);
+                stopLocating(this);
+            }
+        }
     }
 
     private void handleDaily(Intent intent) {
@@ -830,7 +842,7 @@ public class LocationService extends IntentService {
             if (!filterSteps)
                 context.startService(new Intent(context, StepCounterService.class));
         } else {
-            startRepeatingAlarm(context);
+            startPeriodicLocating(context);
             context.startService(new Intent(context, StepCounterService.class));
         }
 
@@ -849,14 +861,14 @@ public class LocationService extends IntentService {
 
         // Start significant motion detector
         boolean pref_significant = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_SIGNIFICANT, SettingsFragment.DEFAULT_RECOGNITION_SIGNIFICANT);
-        if (pref_significant)
+        if (recognition && pref_significant)
             context.startService(new Intent(context, SignificantMotionService.class));
     }
 
     public static void stopTracking(final Context context) {
         Log.w(TAG, "Stop tracking");
 
-        stopRepeatingAlarm(context);
+        stopPeriodicLocating(context);
         stopLocating(context);
         cancelNotification(context);
 
@@ -927,7 +939,7 @@ public class LocationService extends IntentService {
         Log.w(TAG, "Started guard interval=" + interval + "s");
     }
 
-    private static void startRepeatingAlarm(Context context) {
+    private static void startPeriodicLocating(Context context) {
         // Set repeating alarm
         Intent alarmIntent = new Intent(context, LocationService.class);
         alarmIntent.setAction(LocationService.ACTION_ALARM);
@@ -939,7 +951,7 @@ public class LocationService extends IntentService {
         Log.w(TAG, "Start repeating alarm frequency=" + interval + "s" + " due=" + ALARM_DUE_TIME + "ms");
     }
 
-    private static void stopRepeatingAlarm(Context context) {
+    private static void stopPeriodicLocating(Context context) {
         // Cancel repeating alarm
         Intent alarmIntent = new Intent(context, LocationService.class);
         alarmIntent.setAction(LocationService.ACTION_ALARM);

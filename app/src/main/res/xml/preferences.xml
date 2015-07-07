@@ -276,7 +276,7 @@
                 android:title="@string/title_recognition_unknown_steps" />
             <CheckBoxPreference
                 android:defaultValue="false"
-                android:dependency="pref_enabled"
+                android:dependency="pref_recognition_enabled"
                 android:key="pref_recognition_significant"
                 android:summary="@string/summary_recognition_significant"
                 android:title="@string/title_recognition_significant" />
