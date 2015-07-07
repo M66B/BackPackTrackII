@@ -541,7 +541,10 @@ public class LocationService extends IntentService {
             // Feedback
             updateState(this);
             if (debugMode(this))
-                toast(getString(R.string.title_trackpoint) + " " + Math.round(bchange) + "° / " + Math.round(achange) + "m", Toast.LENGTH_SHORT, this);
+                toast(getString(R.string.title_trackpoint) +
+                        " " + getProviderName(location, this) +
+                        " " + Math.round(bchange) +
+                        "° / " + Math.round(achange) + "m", Toast.LENGTH_SHORT, this);
         }
     }
 
@@ -1121,7 +1124,7 @@ public class LocationService extends IntentService {
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(locationType == LOCATION_TRACKPOINT ? VIBRATE_SHORT : VIBRATE_LONG);
             } else if (debugMode(this))
-                toast(getString(R.string.title_trackpoint) + " " + location.getProvider(), Toast.LENGTH_SHORT, this);
+                toast(getString(R.string.title_trackpoint) + " " + getProviderName(location, this), Toast.LENGTH_SHORT, this);
         } else
             Log.w(TAG, "Filtered location=" + location);
     }
@@ -1364,13 +1367,9 @@ public class LocationService extends IntentService {
     }
 
     private static String getProviderName(Location location, Context context) {
-        if (location != null) {
-            String provider = location.getProvider();
-            int resId = context.getResources().getIdentifier("provider_" + provider, "string", context.getPackageName());
-            if (resId != 0)
-                return context.getString(resId);
-        }
-        return "";
+        String provider = (location == null ? context.getString(R.string.undefined) : location.getProvider());
+        int resId = context.getResources().getIdentifier("provider_" + provider, "string", context.getPackageName());
+        return (resId == 0 ? provider : context.getString(resId));
     }
 
     private static void cancelNotification(Context context) {
