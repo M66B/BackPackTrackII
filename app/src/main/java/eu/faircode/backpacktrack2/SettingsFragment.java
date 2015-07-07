@@ -516,6 +516,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             findPreference(PREF_UPLOAD_GPX).setEnabled(blogurl != null);
         }
 
+        if (PREF_DEBUG.equals(key))
+            findPreference(PREF_RECOGNITION_SIGNIFICANT).setEnabled(prefs.getBoolean(PREF_DEBUG, false));
+
         // Update preference titles
         updateTitle(prefs, key);
 
