@@ -100,7 +100,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_PASSIVE_NEARBY = "pref_passive_nearby";
     public static final String PREF_PASSIVE_MINTIME = "pref_passive_mintime";
     public static final String PREF_PASSIVE_MINDIST = "pref_passive_mindist";
-    public static final String PREF_PASSIVE_DISPLACEMENT = "pref_passive_displacement";
 
     public static final String PREF_CORRECTION_ENABLED = "pref_correction_enabled";
     public static final String PREF_ALTITUDE_WAYPOINT = "pref_altitude_waypoint";
@@ -116,7 +115,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_RECOGNITION_UNKNOWN = "pref_recognition_filter_unknown";
     public static final String PREF_RECOGNITION_STEPS = "pref_recognition_steps";
     public static final String PREF_RECOGNITION_UNKNOWN_STEPS = "pref_recognition_unknown_steps";
-    public static final String PREF_RECOGNITION_SIGNIFICANT = "pref_recognition_significant";
 
     public static final String PREF_RECOGNITION_HISTORY = "pref_recognition_history";
 
@@ -156,7 +154,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_PASSIVE_NEARBY = "20"; // meters
     public static final String DEFAULT_PASSIVE_MINTIME = "1"; // seconds
     public static final String DEFAULT_PASSIVE_MINDIST = "0"; // meters
-    public static final boolean DEFAULT_PASSIVE_DISPLACEMENT = true;
 
     public static final boolean DEFAULT_CORRECTION_ENABLED = true;
     public static final boolean DEFAULT_ALTITUDE_WAYPOINT = true;
@@ -173,7 +170,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final boolean DEFAULT_RECOGNITION_STEPS = true;
     public static final boolean DEFAULT_RECOGNITION_UNKNOWN_STEPS = true;
     public static final boolean DEFAULT_RECOGNITION_HISTORY = false;
-    public static final boolean DEFAULT_RECOGNITION_SIGNIFICANT = false;
 
     public static final String DEFAULT_STEP_DELTA = "10"; // steps
     public static final String DEFAULT_STEP_SIZE = "75"; // centimeters
@@ -288,7 +284,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Preference pref_location_history = findPreference(PREF_LOCATION_HISTORY);
         Preference pref_activity_history = findPreference(PREF_ACTIVITY_HISTORY);
         Preference pref_recognize_steps = findPreference(PREF_RECOGNITION_STEPS);
-        Preference pref_significant = findPreference(PREF_RECOGNITION_SIGNIFICANT);
         Preference pref_step_history = findPreference(PREF_STEP_HISTORY);
         Preference pref_step_update = findPreference(PREF_STEP_DELTA);
         Preference pref_step_size = findPreference(PREF_STEP_SIZE);
@@ -436,9 +431,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         findPreference(PREF_RECOGNITION_INTERVAL_MOVING).setEnabled(playServices);
         findPreference(PREF_RECOGNITION_CONFIDENCE).setEnabled(playServices);
 
-        // Check for significant motion detector
-        pref_significant.setEnabled(LocationService.hasSignificantMotion(getActivity()));
-
         // Handle Play store link
         Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getActivity().getPackageName()));
         if (getActivity().getPackageManager().queryIntentActivities(playStoreIntent, 0).size() > 0)
@@ -532,8 +524,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 PREF_RECOGNITION_ENABLED.equals(key) ||
                 PREF_RECOGNITION_INTERVAL_STILL.equals(key) ||
                 PREF_RECOGNITION_INTERVAL_MOVING.equals(key) ||
-                PREF_RECOGNITION_STEPS.equals(key) ||
-                PREF_RECOGNITION_SIGNIFICANT.equals(key))
+                PREF_RECOGNITION_STEPS.equals(key))
             new Thread(new Runnable() {
                 @Override
                 public void run() {

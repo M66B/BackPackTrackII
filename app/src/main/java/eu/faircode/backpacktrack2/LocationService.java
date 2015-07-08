@@ -72,7 +72,6 @@ public class LocationService extends IntentService {
 
     // Actions
     public static final String ACTION_ALARM = "Alarm";
-    public static final String ACTION_GUARD = "Guard";
     public static final String ACTION_DAILY = "Daily";
     public static final String ACTION_ACTIVITY = "Activity";
     public static final String ACTION_LOCATION_FINE = "LocationFine";
@@ -85,7 +84,6 @@ public class LocationService extends IntentService {
     public static final String ACTION_TRACKPOINT = "TrackPoint";
     public static final String ACTION_WAYPOINT = "WayPoint";
     public static final String ACTION_GEOPOINT = "Geopoint";
-    public static final String ACTION_MOTION = "Motion";
     public static final String ACTION_SHARE_GPX = "ShareGPX";
     public static final String ACTION_SHARE_KML = "ShareKML";
     public static final String ACTION_UPLOAD_GPX = "UploadGPX";
@@ -182,9 +180,6 @@ public class LocationService extends IntentService {
             else if (ACTION_GEOPOINT.equals(intent.getAction()))
                 handleGeopoint(intent);
 
-            else if (ACTION_MOTION.equals(intent.getAction()))
-                handleMotion(intent);
-
             else if (ACTION_SHARE_GPX.equals(intent.getAction()))
                 handleShare(intent);
 
@@ -210,10 +205,7 @@ public class LocationService extends IntentService {
                 convertTime(intent);
                 handleGetAltitude(intent);
 
-            } else if (ACTION_GUARD.equals(intent.getAction()))
-                handleGuard(intent);
-
-            else if (ACTION_DAILY.equals(intent.getAction()))
+            } else if (ACTION_DAILY.equals(intent.getAction()))
                 handleDaily(intent);
 
             else
@@ -365,12 +357,6 @@ public class LocationService extends IntentService {
                 else
                     stopService(new Intent(this, StepCounterService.class));
         }
-
-        // Keep significant motion service alive
-        boolean recognition = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_ENABLED, SettingsFragment.DEFAULT_RECOGNITION_ENABLED);
-        boolean pref_significant = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_SIGNIFICANT, SettingsFragment.DEFAULT_RECOGNITION_SIGNIFICANT);
-        if (recognition && pref_significant)
-            startService(new Intent(this, SignificantMotionService.class));
     }
 
     private void handleLocationRequest(Intent intent) {
@@ -490,21 +476,6 @@ public class LocationService extends IntentService {
                         (location.hasAccuracy() ? location.getAccuracy() : Float.MAX_VALUE)) {
             Log.w(TAG, "Filtering nearby passive location=" + location);
             return;
-        }
-
-        // Movement detected
-        boolean recognition = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_ENABLED, SettingsFragment.DEFAULT_RECOGNITION_ENABLED);
-        boolean pref_displacement = prefs.getBoolean(SettingsFragment.PREF_PASSIVE_DISPLACEMENT, SettingsFragment.DEFAULT_PASSIVE_DISPLACEMENT);
-        if (recognition && pref_displacement) {
-            int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
-            if (lastActivity == DetectedActivity.STILL) {
-                if (prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_HISTORY, SettingsFragment.DEFAULT_RECOGNITION_HISTORY))
-                    new DatabaseHelper(this).insertActivityType(new Date().getTime(), -2, 100).close();
-
-                stopPeriodicLocating(this);
-                startPeriodicLocating(this);
-                startGuard(this);
-            }
         }
 
         float bchange = 0;
@@ -654,18 +625,6 @@ public class LocationService extends IntentService {
         }
     }
 
-    private void handleMotion(Intent intent) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_HISTORY, SettingsFragment.DEFAULT_RECOGNITION_HISTORY)) {
-            long time = intent.getLongExtra(EXTRA_TIME, new Date().getTime());
-            new DatabaseHelper(this).insertActivityType(time, -1, 100).close();
-        }
-
-        stopPeriodicLocating(this);
-        startPeriodicLocating(this);
-        startGuard(this);
-    }
-
     private void handleShare(Intent intent) {
         try {
             // Write file
@@ -785,18 +744,6 @@ public class LocationService extends IntentService {
         getAltitude(from, to, this);
     }
 
-    private void handleGuard(Intent intent) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean recognition = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_ENABLED, SettingsFragment.DEFAULT_RECOGNITION_ENABLED);
-        if (recognition) {
-            int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
-            if (lastActivity == DetectedActivity.STILL) {
-                stopPeriodicLocating(this);
-                stopLocating(this);
-            }
-        }
-    }
-
     private void handleDaily(Intent intent) {
         // Reset step counter
         long time = new Date().getTime() / (5 * 60 * 1000) * (5 * 60 * 1000);
@@ -858,11 +805,6 @@ public class LocationService extends IntentService {
             lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, minTime * 1000, minDist, pi);
             Log.w(TAG, "Requested passive location updates");
         }
-
-        // Start significant motion detector
-        boolean pref_significant = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_SIGNIFICANT, SettingsFragment.DEFAULT_RECOGNITION_SIGNIFICANT);
-        if (recognition && pref_significant)
-            context.startService(new Intent(context, SignificantMotionService.class));
     }
 
     public static void stopTracking(final Context context) {
@@ -884,9 +826,6 @@ public class LocationService extends IntentService {
 
         // Stop step counter
         context.stopService(new Intent(context, StepCounterService.class));
-
-        // Stop significant motion detector
-        context.stopService(new Intent(context, SignificantMotionService.class));
     }
 
     private static void startActivityRecognition(final Context context) {
@@ -926,17 +865,6 @@ public class LocationService extends IntentService {
                 Log.w(TAG, "Canceled activity updates");
             }
         }
-    }
-
-    private static void startGuard(Context context) {
-        Intent guardIntent = new Intent(context, LocationService.class);
-        guardIntent.setAction(LocationService.ACTION_GUARD);
-        PendingIntent pi = PendingIntent.getService(context, 0, guardIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_RECOGNITION_INTERVAL_STILL, SettingsFragment.DEFAULT_RECOGNITION_INTERVAL_STILL));
-        am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + interval * 1000, pi);
-        Log.w(TAG, "Started guard interval=" + interval + "s");
     }
 
     private static void startPeriodicLocating(Context context) {

@@ -171,12 +171,6 @@
                 android:inputType="number"
                 android:key="pref_passive_mindist"
                 android:summary="@string/summary_mindist" />
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:dependency="pref_passive_enabled"
-                android:key="pref_passive_displacement"
-                android:summary="@string/summary_passive_displacement"
-                android:title="@string/title_passive_displacement" />
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_altitude_settings">
             <CheckBoxPreference
@@ -274,12 +268,6 @@
                 android:key="pref_recognition_unknown_steps"
                 android:summary="@string/summary_recognition_unknown_steps"
                 android:title="@string/title_recognition_unknown_steps" />
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:dependency="pref_recognition_enabled"
-                android:key="pref_recognition_significant"
-                android:summary="@string/summary_recognition_significant"
-                android:title="@string/title_recognition_significant" />
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_step_counter">
             <EditTextPreference
