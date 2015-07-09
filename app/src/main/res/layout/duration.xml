@@ -6,7 +6,7 @@
 
     <TextView
         android:id="@+id/tvTime"
-        android:layout_width="60dp"
+        android:layout_width="66dp"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
