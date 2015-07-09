@@ -1090,6 +1090,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View viewHistory = inflater.inflate(R.layout.activity_history, null);
 
+        // Show activity graph
+        final GraphView graphView = (GraphView) viewHistory.findViewById(R.id.gvActivity);
+        showActivityGraph(graphView);
+
         // Handle view list
         ImageView ivList = (ImageView) viewHistory.findViewById(R.id.ivList);
         if (LocationService.debugMode(getActivity()))
@@ -1138,6 +1142,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     public void run() {
                         Cursor cursor = db.getActivityDurations(0, Long.MAX_VALUE, false);
                         adapter.changeCursor(cursor);
+                        showActivityGraph(graphView);
                     }
                 });
             }
@@ -1164,6 +1169,82 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
         alertDialog.show();
+    }
+
+    private void showActivityGraph(GraphView graph) {
+        boolean data = false;
+        long max = 0;
+
+        Cursor cursor = db.getActivityDurations(0, Long.MAX_VALUE, true);
+
+        int colTime = cursor.getColumnIndex("time");
+        int colWalking = cursor.getColumnIndex("walking");
+        int colRunning = cursor.getColumnIndex("running");
+        int colOnbicycle = cursor.getColumnIndex("onbicycle");
+        int colInvehicle = cursor.getColumnIndex("invehicle");
+        int colUnknown = cursor.getColumnIndex("unknown");
+
+        LineGraphSeries<DataPoint> seriesWalking = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesRunning = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesOnbicyle = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesInvehicle = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesUnknown = new LineGraphSeries<DataPoint>();
+
+        while (cursor.moveToNext()) {
+            data = true;
+
+            long time = cursor.getLong(colTime);
+            int walking = Math.round(cursor.getLong(colWalking) / 60000f);
+            int running = Math.round(cursor.getLong(colRunning) / 60000f);
+            int onbicycle = Math.round(cursor.getLong(colOnbicycle) / 60000f);
+            int invehicle = Math.round(cursor.getLong(colInvehicle) / 60000f);
+            int unknown = Math.round(cursor.getLong(colUnknown) / 60000f);
+
+            if (walking > max)
+                max = walking;
+            if (running > max)
+                max = running;
+            if (onbicycle > max)
+                max = onbicycle;
+            if (invehicle > max)
+                max = invehicle;
+            if (unknown > max)
+                max = unknown;
+
+            seriesWalking.appendData(new DataPoint(new Date(time), walking), true, Integer.MAX_VALUE);
+            seriesRunning.appendData(new DataPoint(new Date(time), running), true, Integer.MAX_VALUE);
+            seriesOnbicyle.appendData(new DataPoint(new Date(time), onbicycle), true, Integer.MAX_VALUE);
+            seriesInvehicle.appendData(new DataPoint(new Date(time), invehicle), true, Integer.MAX_VALUE);
+            seriesUnknown.appendData(new DataPoint(new Date(time), unknown), true, Integer.MAX_VALUE);
+        }
+
+        if (data) {
+            graph.getViewport().setXAxisBoundsManual(true);
+            graph.getViewport().setMinX(new Date().getTime() - DAYS_HISTORY * DAY_MS);
+            graph.getViewport().setMaxX(new Date().getTime());
+
+            graph.getViewport().setYAxisBoundsManual(true);
+            graph.getViewport().setMinY(0);
+            graph.getViewport().setMaxY(max);
+
+            seriesWalking.setColor(Color.BLUE);
+            seriesRunning.setColor(Color.WHITE);
+            seriesOnbicyle.setColor(Color.GREEN);
+            seriesInvehicle.setColor(Color.RED);
+            seriesUnknown.setColor(Color.GRAY);
+
+            graph.removeAllSeries();
+            graph.addSeries(seriesWalking);
+            graph.addSeries(seriesRunning);
+            graph.addSeries(seriesOnbicyle);
+            graph.addSeries(seriesInvehicle);
+            graph.addSeries(seriesUnknown);
+
+            graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity(), SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)));
+            graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+            graph.getViewport().setScrollable(true);
+        } else
+            graph.setVisibility(View.GONE);
     }
 
     private void activity_list() {
