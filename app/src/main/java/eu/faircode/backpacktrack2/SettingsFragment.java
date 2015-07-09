@@ -1016,9 +1016,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         boolean data = false;
         double minAlt = 10000;
         double maxAlt = 0;
-        long minTime = new Date().getTime();
-        long maxTime = 0;
-        long from = new Date().getTime() - DAYS_HISTORY * DAY_MS;
         double avg = 0;
         int n = 0;
 
@@ -1040,10 +1037,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     data = true;
 
                     long time = cursor.getLong(colTime);
-                    if (time > from && time < minTime)
-                        minTime = time;
-                    if (time > maxTime)
-                        maxTime = time;
 
                     double alt = cursor.getDouble(colAltitude);
                     if (alt < minAlt)
@@ -1062,8 +1055,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         if (data) {
             graph.getViewport().setXAxisBoundsManual(true);
-            graph.getViewport().setMinX(minTime);
-            graph.getViewport().setMaxX(maxTime);
+            graph.getViewport().setMinX(new Date().getTime() - DAYS_HISTORY * DAY_MS);
+            graph.getViewport().setMaxX(new Date().getTime());
 
             graph.getViewport().setYAxisBoundsManual(true);
             graph.getViewport().setMinY(minAlt);
@@ -1077,10 +1070,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.addSeries(seriesAltitudeReal);
             graph.addSeries(seriesAltitudeAvg);
 
-            graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity(), SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
-            graph.getGridLabelRenderer().setNumHorizontalLabels(2);
+            graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity(), SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)));
+            graph.getGridLabelRenderer().setNumHorizontalLabels(3);
             graph.getViewport().setScrollable(true);
-            graph.getViewport().setScalable(true);
         } else
             graph.setVisibility(View.GONE);
     }
