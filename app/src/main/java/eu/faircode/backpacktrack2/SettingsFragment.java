@@ -17,6 +17,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -51,6 +52,8 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LabelFormatter;
+import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
@@ -1098,6 +1101,19 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else
             ivList.setVisibility(View.INVISIBLE);
 
+
+        ImageView ivWalking = (ImageView) viewHistory.findViewById(R.id.ivWalking);
+        ImageView ivRunning = (ImageView) viewHistory.findViewById(R.id.ivRunning);
+        ImageView ivOnbicyle = (ImageView) viewHistory.findViewById(R.id.ivOnbicyle);
+        ImageView ivInvehicle = (ImageView) viewHistory.findViewById(R.id.ivInvehicle);
+        ImageView ivUnknown = (ImageView) viewHistory.findViewById(R.id.ivUnknown);
+
+        ivWalking.setColorFilter(Color.CYAN, PorterDuff.Mode.SRC_ATOP);
+        ivRunning.setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
+        ivOnbicyle.setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_ATOP);
+        ivInvehicle.setColorFilter(Color.MAGENTA, PorterDuff.Mode.SRC_ATOP);
+        ivUnknown.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
+
         // Fill list
         final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityDuration);
         Cursor cursor = db.getActivityDurations(0, Long.MAX_VALUE, false);
@@ -1181,6 +1197,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         LineGraphSeries<DataPoint> seriesOnbicyle = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesInvehicle = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesUnknown = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesTotal = new LineGraphSeries<DataPoint>();
 
         while (cursor.moveToNext()) {
             data = true;
@@ -1191,23 +1208,17 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             int onbicycle = Math.round(cursor.getLong(colOnbicycle) / 60000f);
             int invehicle = Math.round(cursor.getLong(colInvehicle) / 60000f);
             int unknown = Math.round(cursor.getLong(colUnknown) / 60000f);
+            int total = walking + running + onbicycle + invehicle + unknown;
 
-            if (walking > max)
-                max = walking;
-            if (running > max)
-                max = running;
-            if (onbicycle > max)
-                max = onbicycle;
-            if (invehicle > max)
-                max = invehicle;
-            if (unknown > max)
-                max = unknown;
+            if (total > max)
+                max = total;
 
             seriesWalking.appendData(new DataPoint(new Date(time), walking), true, Integer.MAX_VALUE);
             seriesRunning.appendData(new DataPoint(new Date(time), running), true, Integer.MAX_VALUE);
             seriesOnbicyle.appendData(new DataPoint(new Date(time), onbicycle), true, Integer.MAX_VALUE);
             seriesInvehicle.appendData(new DataPoint(new Date(time), invehicle), true, Integer.MAX_VALUE);
             seriesUnknown.appendData(new DataPoint(new Date(time), unknown), true, Integer.MAX_VALUE);
+            seriesTotal.appendData(new DataPoint(new Date(time), total), true, Integer.MAX_VALUE);
         }
 
         if (data) {
@@ -1219,11 +1230,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.getViewport().setMinY(0);
             graph.getViewport().setMaxY(max);
 
-            seriesWalking.setColor(Color.BLUE);
-            seriesRunning.setColor(Color.WHITE);
-            seriesOnbicyle.setColor(Color.GREEN);
-            seriesInvehicle.setColor(Color.RED);
+            seriesWalking.setColor(Color.CYAN);
+            seriesRunning.setColor(Color.GREEN);
+            seriesOnbicyle.setColor(Color.YELLOW);
+            seriesInvehicle.setColor(Color.MAGENTA);
             seriesUnknown.setColor(Color.GRAY);
+            seriesTotal.setColor(Color.BLUE);
 
             graph.removeAllSeries();
             graph.addSeries(seriesWalking);
@@ -1231,8 +1243,20 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.addSeries(seriesOnbicyle);
             graph.addSeries(seriesInvehicle);
             graph.addSeries(seriesUnknown);
+            graph.addSeries(seriesTotal);
 
-            graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity(), SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)));
+            graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity(), SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)) {
+                @Override
+                public String formatLabel(double value, boolean isValueX) {
+                    if (isValueX)
+                        return super.formatLabel(value, isValueX);
+                    else {
+                        int minutes = (int) value % 60;
+                        int hours = (int) value / 60;
+                        return hours + ":" + (minutes < 10 ? "0" : "") + minutes;
+                    }
+                }
+            });
             graph.getGridLabelRenderer().setNumHorizontalLabels(3);
             graph.getViewport().setScrollable(true);
         } else

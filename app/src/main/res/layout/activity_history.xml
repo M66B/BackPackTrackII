@@ -24,36 +24,42 @@
             android:src="@drawable/toc" />
 
         <ImageView
+            android:id="@+id/ivStill"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginLeft="12dp"
             android:src="@drawable/pause" />
 
         <ImageView
+            android:id="@+id/ivWalking"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginLeft="12dp"
             android:src="@drawable/walk" />
 
         <ImageView
+            android:id="@+id/ivRunning"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginLeft="12dp"
             android:src="@drawable/run" />
 
         <ImageView
+            android:id="@+id/ivOnbicyle"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginLeft="12dp"
             android:src="@drawable/bike" />
 
         <ImageView
+            android:id="@+id/ivInvehicle"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginLeft="12dp"
             android:src="@drawable/car" />
 
         <ImageView
+            android:id="@+id/ivUnknown"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_marginLeft="12dp"
