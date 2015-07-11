@@ -321,7 +321,7 @@ public class LocationService extends IntentService {
                 new DatabaseHelper(this).updateActivity(lastTime, lastActivity, time - lastTime).close();
 
             // Feedback
-            updateState(this);
+            updateState(this, "new activity");
 
             // Get parameters
             int act = activity.getType();
@@ -387,6 +387,12 @@ public class LocationService extends IntentService {
         if (location == null || (location.getLatitude() == 0.0 && location.getLongitude() == 0.0))
             return;
 
+        // Check if still acquiring location
+        if (prefs.getInt(SettingsFragment.PREF_STATE, STATE_IDLE) == STATE_IDLE) {
+            Log.w(TAG, "Not acquiring anymore");
+            return;
+        }
+
         // Filter inaccurate location
         int pref_inaccurate = Integer.parseInt(prefs.getString(SettingsFragment.PREF_INACCURATE, SettingsFragment.DEFAULT_INACCURATE));
         if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
@@ -410,7 +416,7 @@ public class LocationService extends IntentService {
             Log.w(TAG, "Better location=" + location);
             prefs.edit().putInt(SettingsFragment.PREF_STATE, STATE_ACQUIRED).apply();
             prefs.edit().putString(SettingsFragment.PREF_BEST_LOCATION, LocationSerializer.serialize(location)).apply();
-            updateState(this);
+            updateState(this, "better location");
         }
 
         // Check altitude
@@ -520,7 +526,7 @@ public class LocationService extends IntentService {
             }
 
             // Feedback
-            updateState(this);
+            updateState(this, "passive location");
             if (debugMode(this))
                 toast(getString(R.string.title_trackpoint) +
                         " " + getProviderName(location, this) +
@@ -555,7 +561,7 @@ public class LocationService extends IntentService {
     }
 
     private void handleStateChanged(Intent intent) {
-        updateState(this);
+        updateState(this, "state changed");
     }
 
     private void handleLocationTimeout(Intent intent) {
@@ -760,7 +766,7 @@ public class LocationService extends IntentService {
         }
 
         // Feedback
-        updateState(this);
+        updateState(this, "daily alarm");
         StepCountWidget.updateWidgets(this);
 
         // Optimize database
@@ -779,7 +785,7 @@ public class LocationService extends IntentService {
             return;
         }
 
-        updateState(context);
+        updateState(context, "start tracking");
 
         // Start activity recognition / repeating alarm
         boolean recognition = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_ENABLED, SettingsFragment.DEFAULT_RECOGNITION_ENABLED);
@@ -948,7 +954,7 @@ public class LocationService extends IntentService {
             }
 
             prefs.edit().putInt(SettingsFragment.PREF_STATE, STATE_ACQUIRING).apply();
-            updateState(context);
+            updateState(context, "start locating");
         } else
             Log.w(TAG, "No location providers");
 
@@ -1008,7 +1014,7 @@ public class LocationService extends IntentService {
         prefs.edit().putInt(SettingsFragment.PREF_STATE, STATE_IDLE).apply();
         prefs.edit().remove(SettingsFragment.PREF_LOCATION_TYPE).apply();
         prefs.edit().remove(SettingsFragment.PREF_BEST_LOCATION).apply();
-        updateState(context);
+        updateState(context, "stop locating");
     }
 
     // Helper methods
@@ -1081,7 +1087,7 @@ public class LocationService extends IntentService {
             }
 
             // Feedback
-            updateState(this);
+            updateState(this, "handle location");
             if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT) {
                 if (locationType == LOCATION_WAYPOINT)
                     toast(waypointName, Toast.LENGTH_LONG, this);
@@ -1161,7 +1167,7 @@ public class LocationService extends IntentService {
         return listline;
     }
 
-    private static void updateState(Context context) {
+    private static void updateState(Context context, String reason) {
         // Get state
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int state = prefs.getInt(SettingsFragment.PREF_STATE, STATE_IDLE);
@@ -1207,6 +1213,9 @@ public class LocationService extends IntentService {
                     SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(new Date(bestLocation.getTime())),
                     getProviderName(bestLocation, context));
         }
+
+        //if (debugMode(context))
+        //    text += " " + reason;
 
         // Build main intent
         Intent riSettings = new Intent(context, SettingsActivity.class);
