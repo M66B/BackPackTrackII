@@ -134,6 +134,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_SUPPORT = "pref_support";
     public static final String PREF_DEBUG = "pref_debug";
 
+    public static final String PREF_GRAPH_STILL = "pref_graph_still";
+    public static final String PREF_GRAPH_WALKING = "pref_graph_walking";
+    public static final String PREF_GRAPH_RUNNING = "pref_graph_running";
+    public static final String PREF_GRAPH_ONBICYCLE = "pref_graph_onbicycle";
+    public static final String PREF_GRAPH_INVEHICLE = "pref_graph_invehicle";
+    public static final String PREF_GRAPH_UNKNOWN = "pref_graph_unknown";
+    public static final String PREF_GRAPH_TOTAL = "pref_graph_total";
+
     // Preference defaults
     public static final boolean DEFAULT_ENABLED = true;
     public static final boolean DEFAULT_USE_NETWORK = true;
@@ -177,6 +185,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_STEP_DELTA = "10"; // steps
     public static final String DEFAULT_STEP_SIZE = "75"; // centimeters
     public static final String DEFAULT_WEIGHT = "75"; // kilograms
+
+    public static final boolean DEFAULT_GRAPH_STILL = false;
+    public static final boolean DEFAULT_GRAPH_WALKING = true;
+    public static final boolean DEFAULT_GRAPH_RUNNING = true;
+    public static final boolean DEFAULT_GRAPH_ONBICYCLE = true;
+    public static final boolean DEFAULT_GRAPH_INVEHICLE = true;
+    public static final boolean DEFAULT_GRAPH_UNKNOWN = true;
+    public static final boolean DEFAULT_GRAPH_TOTAL = true;
 
     // Transient values
     public static final String PREF_FIRST = "pref_first";
@@ -1081,6 +1097,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     private void activity_history() {
+        final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+
         // Get layout
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View viewHistory = inflater.inflate(R.layout.activity_history, null);
@@ -1101,7 +1119,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else
             ivList.setVisibility(View.INVISIBLE);
 
-
+        ImageView ivStill = (ImageView) viewHistory.findViewById(R.id.ivStill);
         ImageView ivWalking = (ImageView) viewHistory.findViewById(R.id.ivWalking);
         ImageView ivRunning = (ImageView) viewHistory.findViewById(R.id.ivRunning);
         ImageView ivOnbicyle = (ImageView) viewHistory.findViewById(R.id.ivOnbicyle);
@@ -1113,6 +1131,54 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         ivOnbicyle.setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_ATOP);
         ivInvehicle.setColorFilter(Color.MAGENTA, PorterDuff.Mode.SRC_ATOP);
         ivUnknown.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
+
+        ivStill.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putBoolean(PREF_GRAPH_STILL, !prefs.getBoolean(PREF_GRAPH_STILL, DEFAULT_GRAPH_STILL)).apply();
+                showActivityGraph(graphView);
+            }
+        });
+
+        ivWalking.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putBoolean(PREF_GRAPH_WALKING, !prefs.getBoolean(PREF_GRAPH_WALKING, DEFAULT_GRAPH_WALKING)).apply();
+                showActivityGraph(graphView);
+            }
+        });
+
+        ivRunning.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putBoolean(PREF_GRAPH_RUNNING, !prefs.getBoolean(PREF_GRAPH_RUNNING, DEFAULT_GRAPH_RUNNING)).apply();
+                showActivityGraph(graphView);
+            }
+        });
+
+        ivOnbicyle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putBoolean(PREF_GRAPH_ONBICYCLE, !prefs.getBoolean(PREF_GRAPH_ONBICYCLE, DEFAULT_GRAPH_ONBICYCLE)).apply();
+                showActivityGraph(graphView);
+            }
+        });
+
+        ivInvehicle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putBoolean(PREF_GRAPH_INVEHICLE, !prefs.getBoolean(PREF_GRAPH_INVEHICLE, DEFAULT_GRAPH_INVEHICLE)).apply();
+                showActivityGraph(graphView);
+            }
+        });
+
+        ivUnknown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putBoolean(PREF_GRAPH_UNKNOWN, !prefs.getBoolean(PREF_GRAPH_UNKNOWN, DEFAULT_GRAPH_UNKNOWN)).apply();
+                showActivityGraph(graphView);
+            }
+        });
 
         // Fill list
         final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityDuration);
@@ -1180,18 +1246,43 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     private void showActivityGraph(GraphView graph) {
-        boolean data = false;
         long max = 0;
+        boolean data = false;
+        SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+
+        boolean showStill = prefs.getBoolean(PREF_GRAPH_STILL, DEFAULT_GRAPH_STILL);
+        boolean showWalking = prefs.getBoolean(PREF_GRAPH_WALKING, DEFAULT_GRAPH_WALKING);
+        boolean showRunning = prefs.getBoolean(PREF_GRAPH_RUNNING, DEFAULT_GRAPH_RUNNING);
+        boolean showOnbicycle = prefs.getBoolean(PREF_GRAPH_ONBICYCLE, DEFAULT_GRAPH_ONBICYCLE);
+        boolean showInvehicle = prefs.getBoolean(PREF_GRAPH_INVEHICLE, DEFAULT_GRAPH_INVEHICLE);
+        boolean showUnknown = prefs.getBoolean(PREF_GRAPH_UNKNOWN, DEFAULT_GRAPH_UNKNOWN);
+        boolean showTotal = prefs.getBoolean(PREF_GRAPH_TOTAL, DEFAULT_GRAPH_TOTAL);
+
+        int graphs = 0;
+        if (showStill)
+            graphs++;
+        if (showWalking)
+            graphs++;
+        if (showRunning)
+            graphs++;
+        if (showOnbicycle)
+            graphs++;
+        if (showInvehicle)
+            graphs++;
+        if (showUnknown)
+            graphs++;
 
         Cursor cursor = db.getActivityDurations(0, Long.MAX_VALUE, true);
 
         int colTime = cursor.getColumnIndex("time");
+        int colStill = cursor.getColumnIndex("still");
         int colWalking = cursor.getColumnIndex("walking");
         int colRunning = cursor.getColumnIndex("running");
         int colOnbicycle = cursor.getColumnIndex("onbicycle");
         int colInvehicle = cursor.getColumnIndex("invehicle");
         int colUnknown = cursor.getColumnIndex("unknown");
 
+        LineGraphSeries<DataPoint> seriesStill = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesWalking = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesRunning = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesOnbicyle = new LineGraphSeries<DataPoint>();
@@ -1203,22 +1294,44 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             data = true;
 
             long time = cursor.getLong(colTime);
+            int still = Math.round(cursor.getLong(colStill) / 60000f);
             int walking = Math.round(cursor.getLong(colWalking) / 60000f);
             int running = Math.round(cursor.getLong(colRunning) / 60000f);
             int onbicycle = Math.round(cursor.getLong(colOnbicycle) / 60000f);
             int invehicle = Math.round(cursor.getLong(colInvehicle) / 60000f);
             int unknown = Math.round(cursor.getLong(colUnknown) / 60000f);
-            int total = walking + running + onbicycle + invehicle + unknown;
+
+            int total = 0;
+            if (showStill)
+                total += still;
+            if (showWalking)
+                total += walking;
+            if (showRunning)
+                total += running;
+            if (showOnbicycle)
+                total += onbicycle;
+            if (showInvehicle)
+                total += invehicle;
+            if (showUnknown)
+                total += unknown;
 
             if (total > max)
                 max = total;
 
-            seriesWalking.appendData(new DataPoint(new Date(time), walking), true, Integer.MAX_VALUE);
-            seriesRunning.appendData(new DataPoint(new Date(time), running), true, Integer.MAX_VALUE);
-            seriesOnbicyle.appendData(new DataPoint(new Date(time), onbicycle), true, Integer.MAX_VALUE);
-            seriesInvehicle.appendData(new DataPoint(new Date(time), invehicle), true, Integer.MAX_VALUE);
-            seriesUnknown.appendData(new DataPoint(new Date(time), unknown), true, Integer.MAX_VALUE);
-            seriesTotal.appendData(new DataPoint(new Date(time), total), true, Integer.MAX_VALUE);
+            if (showStill)
+                seriesStill.appendData(new DataPoint(new Date(time), still), true, Integer.MAX_VALUE);
+            if (showWalking)
+                seriesWalking.appendData(new DataPoint(new Date(time), walking), true, Integer.MAX_VALUE);
+            if (showRunning)
+                seriesRunning.appendData(new DataPoint(new Date(time), running), true, Integer.MAX_VALUE);
+            if (showOnbicycle)
+                seriesOnbicyle.appendData(new DataPoint(new Date(time), onbicycle), true, Integer.MAX_VALUE);
+            if (showInvehicle)
+                seriesInvehicle.appendData(new DataPoint(new Date(time), invehicle), true, Integer.MAX_VALUE);
+            if (showUnknown)
+                seriesUnknown.appendData(new DataPoint(new Date(time), unknown), true, Integer.MAX_VALUE);
+            if (showTotal && graphs > 1)
+                seriesTotal.appendData(new DataPoint(new Date(time), total), true, Integer.MAX_VALUE);
         }
 
         if (data) {
@@ -1230,6 +1343,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.getViewport().setMinY(0);
             graph.getViewport().setMaxY(max);
 
+            seriesStill.setColor(Color.WHITE);
             seriesWalking.setColor(Color.CYAN);
             seriesRunning.setColor(Color.GREEN);
             seriesOnbicyle.setColor(Color.YELLOW);
@@ -1238,12 +1352,21 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             seriesTotal.setColor(Color.BLUE);
 
             graph.removeAllSeries();
-            graph.addSeries(seriesWalking);
-            graph.addSeries(seriesRunning);
-            graph.addSeries(seriesOnbicyle);
-            graph.addSeries(seriesInvehicle);
-            graph.addSeries(seriesUnknown);
-            graph.addSeries(seriesTotal);
+
+            if (showStill)
+                graph.addSeries(seriesStill);
+            if (showWalking)
+                graph.addSeries(seriesWalking);
+            if (showRunning)
+                graph.addSeries(seriesRunning);
+            if (showOnbicycle)
+                graph.addSeries(seriesOnbicyle);
+            if (showInvehicle)
+                graph.addSeries(seriesInvehicle);
+            if (showUnknown)
+                graph.addSeries(seriesUnknown);
+            if (showTotal && graphs > 1)
+                graph.addSeries(seriesTotal);
 
             graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity(), SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)) {
                 @Override
