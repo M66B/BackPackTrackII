@@ -1126,28 +1126,21 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else
             ivList.setVisibility(View.INVISIBLE);
 
-        ImageView ivTotal = (ImageView) viewHistory.findViewById(R.id.ivTotal);
         ImageView ivStill = (ImageView) viewHistory.findViewById(R.id.ivStill);
         ImageView ivWalking = (ImageView) viewHistory.findViewById(R.id.ivWalking);
         ImageView ivRunning = (ImageView) viewHistory.findViewById(R.id.ivRunning);
         ImageView ivOnbicyle = (ImageView) viewHistory.findViewById(R.id.ivOnbicyle);
         ImageView ivInvehicle = (ImageView) viewHistory.findViewById(R.id.ivInvehicle);
         ImageView ivUnknown = (ImageView) viewHistory.findViewById(R.id.ivUnknown);
+        ImageView ivTotal = (ImageView) viewHistory.findViewById(R.id.ivTotal);
 
-        ivTotal.setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_ATOP);
+        ivStill.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         ivWalking.setColorFilter(Color.CYAN, PorterDuff.Mode.SRC_ATOP);
         ivRunning.setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
         ivOnbicyle.setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_ATOP);
         ivInvehicle.setColorFilter(Color.MAGENTA, PorterDuff.Mode.SRC_ATOP);
         ivUnknown.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
-
-        ivTotal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                prefs.edit().putBoolean(PREF_GRAPH_TOTAL, !prefs.getBoolean(PREF_GRAPH_TOTAL, DEFAULT_GRAPH_TOTAL)).apply();
-                showActivityGraph(graphView);
-            }
-        });
+        ivTotal.setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_ATOP);
 
         ivStill.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1193,6 +1186,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             @Override
             public void onClick(View view) {
                 prefs.edit().putBoolean(PREF_GRAPH_UNKNOWN, !prefs.getBoolean(PREF_GRAPH_UNKNOWN, DEFAULT_GRAPH_UNKNOWN)).apply();
+                showActivityGraph(graphView);
+            }
+        });
+
+        ivTotal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putBoolean(PREF_GRAPH_TOTAL, !prefs.getBoolean(PREF_GRAPH_TOTAL, DEFAULT_GRAPH_TOTAL)).apply();
                 showActivityGraph(graphView);
             }
         });
