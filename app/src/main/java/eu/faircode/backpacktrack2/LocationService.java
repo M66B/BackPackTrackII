@@ -1245,6 +1245,7 @@ public class LocationService extends IntentService {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             notificationBuilder.setColor(context.getResources().getColor(R.color.color_teal_600));
+
         notificationBuilder.setContentTitle(title);
         notificationBuilder.setContentText(text);
         notificationBuilder.setContentIntent(piSettings);
@@ -1252,6 +1253,7 @@ public class LocationService extends IntentService {
         notificationBuilder.setWhen(lastLocation == null ? System.currentTimeMillis() : lastLocation.getTime());
         notificationBuilder.setAutoCancel(false);
         notificationBuilder.setOngoing(true);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             notificationBuilder.setCategory(Notification.CATEGORY_SERVICE);
             notificationBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
@@ -1273,6 +1275,7 @@ public class LocationService extends IntentService {
                     piTrackpoint);
             notificationBuilder.addAction(android.R.drawable.ic_menu_myplaces, context.getString(R.string.title_waypoint),
                     piWaypoint);
+
         } else {
             // Indeterminate progress
             int fixed = prefs.getInt(SettingsFragment.PREF_SATS_FIXED, 0);

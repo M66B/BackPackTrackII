@@ -52,8 +52,6 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.LabelFormatter;
-import com.jjoe64.graphview.Viewport;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
@@ -219,7 +217,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     private static final int GEOCODER_RESULTS = 5;
     private static final long DAY_MS = 24L * 3600L * 1000L;
-    private static final int DAYS_HISTORY = 7;
+    private static final int DAYS_VIEWPORT = 7;
 
     private DatabaseHelper db = null;
     private boolean elevationBusy = false;
@@ -270,9 +268,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onResume() {
         super.onResume();
+
+        // Listen for preference changes
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
+        // Listen for connectivity changes
         getActivity().registerReceiver(mConnectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
+        // Listen for storage changes
         IntentFilter storageFilter = new IntentFilter();
         storageFilter.addAction(Intent.ACTION_MEDIA_MOUNTED);
         storageFilter.addAction(Intent.ACTION_MEDIA_REMOVED);
@@ -483,8 +486,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onPause() {
         super.onPause();
-        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 
+        // Stop listening for changes
+        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
         getActivity().unregisterReceiver(mConnectivityChangeReceiver);
         getActivity().unregisterReceiver(mExternalStorageReceiver);
     }
@@ -560,13 +564,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static void firstRun(Context context) {
         Log.w(TAG, "First run");
 
+        // Initialize step counting
         long time = new Date().getTime();
         new DatabaseHelper(context).updateSteps(time, 0).close();
         StepCountWidget.updateWidgets(context);
 
+        // Initialize tracking
         LocationService.stopTracking(context);
         LocationService.startTracking(context);
 
+        // Initialize daily alarm
         Intent alarmIntent = new Intent(context, LocationService.class);
         alarmIntent.setAction(LocationService.ACTION_DAILY);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -1074,7 +1081,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         if (data) {
             graph.getViewport().setXAxisBoundsManual(true);
-            graph.getViewport().setMinX(new Date().getTime() - DAYS_HISTORY * DAY_MS);
+            graph.getViewport().setMinX(new Date().getTime() - DAYS_VIEWPORT * DAY_MS);
             graph.getViewport().setMaxX(new Date().getTime());
 
             graph.getViewport().setYAxisBoundsManual(true);
@@ -1119,6 +1126,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else
             ivList.setVisibility(View.INVISIBLE);
 
+        ImageView ivTotal = (ImageView) viewHistory.findViewById(R.id.ivTotal);
         ImageView ivStill = (ImageView) viewHistory.findViewById(R.id.ivStill);
         ImageView ivWalking = (ImageView) viewHistory.findViewById(R.id.ivWalking);
         ImageView ivRunning = (ImageView) viewHistory.findViewById(R.id.ivRunning);
@@ -1126,11 +1134,20 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         ImageView ivInvehicle = (ImageView) viewHistory.findViewById(R.id.ivInvehicle);
         ImageView ivUnknown = (ImageView) viewHistory.findViewById(R.id.ivUnknown);
 
+        ivTotal.setColorFilter(Color.BLUE, PorterDuff.Mode.SRC_ATOP);
         ivWalking.setColorFilter(Color.CYAN, PorterDuff.Mode.SRC_ATOP);
         ivRunning.setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
         ivOnbicyle.setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_ATOP);
         ivInvehicle.setColorFilter(Color.MAGENTA, PorterDuff.Mode.SRC_ATOP);
         ivUnknown.setColorFilter(Color.GRAY, PorterDuff.Mode.SRC_ATOP);
+
+        ivTotal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putBoolean(PREF_GRAPH_TOTAL, !prefs.getBoolean(PREF_GRAPH_TOTAL, DEFAULT_GRAPH_TOTAL)).apply();
+                showActivityGraph(graphView);
+            }
+        });
 
         ivStill.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -1336,7 +1353,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         if (data) {
             graph.getViewport().setXAxisBoundsManual(true);
-            graph.getViewport().setMinX(new Date().getTime() - DAYS_HISTORY * DAY_MS);
+            graph.getViewport().setMinX(new Date().getTime() - DAYS_VIEWPORT * DAY_MS);
             graph.getViewport().setMaxX(new Date().getTime());
 
             graph.getViewport().setYAxisBoundsManual(true);
@@ -1639,7 +1656,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         if (data) {
             graph.getViewport().setXAxisBoundsManual(true);
-            graph.getViewport().setMinX(new Date().getTime() - DAYS_HISTORY * DAY_MS);
+            graph.getViewport().setMinX(new Date().getTime() - DAYS_VIEWPORT * DAY_MS);
             graph.getViewport().setMaxX(new Date().getTime());
 
             graph.getViewport().setYAxisBoundsManual(true);

@@ -17,12 +17,24 @@
         android:layout_marginTop="6dp"
         android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/ivList"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginRight="42dp"
-            android:src="@drawable/toc" />
+        <RelativeLayout
+            android:layout_width="66dp"
+            android:layout_height="24dp">
+
+            <ImageView
+                android:id="@+id/ivList"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentLeft="true"
+                android:src="@drawable/toc" />
+
+            <ImageView
+                android:id="@+id/ivTotal"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentRight="true"
+                android:src="@android:drawable/ic_menu_add" />
+        </RelativeLayout>
 
         <ImageView
             android:id="@+id/ivStill"
