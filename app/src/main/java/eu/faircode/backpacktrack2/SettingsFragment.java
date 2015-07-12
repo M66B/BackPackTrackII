@@ -1040,6 +1040,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
         boolean data = false;
+        long maxTime = 0;
         double minAlt = 10000;
         double maxAlt = 0;
         double avg = 0;
@@ -1064,6 +1065,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                     long time = cursor.getLong(colTime);
 
+                    if (time > maxTime)
+                        maxTime = maxTime;
+
                     double alt = cursor.getDouble(colAltitude);
                     if (alt < minAlt)
                         minAlt = alt;
@@ -1081,8 +1085,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         if (data) {
             graph.getViewport().setXAxisBoundsManual(true);
-            graph.getViewport().setMinX(new Date().getTime() - DAYS_VIEWPORT * DAY_MS);
-            graph.getViewport().setMaxX(new Date().getTime());
+            graph.getViewport().setMinX(maxTime - DAYS_VIEWPORT * DAY_MS);
+            graph.getViewport().setMaxX(maxTime);
 
             graph.getViewport().setYAxisBoundsManual(true);
             graph.getViewport().setMinY(minAlt);
@@ -1264,7 +1268,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     private void showActivityGraph(GraphView graph) {
-        long max = 0;
+        long maxTime = 0;
+        long maxDuration = 0;
         boolean data = false;
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
@@ -1319,6 +1324,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             int invehicle = Math.round(cursor.getLong(colInvehicle) / 60000f);
             int unknown = Math.round(cursor.getLong(colUnknown) / 60000f);
 
+            if (time > maxTime)
+                maxTime = time;
+
             int total = 0;
             if (showStill)
                 total += still;
@@ -1333,8 +1341,23 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             if (showUnknown)
                 total += unknown;
 
-            if (total > max)
-                max = total;
+            if (showTotal) {
+                if (total > maxDuration)
+                    maxDuration = total;
+            } else {
+                if (showStill && still > maxDuration)
+                    maxDuration = still;
+                if (showWalking && walking > maxDuration)
+                    maxDuration = walking;
+                if (showRunning && running > maxDuration)
+                    maxDuration = running;
+                if (showOnbicycle && onbicycle > maxDuration)
+                    maxDuration = onbicycle;
+                if (showInvehicle && invehicle > maxDuration)
+                    maxDuration = invehicle;
+                if (showUnknown && unknown > maxDuration)
+                    maxDuration = unknown;
+            }
 
             if (showStill)
                 seriesStill.appendData(new DataPoint(new Date(time), still), true, Integer.MAX_VALUE);
@@ -1354,12 +1377,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         if (data) {
             graph.getViewport().setXAxisBoundsManual(true);
-            graph.getViewport().setMinX(new Date().getTime() - DAYS_VIEWPORT * DAY_MS);
-            graph.getViewport().setMaxX(new Date().getTime());
+            graph.getViewport().setMinX(maxTime - DAYS_VIEWPORT * DAY_MS);
+            graph.getViewport().setMaxX(maxTime);
 
             graph.getViewport().setYAxisBoundsManual(true);
             graph.getViewport().setMinY(0);
-            graph.getViewport().setMaxY(max);
+            graph.getViewport().setMaxY(maxDuration);
 
             seriesStill.setColor(Color.WHITE);
             seriesWalking.setColor(Color.CYAN);
@@ -1635,7 +1658,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     private void showStepGraph(GraphView graph) {
         boolean data = false;
-        int max = 10000;
+        long maxTime = 0;
+        int maxSteps = 10000;
 
         Cursor cursor = db.getSteps(true);
         int colTime = cursor.getColumnIndex("time");
@@ -1647,22 +1671,24 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             data = true;
 
             long time = cursor.getLong(colTime);
+            if (time > maxTime)
+                maxTime = time;
 
             int count = cursor.getInt(colCount);
-            if (count > max)
-                max = count;
+            if (count > maxSteps)
+                maxSteps = count;
 
             seriesStep.appendData(new DataPoint(new Date(time), count), true, Integer.MAX_VALUE);
         }
 
         if (data) {
             graph.getViewport().setXAxisBoundsManual(true);
-            graph.getViewport().setMinX(new Date().getTime() - DAYS_VIEWPORT * DAY_MS);
-            graph.getViewport().setMaxX(new Date().getTime());
+            graph.getViewport().setMinX(maxTime - DAYS_VIEWPORT * DAY_MS);
+            graph.getViewport().setMaxX(maxTime);
 
             graph.getViewport().setYAxisBoundsManual(true);
             graph.getViewport().setMinY(0);
-            graph.getViewport().setMaxY(max);
+            graph.getViewport().setMaxY(maxSteps);
 
             seriesStep.setSpacing(10);
 
