@@ -1066,7 +1066,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     long time = cursor.getLong(colTime);
 
                     if (time > maxTime)
-                        maxTime = maxTime;
+                        maxTime = time;
 
                     double alt = cursor.getDouble(colAltitude);
                     if (alt < minAlt)
