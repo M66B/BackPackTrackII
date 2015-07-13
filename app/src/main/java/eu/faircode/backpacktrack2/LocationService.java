@@ -1168,8 +1168,13 @@ public class LocationService extends IntentService {
     }
 
     private static void updateState(Context context, String reason) {
-        // Get state
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
+        // Check if tracking enabled
+        if (!prefs.getBoolean(SettingsFragment.PREF_ENABLED, SettingsFragment.DEFAULT_ENABLED))
+            return;
+
+        // Get state
         int state = prefs.getInt(SettingsFragment.PREF_STATE, STATE_IDLE);
         int activityType = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
