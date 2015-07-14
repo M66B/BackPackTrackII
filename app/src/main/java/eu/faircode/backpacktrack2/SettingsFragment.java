@@ -1,5 +1,6 @@
 package eu.faircode.backpacktrack2;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -51,6 +52,11 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
@@ -646,10 +652,70 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         // Do nothing
                     }
                 });
-        AlertDialog alertDialog = alertDialogBuilder.create();
+        final AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
         // Fix keyboard input
         alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+
+        // Handle place
+        ImageView ivPlace = (ImageView) viewEdit.findViewById(R.id.ivPlace);
+        if (LocationService.hasPlayServices(getActivity()))
+            ivPlace.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
+                        Intent intent = intentBuilder.build(getActivity());
+                        startActivityForResult(intent, 1);
+                        alertDialog.dismiss();
+                    } catch (GooglePlayServicesRepairableException ex) {
+                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    } catch (GooglePlayServicesNotAvailableException ex) {
+                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    }
+                }
+            });
+        else
+            ivPlace.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
+            Place place = PlacePicker.getPlace(data, getActivity());
+            final CharSequence name = place.getName();
+            LatLng ll = place.getLatLng();
+            if (name == null || ll == null)
+                return;
+
+            final Location location = new Location("place");
+            location.setLatitude(ll.latitude);
+            location.setLongitude(ll.longitude);
+            location.setTime(System.currentTimeMillis());
+
+            new AsyncTask<Object, Object, Object>() {
+                protected Object doInBackground(Object... params) {
+                    // Add elevation data
+                    if (!location.hasAltitude()) {
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                        if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
+                            GoogleElevationApi.getElevation(location, getActivity());
+                    }
+
+                    // Persist location
+                    new DatabaseHelper(getActivity()).insertLocation(location, name.toString(), -1, -1, -1).close();
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Object result) {
+                    // TODO: refresh view instead of closing it
+                    Toast.makeText(getActivity(), getString(R.string.msg_added, name.toString()), Toast.LENGTH_LONG).show();
+                }
+            }.execute();
+
+        } else
+            super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void add_waypoint(final String name, final WaypointAdapter adapter) {
