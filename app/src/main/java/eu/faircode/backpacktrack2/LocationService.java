@@ -931,32 +931,31 @@ public class LocationService extends IntentService {
             Log.w(TAG, "Requested GPS location updates");
         }
 
-        // Set location timeout
+        // Initiate location timeout
         if ((network && lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) || (gps && lm.isProviderEnabled(LocationManager.GPS_PROVIDER))) {
-            {
-                int check = Integer.parseInt(prefs.getString(SettingsFragment.PREF_CHECK_TIME, SettingsFragment.DEFAULT_CHECK_TIME));
-                Intent alarmIntent = new Intent(context, LocationService.class);
-                alarmIntent.setAction(LocationService.ACTION_LOCATION_CHECK);
-                PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + check * 1000, pi);
-                Log.w(TAG, "Set check=" + check + "s");
-            }
-
-            {
-                int timeout = Integer.parseInt(prefs.getString(SettingsFragment.PREF_TIMEOUT, SettingsFragment.DEFAULT_TIMEOUT));
-                Intent alarmIntent = new Intent(context, LocationService.class);
-                alarmIntent.setAction(LocationService.ACTION_LOCATION_TIMEOUT);
-                PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-                am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + timeout * 1000, pi);
-                Log.w(TAG, "Set timeout=" + timeout + "s");
-            }
+            int timeout = Integer.parseInt(prefs.getString(SettingsFragment.PREF_TIMEOUT, SettingsFragment.DEFAULT_TIMEOUT));
+            Intent alarmIntent = new Intent(context, LocationService.class);
+            alarmIntent.setAction(LocationService.ACTION_LOCATION_TIMEOUT);
+            PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + timeout * 1000, pi);
+            Log.w(TAG, "Set timeout=" + timeout + "s");
 
             prefs.edit().putInt(SettingsFragment.PREF_STATE, STATE_ACQUIRING).apply();
             updateState(context, "start locating");
         } else
             Log.w(TAG, "No location providers");
+
+        // Initiate satellite check
+        if (gps && lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            int check = Integer.parseInt(prefs.getString(SettingsFragment.PREF_CHECK_TIME, SettingsFragment.DEFAULT_CHECK_TIME));
+            Intent alarmIntent = new Intent(context, LocationService.class);
+            alarmIntent.setAction(LocationService.ACTION_LOCATION_CHECK);
+            PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + check * 1000, pi);
+            Log.w(TAG, "Set check=" + check + "s");
+        }
 
         // Keep step counter service alive
         boolean recognition = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_ENABLED, SettingsFragment.DEFAULT_RECOGNITION_ENABLED);
