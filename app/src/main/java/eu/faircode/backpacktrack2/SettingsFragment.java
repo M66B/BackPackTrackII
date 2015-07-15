@@ -655,8 +655,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                     if (!TextUtils.isEmpty(name))
                                         add_waypoint(name);
                                 }
-                            });
-                    alertDialogBuilder
+                            })
                             .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -694,14 +693,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
         alertDialogBuilder.setTitle(R.string.title_edit);
         alertDialogBuilder.setView(viewEdit);
-        alertDialogBuilder
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                });
-        final AlertDialog alertDialog = alertDialogBuilder.create();
+        AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
         // Fix keyboard input
         alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
@@ -1108,13 +1100,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         alertDialogBuilder.setTitle(R.string.title_location_history);
         alertDialogBuilder.setIcon(R.drawable.location_60);
         alertDialogBuilder.setView(viewHistory);
-        alertDialogBuilder
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
@@ -1341,13 +1326,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         alertDialogBuilder.setTitle(R.string.title_activity_history);
         alertDialogBuilder.setIcon(R.drawable.history_60);
         alertDialogBuilder.setView(viewHistory);
-        alertDialogBuilder
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
@@ -1606,13 +1584,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         alertDialogBuilder.setTitle(R.string.title_activity_history);
         alertDialogBuilder.setIcon(R.drawable.history_60);
         alertDialogBuilder.setView(viewHistory);
-        alertDialogBuilder
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
@@ -1667,13 +1638,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         alertDialogBuilder.setTitle(R.string.title_activity_history);
         alertDialogBuilder.setIcon(R.drawable.history_60);
         alertDialogBuilder.setView(viewHistory);
-        alertDialogBuilder
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
@@ -1730,13 +1694,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         alertDialogBuilder.setTitle(R.string.title_step_history);
         alertDialogBuilder.setIcon(R.drawable.walk_60);
         alertDialogBuilder.setView(viewHistory);
-        alertDialogBuilder
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
