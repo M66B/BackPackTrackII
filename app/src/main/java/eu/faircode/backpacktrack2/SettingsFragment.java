@@ -608,7 +608,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         lv.setAdapter(adapter);
 
         // Handle updates
-        DatabaseHelper.addLocationChangedListener(new DatabaseHelper.LocationChangedListener() {
+        final DatabaseHelper.LocationChangedListener listener = new DatabaseHelper.LocationChangedListener() {
             @Override
             public void onLocationAdded(Location location) {
                 update();
@@ -633,7 +633,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     }
                 });
             }
-        });
+        };
+        DatabaseHelper.addLocationChangedListener(listener);
 
         // Handle add waypoint
         ImageView ivAdd = (ImageView) viewEdit.findViewById(R.id.ivAdd);
@@ -694,6 +695,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         alertDialogBuilder.setTitle(R.string.title_edit);
         alertDialogBuilder.setView(viewEdit);
         AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                DatabaseHelper.removeLocationChangedListener(listener);
+            }
+        });
         alertDialog.show();
         // Fix keyboard input
         alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
