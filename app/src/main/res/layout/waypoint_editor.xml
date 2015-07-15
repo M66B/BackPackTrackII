@@ -23,7 +23,7 @@
             android:layout_height="24dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="12dp"
-            android:src="@android:drawable/ic_menu_mylocation" />
+            android:src="@drawable/location_60" />
     </LinearLayout>
 
 

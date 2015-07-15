@@ -221,6 +221,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_LAST_FROM = "pref_last_from";
     public static final String PREF_LAST_TO = "pref_last_to";
 
+    private static final int ACTIVITY_PICKPLACE = 1;
     private static final int GEOCODER_RESULTS = 5;
     private static final long DAY_MS = 24L * 3600L * 1000L;
     private static final int DAYS_VIEWPORT = 7;
@@ -598,7 +599,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private void edit_waypoints() {
         // Get layout
         final LayoutInflater inflater = LayoutInflater.from(getActivity());
-        View viewEdit = inflater.inflate(R.layout.waypoint_edit, null);
+        View viewEdit = inflater.inflate(R.layout.waypoint_editor, null);
 
         // Fill list
         final ListView lv = (ListView) viewEdit.findViewById(R.id.lvEdit);
@@ -606,7 +607,35 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final WaypointAdapter adapter = new WaypointAdapter(getActivity(), cursor, db);
         lv.setAdapter(adapter);
 
-        // Handle waypoint_add
+        // Handle updates
+        DatabaseHelper.addLocationChangedListener(new DatabaseHelper.LocationChangedListener() {
+            @Override
+            public void onLocationAdded(Location location) {
+                update();
+            }
+
+            @Override
+            public void onLocationUpdated() {
+                update();
+            }
+
+            @Override
+            public void onLocationDeleted() {
+                update();
+            }
+
+            private void update() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
+                        adapter.changeCursor(cursor);
+                    }
+                });
+            }
+        });
+
+        // Handle add waypoint
         ImageView ivAdd = (ImageView) viewEdit.findViewById(R.id.ivAdd);
         if (Geocoder.isPresent())
             ivAdd.setOnClickListener(new View.OnClickListener() {
@@ -624,7 +653,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 public void onClick(DialogInterface dialog, int which) {
                                     String name = address.getText().toString();
                                     if (!TextUtils.isEmpty(name))
-                                        add_waypoint(name, adapter);
+                                        add_waypoint(name);
                                 }
                             });
                     alertDialogBuilder
@@ -641,6 +670,26 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else
             ivAdd.setVisibility(View.GONE);
 
+        // Handle add place
+        ImageView ivPlace = (ImageView) viewEdit.findViewById(R.id.ivPlace);
+        if (LocationService.hasPlayServices(getActivity()))
+            ivPlace.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
+                        Intent intent = intentBuilder.build(getActivity());
+                        startActivityForResult(intent, ACTIVITY_PICKPLACE);
+                    } catch (GooglePlayServicesRepairableException ex) {
+                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    } catch (GooglePlayServicesNotAvailableException ex) {
+                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    }
+                }
+            });
+        else
+            ivPlace.setVisibility(View.GONE);
+
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
         alertDialogBuilder.setTitle(R.string.title_edit);
@@ -656,69 +705,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         alertDialog.show();
         // Fix keyboard input
         alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-
-        // Handle place
-        ImageView ivPlace = (ImageView) viewEdit.findViewById(R.id.ivPlace);
-        if (LocationService.hasPlayServices(getActivity()))
-            ivPlace.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    try {
-                        PlacePicker.IntentBuilder intentBuilder = new PlacePicker.IntentBuilder();
-                        Intent intent = intentBuilder.build(getActivity());
-                        startActivityForResult(intent, 1);
-                        alertDialog.dismiss();
-                    } catch (GooglePlayServicesRepairableException ex) {
-                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                    } catch (GooglePlayServicesNotAvailableException ex) {
-                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                    }
-                }
-            });
-        else
-            ivPlace.setVisibility(View.GONE);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
-            Place place = PlacePicker.getPlace(data, getActivity());
-            final CharSequence name = place.getName();
-            LatLng ll = place.getLatLng();
-            if (name == null || ll == null)
-                return;
-
-            final Location location = new Location("place");
-            location.setLatitude(ll.latitude);
-            location.setLongitude(ll.longitude);
-            location.setTime(System.currentTimeMillis());
-
-            new AsyncTask<Object, Object, Object>() {
-                protected Object doInBackground(Object... params) {
-                    // Add elevation data
-                    if (!location.hasAltitude()) {
-                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                        if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
-                            GoogleElevationApi.getElevation(location, getActivity());
-                    }
-
-                    // Persist location
-                    new DatabaseHelper(getActivity()).insertLocation(location, name.toString(), -1, -1, -1).close();
-                    return null;
-                }
-
-                @Override
-                protected void onPostExecute(Object result) {
-                    // TODO: refresh view instead of closing it
-                    Toast.makeText(getActivity(), getString(R.string.msg_added, name.toString()), Toast.LENGTH_LONG).show();
-                }
-            }.execute();
-
-        } else
-            super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void add_waypoint(final String name, final WaypointAdapter adapter) {
+    private void add_waypoint(final String name) {
         // Geocode name
         Toast.makeText(getActivity(), getString(R.string.msg_geocoding, name), Toast.LENGTH_LONG).show();
 
@@ -773,8 +762,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                                 @Override
                                 protected void onPostExecute(Object result) {
-                                    Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
-                                    adapter.changeCursor(cursor);
                                     Toast.makeText(getActivity(), getString(R.string.msg_added, geocodedName), Toast.LENGTH_LONG).show();
                                 }
                             }.execute();
@@ -791,6 +778,44 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     Toast.makeText(getActivity(), getString(R.string.msg_nolocation, name), Toast.LENGTH_LONG).show();
             }
         }.execute();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ACTIVITY_PICKPLACE && resultCode == Activity.RESULT_OK) {
+            Place place = PlacePicker.getPlace(data, getActivity());
+            final CharSequence name = place.getName();
+            LatLng ll = place.getLatLng();
+            if (name == null || ll == null)
+                return;
+
+            final Location location = new Location("place");
+            location.setLatitude(ll.latitude);
+            location.setLongitude(ll.longitude);
+            location.setTime(System.currentTimeMillis());
+
+            new AsyncTask<Object, Object, Object>() {
+                protected Object doInBackground(Object... params) {
+                    // Add elevation data
+                    if (!location.hasAltitude()) {
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                        if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
+                            GoogleElevationApi.getElevation(location, getActivity());
+                    }
+
+                    // Persist location
+                    new DatabaseHelper(getActivity()).insertLocation(location, name.toString(), -1, -1, -1).close();
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Object result) {
+                    Toast.makeText(getActivity(), getString(R.string.msg_added, name.toString()), Toast.LENGTH_LONG).show();
+                }
+            }.execute();
+
+        } else
+            super.onActivityResult(requestCode, resultCode, data);
     }
 
     private void export(final Intent intent, int resTitle) {
