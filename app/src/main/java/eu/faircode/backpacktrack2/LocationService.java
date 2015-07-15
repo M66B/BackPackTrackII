@@ -1217,7 +1217,8 @@ public class LocationService extends IntentService {
             Location bestLocation = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_BEST_LOCATION, null));
             text = context.getString(R.string.msg_acquired,
                     SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(new Date(bestLocation.getTime())),
-                    getProviderName(bestLocation, context));
+                    getProviderName(bestLocation, context),
+                    bestLocation.hasAccuracy() ? Math.round(bestLocation.getAccuracy()) : 0);
         }
 
         //if (debugMode(context))

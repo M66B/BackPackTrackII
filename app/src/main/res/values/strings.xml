@@ -166,7 +166,7 @@
     <string name="msg_notification">%1$s %2$s @%3$sm #%4$d</string>
     <string name="msg_idle">Last @%1$s %2$s</string>
     <string name="msg_acquiring">Acquiring ...</string>
-    <string name="msg_acquired">Acquired @%1$s %2$s</string>
+    <string name="msg_acquired">Acquired @%1$s %2$s &#177;%3$dm</string>
 
     <string name="msg_added">Added \'%s\'</string>
     <string name="msg_updated">Updated \'%s\'</string>
