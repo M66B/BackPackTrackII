@@ -751,8 +751,10 @@ public class LocationService extends IntentService {
     }
 
     private void handleDaily(Intent intent) {
-        // Reset step counter
         long time = new Date().getTime() / (5 * 60 * 1000) * (5 * 60 * 1000);
+        Log.w(TAG, "Daily task at " + SimpleDateFormat.getDateTimeInstance().format(time));
+
+        // Reset step counter
         new DatabaseHelper(this).updateSteps(time, 0).close();
 
         // Finalize last activity

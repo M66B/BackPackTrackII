@@ -594,6 +594,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
+        Log.w(TAG, "Settings daily task from " + SimpleDateFormat.getDateTimeInstance().format(calendar.getTimeInMillis()));
     }
 
     private void edit_waypoints() {
