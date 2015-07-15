@@ -1358,7 +1358,7 @@ public class LocationService extends IntentService {
     }
 
     private static String writeFile(boolean gpx, String trackName, boolean extensions, long from, long to, Context context) throws IOException {
-        File folder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + File.separatorChar + "BackPackTrackII");
+        File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "BackPackTrackII");
         folder.mkdirs();
         String fileName = folder.getAbsolutePath() + File.separatorChar + trackName + (gpx ? ".gpx" : ".kml");
         Log.w(TAG, "Writing file=" + fileName +
