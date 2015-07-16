@@ -181,10 +181,10 @@
     <string name="provider_gps">GPS</string>
     <string name="provider_network">Netzwerk</string>
 
-    <string name="menu_share">Share</string>
-    <string name="menu_elevation_loc">Fetch elevation for location</string>
-    <string name="menu_elevation_day">Fetch elevations for day</string>
-    <string name="menu_delete">Delete</string>
+    <string name="menu_share">Teilen</string>
+    <string name="menu_elevation_loc">Höhe für Standort bezeihen</string>
+    <string name="menu_elevation_day">Höhe für Tag beziehen</string>
+    <string name="menu_delete">Löschen</string>
 
     <string name="still">Stillstand</string>
     <string name="tilting">Kippen</string>
