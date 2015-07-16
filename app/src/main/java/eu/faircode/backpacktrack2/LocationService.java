@@ -959,6 +959,11 @@ public class LocationService extends IntentService {
             Log.w(TAG, "Set check=" + check + "s");
         }
 
+        // Start pressure service
+        boolean pressure_enabled = prefs.getBoolean(SettingsFragment.PREF_PRESSURE_ENABLED, SettingsFragment.DEFAULT_PRESSURE_ENABLED);
+        if (pressure_enabled)
+            context.startService(new Intent(context, PressureService.class));
+
         // Keep step counter service alive
         boolean recognition = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_ENABLED, SettingsFragment.DEFAULT_RECOGNITION_ENABLED);
         boolean recognizeSteps = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_STEPS, SettingsFragment.DEFAULT_RECOGNITION_STEPS);
@@ -1012,6 +1017,9 @@ public class LocationService extends IntentService {
             am.cancel(pi);
         }
 
+        // Stop pressure service
+        context.stopService(new Intent(context, PressureService.class));
+
         prefs.edit().putInt(SettingsFragment.PREF_STATE, STATE_IDLE).apply();
         prefs.edit().remove(SettingsFragment.PREF_LOCATION_TYPE).apply();
         prefs.edit().remove(SettingsFragment.PREF_BEST_LOCATION).apply();
@@ -1051,6 +1059,11 @@ public class LocationService extends IntentService {
                         (location.hasAccuracy() ? location.getAccuracy() : Float.MAX_VALUE)) {
             // New location
             Log.w(TAG, "New location=" + location + " type=" + locationType);
+
+            // Derive altitude from pressure
+            float altitude = PressureService.getAltitude(this, location);
+            if (!Float.isNaN(altitude))
+                location.setAltitude(altitude);
 
             // Add elevation data
             if (!location.hasAltitude()) {

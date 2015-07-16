@@ -207,6 +207,14 @@
                     android:action="android.intent.action.VIEW"
                     android:data="https://developers.google.com/maps/terms" />
             </Preference>
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="pref_enabled"
+                android:key="pref_pressure_enabled"
+                android:title="@string/title_pressure_enabled" />
+            <Preference
+                android:dependency="pref_pressure_enabled"
+                android:key="pref_pressure_display" />
             <EditTextPreference
                 android:defaultValue="5"
                 android:inputType="number"

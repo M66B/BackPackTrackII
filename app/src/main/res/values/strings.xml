@@ -44,6 +44,7 @@
     <string name="title_altitude_waypoint">Google elevation for waypoints</string>
     <string name="title_altitude_trackpoint">Google elevation for trackpoints</string>
     <string name="title_altitude_google_terms">Powered by Google</string>
+    <string name="title_pressure_enabled">Use pressure to determine altitude</string>
     <string name="title_altitude_avg">Moving average: %s samples</string>
 
     <string name="title_recognition">Activity recognition</string>

@@ -20,7 +20,7 @@ public class GoogleElevationApi {
 
     public static boolean getElevation(Location location, Context context) {
         try {
-            // Check if connectivity
+            // Check connectivity
             if (!SettingsFragment.isConnected(context))
                 return false;
 

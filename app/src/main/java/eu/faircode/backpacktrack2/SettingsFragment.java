@@ -115,6 +115,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_ALTITUDE_TRACKPOINT = "pref_altitude_trackpoint";
     public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
 
+    public static final String PREF_PRESSURE_ENABLED = "pref_pressure_enabled";
+    public static final String PREF_PRESSURE_REFRESH = "pref_pressure_refresh";
+    public static final String PREF_PRESSURE_MAXAGE = "pref_pressure_maxage";
+    public static final String PREF_PRESSURE_MAXDIST = "pref_pressure_maxdist";
+    public static final String PREF_PRESSURE_STATIONS = "pref_pressure_stations";
+    public static final String PREF_PRESSURE_SAMPLES = "pref_pressure_samples";
+    public static final String PREF_PRESSURE_OFFSET = "pref_pressure_offset";
+    public static final String PREF_PRESSURE_INVEHICLE = "pref_pressure_invehicle";
+    public static final String PREF_PRESSURE_DISPLAY = "pref_pressure_display";
+
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
     public static final String PREF_RECOGNITION_INTERVAL_STILL = "pref_recognition_interval_still";
     public static final String PREF_RECOGNITION_INTERVAL_MOVING = "pref_recognition_interval_moving";
@@ -158,7 +168,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_WP_ACCURACY = "10"; // meters
     public static final String DEFAULT_TIMEOUT = "60"; // seconds
     public static final String DEFAULT_CHECK_TIME = "30"; // seconds
-    public static final String DEFAULT_CHECK_SAT = "1";
+    public static final String DEFAULT_CHECK_SAT = "1"; // count
     public static final String DEFAULT_INACCURATE = "100"; // meters
     public static final String DEFAULT_NEARBY = "100"; // meters
     public static final String DEFAULT_MINTIME = "1"; // seconds
@@ -176,6 +186,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final boolean DEFAULT_ALTITUDE_WAYPOINT = true;
     public static final boolean DEFAULT_ALTITUDE_TRACKPOINT = false;
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
+
+    public static final boolean DEFAULT_PRESSURE_ENABLED = false;
+    public static final String DEFAULT_PRESSURE_REFRESH = "60"; // minutes
+    public static final String DEFAULT_PRESSURE_MAXAGE = "720"; // minutes
+    public static final String DEFAULT_PRESSURE_MAXDIST = "25"; // kilometer
+    public static final String DEFAULT_PRESSURE_STATIONS = "5"; // count
+    public static final String DEFAULT_PRESSURE_SAMPLES = "10"; // count
+    public static final String DEFAULT_PRESSURE_OFFSET = "0"; // mbar
+    public static final boolean DEFAULT_PRESSURE_INVEHICLE = false;
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
     public static final String DEFAULT_RECOGNITION_INTERVAL_STILL = "60"; // seconds
@@ -207,6 +226,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_BEST_LOCATION = "pref_best_location";
     public static final String PREF_SATS_FIXED = "pref_sats_fixed";
     public static final String PREF_SATS_VISIBLE = "pref_sats_visible";
+
+    public static final String PREF_PRESSURE_VALUE = "pref_pressure_value";
+    public static final String PREF_PRESSURE_TIME = "pref_pressure_time";
+
+    public static final String PREF_PRESSURE_REF_NAME = "pref_pressure_ref_name";
+    public static final String PREF_PRESSURE_REF_LAT = "pref_pressure_ref_lat";
+    public static final String PREF_PRESSURE_REF_LON = "pref_pressure_ref_lon";
+    public static final String PREF_PRESSURE_REF_VALUE = "pref_pressure_ref_value";
+    public static final String PREF_PRESSURE_REF_TIME = "pref_pressure_ref_time";
 
     // Remember last values
     public static final String PREF_LAST_ACTIVITY = "pref_last_activity";
@@ -278,6 +306,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void onResume() {
         super.onResume();
 
+        final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+
         // Listen for preference changes
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 
@@ -291,7 +321,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         getActivity().registerReceiver(mExternalStorageReceiver, storageFilter);
 
         // First run
-        SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
         if (prefs.getBoolean(PREF_FIRST, true)) {
             prefs.edit().putBoolean(PREF_FIRST, false).apply();
 
@@ -312,6 +341,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Preference pref_upload_gpx = findPreference(PREF_UPLOAD_GPX);
         Preference pref_enabled = findPreference(PREF_ENABLED);
         Preference pref_check = findPreference(PREF_SETTINGS);
+        Preference pref_pressure_enabled = findPreference(PREF_PRESSURE_ENABLED);
+        Preference pref_pressure_display = findPreference(PREF_PRESSURE_DISPLAY);
         Preference pref_location_history = findPreference(PREF_LOCATION_HISTORY);
         Preference pref_activity_history = findPreference(PREF_ACTIVITY_HISTORY);
         Preference pref_recognize_steps = findPreference(PREF_RECOGNITION_STEPS);
@@ -345,6 +376,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_PASSIVE_MINTIME);
         updateTitle(prefs, PREF_PASSIVE_MINDIST);
 
+        updateTitle(prefs, PREF_PRESSURE_DISPLAY);
         updateTitle(prefs, PREF_ALTITUDE_AVG);
 
         updateTitle(prefs, PREF_RECOGNITION_INTERVAL_STILL);
@@ -454,6 +486,28 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else
             pref_check.setEnabled(false);
 
+        // Check for pressure sensor
+        pref_pressure_enabled.setEnabled(LocationService.hasPressureSensor(getActivity()));
+
+        // Handle reference pressure refresh
+        pref_pressure_display.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                final Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+                if (lastLocation == null)
+                    return false;
+                else {
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            PressureService.getReferencePressure(lastLocation, getActivity());
+                        }
+                    }).start();
+                    return true;
+                }
+            }
+        });
+
         // Check for Play services
         boolean playServices = LocationService.hasPlayServices(getActivity());
         findPreference(PREF_ACTIVITY_HISTORY).setEnabled(playServices);
@@ -462,19 +516,18 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         findPreference(PREF_RECOGNITION_INTERVAL_MOVING).setEnabled(playServices);
         findPreference(PREF_RECOGNITION_CONFIDENCE).setEnabled(playServices);
 
+        // Check for step counter
+        boolean hasStepCounter = LocationService.hasStepCounter(getActivity());
+        pref_recognize_steps.setEnabled(hasStepCounter);
+        pref_step_history.setEnabled(hasStepCounter);
+        pref_step_size.setEnabled(hasStepCounter);
+        pref_step_update.setEnabled(hasStepCounter);
+        pref_weight.setEnabled(hasStepCounter);
+
         // Handle Play store link
         Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getActivity().getPackageName()));
         if (getActivity().getPackageManager().queryIntentActivities(playStoreIntent, 0).size() > 0)
             pref_version.setIntent(playStoreIntent);
-
-        // Step counting not available
-        if (!LocationService.hasStepCounter(getActivity())) {
-            pref_recognize_steps.setEnabled(false);
-            pref_step_history.setEnabled(false);
-            pref_step_size.setEnabled(false);
-            pref_step_update.setEnabled(false);
-            pref_weight.setEnabled(false);
-        }
 
         // Handle version info
         try {
@@ -511,6 +564,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             key = PREF_SHARE_KML;
         else if (PREF_LAST_UPLOAD_GPX.equals(key))
             key = PREF_UPLOAD_GPX;
+        else if (PREF_PRESSURE_REF_TIME.equals(key))
+            key = PREF_PRESSURE_DISPLAY;
 
         Preference pref = findPreference(key);
 
@@ -554,6 +609,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 PREF_PASSIVE_ENABLED.equals(key) ||
                 PREF_PASSIVE_MINTIME.equals(key) ||
                 PREF_PASSIVE_MINDIST.equals(key) ||
+                PREF_PRESSURE_ENABLED.equals(key) ||
                 PREF_RECOGNITION_ENABLED.equals(key) ||
                 PREF_RECOGNITION_INTERVAL_STILL.equals(key) ||
                 PREF_RECOGNITION_INTERVAL_MOVING.equals(key) ||
@@ -1891,7 +1947,20 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if (PREF_PASSIVE_MINDIST.equals(key))
             pref.setTitle(getString(R.string.title_mindist, prefs.getString(key, DEFAULT_PASSIVE_MINDIST)));
 
-        else if (PREF_ALTITUDE_AVG.equals(key))
+        else if (PREF_PRESSURE_DISPLAY.equals(key)) {
+            String name = prefs.getString(SettingsFragment.PREF_PRESSURE_REF_NAME, null);
+            float pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, 0);
+            long time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
+            Location station = new Location("station");
+            station.setLatitude(prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_LAT, 0));
+            station.setLongitude(prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_LON, 0));
+            Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+            pref.setTitle(name == null ? "-" : name + " @" + Math.round(station.distanceTo(lastLocation) / 1000) + " km");
+            if (pressure == 0 || time == 0)
+                pref.setSummary(null);
+            else
+                pref.setSummary(pressure + " mbar\n" + SimpleDateFormat.getDateTimeInstance().format(time));
+        } else if (PREF_ALTITUDE_AVG.equals(key))
             pref.setTitle(getString(R.string.title_altitude_avg, prefs.getString(key, DEFAULT_ALTITUDE_AVG)));
 
         else if (PREF_RECOGNITION_INTERVAL_STILL.equals(key))
