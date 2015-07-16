@@ -222,11 +222,11 @@ public class PressureService extends Service {
                     Log.w(TAG, "Pressure " + ref_pressure + "mb " +
                             ref_name + " " +
                             SimpleDateFormat.getDateTimeInstance().format(ref_time) + " " +
-                            Math.round(ref_location.distanceTo(location)) + "km");
+                            Math.round(ref_location.distanceTo(location) / 1000) + "km");
 
-                    if (ref_time + maxage * 60 * 1000 >= time) {
+                    if (!found && ref_time + maxage * 60 * 1000 >= time) {
                         found = true;
-                        Log.w(TAG, "Reference pressure " + ref_pressure + "mbar @" + SimpleDateFormat.getDateTimeInstance().format(time) + " " + ref_name + " " + ref_location);
+                        Log.w(TAG, "Reference pressure " + ref_pressure + "mbar @" + SimpleDateFormat.getDateTimeInstance().format(ref_time));
 
                         // Persist reference pressure
                         prefs.edit().putString(SettingsFragment.PREF_PRESSURE_REF_NAME, ref_name).apply();
@@ -234,7 +234,6 @@ public class PressureService extends Service {
                         prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_LON, (float) ref_lon).apply();
                         prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, (float) ref_pressure).apply();
                         prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, ref_time).apply();
-                        break;
                     }
                 }
 
