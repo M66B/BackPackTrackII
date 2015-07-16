@@ -160,6 +160,7 @@
     <string name="msg_playservices">Play Dienste: %s</string>
     <string name="msg_stepcounter">Schrittzähler: %s</string>
     <string name="msg_significantmotion">Signifikante Bewegung: %s</string>
+    <string name="msg_pressure">Atmospheric pressure: %s</string>
     <string name="msg_yes">ja</string>
     <string name="msg_no">nein</string>
 

@@ -160,6 +160,7 @@
     <string name="msg_playservices">Play services: %s</string>
     <string name="msg_stepcounter">Stappenteller: %s</string>
     <string name="msg_significantmotion">Significante beweging: %s</string>
+    <string name="msg_pressure">Luchtdruk: %s</string>
     <string name="msg_yes">ja</string>
     <string name="msg_no">nee</string>
 

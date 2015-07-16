@@ -486,7 +486,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             getString(R.string.msg_playservices,
                                     getString(LocationService.hasPlayServices(getActivity()) ? R.string.msg_yes : R.string.msg_no)) + "\n" +
                             getString(R.string.msg_stepcounter, getString(LocationService.hasStepCounter(getActivity()) ? R.string.msg_yes : R.string.msg_no)) + "\n" +
-                            getString(R.string.msg_significantmotion, getString(LocationService.hasSignificantMotion(getActivity()) ? R.string.msg_yes : R.string.msg_no)));
+                            getString(R.string.msg_significantmotion, getString(LocationService.hasSignificantMotionSensor(getActivity()) ? R.string.msg_yes : R.string.msg_no)) + "\n" +
+                            getString(R.string.msg_pressure, getString(LocationService.hasPressureSensor(getActivity()) ? R.string.msg_yes : R.string.msg_no)));
         } catch (PackageManager.NameNotFoundException ex) {
             pref_version.setSummary(ex.toString());
         }

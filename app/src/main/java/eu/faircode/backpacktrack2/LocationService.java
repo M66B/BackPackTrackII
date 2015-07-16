@@ -1462,10 +1462,15 @@ public class LocationService extends IntentService {
             return false;
     }
 
-    public static boolean hasSignificantMotion(Context context) {
+    public static boolean hasSignificantMotionSensor(Context context) {
+        SensorManager sm = (SensorManager) context.getSystemService(SENSOR_SERVICE);
+        return (sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION) != null);
+    }
+
+    public static boolean hasPressureSensor(Context context) {
         SensorManager sm = (SensorManager) context.getSystemService(SENSOR_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-            return (sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION) != null);
+            return (sm.getDefaultSensor(Sensor.TYPE_PRESSURE) != null);
         else
             return false;
     }
