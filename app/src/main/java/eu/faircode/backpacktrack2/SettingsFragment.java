@@ -376,6 +376,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_PASSIVE_MINTIME);
         updateTitle(prefs, PREF_PASSIVE_MINDIST);
 
+        updateTitle(prefs, PREF_PRESSURE_OFFSET);
         updateTitle(prefs, PREF_PRESSURE_DISPLAY);
         updateTitle(prefs, PREF_ALTITUDE_AVG);
 
@@ -1947,6 +1948,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if (PREF_PASSIVE_MINDIST.equals(key))
             pref.setTitle(getString(R.string.title_mindist, prefs.getString(key, DEFAULT_PASSIVE_MINDIST)));
 
+        else if (PREF_PRESSURE_OFFSET.equals(key))
+            pref.setTitle(getString(R.string.title_pressure_offset, prefs.getString(key, DEFAULT_PRESSURE_OFFSET)));
         else if (PREF_PRESSURE_DISPLAY.equals(key)) {
             String name = prefs.getString(SettingsFragment.PREF_PRESSURE_REF_NAME, null);
             float pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, 0);
