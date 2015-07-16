@@ -22,7 +22,6 @@ public class LocationAdapter extends CursorAdapter {
 
     private Context mContext;
     private Location lastLocation;
-    private boolean elevationBusy = false;
 
     public LocationAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
@@ -55,15 +54,14 @@ public class LocationAdapter extends CursorAdapter {
         double accuracy = cursor.getDouble(cursor.getColumnIndex("accuracy"));
         final String name = cursor.getString(cursor.getColumnIndex("name"));
 
+        // Calculate distance to last location
         Location dest = new Location("");
         dest.setLatitude(latitude);
         dest.setLongitude(longitude);
         double distance = (lastLocation == null ? 0 : lastLocation.distanceTo(dest));
 
         // Get views
-        ImageView ivShare = (ImageView) view.findViewById(R.id.ivShare);
         TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
-        ImageView ivPin = (ImageView) view.findViewById(R.id.ivPin);
         TextView tvProvider = (TextView) view.findViewById(R.id.tvProvider);
         TextView tvAltitude = (TextView) view.findViewById(R.id.tvAltitude);
         TextView tvBearing = (TextView) view.findViewById(R.id.tvBearing);
@@ -71,8 +69,8 @@ public class LocationAdapter extends CursorAdapter {
         TextView tvDistance = (TextView) view.findViewById(R.id.tvDistance);
 
         // Set values
+        view.setBackgroundColor(context.getResources().getColor(name == null ? android.R.color.transparent : android.R.color.darker_gray));
         tvTime.setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(time));
-        ivPin.setVisibility(name == null ? View.INVISIBLE : View.VISIBLE);
         int resId = context.getResources().getIdentifier("provider_" + provider, "string", context.getPackageName());
         tvProvider.setText(resId == 0 ? "-" : context.getString(resId).substring(0, 1));
         tvAltitude.setText(hasAltitude ? Long.toString(Math.round(altitude)) : "?");
@@ -84,20 +82,5 @@ public class LocationAdapter extends CursorAdapter {
             tvDistance.setText(Long.toString(Math.round(distance / 1e3)) + "k");
         else
             tvDistance.setText(lastLocation == null ? "?" : Long.toString(Math.round(distance)));
-
-        // Handle share location
-        ivShare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude;
-                    if (name != null)
-                        uri += "(" + Uri.encode(name) + ")";
-                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
-                } catch (Throwable ex) {
-                    Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
     }
 }

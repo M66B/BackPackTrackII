@@ -38,6 +38,7 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -48,6 +49,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -1014,61 +1016,145 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
-        // Handle list item long click
-        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Cursor cursor = (Cursor) lv.getItemAtPosition(position);
-                if (cursor != null) {
-                    final long time = cursor.getLong(cursor.getColumnIndex("time"));
-
-                    synchronized (getActivity()) {
-                        if (elevationBusy)
+            public void onItemClick(AdapterView<?> adapterView, View view, final int position, long id) {
+                PopupMenu popupMenu = new PopupMenu(getActivity(), view);
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        Cursor cursor = (Cursor) lv.getItemAtPosition(position);
+                        if (cursor == null)
                             return false;
-                        else
-                            elevationBusy = true;
-                    }
+                        final long id = cursor.getLong(cursor.getColumnIndex("ID"));
+                        final long time = cursor.getLong(cursor.getColumnIndex("time"));
+                        final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
+                        final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
+                        final String name = cursor.getString(cursor.getColumnIndex("name"));
 
-                    // Get elevation for day
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            // Get range
-                            Calendar from = Calendar.getInstance();
-                            from.setTimeInMillis(time);
-                            from.set(Calendar.HOUR_OF_DAY, 0);
-                            from.set(Calendar.MINUTE, 0);
-                            from.set(Calendar.SECOND, 0);
-                            from.set(Calendar.MILLISECOND, 0);
-
-                            Calendar to = Calendar.getInstance();
-                            to.setTimeInMillis(time);
-                            to.set(Calendar.HOUR_OF_DAY, 23);
-                            to.set(Calendar.MINUTE, 59);
-                            to.set(Calendar.SECOND, 59);
-                            to.set(Calendar.MILLISECOND, 999);
-
-                            // Get altitudes for range
-                            LocationService.getAltitude(from.getTimeInMillis(), to.getTimeInMillis(), getActivity());
-
-                            synchronized (getActivity()) {
-                                elevationBusy = false;
-                            }
-
-                            getActivity().runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(getActivity(), getString(R.string.msg_updated, getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
+                        switch (item.getItemId()) {
+                            case R.id.menu_share:
+                                try {
+                                    String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude;
+                                    if (name != null)
+                                        uri += "(" + Uri.encode(name) + ")";
+                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
+                                } catch (Throwable ex) {
+                                    Toast.makeText(getActivity(), ex.toString(), Toast.LENGTH_SHORT).show();
                                 }
-                            });
+                                return true;
+
+                            case R.id.menu_elevation_loc:
+                                // Get elevation for location
+                                synchronized (getActivity()) {
+                                    if (elevationBusy)
+                                        return false;
+                                    else
+                                        elevationBusy = true;
+                                }
+
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // Get altitudes for range
+                                        LocationService.getAltitude(time, time, getActivity());
+
+                                        synchronized (getActivity()) {
+                                            elevationBusy = false;
+                                        }
+
+                                        getActivity().runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Toast.makeText(getActivity(), getString(R.string.msg_updated, getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+                                }).start();
+                                return true;
+
+                            case R.id.menu_elevation_day:
+                                // Get elevation for day
+                                synchronized (getActivity()) {
+                                    if (elevationBusy)
+                                        return false;
+                                    else
+                                        elevationBusy = true;
+                                }
+
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // Get range
+                                        Calendar from = Calendar.getInstance();
+                                        from.setTimeInMillis(time);
+                                        from.set(Calendar.HOUR_OF_DAY, 0);
+                                        from.set(Calendar.MINUTE, 0);
+                                        from.set(Calendar.SECOND, 0);
+                                        from.set(Calendar.MILLISECOND, 0);
+
+                                        Calendar to = Calendar.getInstance();
+                                        to.setTimeInMillis(time);
+                                        to.set(Calendar.HOUR_OF_DAY, 23);
+                                        to.set(Calendar.MINUTE, 59);
+                                        to.set(Calendar.SECOND, 59);
+                                        to.set(Calendar.MILLISECOND, 999);
+
+                                        // Get altitudes for range
+                                        LocationService.getAltitude(from.getTimeInMillis(), to.getTimeInMillis(), getActivity());
+
+                                        synchronized (getActivity()) {
+                                            elevationBusy = false;
+                                        }
+
+                                        getActivity().runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                Toast.makeText(getActivity(), getString(R.string.msg_updated, getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                                    }
+                                }).start();
+                                return true;
+
+                            case R.id.menu_delete:
+                                final String title = (name == null ? getString(R.string.title_trackpoint) : name);
+                                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                                alertDialogBuilder.setTitle(getString(R.string.msg_delete, title));
+                                alertDialogBuilder
+                                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                new AsyncTask<Object, Object, Object>() {
+                                                    protected Object doInBackground(Object... params) {
+                                                        new DatabaseHelper(getActivity()).deleteLocation(id).close();
+                                                        return null;
+                                                    }
+
+                                                    @Override
+                                                    protected void onPostExecute(Object result) {
+                                                        Toast.makeText(getActivity(), getString(R.string.msg_deleted, title), Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }.execute();
+                                            }
+                                        })
+                                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // Do nothing
+                                            }
+                                        });
+                                AlertDialog alertDialog = alertDialogBuilder.create();
+                                alertDialog.show();
+                                return true;
+
+                            default:
+                                return false;
                         }
-                    }).start();
-
-                    // Feedback
-                    return true;
-                }
-
-                return false;
+                    }
+                });
+                popupMenu.inflate(R.menu.location);
+                popupMenu.show();
             }
         });
 
@@ -1567,11 +1653,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                     protected Object doInBackground(Object... params) {
                                         new DatabaseHelper(getActivity()).deleteActivityTypes().close();
                                         return null;
-                                    }
-
-                                    @Override
-                                    protected void onPostExecute(Object result) {
-                                        adapter.changeCursor(db.getActivityTypes(0, Long.MAX_VALUE));
                                     }
                                 }.execute();
                             }

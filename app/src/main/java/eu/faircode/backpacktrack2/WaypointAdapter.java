@@ -137,8 +137,6 @@ public class WaypointAdapter extends CursorAdapter {
 
                                             @Override
                                             protected void onPostExecute(Object result) {
-                                                Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
-                                                changeCursor(cursor);
                                                 Toast.makeText(context, context.getString(R.string.msg_updated, geocodedName), Toast.LENGTH_SHORT).show();
                                             }
                                         }.execute();
@@ -174,8 +172,6 @@ public class WaypointAdapter extends CursorAdapter {
 
                     @Override
                     protected void onPostExecute(Object result) {
-                        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
-                        changeCursor(cursor);
                         Toast.makeText(context, context.getString(R.string.msg_updated, newName), Toast.LENGTH_SHORT).show();
                     }
                 }.execute();
@@ -200,8 +196,6 @@ public class WaypointAdapter extends CursorAdapter {
 
                                     @Override
                                     protected void onPostExecute(Object result) {
-                                        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
-                                        changeCursor(cursor);
                                         Toast.makeText(context, context.getString(R.string.msg_deleted, name), Toast.LENGTH_SHORT).show();
                                     }
                                 }.execute();
@@ -210,7 +204,7 @@ public class WaypointAdapter extends CursorAdapter {
                         .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                // Ignore
+                                // Do nothing
                             }
                         });
                 AlertDialog alertDialog = alertDialogBuilder.create();

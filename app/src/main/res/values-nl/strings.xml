@@ -181,6 +181,11 @@
     <string name="provider_gps">GPS</string>
     <string name="provider_network">Netwerk</string>
 
+    <string name="menu_share">Delen</string>
+    <string name="menu_elevation_loc">Hoogte voor locatie ophalen</string>
+    <string name="menu_elevation_day">Hoogtes voor dag ophalen</string>
+    <string name="menu_delete">Verwijderen</string>
+
     <string name="still">Stil</string>
     <string name="tilting">Kantelen</string>
     <string name="on_foot">Te voet</string>

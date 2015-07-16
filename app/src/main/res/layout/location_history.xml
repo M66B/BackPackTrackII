@@ -16,19 +16,10 @@
         android:layout_marginTop="6dp"
         android:orientation="horizontal">
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="wrap_content" />
-
         <TextView
-            android:layout_width="75dp"
+            android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="6dp" />
-
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="3dp" />
 
         <TextView
             android:layout_width="10dp"
@@ -36,7 +27,7 @@
             android:layout_marginLeft="3dp" />
 
         <TextView
-            android:layout_width="35dp"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="3dp"

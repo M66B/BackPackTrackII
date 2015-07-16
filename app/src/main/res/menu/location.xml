@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_share"
+        android:title="@string/menu_share" />
+    <item
+        android:id="@+id/menu_elevation_loc"
+        android:title="@string/menu_elevation_loc" />
+    <item
+        android:id="@+id/menu_elevation_day"
+        android:title="@string/menu_elevation_day" />
+    <item
+        android:id="@+id/menu_delete"
+        android:title="@string/menu_delete" />
+</menu>
