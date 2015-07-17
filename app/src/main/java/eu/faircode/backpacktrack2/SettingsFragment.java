@@ -1987,7 +1987,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 String summary = df.format(ref_time) + " " + nf.format(ref_pressure) + " mbar " + Math.round(ref_location.distanceTo(lastLocation) / 1000) + " km";
                 if (pressure != 0 && time != 0) {
                     float altitude = PressureService.getAltitude(lastLocation, getActivity());
-                    summary += "\n" + df.format(time) + " " + nf.format(pressure) + " mbar " + Math.round(altitude) + " m";
+                    summary += "\n" + df.format(time) + " " +
+                            nf.format(pressure) + " mbar " +
+                            (Float.isNaN(altitude) ? "-" : Math.round(altitude)) + " m";
                 }
                 pref.setSummary(summary);
             }
