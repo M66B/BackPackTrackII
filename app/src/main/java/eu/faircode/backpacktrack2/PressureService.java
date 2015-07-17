@@ -58,19 +58,6 @@ public class PressureService extends Service {
             // Pressure averaging
             count++;
             values += mbar;
-
-            // Check if done
-            int samples = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_SAMPLES, SettingsFragment.DEFAULT_PRESSURE_SAMPLES));
-            if (count >= samples) {
-                stopSelf();
-                long time = new Date().getTime();
-                float pressure = values / count;
-                Log.w(TAG, "Average pressure " + pressure + "mb");
-                prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_VALUE, pressure).apply();
-                prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_TIME, time).apply();
-                Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
-                Log.w(TAG, "Pressure altitude " + getAltitude(lastLocation, PressureService.this) + "m");
-            }
         }
 
         @Override
@@ -126,6 +113,24 @@ public class PressureService extends Service {
             }).start();
         else
             Log.w(TAG, "Reference pressure valid");
+
+        //
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                int wait = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_WAIT, SettingsFragment.DEFAULT_PRESSURE_WAIT));
+                try {
+                    Thread.sleep(wait * 1000);
+                } catch (InterruptedException ignored) {
+                }
+                stopSelf();
+                long time = new Date().getTime();
+                float pressure = (count > 0 ? values / count : 0);
+                Log.w(TAG, "Average pressure " + pressure + "mb");
+                prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_VALUE, pressure).apply();
+                prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_TIME, time).apply();
+            }
+        }).start();
     }
 
     private static void getReferencePressure(Location location, Context context) {

@@ -437,6 +437,14 @@ public class LocationService extends IntentService {
             return;
         }
 
+        // Check pressure
+        boolean pressure_enabled = prefs.getBoolean(SettingsFragment.PREF_PRESSURE_ENABLED, SettingsFragment.DEFAULT_PRESSURE_ENABLED);
+        if (pressure_enabled)
+            if (prefs.getFloat(SettingsFragment.PREF_PRESSURE_VALUE, -1) < 0) {
+                Log.w(TAG, "Pressure not available yet");
+                return;
+            }
+
         stopLocating(this);
 
         // Process location

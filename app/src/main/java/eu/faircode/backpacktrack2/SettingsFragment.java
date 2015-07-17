@@ -124,7 +124,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_PRESSURE_MAXAGE = "pref_pressure_maxage";
     public static final String PREF_PRESSURE_MAXDIST = "pref_pressure_maxdist";
     public static final String PREF_PRESSURE_STATIONS = "pref_pressure_stations";
-    public static final String PREF_PRESSURE_SAMPLES = "pref_pressure_samples";
+    public static final String PREF_PRESSURE_WAIT = "pref_pressure_wait";
     public static final String PREF_PRESSURE_OFFSET = "pref_pressure_offset";
     public static final String PREF_PRESSURE_INVEHICLE = "pref_pressure_invehicle";
     public static final String PREF_PRESSURE_DISPLAY = "pref_pressure_display";
@@ -196,7 +196,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_PRESSURE_MAXAGE = "720"; // minutes
     public static final String DEFAULT_PRESSURE_MAXDIST = "25"; // kilometer
     public static final String DEFAULT_PRESSURE_STATIONS = "5"; // count
-    public static final String DEFAULT_PRESSURE_SAMPLES = "10"; // count
+    public static final String DEFAULT_PRESSURE_WAIT = "5"; // seconds
     public static final String DEFAULT_PRESSURE_OFFSET = "0"; // mbar
     public static final boolean DEFAULT_PRESSURE_INVEHICLE = false;
 
@@ -380,6 +380,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_PASSIVE_MINTIME);
         updateTitle(prefs, PREF_PASSIVE_MINDIST);
 
+        updateTitle(prefs, PREF_PRESSURE_WAIT);
         updateTitle(prefs, PREF_PRESSURE_OFFSET);
         updateTitle(prefs, PREF_PRESSURE_DISPLAY);
         updateTitle(prefs, PREF_ALTITUDE_AVG);
@@ -1947,6 +1948,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if (PREF_PASSIVE_MINDIST.equals(key))
             pref.setTitle(getString(R.string.title_mindist, prefs.getString(key, DEFAULT_PASSIVE_MINDIST)));
 
+        else if (PREF_PRESSURE_WAIT.equals(key))
+            pref.setTitle(getString(R.string.title_pressure_wait, prefs.getString(key, DEFAULT_PRESSURE_WAIT)));
         else if (PREF_PRESSURE_OFFSET.equals(key))
             pref.setTitle(getString(R.string.title_pressure_offset, prefs.getString(key, DEFAULT_PRESSURE_OFFSET)));
         else if (PREF_PRESSURE_DISPLAY.equals(key)) {
