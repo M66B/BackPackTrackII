@@ -196,7 +196,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_PRESSURE_MAXAGE = "720"; // minutes
     public static final String DEFAULT_PRESSURE_MAXDIST = "25"; // kilometer
     public static final String DEFAULT_PRESSURE_STATIONS = "5"; // count
-    public static final String DEFAULT_PRESSURE_WAIT = "5"; // seconds
+    public static final String DEFAULT_PRESSURE_WAIT = "3"; // seconds
     public static final String DEFAULT_PRESSURE_OFFSET = "0"; // mbar
     public static final boolean DEFAULT_PRESSURE_INVEHICLE = false;
 
@@ -380,6 +380,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_PASSIVE_MINTIME);
         updateTitle(prefs, PREF_PASSIVE_MINDIST);
 
+        updateTitle(prefs, PREF_PRESSURE_REFRESH);
+        updateTitle(prefs, PREF_PRESSURE_MAXAGE);
+        updateTitle(prefs, PREF_PRESSURE_MAXDIST);
+        updateTitle(prefs, PREF_PRESSURE_STATIONS);
         updateTitle(prefs, PREF_PRESSURE_WAIT);
         updateTitle(prefs, PREF_PRESSURE_OFFSET);
         updateTitle(prefs, PREF_PRESSURE_DISPLAY);
@@ -1948,6 +1952,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if (PREF_PASSIVE_MINDIST.equals(key))
             pref.setTitle(getString(R.string.title_mindist, prefs.getString(key, DEFAULT_PASSIVE_MINDIST)));
 
+        else if (PREF_PRESSURE_REFRESH.equals(key))
+            pref.setTitle(getString(R.string.title_pressure_refresh, prefs.getString(key, DEFAULT_PRESSURE_REFRESH)));
+        else if (PREF_PRESSURE_MAXAGE.equals(key))
+            pref.setTitle(getString(R.string.title_pressure_maxage, prefs.getString(key, DEFAULT_PRESSURE_MAXAGE)));
+        else if (PREF_PRESSURE_MAXDIST.equals(key))
+            pref.setTitle(getString(R.string.title_pressure_maxdist, prefs.getString(key, DEFAULT_PRESSURE_MAXDIST)));
+        else if (PREF_PRESSURE_STATIONS.equals(key))
+            pref.setTitle(getString(R.string.title_pressure_stations, prefs.getString(key, DEFAULT_PRESSURE_STATIONS)));
         else if (PREF_PRESSURE_WAIT.equals(key))
             pref.setTitle(getString(R.string.title_pressure_wait, prefs.getString(key, DEFAULT_PRESSURE_WAIT)));
         else if (PREF_PRESSURE_OFFSET.equals(key))
@@ -1966,16 +1978,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             float pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_VALUE, 0);
             long time = prefs.getLong(SettingsFragment.PREF_PRESSURE_TIME, 0);
 
-            pref.setTitle(ref_name == null ? "-" : ref_name + " @" + Math.round(ref_location.distanceTo(lastLocation) / 1000) + " km");
+            pref.setTitle(ref_name == null ? "-" : ref_name);
             if (ref_pressure == 0 || ref_time == 0)
                 pref.setSummary(null);
             else {
                 DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
                 DecimalFormat nf = new DecimalFormat("#.0", new DecimalFormatSymbols(Locale.ROOT));
-                String summary = df.format(ref_time) + " " + nf.format(ref_pressure) + " mbar";
+                String summary = df.format(ref_time) + " " + nf.format(ref_pressure) + " mbar " + Math.round(ref_location.distanceTo(lastLocation) / 1000) + " km";
                 if (pressure != 0 && time != 0) {
                     float altitude = PressureService.getAltitude(lastLocation, getActivity());
-                    summary += "\n" + df.format(time) + " " + nf.format(pressure) + " mbar " + Math.round(altitude) + "m";
+                    summary += "\n" + df.format(time) + " " + nf.format(pressure) + " mbar " + Math.round(altitude) + " m";
                 }
                 pref.setSummary(summary);
             }

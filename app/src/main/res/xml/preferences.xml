@@ -213,7 +213,27 @@
                 android:key="pref_pressure_enabled"
                 android:title="@string/title_pressure_enabled" />
             <EditTextPreference
+                android:defaultValue="60"
+                android:dependency="pref_pressure_enabled"
+                android:inputType="number"
+                android:key="pref_pressure_refresh" />
+            <EditTextPreference
+                android:defaultValue="720"
+                android:dependency="pref_pressure_enabled"
+                android:inputType="number"
+                android:key="pref_pressure_maxage" />
+            <EditTextPreference
+                android:defaultValue="25"
+                android:dependency="pref_pressure_enabled"
+                android:inputType="number"
+                android:key="pref_pressure_maxdist" />
+            <EditTextPreference
                 android:defaultValue="5"
+                android:dependency="pref_pressure_enabled"
+                android:inputType="number"
+                android:key="pref_pressure_stations" />
+            <EditTextPreference
+                android:defaultValue="3"
                 android:dependency="pref_pressure_enabled"
                 android:inputType="number"
                 android:key="pref_pressure_wait" />
@@ -222,6 +242,11 @@
                 android:dependency="pref_pressure_enabled"
                 android:inputType="numberSigned|numberDecimal"
                 android:key="pref_pressure_offset" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="pref_pressure_enabled"
+                android:key="pref_pressure_invehicle"
+                android:title="@string/title_pressure_invehicle" />
             <Preference
                 android:dependency="pref_pressure_enabled"
                 android:key="pref_pressure_display" />

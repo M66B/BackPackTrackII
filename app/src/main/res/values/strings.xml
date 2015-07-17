@@ -45,8 +45,13 @@
     <string name="title_altitude_trackpoint">Google elevation for trackpoints</string>
     <string name="title_altitude_google_terms">Powered by Google</string>
     <string name="title_pressure_enabled">Use pressure to determine altitude</string>
+    <string name="title_pressure_refresh">Pressure refresh time: %s minutes</string>
+    <string name="title_pressure_maxage">Pressure max. age: %s minutes</string>
+    <string name="title_pressure_maxdist">Pressure max. distance: %s km</string>
+    <string name="title_pressure_stations">Pressure fetch stations: %s</string>
     <string name="title_pressure_wait">Pressure averaging time: %s seconds</string>
     <string name="title_pressure_offset">Pressure calibration: %s mbar</string>
+    <string name="title_pressure_invehicle">Use pressure in vehicle</string>
     <string name="title_altitude_avg">Moving average: %s samples</string>
 
     <string name="title_recognition">Activity recognition</string>
