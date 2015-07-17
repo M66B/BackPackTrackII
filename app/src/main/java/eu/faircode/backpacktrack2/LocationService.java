@@ -1061,7 +1061,7 @@ public class LocationService extends IntentService {
             Log.w(TAG, "New location=" + location + " type=" + locationType);
 
             // Derive altitude from pressure
-            float altitude = PressureService.getAltitude(this, location);
+            float altitude = PressureService.getAltitude(location, this);
             if (!Float.isNaN(altitude))
                 location.setAltitude(altitude);
 

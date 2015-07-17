@@ -67,12 +67,16 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "BPT2.Settings";
@@ -494,18 +498,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         pref_pressure_display.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                final Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
-                if (lastLocation == null)
-                    return false;
-                else {
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            PressureService.getReferencePressure(lastLocation, getActivity());
-                        }
-                    }).start();
-                    return true;
-                }
+                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_NAME).apply();
+                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_LAT).apply();
+                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_LON).apply();
+                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_VALUE).apply();
+                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_TIME).apply();
+                getActivity().startService(new Intent(getActivity(), PressureService.class));
+                return true;
             }
         });
 
@@ -565,7 +564,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             key = PREF_SHARE_KML;
         else if (PREF_LAST_UPLOAD_GPX.equals(key))
             key = PREF_UPLOAD_GPX;
-        else if (PREF_PRESSURE_REF_TIME.equals(key))
+        else if (PREF_PRESSURE_REF_TIME.equals(key) || PREF_PRESSURE_TIME.equals(key))
             key = PREF_PRESSURE_DISPLAY;
 
         Preference pref = findPreference(key);
@@ -1951,18 +1950,32 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if (PREF_PRESSURE_OFFSET.equals(key))
             pref.setTitle(getString(R.string.title_pressure_offset, prefs.getString(key, DEFAULT_PRESSURE_OFFSET)));
         else if (PREF_PRESSURE_DISPLAY.equals(key)) {
-            String name = prefs.getString(SettingsFragment.PREF_PRESSURE_REF_NAME, null);
-            float pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, 0);
-            long time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
-            Location station = new Location("station");
-            station.setLatitude(prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_LAT, 0));
-            station.setLongitude(prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_LON, 0));
+            // Get reference pressure
+            String ref_name = prefs.getString(SettingsFragment.PREF_PRESSURE_REF_NAME, null);
+            float ref_pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, 0);
+            long ref_time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
+            Location ref_location = new Location("station");
+            ref_location.setLatitude(prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_LAT, 0));
+            ref_location.setLongitude(prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_LON, 0));
             Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
-            pref.setTitle(name == null ? "-" : name + " @" + Math.round(station.distanceTo(lastLocation) / 1000) + " km");
-            if (pressure == 0 || time == 0)
+
+            // Get last pressure
+            float pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_VALUE, 0);
+            long time = prefs.getLong(SettingsFragment.PREF_PRESSURE_TIME, 0);
+
+            pref.setTitle(ref_name == null ? "-" : ref_name + " @" + Math.round(ref_location.distanceTo(lastLocation) / 1000) + " km");
+            if (ref_pressure == 0 || ref_time == 0)
                 pref.setSummary(null);
-            else
-                pref.setSummary(pressure + " mbar\n" + SimpleDateFormat.getDateTimeInstance().format(time));
+            else {
+                DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
+                DecimalFormat nf = new DecimalFormat("#.0", new DecimalFormatSymbols(Locale.ROOT));
+                String summary = df.format(ref_time) + " " + nf.format(ref_pressure) + " mbar";
+                if (pressure != 0 && time != 0) {
+                    float altitude = PressureService.getAltitude(lastLocation, getActivity());
+                    summary += "\n" + df.format(time) + " " + nf.format(pressure) + " mbar " + Math.round(altitude) + "m";
+                }
+                pref.setSummary(summary);
+            }
         } else if (PREF_ALTITUDE_AVG.equals(key))
             pref.setTitle(getString(R.string.title_altitude_avg, prefs.getString(key, DEFAULT_ALTITUDE_AVG)));
 

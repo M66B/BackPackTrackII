@@ -1,7 +1,6 @@
 package eu.faircode.backpacktrack2;
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -70,7 +69,7 @@ public class PressureService extends Service {
                 prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_VALUE, pressure).apply();
                 prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_TIME, time).apply();
                 Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
-                Log.w(TAG, "Pressure altitude " + getAltitude(PressureService.this, lastLocation) + "m");
+                Log.w(TAG, "Pressure altitude " + getAltitude(lastLocation, PressureService.this) + "m");
             }
         }
 
@@ -129,7 +128,7 @@ public class PressureService extends Service {
             Log.w(TAG, "Reference pressure valid");
     }
 
-    public static void getReferencePressure(Location location, Context context) {
+    private static void getReferencePressure(Location location, Context context) {
         try {
             // Check connectivity
             if (!SettingsFragment.isConnected(context))
@@ -254,7 +253,7 @@ public class PressureService extends Service {
         }
     }
 
-    public static float getAltitude(Context context, Location location) {
+    public static float getAltitude(Location location, Context context) {
         // Get settings
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int maxage = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXAGE, SettingsFragment.DEFAULT_PRESSURE_MAXAGE));
