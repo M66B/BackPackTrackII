@@ -44,15 +44,24 @@
     <string name="title_altitude_waypoint">Google elevation for waypoints</string>
     <string name="title_altitude_trackpoint">Google elevation for trackpoints</string>
     <string name="title_altitude_google_terms">Powered by Google</string>
+    <string name="title_altitude_avg">Moving average: %s samples</string>
+
+    <string name="title_pressure_settings">Pressure</string>
     <string name="title_pressure_enabled">Use pressure to determine altitude</string>
-    <string name="title_pressure_refresh">Pressure refresh time: %s minutes</string>
-    <string name="title_pressure_maxage">Pressure max. age: %s minutes</string>
-    <string name="title_pressure_maxdist">Pressure max. distance: %s km</string>
-    <string name="title_pressure_stations">Pressure fetch stations: %s</string>
+    <string name="title_pressure_refresh">Reference pressure refresh: %s minutes</string>
+    <string name="title_pressure_maxage">Reference pressure max. age: %s minutes</string>
+    <string name="title_pressure_maxdist">Reference pressure max. distance: %s km</string>
+    <string name="title_pressure_stations">Reference pressure stations: %s</string>
+    <string name="title_pressure_airport">Use airport stations</string>
+    <string name="title_pressure_swop">Use SWOP stations</string>
+    <string name="title_pressure_synop">Use SYNOP stations</string>
+    <string name="title_pressure_diy">Use DIY stations</string>
+    <string name="title_pressure_other">Use other stations</string>
+    <string name="title_pressure_tos">OpenWeatherMap TOS</string>
     <string name="title_pressure_wait">Pressure averaging time: %s seconds</string>
     <string name="title_pressure_offset">Pressure calibration: %s mbar</string>
     <string name="title_pressure_invehicle">Use pressure in vehicle</string>
-    <string name="title_altitude_avg">Moving average: %s samples</string>
+    <string name="title_pressure_nodata">No reference data</string>
 
     <string name="title_recognition">Activity recognition</string>
     <string name="title_recognition_enabled">Activity recognition enabled</string>

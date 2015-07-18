@@ -147,6 +147,11 @@ public class PressureService extends Service {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             int stations = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_STATIONS, SettingsFragment.DEFAULT_PRESSURE_STATIONS));
             int maxage = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXAGE, SettingsFragment.DEFAULT_PRESSURE_MAXAGE));
+            boolean airport = prefs.getBoolean(SettingsFragment.PREF_PRESSURE_AIRPORT, SettingsFragment.DEFAULT_PRESSURE_AIRPORT);
+            boolean swop = prefs.getBoolean(SettingsFragment.PREF_PRESSURE_SWOP, SettingsFragment.DEFAULT_PRESSURE_SWOP);
+            boolean synop = prefs.getBoolean(SettingsFragment.PREF_PRESSURE_SYNOP, SettingsFragment.DEFAULT_PRESSURE_SYNOP);
+            boolean diy = prefs.getBoolean(SettingsFragment.PREF_PRESSURE_DIY, SettingsFragment.DEFAULT_PRESSURE_DIY);
+            boolean other = prefs.getBoolean(SettingsFragment.PREF_PRESSURE_OTHER, SettingsFragment.DEFAULT_PRESSURE_OTHER);
 
             // http://api.openweathermap.org/data/2.5/station/find?lat=55&lon=37&cnt=1&APPID=864e7cbda85229f66bc58b483c0ae312
             URL url = new URL("http://api.openweathermap.org/data/2.5/station/find" +
@@ -215,6 +220,7 @@ public class PressureService extends Service {
 
                     // Get data
                     String ref_name = (station.has("name") ? station.getString("name") : "-");
+                    int ref_type = (station.has("type") ? station.getInt("type") : -1);
                     double ref_lat = coord.getDouble("lat");
                     double ref_lon = coord.getDouble("lon");
                     double ref_pressure = main.getDouble("pressure");
@@ -224,11 +230,12 @@ public class PressureService extends Service {
                     ref_location.setLongitude(ref_lon);
 
                     Log.w(TAG, "Pressure " + ref_pressure + "mb " +
-                            ref_name + " " +
+                            ref_name + ":" + ref_type + " " +
                             SimpleDateFormat.getDateTimeInstance().format(ref_time) + " " +
                             Math.round(ref_location.distanceTo(location) / 1000) + "km");
 
-                    if (!found && ref_time + maxage * 60 * 1000 >= time) {
+                    if (!found && ref_time + maxage * 60 * 1000 >= time &&
+                            (other || (ref_type == 1 && airport) || (ref_type == 2 && swop)) || (ref_type == 3 && synop) || (ref_type == 5 && diy)) {
                         found = true;
                         Log.w(TAG, "Reference pressure " + ref_pressure + "mbar @" + SimpleDateFormat.getDateTimeInstance().format(ref_time));
 

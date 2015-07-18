@@ -207,6 +207,13 @@
                     android:action="android.intent.action.VIEW"
                     android:data="https://developers.google.com/maps/terms" />
             </Preference>
+            <EditTextPreference
+                android:defaultValue="5"
+                android:inputType="number"
+                android:key="pref_altitude_avg"
+                android:summary="@string/summary_altitude_avg" />
+        </PreferenceScreen>
+        <PreferenceScreen android:title="@string/title_pressure_settings">
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:dependency="pref_enabled"
@@ -232,6 +239,36 @@
                 android:dependency="pref_pressure_enabled"
                 android:inputType="number"
                 android:key="pref_pressure_stations" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="pref_pressure_enabled"
+                android:key="pref_pressure_airport"
+                android:title="@string/title_pressure_airport" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="pref_pressure_enabled"
+                android:key="pref_pressure_swop"
+                android:title="@string/title_pressure_swop" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="pref_pressure_enabled"
+                android:key="pref_pressure_synop"
+                android:title="@string/title_pressure_synop" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="pref_pressure_enabled"
+                android:key="pref_pressure_diy"
+                android:title="@string/title_pressure_diy" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="pref_pressure_enabled"
+                android:key="pref_pressure_other"
+                android:title="@string/title_pressure_other" />
+            <Preference android:title="@string/title_pressure_tos">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="http://openweathermap.org/terms" />
+            </Preference>
             <EditTextPreference
                 android:defaultValue="3"
                 android:dependency="pref_pressure_enabled"
@@ -250,11 +287,6 @@
             <Preference
                 android:dependency="pref_pressure_enabled"
                 android:key="pref_pressure_display" />
-            <EditTextPreference
-                android:defaultValue="5"
-                android:inputType="number"
-                android:key="pref_altitude_avg"
-                android:summary="@string/summary_altitude_avg" />
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_recognition">
             <CheckBoxPreference

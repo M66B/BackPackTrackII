@@ -124,6 +124,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_PRESSURE_MAXAGE = "pref_pressure_maxage";
     public static final String PREF_PRESSURE_MAXDIST = "pref_pressure_maxdist";
     public static final String PREF_PRESSURE_STATIONS = "pref_pressure_stations";
+    public static final String PREF_PRESSURE_AIRPORT = "pref_pressure_airport";
+    public static final String PREF_PRESSURE_SWOP = "pref_pressure_swop";
+    public static final String PREF_PRESSURE_SYNOP = "pref_pressure_synop";
+    public static final String PREF_PRESSURE_DIY = "pref_pressure_diy";
+    public static final String PREF_PRESSURE_OTHER = "pref_pressure_other";
     public static final String PREF_PRESSURE_WAIT = "pref_pressure_wait";
     public static final String PREF_PRESSURE_OFFSET = "pref_pressure_offset";
     public static final String PREF_PRESSURE_INVEHICLE = "pref_pressure_invehicle";
@@ -196,6 +201,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_PRESSURE_MAXAGE = "720"; // minutes
     public static final String DEFAULT_PRESSURE_MAXDIST = "25"; // kilometer
     public static final String DEFAULT_PRESSURE_STATIONS = "5"; // count
+    public static final boolean DEFAULT_PRESSURE_AIRPORT = true;
+    public static final boolean DEFAULT_PRESSURE_SWOP = true;
+    public static final boolean DEFAULT_PRESSURE_SYNOP = true;
+    public static final boolean DEFAULT_PRESSURE_DIY = false;
+    public static final boolean DEFAULT_PRESSURE_OTHER = false;
     public static final String DEFAULT_PRESSURE_WAIT = "3"; // seconds
     public static final String DEFAULT_PRESSURE_OFFSET = "0"; // mbar
     public static final boolean DEFAULT_PRESSURE_INVEHICLE = false;
@@ -1978,10 +1988,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             float pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_VALUE, 0);
             long time = prefs.getLong(SettingsFragment.PREF_PRESSURE_TIME, 0);
 
-            pref.setTitle(ref_name == null ? "-" : ref_name);
-            if (ref_pressure == 0 || ref_time == 0)
+            if (ref_pressure == 0 || ref_time == 0) {
+                pref.setTitle(getString(R.string.title_pressure_nodata));
                 pref.setSummary(null);
-            else {
+            } else {
+                pref.setTitle(ref_name == null ? "-" : ref_name);
                 DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
                 DecimalFormat nf = new DecimalFormat("#.0", new DecimalFormatSymbols(Locale.ROOT));
                 String summary = df.format(ref_time) + " " + nf.format(ref_pressure) + " mbar " + Math.round(ref_location.distanceTo(lastLocation) / 1000) + " km";
