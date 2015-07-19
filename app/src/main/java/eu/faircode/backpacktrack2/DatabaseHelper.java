@@ -144,7 +144,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", humidity REAL NULL" +
                 ", pressure REAL NULL" +
                 ", wind_speed REAL NULL" +
-                ", wind_direction REAL NULL" + ");");
+                ", wind_direction REAL NULL" +
+                ", created INTEGER NULL" + ");");
         db.execSQL("CREATE INDEX idx_weather_time ON weather(time)");
         db.execSQL("CREATE INDEX idx_weather_station_id ON weather(station_id)");
     }
@@ -609,6 +610,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cv.putNull("wind_direction");
             else
                 cv.put("wind_direction", weather.wind_direction);
+
+            cv.put("created", new Date().getTime());
 
             db.insert("weather", null, cv);
         }
