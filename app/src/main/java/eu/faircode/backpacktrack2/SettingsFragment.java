@@ -85,6 +85,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_LOCATION_HISTORY = "pref_location_history";
     public static final String PREF_ACTIVITY_HISTORY = "pref_activity_history";
     public static final String PREF_STEP_HISTORY = "pref_step_history";
+    public static final String PREF_WEATHER_HISTORY = "pref_weather_history";
     public static final String PREF_SETTINGS = "pref_settings";
 
     public static final String PREF_ENABLED = "pref_enabled";
@@ -353,17 +354,19 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Preference pref_share_gpx = findPreference(PREF_SHARE_GPX);
         Preference pref_share_kml = findPreference(PREF_SHARE_KML);
         Preference pref_upload_gpx = findPreference(PREF_UPLOAD_GPX);
-        Preference pref_enabled = findPreference(PREF_ENABLED);
-        Preference pref_check = findPreference(PREF_SETTINGS);
-        Preference pref_pressure_enabled = findPreference(PREF_PRESSURE_ENABLED);
         Preference pref_location_history = findPreference(PREF_LOCATION_HISTORY);
         Preference pref_activity_history = findPreference(PREF_ACTIVITY_HISTORY);
-        Preference pref_recognize_steps = findPreference(PREF_RECOGNITION_STEPS);
         Preference pref_step_history = findPreference(PREF_STEP_HISTORY);
+        Preference pref_weather_history = findPreference(PREF_WEATHER_HISTORY);
+        Preference pref_check = findPreference(PREF_SETTINGS);
+        Preference pref_version = findPreference(PREF_VERSION);
+
+        Preference pref_enabled = findPreference(PREF_ENABLED);
+        Preference pref_pressure_enabled = findPreference(PREF_PRESSURE_ENABLED);
+        Preference pref_recognize_steps = findPreference(PREF_RECOGNITION_STEPS);
         Preference pref_step_update = findPreference(PREF_STEP_DELTA);
         Preference pref_step_size = findPreference(PREF_STEP_SIZE);
         Preference pref_weight = findPreference(PREF_WEIGHT);
-        Preference pref_version = findPreference(PREF_VERSION);
 
         // Set titles/summaries
         updateTitle(prefs, PREF_SHARE_GPX);
@@ -495,6 +498,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 step_history();
+                return true;
+            }
+        });
+
+        // Handle weather history
+        pref_weather_history.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
                 return true;
             }
         });

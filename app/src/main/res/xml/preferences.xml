@@ -40,6 +40,11 @@
             android:summary="@string/summary_step_history"
             android:title="@string/title_step_history" />
         <Preference
+            android:icon="@drawable/sunny_60"
+            android:key="pref_weather_history"
+            android:summary="@string/summary_weather_history"
+            android:title="@string/title_weather_history" />
+        <Preference
             android:icon="@drawable/gpsfixed_60"
             android:key="pref_settings"
             android:summary="@string/summary_loc_settings"
