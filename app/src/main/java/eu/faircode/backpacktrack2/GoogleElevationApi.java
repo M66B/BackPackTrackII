@@ -20,10 +20,6 @@ public class GoogleElevationApi {
 
     public static boolean getElevation(Location location, Context context) {
         try {
-            // Check connectivity
-            if (!SettingsFragment.isConnected(context))
-                return false;
-
             // https://developers.google.com/maps/documentation/elevation/
             URL url = new URL("https://maps.googleapis.com/maps/api/elevation/json?locations=" +
                     String.valueOf(location.getLatitude()) + "," +

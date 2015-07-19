@@ -67,16 +67,12 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.io.IOException;
 import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "BPT2.Settings";
@@ -117,22 +113,24 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_CORRECTION_ENABLED = "pref_correction_enabled";
     public static final String PREF_ALTITUDE_WAYPOINT = "pref_altitude_waypoint";
     public static final String PREF_ALTITUDE_TRACKPOINT = "pref_altitude_trackpoint";
-    public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
 
     public static final String PREF_PRESSURE_ENABLED = "pref_pressure_enabled";
-    public static final String PREF_PRESSURE_REFRESH = "pref_pressure_refresh";
     public static final String PREF_PRESSURE_MAXAGE = "pref_pressure_maxage";
     public static final String PREF_PRESSURE_MAXDIST = "pref_pressure_maxdist";
-    public static final String PREF_PRESSURE_STATIONS = "pref_pressure_stations";
-    public static final String PREF_PRESSURE_AIRPORT = "pref_pressure_airport";
-    public static final String PREF_PRESSURE_SWOP = "pref_pressure_swop";
-    public static final String PREF_PRESSURE_SYNOP = "pref_pressure_synop";
-    public static final String PREF_PRESSURE_DIY = "pref_pressure_diy";
-    public static final String PREF_PRESSURE_OTHER = "pref_pressure_other";
     public static final String PREF_PRESSURE_WAIT = "pref_pressure_wait";
     public static final String PREF_PRESSURE_OFFSET = "pref_pressure_offset";
     public static final String PREF_PRESSURE_INVEHICLE = "pref_pressure_invehicle";
-    public static final String PREF_PRESSURE_DISPLAY = "pref_pressure_display";
+
+    public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
+
+    public static final String PREF_WEATHER_ENABLED = "pref_weather_enabled";
+    public static final String PREF_WEATHER_INTERVAL = "pref_weather_interval";
+    public static final String PREF_WEATHER_STATIONS = "pref_weather_stations";
+    public static final String PREF_WEATHER_AIRPORT = "pref_weather_airport";
+    public static final String PREF_WEATHER_SWOP = "pref_weather_swop";
+    public static final String PREF_WEATHER_SYNOP = "pref_weather_synop";
+    public static final String PREF_WEATHER_DIY = "pref_weather_diy";
+    public static final String PREF_WEATHER_OTHER = "pref_weather_other";
 
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
     public static final String PREF_RECOGNITION_INTERVAL_STILL = "pref_recognition_interval_still";
@@ -194,21 +192,24 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final boolean DEFAULT_CORRECTION_ENABLED = true;
     public static final boolean DEFAULT_ALTITUDE_WAYPOINT = true;
     public static final boolean DEFAULT_ALTITUDE_TRACKPOINT = false;
-    public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
 
     public static final boolean DEFAULT_PRESSURE_ENABLED = false;
-    public static final String DEFAULT_PRESSURE_REFRESH = "60"; // minutes
     public static final String DEFAULT_PRESSURE_MAXAGE = "180"; // minutes
     public static final String DEFAULT_PRESSURE_MAXDIST = "25"; // kilometer
-    public static final String DEFAULT_PRESSURE_STATIONS = "10"; // count
-    public static final boolean DEFAULT_PRESSURE_AIRPORT = true;
-    public static final boolean DEFAULT_PRESSURE_SWOP = true;
-    public static final boolean DEFAULT_PRESSURE_SYNOP = true;
-    public static final boolean DEFAULT_PRESSURE_DIY = false;
-    public static final boolean DEFAULT_PRESSURE_OTHER = false;
     public static final String DEFAULT_PRESSURE_WAIT = "3"; // seconds
     public static final String DEFAULT_PRESSURE_OFFSET = "0"; // hPa
     public static final boolean DEFAULT_PRESSURE_INVEHICLE = false;
+
+    public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
+
+    public static final boolean DEFAULT_WEATHER_ENABLED = true;
+    public static final String DEFAULT_WEATHER_INTERVAL = "60"; // minutes
+    public static final String DEFAULT_WEATHER_STATIONS = "10"; // count
+    public static final boolean DEFAULT_WEATHER_AIRPORT = true;
+    public static final boolean DEFAULT_WEATHER_SWOP = true;
+    public static final boolean DEFAULT_WEATHER_SYNOP = true;
+    public static final boolean DEFAULT_WEATHER_DIY = false;
+    public static final boolean DEFAULT_WEATHER_OTHER = false;
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
     public static final String DEFAULT_RECOGNITION_INTERVAL_STILL = "60"; // seconds
@@ -244,11 +245,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_PRESSURE_VALUE = "pref_pressure_value";
     public static final String PREF_PRESSURE_TIME = "pref_pressure_time";
 
-    public static final String PREF_PRESSURE_REF_NAME = "pref_pressure_ref_name";
     public static final String PREF_PRESSURE_REF_LAT = "pref_pressure_ref_lat";
     public static final String PREF_PRESSURE_REF_LON = "pref_pressure_ref_lon";
-    public static final String PREF_PRESSURE_REF_TEMP = "pref_pressure_ref_temp";
-    public static final String PREF_PRESSURE_REF_HUMIDITY = "pref_pressure_ref_humidity";
     public static final String PREF_PRESSURE_REF_VALUE = "pref_pressure_ref_value";
     public static final String PREF_PRESSURE_REF_TIME = "pref_pressure_ref_time";
 
@@ -358,7 +356,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Preference pref_enabled = findPreference(PREF_ENABLED);
         Preference pref_check = findPreference(PREF_SETTINGS);
         Preference pref_pressure_enabled = findPreference(PREF_PRESSURE_ENABLED);
-        Preference pref_pressure_display = findPreference(PREF_PRESSURE_DISPLAY);
         Preference pref_location_history = findPreference(PREF_LOCATION_HISTORY);
         Preference pref_activity_history = findPreference(PREF_ACTIVITY_HISTORY);
         Preference pref_recognize_steps = findPreference(PREF_RECOGNITION_STEPS);
@@ -392,14 +389,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_PASSIVE_MINTIME);
         updateTitle(prefs, PREF_PASSIVE_MINDIST);
 
-        updateTitle(prefs, PREF_PRESSURE_REFRESH);
         updateTitle(prefs, PREF_PRESSURE_MAXAGE);
         updateTitle(prefs, PREF_PRESSURE_MAXDIST);
-        updateTitle(prefs, PREF_PRESSURE_STATIONS);
         updateTitle(prefs, PREF_PRESSURE_WAIT);
         updateTitle(prefs, PREF_PRESSURE_OFFSET);
-        updateTitle(prefs, PREF_PRESSURE_DISPLAY);
+
         updateTitle(prefs, PREF_ALTITUDE_AVG);
+
+        updateTitle(prefs, PREF_WEATHER_INTERVAL);
+        updateTitle(prefs, PREF_WEATHER_STATIONS);
 
         updateTitle(prefs, PREF_RECOGNITION_INTERVAL_STILL);
         updateTitle(prefs, PREF_RECOGNITION_INTERVAL_MOVING);
@@ -511,20 +509,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Check for pressure sensor
         pref_pressure_enabled.setEnabled(LocationService.hasPressureSensor(getActivity()));
 
-        // Handle reference pressure refresh
-        pref_pressure_display.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_NAME).apply();
-                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_LAT).apply();
-                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_LON).apply();
-                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_VALUE).apply();
-                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_TIME).apply();
-                getActivity().startService(new Intent(getActivity(), PressureService.class));
-                return true;
-            }
-        });
-
         // Check for Play services
         boolean playServices = LocationService.hasPlayServices(getActivity());
         findPreference(PREF_ACTIVITY_HISTORY).setEnabled(playServices);
@@ -581,8 +565,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             key = PREF_SHARE_KML;
         else if (PREF_LAST_UPLOAD_GPX.equals(key))
             key = PREF_UPLOAD_GPX;
-        else if (PREF_PRESSURE_REF_TIME.equals(key) || PREF_PRESSURE_TIME.equals(key))
-            key = PREF_PRESSURE_DISPLAY;
 
         Preference pref = findPreference(key);
 
@@ -640,6 +622,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     }
                 }
             }).start();
+
+        if (PREF_WEATHER_ENABLED.equals(key) ||
+                PREF_WEATHER_INTERVAL.equals(key)) {
+            LocationService.stopWeatherUpdates(getActivity());
+            LocationService.startWeatherUpdates(getActivity());
+        }
     }
 
     // Helper methods
@@ -671,6 +659,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
         Log.w(TAG, "Settings daily task from " + SimpleDateFormat.getDateTimeInstance().format(calendar.getTimeInMillis()));
+
+        // Initialize weather updates
+        LocationService.startWeatherUpdates(context);
     }
 
     private void edit_waypoints() {
@@ -825,7 +816,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             new AsyncTask<Object, Object, Object>() {
                                 protected Object doInBackground(Object... params) {
                                     // Add elevation data
-                                    if (!location.hasAltitude()) {
+                                    if (!location.hasAltitude() && isConnected(getActivity())) {
                                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
                                         if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
                                             GoogleElevationApi.getElevation(location, getActivity());
@@ -873,7 +864,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             new AsyncTask<Object, Object, Object>() {
                 protected Object doInBackground(Object... params) {
                     // Add elevation data
-                    if (!location.hasAltitude()) {
+                    if (!location.hasAltitude() && isConnected(getActivity())) {
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
                         if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
                             GoogleElevationApi.getElevation(location, getActivity());
@@ -1228,6 +1219,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     }
                 });
                 popupMenu.inflate(R.menu.location);
+                popupMenu.getMenu().findItem(R.id.menu_elevation_loc).setEnabled(isConnected(getActivity()));
+                popupMenu.getMenu().findItem(R.id.menu_elevation_day).setEnabled(isConnected(getActivity()));
                 popupMenu.show();
             }
         });
@@ -1964,56 +1957,22 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if (PREF_PASSIVE_MINDIST.equals(key))
             pref.setTitle(getString(R.string.title_mindist, prefs.getString(key, DEFAULT_PASSIVE_MINDIST)));
 
-        else if (PREF_PRESSURE_REFRESH.equals(key))
-            pref.setTitle(getString(R.string.title_pressure_refresh, prefs.getString(key, DEFAULT_PRESSURE_REFRESH)));
-        else if (PREF_PRESSURE_MAXAGE.equals(key))
-            pref.setTitle(getString(R.string.title_pressure_maxage, prefs.getString(key, DEFAULT_PRESSURE_MAXAGE)));
-        else if (PREF_PRESSURE_MAXDIST.equals(key))
-            pref.setTitle(getString(R.string.title_pressure_maxdist, prefs.getString(key, DEFAULT_PRESSURE_MAXDIST)));
-        else if (PREF_PRESSURE_STATIONS.equals(key))
-            pref.setTitle(getString(R.string.title_pressure_stations, prefs.getString(key, DEFAULT_PRESSURE_STATIONS)));
         else if (PREF_PRESSURE_WAIT.equals(key))
             pref.setTitle(getString(R.string.title_pressure_wait, prefs.getString(key, DEFAULT_PRESSURE_WAIT)));
         else if (PREF_PRESSURE_OFFSET.equals(key))
             pref.setTitle(getString(R.string.title_pressure_offset, prefs.getString(key, DEFAULT_PRESSURE_OFFSET)));
-        else if (PREF_PRESSURE_DISPLAY.equals(key)) {
-            // Get reference pressure
-            String ref_name = prefs.getString(SettingsFragment.PREF_PRESSURE_REF_NAME, null);
-            float ref_temp = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_TEMP, 0);
-            float ref_humidity = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_HUMIDITY, 0);
-            float ref_pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, 0);
-            long ref_time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
-            Location ref_location = new Location("station");
-            ref_location.setLatitude(prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_LAT, 0));
-            ref_location.setLongitude(prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_LON, 0));
-            Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
 
-            // Get last pressure
-            float pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_VALUE, 0);
-            long time = prefs.getLong(SettingsFragment.PREF_PRESSURE_TIME, 0);
-
-            if (ref_pressure == 0 || ref_time == 0) {
-                pref.setTitle(null);
-                pref.setSummary(getString(R.string.title_pressure_nodata));
-            } else {
-                pref.setTitle(ref_name == null ? "-" : ref_name);
-                DateFormat df = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT);
-                DecimalFormat nf = new DecimalFormat("#.0", new DecimalFormatSymbols(Locale.ROOT));
-                String summary = df.format(ref_time) + " " +
-                        nf.format(ref_pressure) + " hPa " +
-                        Math.round(ref_location.distanceTo(lastLocation) / 1000) + " km " +
-                        (Float.isNaN(ref_temp) ? "-" : Math.round(ref_temp)) + " ᵒC " +
-                        (Float.isNaN(ref_humidity) ? "-" : Math.round(ref_humidity)) + " %";
-                if (pressure != 0 && time != 0) {
-                    float altitude = PressureService.getAltitude(lastLocation, getActivity());
-                    summary += "\n" + df.format(time) + " " +
-                            nf.format(pressure) + " hPa " +
-                            (Float.isNaN(altitude) ? "-" : Math.round(altitude)) + " m";
-                }
-                pref.setSummary(summary);
-            }
-        } else if (PREF_ALTITUDE_AVG.equals(key))
+        else if (PREF_ALTITUDE_AVG.equals(key))
             pref.setTitle(getString(R.string.title_altitude_avg, prefs.getString(key, DEFAULT_ALTITUDE_AVG)));
+
+        else if (PREF_WEATHER_INTERVAL.equals(key))
+            pref.setTitle(getString(R.string.title_weather_interval, prefs.getString(key, DEFAULT_WEATHER_INTERVAL)));
+        else if (PREF_PRESSURE_MAXAGE.equals(key))
+            pref.setTitle(getString(R.string.title_pressure_maxage, prefs.getString(key, DEFAULT_PRESSURE_MAXAGE)));
+        else if (PREF_PRESSURE_MAXDIST.equals(key))
+            pref.setTitle(getString(R.string.title_pressure_maxdist, prefs.getString(key, DEFAULT_PRESSURE_MAXDIST)));
+        else if (PREF_WEATHER_STATIONS.equals(key))
+            pref.setTitle(getString(R.string.title_weather_stations, prefs.getString(key, DEFAULT_WEATHER_STATIONS)));
 
         else if (PREF_RECOGNITION_INTERVAL_STILL.equals(key))
             pref.setTitle(getString(R.string.title_recognition_interval_still, prefs.getString(key, DEFAULT_RECOGNITION_INTERVAL_STILL)));

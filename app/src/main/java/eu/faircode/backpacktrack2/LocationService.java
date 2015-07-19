@@ -8,6 +8,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
@@ -73,6 +75,7 @@ public class LocationService extends IntentService {
     // Actions
     public static final String ACTION_ALARM = "Alarm";
     public static final String ACTION_DAILY = "Daily";
+    public static final String ACTION_WEATHER_UPDATE = "Weather";
     public static final String ACTION_ACTIVITY = "Activity";
     public static final String ACTION_LOCATION_FINE = "LocationFine";
     public static final String ACTION_LOCATION_COARSE = "LocationCoarse";
@@ -207,6 +210,9 @@ public class LocationService extends IntentService {
 
             } else if (ACTION_DAILY.equals(intent.getAction()))
                 handleDaily(intent);
+
+            else if (ACTION_WEATHER_UPDATE.equals(intent.getAction()))
+                handleWeatherUpdate(intent);
 
             else
                 Log.w(TAG, "Unknown action");
@@ -783,6 +789,73 @@ public class LocationService extends IntentService {
         new DatabaseHelper(this).vacuum().close();
     }
 
+    private void handleWeatherUpdate(Intent intent) {
+        // Get weather
+        try {
+            // Check connectivity
+            if (!SettingsFragment.isConnected(this))
+                return;
+
+            // Get last location
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+            if (lastLocation == null)
+                return;
+
+            // Get API key
+            ApplicationInfo app = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
+            String apikey = app.metaData.getString("org.openweathermap.API_KEY", null);
+
+            // Get settings
+            int stations = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_STATIONS, SettingsFragment.DEFAULT_WEATHER_STATIONS));
+            int maxage = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXAGE, SettingsFragment.DEFAULT_PRESSURE_MAXAGE));
+            boolean airport = prefs.getBoolean(SettingsFragment.PREF_WEATHER_AIRPORT, SettingsFragment.DEFAULT_WEATHER_AIRPORT);
+            boolean swop = prefs.getBoolean(SettingsFragment.PREF_WEATHER_SWOP, SettingsFragment.DEFAULT_WEATHER_SWOP);
+            boolean synop = prefs.getBoolean(SettingsFragment.PREF_WEATHER_SYNOP, SettingsFragment.DEFAULT_WEATHER_SYNOP);
+            boolean diy = prefs.getBoolean(SettingsFragment.PREF_WEATHER_DIY, SettingsFragment.DEFAULT_WEATHER_DIY);
+            boolean other = prefs.getBoolean(SettingsFragment.PREF_WEATHER_OTHER, SettingsFragment.DEFAULT_WEATHER_OTHER);
+
+            // Fetch weather
+            List<OpenWeatherMap.Weather> listWeather = OpenWeatherMap.getWeather(apikey, lastLocation, stations, this);
+
+            boolean found = false;
+            for (OpenWeatherMap.Weather weather : listWeather) {
+                long time = new Date().getTime();
+                if (weather.time + maxage * 60 * 1000 >= time &&
+                        ((weather.station_type == 1 && airport) ||
+                                (weather.station_type == 2 && swop) ||
+                                (weather.station_type == 3 && synop) ||
+                                (weather.station_type == 5 && diy) ||
+                                ((weather.station_type < 1 || weather.station_type > 5 || weather.station_type == 4) && other))
+                        && !Double.isNaN(weather.pressure)) {
+
+                    found = true;
+
+                    float distance = weather.station_location.distanceTo(lastLocation);
+                    new DatabaseHelper(this).insertWeather(weather, distance).close();
+
+                    Log.w(TAG, "Reference pressure " + weather.pressure + "hPa " +
+                            weather.station_name + " @" + SimpleDateFormat.getDateTimeInstance().format(weather.time));
+                    prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_LAT, (float) weather.station_location.getLatitude()).apply();
+                    prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_LON, (float) weather.station_location.getLongitude()).apply();
+                    prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, (float) weather.pressure).apply();
+                    prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, weather.time).apply();
+
+                    break;
+                }
+            }
+
+            if (!found) {
+                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_LAT).apply();
+                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_LON).apply();
+                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_VALUE).apply();
+                prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, lastLocation.getTime()).apply();
+            }
+        } catch (Throwable ex) {
+            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+        }
+    }
+
     // Start/stop methods
 
     public static void startTracking(final Context context) {
@@ -1034,6 +1107,34 @@ public class LocationService extends IntentService {
         updateState(context, "stop locating");
     }
 
+    public static void startWeatherUpdates(Context context) {
+        // Check if weather updates enabled
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (!prefs.getBoolean(SettingsFragment.PREF_WEATHER_ENABLED, SettingsFragment.DEFAULT_WEATHER_ENABLED)) {
+            Log.w(TAG, "Weather updates disabled");
+            return;
+        }
+
+        // Set repeating alarm
+        Intent alarmIntent = new Intent(context, LocationService.class);
+        alarmIntent.setAction(LocationService.ACTION_WEATHER_UPDATE);
+        PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_INTERVAL, SettingsFragment.DEFAULT_WEATHER_INTERVAL));
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + ALARM_DUE_TIME, interval * 60 * 1000, pi);
+        Log.w(TAG, "Start weather updates frequency=" + interval + "m");
+    }
+
+    public static void stopWeatherUpdates(Context context) {
+        // Cancel repeating alarm
+        Intent alarmIntent = new Intent(context, LocationService.class);
+        alarmIntent.setAction(LocationService.ACTION_WEATHER_UPDATE);
+        PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        am.cancel(pi);
+        Log.w(TAG, "Stop weather updates");
+    }
+
     // Helper methods
 
     private static void convertTime(Intent intent) {
@@ -1074,7 +1175,7 @@ public class LocationService extends IntentService {
                 location.setAltitude(altitude);
 
             // Add elevation data
-            if (!location.hasAltitude()) {
+            if (!location.hasAltitude() && SettingsFragment.isConnected(this)) {
                 if (locationType == LOCATION_WAYPOINT) {
                     if (prefs.getBoolean(SettingsFragment.PREF_ALTITUDE_WAYPOINT, SettingsFragment.DEFAULT_ALTITUDE_WAYPOINT))
                         GoogleElevationApi.getElevation(location, this);
@@ -1323,11 +1424,15 @@ public class LocationService extends IntentService {
             riAccept.setAction(LocationService.ACTION_LOCATION_TIMEOUT);
             PendingIntent piAccept = PendingIntent.getService(context, 5, riAccept, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            // Add actions
+            // Add cancel action
             notificationBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(android.R.string.cancel),
                     piStop);
+
+            // Add accept action
             Location bestLocation = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_BEST_LOCATION, null));
-            if (bestLocation != null)
+            boolean pressure = prefs.getBoolean(SettingsFragment.PREF_PRESSURE_ENABLED, SettingsFragment.DEFAULT_PRESSURE_ENABLED);
+            pressure = (pressure ? prefs.getFloat(SettingsFragment.PREF_PRESSURE_VALUE, -1) >= 0 : true);
+            if (bestLocation != null && pressure)
                 notificationBuilder.addAction(android.R.drawable.ic_menu_save, context.getString(R.string.title_accept),
                         piAccept);
         }

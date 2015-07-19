@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+// TODO: check statement results
+
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
@@ -133,10 +135,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
                 ", time INTEGER NOT NULL" +
                 ", station_id INTEGER NOT NULL" +
+                ", station_type INTEGER NOT NULL" +
                 ", station_name TEXT NULL" +
-                ", pressure REAL NULL" +
+                ", distance REAL NULL" +
+                ", latitude REAL NULL" +
+                ", longitude REAL NULL" +
                 ", temperature REAL NULL" +
                 ", humidity REAL NULL" +
+                ", pressure REAL NULL" +
                 ", wind_speed REAL NULL" +
                 ", wind_direction REAL NULL" + ");");
         db.execSQL("CREATE INDEX idx_weather_time ON weather(time)");
@@ -555,17 +561,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Weather
 
-    public DatabaseHelper insertWeather(
-            long time, long station_id, String station_name,
-            float pressure, float temperature, float humidity, float wind_speed, float wind_direction) {
-
+    public DatabaseHelper insertWeather(OpenWeatherMap.Weather weather, float distance) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
 
             Cursor c = null;
             try {
                 c = db.query("weather", new String[]{"ID"}, "time = ? AND station_id = ?",
-                        new String[]{Long.toString(time), Long.toString(station_id)}, null, null, null, null);
+                        new String[]{Long.toString(weather.time), Long.toString(weather.station_id)}, null, null, null, null);
                 if (c.getCount() != 0)
                     return this;
             } finally {
@@ -574,19 +577,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
 
             ContentValues cv = new ContentValues();
-            cv.put("time", time);
-            cv.put("station_id", station_id);
-            cv.put("station_name", station_name);
-            cv.put("pressure", pressure);
-            cv.put("temperature", temperature);
-            cv.put("humidity", humidity);
-            cv.put("wind_speed", wind_speed);
-            cv.put("wind_direction", wind_direction);
+            cv.put("time", weather.time);
+            cv.put("station_id", weather.station_id);
+            cv.put("station_type", weather.station_type);
+            cv.put("station_name", weather.station_name);
+            cv.put("distance", distance);
+            cv.put("latitude", weather.station_location.getLatitude());
+            cv.put("longitude", weather.station_location.getLongitude());
+
+            if (Double.isNaN(weather.temperature))
+                cv.putNull("temperature");
+            else
+                cv.put("temperature", weather.temperature);
+
+            if (Double.isNaN(weather.humidity))
+                cv.putNull("humidity");
+            else
+                cv.put("humidity", weather.humidity);
+
+            if (Double.isNaN(weather.pressure))
+                cv.putNull("pressure");
+            else
+                cv.put("pressure", weather.pressure);
+
+            if (Double.isNaN(weather.wind_speed))
+                cv.putNull("wind_speed");
+            else
+                cv.put("wind_speed", weather.wind_speed);
+
+            if (Double.isNaN(weather.wind_direction))
+                cv.putNull("wind_direction");
+            else
+                cv.put("wind_direction", weather.wind_direction);
+
             db.insert("weather", null, cv);
         }
 
         for (WeatherChangedListener listener : mWeatherChangedListeners)
-            listener.onWeatherAdded(time, station_id);
+            listener.onWeatherAdded(weather.time, weather.station_id);
 
         return this;
     }

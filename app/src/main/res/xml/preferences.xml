@@ -180,13 +180,14 @@
                 android:summary="@string/summary_correction_enabled"
                 android:title="@string/title_correction_enabled" />
             <Preference
-                android:dependency="pref_enabled"
+                android:dependency="pref_correction_enabled"
                 android:summary="@string/summary_correction_egm96"
                 android:title="@string/title_correction_egm96">
                 <intent
                     android:action="android.intent.action.VIEW"
                     android:data="http://worldwind.arc.nasa.gov/worldwind-nosa-1.3.html" />
             </Preference>
+
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="pref_enabled"
@@ -207,21 +208,13 @@
                     android:action="android.intent.action.VIEW"
                     android:data="https://developers.google.com/maps/terms" />
             </Preference>
-            <EditTextPreference
-                android:defaultValue="5"
-                android:inputType="number"
-                android:key="pref_altitude_avg"
-                android:summary="@string/summary_altitude_avg" />
-        </PreferenceScreen>
-        <PreferenceScreen android:title="@string/title_pressure_settings">
+
             <CheckBoxPreference
                 android:defaultValue="false"
-                android:dependency="pref_enabled"
+                android:dependency="pref_weather_enabled"
                 android:key="pref_pressure_enabled"
+                android:summary="@string/summary_pressure_enabled"
                 android:title="@string/title_pressure_enabled" />
-            <Preference
-                android:dependency="pref_pressure_enabled"
-                android:key="pref_pressure_display" />
             <EditTextPreference
                 android:defaultValue="3"
                 android:dependency="pref_pressure_enabled"
@@ -234,18 +227,6 @@
                 android:inputType="numberSigned|numberDecimal"
                 android:key="pref_pressure_offset"
                 android:summary="@string/summary_pressure_offset" />
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:dependency="pref_pressure_enabled"
-                android:key="pref_pressure_invehicle"
-                android:summary="@string/summary_pressure_invehicle"
-                android:title="@string/title_pressure_invehicle" />
-            <EditTextPreference
-                android:defaultValue="60"
-                android:dependency="pref_pressure_enabled"
-                android:inputType="number"
-                android:key="pref_pressure_refresh"
-                android:summary="@string/summary_pressure_refresh" />
             <EditTextPreference
                 android:defaultValue="720"
                 android:dependency="pref_pressure_enabled"
@@ -258,46 +239,71 @@
                 android:inputType="number"
                 android:key="pref_pressure_maxdist"
                 android:summary="@string/summary_pressure_maxdist" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="pref_pressure_enabled"
+                android:key="pref_pressure_invehicle"
+                android:summary="@string/summary_pressure_invehicle"
+                android:title="@string/title_pressure_invehicle" />
+
             <EditTextPreference
                 android:defaultValue="5"
-                android:dependency="pref_pressure_enabled"
                 android:inputType="number"
-                android:key="pref_pressure_stations"
-                android:summary="@string/summary_pressure_stations" />
+                android:key="pref_altitude_avg"
+                android:summary="@string/summary_altitude_avg" />
+        </PreferenceScreen>
+        <PreferenceScreen android:title="@string/title_weather_settings">
             <CheckBoxPreference
                 android:defaultValue="true"
-                android:dependency="pref_pressure_enabled"
-                android:key="pref_pressure_airport"
-                android:summary="@string/summary_pressure_airport"
-                android:title="@string/title_pressure_airport" />
+                android:dependency="pref_enabled"
+                android:key="pref_weather_enabled"
+                android:title="@string/title_weather_enabled" />
+            <EditTextPreference
+                android:defaultValue="60"
+                android:dependency="pref_weather_enabled"
+                android:inputType="number"
+                android:key="pref_weather_interval"
+                android:summary="@string/summary_weather_interval" />
+            <EditTextPreference
+                android:defaultValue="5"
+                android:dependency="pref_weather_enabled"
+                android:inputType="number"
+                android:key="pref_weather_stations"
+                android:summary="@string/summary_weather_stations" />
             <CheckBoxPreference
                 android:defaultValue="true"
-                android:dependency="pref_pressure_enabled"
-                android:key="pref_pressure_swop"
-                android:summary="@string/summary_pressure_swop"
-                android:title="@string/title_pressure_swop" />
+                android:dependency="pref_weather_enabled"
+                android:key="pref_weather_airport"
+                android:summary="@string/summary_weather_airport"
+                android:title="@string/title_weather_airport" />
             <CheckBoxPreference
                 android:defaultValue="true"
-                android:dependency="pref_pressure_enabled"
-                android:key="pref_pressure_synop"
-                android:summary="@string/summary_pressure_synop"
-                android:title="@string/title_pressure_synop" />
+                android:dependency="pref_weather_enabled"
+                android:key="pref_weather_swop"
+                android:summary="@string/summary_weather_swop"
+                android:title="@string/title_weather_swop" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="pref_weather_enabled"
+                android:key="pref_weather_synop"
+                android:summary="@string/summary_weather_synop"
+                android:title="@string/title_weather_synop" />
             <CheckBoxPreference
                 android:defaultValue="false"
-                android:dependency="pref_pressure_enabled"
-                android:key="pref_pressure_diy"
-                android:summary="@string/summary_pressure_diy"
-                android:title="@string/title_pressure_diy" />
+                android:dependency="pref_weather_enabled"
+                android:key="pref_weather_diy"
+                android:summary="@string/summary_weather_diy"
+                android:title="@string/title_weather_diy" />
             <CheckBoxPreference
                 android:defaultValue="false"
-                android:dependency="pref_pressure_enabled"
-                android:key="pref_pressure_other"
-                android:summary="@string/summary_pressure_other"
-                android:title="@string/title_pressure_other" />
+                android:dependency="pref_weather_enabled"
+                android:key="pref_weather_other"
+                android:summary="@string/summary_weather_other"
+                android:title="@string/title_weather_other" />
             <Preference
-                android:dependency="pref_pressure_enabled"
-                android:summary="@string/summary_pressure_tos"
-                android:title="@string/title_pressure_tos">
+                android:dependency="pref_weather_enabled"
+                android:summary="@string/summary_weather_tos"
+                android:title="@string/title_weather_tos">
                 <intent
                     android:action="android.intent.action.VIEW"
                     android:data="http://openweathermap.org/terms" />
