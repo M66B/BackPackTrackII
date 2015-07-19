@@ -50,14 +50,14 @@ public class PressureService extends Service {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(PressureService.this);
 
             // Get pressure value
-            float mbar = sensorEvent.values[0];
+            float hpa = sensorEvent.values[0];
             float offset = Float.parseFloat(prefs.getString(SettingsFragment.PREF_PRESSURE_OFFSET, SettingsFragment.DEFAULT_PRESSURE_OFFSET));
-            mbar += offset;
-            Log.w(TAG, "Pressure " + mbar + "mb offset=" + offset);
+            hpa += offset;
+            Log.w(TAG, "Pressure " + hpa + "mb offset=" + offset);
 
             // Pressure averaging
             count++;
-            values += mbar;
+            values += hpa;
         }
 
         @Override
@@ -223,6 +223,8 @@ public class PressureService extends Service {
                     int ref_type = (station.has("type") ? station.getInt("type") : -1);
                     double ref_lat = coord.getDouble("lat");
                     double ref_lon = coord.getDouble("lon");
+                    double ref_temp = (main.has("temp") ? main.getDouble("temp") - 273.15 : Double.NaN);
+                    double ref_humidity = (main.has("humidity") ? main.getDouble("humidity") : Double.NaN);
                     double ref_pressure = main.getDouble("pressure");
                     long ref_time = last.getLong("dt") * 1000;
                     Location ref_location = new Location("station");
@@ -235,14 +237,17 @@ public class PressureService extends Service {
                             Math.round(ref_location.distanceTo(location) / 1000) + "km");
 
                     if (!found && ref_time + maxage * 60 * 1000 >= time &&
-                            (other || (ref_type == 1 && airport) || (ref_type == 2 && swop)) || (ref_type == 3 && synop) || (ref_type == 5 && diy)) {
+                            ((ref_type == 1 && airport) || (ref_type == 2 && swop)) || (ref_type == 3 && synop) || (ref_type == 5 && diy) ||
+                            (ref_type != 1 && ref_type != 2 && ref_type != 3 && ref_type != 5 && other)) {
                         found = true;
-                        Log.w(TAG, "Reference pressure " + ref_pressure + "mbar @" + SimpleDateFormat.getDateTimeInstance().format(ref_time));
+                        Log.w(TAG, "Reference pressure " + ref_pressure + "hPa @" + SimpleDateFormat.getDateTimeInstance().format(ref_time));
 
                         // Persist reference pressure
                         prefs.edit().putString(SettingsFragment.PREF_PRESSURE_REF_NAME, ref_name).apply();
                         prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_LAT, (float) ref_lat).apply();
                         prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_LON, (float) ref_lon).apply();
+                        prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_TEMP, (float) ref_temp).apply();
+                        prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_HUMIDITY, (float) ref_humidity).apply();
                         prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, (float) ref_pressure).apply();
                         prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, ref_time).apply();
                     }
@@ -253,6 +258,8 @@ public class PressureService extends Service {
                     prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_NAME).apply();
                     prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_LAT).apply();
                     prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_LON).apply();
+                    prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_TEMP).apply();
+                    prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_HUMIDITY).apply();
                     prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_VALUE).apply();
                     prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, location.getTime()).apply();
                 }

@@ -46,22 +46,22 @@
     <string name="title_altitude_google_terms">Powered by Google</string>
     <string name="title_altitude_avg">Moving average: %s samples</string>
 
-    <string name="title_pressure_settings">Pressure</string>
+    <string name="title_pressure_settings">Atmospheric pressure</string>
     <string name="title_pressure_enabled">Use pressure to determine altitude</string>
+    <string name="title_pressure_nodata">No reference data, tap to fetch</string>
+    <string name="title_pressure_wait">Pressure averaging time: %s seconds</string>
+    <string name="title_pressure_offset">Pressure calibration: %s hPa</string>
+    <string name="title_pressure_invehicle">Use pressure in vehicle</string>
     <string name="title_pressure_refresh">Reference pressure refresh: %s minutes</string>
     <string name="title_pressure_maxage">Reference pressure max. age: %s minutes</string>
     <string name="title_pressure_maxdist">Reference pressure max. distance: %s km</string>
-    <string name="title_pressure_stations">Reference pressure stations: %s</string>
+    <string name="title_pressure_stations">Fetch data of weather stations: %s</string>
     <string name="title_pressure_airport">Use airport stations</string>
     <string name="title_pressure_swop">Use SWOP stations</string>
     <string name="title_pressure_synop">Use SYNOP stations</string>
     <string name="title_pressure_diy">Use DIY stations</string>
     <string name="title_pressure_other">Use other stations</string>
     <string name="title_pressure_tos">OpenWeatherMap TOS</string>
-    <string name="title_pressure_wait">Pressure averaging time: %s seconds</string>
-    <string name="title_pressure_offset">Pressure calibration: %s mbar</string>
-    <string name="title_pressure_invehicle">Use pressure in vehicle</string>
-    <string name="title_pressure_nodata">No reference data</string>
 
     <string name="title_recognition">Activity recognition</string>
     <string name="title_recognition_enabled">Activity recognition enabled</string>
@@ -123,6 +123,20 @@
     <string name="summary_altitude_google">Request Google elevation data for locations without altitude information (typical network locations)</string>
     <string name="summary_altitude_google_terms">Google Maps/Google Earth APIs Terms of Services\nTap to read (will start the browser)</string>
     <string name="summary_altitude_avg">Filter the noise of the GPS altitude using a moving average with the selected number of samples</string>
+
+    <string name="summary_pressure_wait">Number of seconds to wait for an average messured pressure</string>
+    <string name="summary_pressure_offset">Number of hPa to add or substract from the meassure pressure</string>
+    <string name="summary_pressure_invehicle">Determine altitude from the pressure while in a vehcile</string>
+    <string name="summary_pressure_refresh">Refresh the reference pressure every selected number of minutes</string>
+    <string name="summary_pressure_maxage">Use the reference pressure for maximum the selected number of minutes</string>
+    <string name="summary_pressure_maxdist">Use the referene pressure with the selected number of kilometers</string>
+    <string name="summary_pressure_stations">Fetch data of the selected number of weather stations</string>
+    <string name="summary_pressure_airport">Use data of airport weather stations</string>
+    <string name="summary_pressure_swop">Use data of SWOP weather stations</string>
+    <string name="summary_pressure_synop">Use data of SYNOP weather stations</string>
+    <string name="summary_pressure_diy">Use data of amateur weather stations</string>
+    <string name="summary_pressure_other">Use data of other weather station types</string>
+    <string name="summary_pressure_tos">Tap to read the terms of service of OpenWeatherMap (will start the browser)</string>
 
     <string name="summary_recognition_enabled">Recognize if you are still or moving and disable tracking when you are still</string>
     <string name="summary_recognition_interval">Recognize your activity every selected number of seconds</string>

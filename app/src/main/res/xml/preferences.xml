@@ -219,74 +219,89 @@
                 android:dependency="pref_enabled"
                 android:key="pref_pressure_enabled"
                 android:title="@string/title_pressure_enabled" />
+            <Preference
+                android:dependency="pref_pressure_enabled"
+                android:key="pref_pressure_display" />
+            <EditTextPreference
+                android:defaultValue="3"
+                android:dependency="pref_pressure_enabled"
+                android:inputType="number"
+                android:key="pref_pressure_wait"
+                android:summary="@string/summary_pressure_wait" />
+            <EditTextPreference
+                android:defaultValue="0"
+                android:dependency="pref_pressure_enabled"
+                android:inputType="numberSigned|numberDecimal"
+                android:key="pref_pressure_offset"
+                android:summary="@string/summary_pressure_offset" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="pref_pressure_enabled"
+                android:key="pref_pressure_invehicle"
+                android:summary="@string/summary_pressure_invehicle"
+                android:title="@string/title_pressure_invehicle" />
             <EditTextPreference
                 android:defaultValue="60"
                 android:dependency="pref_pressure_enabled"
                 android:inputType="number"
-                android:key="pref_pressure_refresh" />
+                android:key="pref_pressure_refresh"
+                android:summary="@string/summary_pressure_refresh" />
             <EditTextPreference
                 android:defaultValue="720"
                 android:dependency="pref_pressure_enabled"
                 android:inputType="number"
-                android:key="pref_pressure_maxage" />
+                android:key="pref_pressure_maxage"
+                android:summary="@string/summary_pressure_maxage" />
             <EditTextPreference
                 android:defaultValue="25"
                 android:dependency="pref_pressure_enabled"
                 android:inputType="number"
-                android:key="pref_pressure_maxdist" />
+                android:key="pref_pressure_maxdist"
+                android:summary="@string/summary_pressure_maxdist" />
             <EditTextPreference
                 android:defaultValue="5"
                 android:dependency="pref_pressure_enabled"
                 android:inputType="number"
-                android:key="pref_pressure_stations" />
+                android:key="pref_pressure_stations"
+                android:summary="@string/summary_pressure_stations" />
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="pref_pressure_enabled"
                 android:key="pref_pressure_airport"
+                android:summary="@string/summary_pressure_airport"
                 android:title="@string/title_pressure_airport" />
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="pref_pressure_enabled"
                 android:key="pref_pressure_swop"
+                android:summary="@string/summary_pressure_swop"
                 android:title="@string/title_pressure_swop" />
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="pref_pressure_enabled"
                 android:key="pref_pressure_synop"
+                android:summary="@string/summary_pressure_synop"
                 android:title="@string/title_pressure_synop" />
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:dependency="pref_pressure_enabled"
                 android:key="pref_pressure_diy"
+                android:summary="@string/summary_pressure_diy"
                 android:title="@string/title_pressure_diy" />
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:dependency="pref_pressure_enabled"
                 android:key="pref_pressure_other"
+                android:summary="@string/summary_pressure_other"
                 android:title="@string/title_pressure_other" />
-            <Preference android:title="@string/title_pressure_tos">
+            <Preference
+                android:dependency="pref_pressure_enabled"
+                android:summary="@string/summary_pressure_tos"
+                android:title="@string/title_pressure_tos">
                 <intent
                     android:action="android.intent.action.VIEW"
                     android:data="http://openweathermap.org/terms" />
             </Preference>
-            <EditTextPreference
-                android:defaultValue="3"
-                android:dependency="pref_pressure_enabled"
-                android:inputType="number"
-                android:key="pref_pressure_wait" />
-            <EditTextPreference
-                android:defaultValue="0"
-                android:dependency="pref_pressure_enabled"
-                android:inputType="numberSigned|numberDecimal"
-                android:key="pref_pressure_offset" />
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:dependency="pref_pressure_enabled"
-                android:key="pref_pressure_invehicle"
-                android:title="@string/title_pressure_invehicle" />
-            <Preference
-                android:dependency="pref_pressure_enabled"
-                android:key="pref_pressure_display" />
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_recognition">
             <CheckBoxPreference

@@ -46,6 +46,23 @@
     <string name="title_altitude_google_terms">Powered by Google</string>
     <string name="title_altitude_avg">Voortschrijdend gemiddelde: %s monsters</string>
 
+    <string name="title_pressure_settings">Luchtdruk</string>
+    <string name="title_pressure_enabled">Gebruik luchtdruk voor hoogtebepaling</string>
+    <string name="title_pressure_nodata">Geen referentiegegevens, tap om op te vragen</string>
+    <string name="title_pressure_wait">Luchtdruk middelingstijd: %s seconden</string>
+    <string name="title_pressure_offset">Luchtdruk kalibratie: %s hPa</string>
+    <string name="title_pressure_invehicle">Gebruik luchtdruk in voertuig</string>
+    <string name="title_pressure_refresh">Referentie luchtdruk verversen: %s minuten</string>
+    <string name="title_pressure_maxage">Referentie luchtdruk max. leeftijd: %s minuten</string>
+    <string name="title_pressure_maxdist">Referentie luchtdruk max. afstand: %s km</string>
+    <string name="title_pressure_stations">Vraag gegevens op van weerstations: %s</string>
+    <string name="title_pressure_airport">Gebruik luchthaven stations</string>
+    <string name="title_pressure_swop">Gebruik SWOP stations</string>
+    <string name="title_pressure_synop">Gebruik SYNOP stations</string>
+    <string name="title_pressure_diy">Gebruik DIY stations</string>
+    <string name="title_pressure_other">Gebruik andere stations</string>
+    <string name="title_pressure_tos">OpenWeatherMap voorwaarden</string>
+
     <string name="title_recognition">Activiteitsherkenning</string>
     <string name="title_recognition_enabled">Activiteitsherkenning aan</string>
     <string name="title_recognition_interval_still">Activiteitsherkenning stil: %s seconden</string>
@@ -106,6 +123,20 @@
     <string name="summary_altitude_google">Request Google elevation data for locations without altitude information (typical network locations)</string>
     <string name="summary_altitude_google_terms">Google Maps/Google Earth APIs Terms of Services\nTap to read (will start the browser)</string>
     <string name="summary_altitude_avg">Filter the noise of the GPS altitude using a moving average with the selected number of samples</string>
+
+    <string name="summary_pressure_wait">Number of seconds to wait for an average messured pressure</string>
+    <string name="summary_pressure_offset">Number of hPa to add or substract from the meassure pressure</string>
+    <string name="summary_pressure_invehicle">Determine altitude from the pressure while in a vehcile</string>
+    <string name="summary_pressure_refresh">Refresh the reference pressure every selected number of minutes</string>
+    <string name="summary_pressure_maxage">Use the reference pressure for maximum the selected number of minutes</string>
+    <string name="summary_pressure_maxdist">Use the referene pressure with the selected number of kilometers</string>
+    <string name="summary_pressure_stations">Fetch data of the selected number of weather stations</string>
+    <string name="summary_pressure_airport">Use data of airport weather stations</string>
+    <string name="summary_pressure_swop">Use data of SWOP weather stations</string>
+    <string name="summary_pressure_synop">Use data of SYNOP weather stations</string>
+    <string name="summary_pressure_diy">Use data of amateur weather stations</string>
+    <string name="summary_pressure_other">Use data of other weather station types</string>
+    <string name="summary_pressure_tos">Tap to read the terms of service of OpenWeatherMap (will start the browser)</string>
 
     <string name="summary_recognition_enabled">Recognize if you are still or moving and disable tracking when you are still</string>
     <string name="summary_recognition_interval">Recognize your activity every selected number of seconds</string>
@@ -183,8 +214,8 @@
     <string name="provider_network">Netwerk</string>
 
     <string name="menu_share">Delen</string>
-    <string name="menu_elevation_loc">Hoogte voor locatie ophalen</string>
-    <string name="menu_elevation_day">Hoogtes voor dag ophalen</string>
+    <string name="menu_elevation_loc">Hoogte voor locatie opvragen</string>
+    <string name="menu_elevation_day">Hoogtes voor dag opvragen</string>
     <string name="menu_delete">Verwijderen</string>
 
     <string name="still">Stil</string>
