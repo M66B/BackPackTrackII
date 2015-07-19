@@ -23,13 +23,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 9;
+    private static final int DB_VERSION = 10;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
     private static List<ActivityDurationChangedListener> mActivityDurationChangedListeners = new ArrayList<ActivityDurationChangedListener>();
     private static List<ActivityLogChangedListener> mActivityLogChangedListeners = new ArrayList<ActivityLogChangedListener>();
     private static List<StepCountChangedListener> mStepCountChangedListeners = new ArrayList<StepCountChangedListener>();
+    private static List<WeatherChangedListener> mWeatherChangedListeners = new ArrayList<WeatherChangedListener>();
 
     private Context mContext;
 
@@ -60,6 +61,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         createTableActivityDuration(db);
         createTableActivityLog(db);
         createTableStep(db);
+        createTableWeather(db);
     }
 
     private void createTableLocation(SQLiteDatabase db) {
@@ -125,6 +127,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE INDEX idx_step_time ON step(time)");
     }
 
+    private void createTableWeather(SQLiteDatabase db) {
+        Log.w(TAG, "Adding table weather");
+        db.execSQL("CREATE TABLE weather (" +
+                " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
+                ", time INTEGER NOT NULL" +
+                ", station_id INTEGER NOT NULL" +
+                ", station_name TEXT NULL" +
+                ", pressure REAL NULL" +
+                ", temperature REAL NULL" +
+                ", humidity REAL NULL" +
+                ", wind_speed REAL NULL" +
+                ", wind_direction REAL NULL" + ");");
+        db.execSQL("CREATE INDEX idx_weather_time ON weather(time)");
+        db.execSQL("CREATE INDEX idx_weather_station_id ON weather(station_id)");
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(TAG, "Upgrading from version " + oldVersion + " to " + newVersion);
@@ -173,6 +191,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (oldVersion < 9)
             createTableActivityLog(db);
+
+        if (oldVersion < 10)
+            createTableWeather(db);
 
         db.setVersion(DB_VERSION);
     }
@@ -532,6 +553,55 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    // Weather
+
+    public DatabaseHelper insertWeather(
+            long time, long station_id, String station_name,
+            float pressure, float temperature, float humidity, float wind_speed, float wind_direction) {
+
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+
+            Cursor c = null;
+            try {
+                c = db.query("weather", new String[]{"ID"}, "time = ? AND station_id = ?",
+                        new String[]{Long.toString(time), Long.toString(station_id)}, null, null, null, null);
+                if (c.getCount() != 0)
+                    return this;
+            } finally {
+                if (c != null)
+                    c.close();
+            }
+
+            ContentValues cv = new ContentValues();
+            cv.put("time", time);
+            cv.put("station_id", station_id);
+            cv.put("station_name", station_name);
+            cv.put("pressure", pressure);
+            cv.put("temperature", temperature);
+            cv.put("humidity", humidity);
+            cv.put("wind_speed", wind_speed);
+            cv.put("wind_direction", wind_direction);
+            db.insert("weather", null, cv);
+        }
+
+        for (WeatherChangedListener listener : mWeatherChangedListeners)
+            listener.onWeatherAdded(time, station_id);
+
+        return this;
+    }
+
+    public Cursor getWeather(boolean asc) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT *, ID AS _id FROM weather";
+        query += " ORDER BY time";
+        if (!asc)
+            query += " DESC";
+        return db.rawQuery(query, new String[]{});
+    }
+
+    // Utility
+
     public DatabaseHelper vacuum() {
         SQLiteDatabase db = this.getWritableDatabase();
         Log.w(TAG, "Running vacuum");
@@ -593,6 +663,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         mStepCountChangedListeners.remove(listener);
     }
 
+    public static void addWeatherChangedListener(WeatherChangedListener listener) {
+        mWeatherChangedListeners.add(listener);
+    }
+
+    public static void removeWeatherChangedListener(WeatherChangedListener listener) {
+        mWeatherChangedListeners.remove(listener);
+    }
+
     public interface LocationChangedListener {
         void onLocationAdded(Location location);
 
@@ -623,5 +701,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         void onStepCountAdded(long time, int count);
 
         void onStepCountUpdated(long time, int count);
+    }
+
+    public interface WeatherChangedListener {
+        void onWeatherAdded(long time, long station_id);
     }
 }
