@@ -30,6 +30,7 @@
                 android:id="@+id/ivAdd"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:layout_marginLeft="12dp"
                 android:src="@android:drawable/ic_menu_add" />
         </LinearLayout>
 
