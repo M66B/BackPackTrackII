@@ -1961,6 +1961,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         showWeatherGraph(graph);
 
         ImageView ivViewport = (ImageView) viewHistory.findViewById(R.id.ivViewport);
+        ImageView ivAdd = (ImageView) viewHistory.findViewById(R.id.ivAdd);
         TextView tvHeaderTemperature = (TextView) viewHistory.findViewById(R.id.tvHeaderTemperature);
         TextView tvHeaderHumidity = (TextView) viewHistory.findViewById(R.id.tvHeaderHumidity);
         TextView tvHeaderPressure = (TextView) viewHistory.findViewById(R.id.tvHeaderPressure);
@@ -1986,6 +1987,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 long range = prefs.getLong(PREF_LAST_WEATHER_VIEWPORT, DAY_MS);
                 prefs.edit().putLong(PREF_LAST_WEATHER_VIEWPORT, range == DAY_MS ? DAYS_VIEWPORT * DAY_MS : DAY_MS).apply();
                 showWeatherGraph(graph);
+            }
+        });
+
+        ivAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), LocationService.class);
+                intent.setAction(LocationService.EXPORTED_ACTION_UPDATE_WEATHER);
+                getActivity().startService(intent);
             }
         });
 

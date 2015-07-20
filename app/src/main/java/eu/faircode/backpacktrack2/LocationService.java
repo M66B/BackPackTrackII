@@ -91,14 +91,14 @@ public class LocationService extends IntentService {
     public static final String ACTION_SHARE_KML = "ShareKML";
     public static final String ACTION_UPLOAD_GPX = "UploadGPX";
 
-    private static final String EXPORTED_ACTION_TRACKING = "eu.faircode.backpacktrack2.TRACKING";
-    private static final String EXPORTED_ACTION_TRACKPOINT = "eu.faircode.backpacktrack2.TRACKPOINT";
-    private static final String EXPORTED_ACTION_WAYPOINT = "eu.faircode.backpacktrack2.WAYPOINT";
-    private static final String EXPORTED_ACTION_WRITE_GPX = "eu.faircode.backpacktrack2.WRITE_GPX";
-    private static final String EXPORTED_ACTION_WRITE_KML = "eu.faircode.backpacktrack2.WRITE_KML";
-    private static final String EXPORTED_ACTION_UPLOAD_GPX = "eu.faircode.backpacktrack2.UPLOAD_GPX";
-    private static final String EXPORTED_ACTION_GET_ALTITUDE = "eu.faircode.backpacktrack2.GET_ALTITUDE";
-    private static final String EXPORTED_ACTION_UPDATE_WEATHER = "eu.faircode.backpacktrack2.UPDATE_WEATHER";
+    public static final String EXPORTED_ACTION_TRACKING = "eu.faircode.backpacktrack2.TRACKING";
+    public static final String EXPORTED_ACTION_TRACKPOINT = "eu.faircode.backpacktrack2.TRACKPOINT";
+    public static final String EXPORTED_ACTION_WAYPOINT = "eu.faircode.backpacktrack2.WAYPOINT";
+    public static final String EXPORTED_ACTION_WRITE_GPX = "eu.faircode.backpacktrack2.WRITE_GPX";
+    public static final String EXPORTED_ACTION_WRITE_KML = "eu.faircode.backpacktrack2.WRITE_KML";
+    public static final String EXPORTED_ACTION_UPLOAD_GPX = "eu.faircode.backpacktrack2.UPLOAD_GPX";
+    public static final String EXPORTED_ACTION_GET_ALTITUDE = "eu.faircode.backpacktrack2.GET_ALTITUDE";
+    public static final String EXPORTED_ACTION_UPDATE_WEATHER = "eu.faircode.backpacktrack2.UPDATE_WEATHER";
 
     // Extras
     public static final String EXTRA_ENABLE = "Enable";
