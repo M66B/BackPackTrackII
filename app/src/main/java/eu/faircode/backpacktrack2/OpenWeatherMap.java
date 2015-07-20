@@ -120,7 +120,12 @@ public class OpenWeatherMap {
 
                 weather.temperature = (main.has("temp") ? main.getDouble("temp") - 273.15 : Double.NaN);
                 weather.humidity = (main.has("humidity") ? main.getDouble("humidity") : Double.NaN);
-                weather.pressure = (main.has("pressure") ? main.getDouble("pressure") : Double.NaN);
+
+                weather.pressure = Double.NaN;
+                if (main.has("sea_level"))
+                    weather.pressure = main.getDouble("sea_level");
+                else if (main.has("pressure"))
+                    weather.pressure = main.getDouble("pressure");
 
                 if (last.has("wind")) {
                     JSONObject wind = last.getJSONObject("wind");
