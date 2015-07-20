@@ -271,6 +271,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_LAST_SHARE_KML = "pref_last_share_kml";
     public static final String PREF_LAST_UPLOAD_GPX = "pref_last_gpx_upload";
     public static final String PREF_LAST_WEATHER_GRAPH = "pref_last_weather_graph";
+    public static final String PREF_LAST_WEATHER_VIEWPORT = "pref_last_weather_viewport";
 
     public static final String PREF_LAST_TRACK = "pref_last_track";
     public static final String PREF_LAST_EXTENSIONS = "pref_last_extensions";
@@ -1959,6 +1960,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvWeather);
         showWeatherGraph(graph);
 
+        ImageView ivViewport = (ImageView) viewHistory.findViewById(R.id.ivViewport);
         TextView tvHeaderTemperature = (TextView) viewHistory.findViewById(R.id.tvHeaderTemperature);
         TextView tvHeaderHumidity = (TextView) viewHistory.findViewById(R.id.tvHeaderHumidity);
         TextView tvHeaderPressure = (TextView) viewHistory.findViewById(R.id.tvHeaderPressure);
@@ -1977,6 +1979,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             tvHeaderWindSpeed.setText(R.string.header_ms);
         else if ("kmh".equals(speed_unit))
             tvHeaderWindSpeed.setText(R.string.header_kph);
+
+        ivViewport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                long range = prefs.getLong(PREF_LAST_WEATHER_VIEWPORT, DAY_MS);
+                prefs.edit().putLong(PREF_LAST_WEATHER_VIEWPORT, range == DAY_MS ? DAYS_VIEWPORT * DAY_MS : DAY_MS).apply();
+                showWeatherGraph(graph);
+            }
+        });
 
         tvHeaderTemperature.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -2062,6 +2073,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         double maxValue = 0;
 
         String column = prefs.getString(PREF_LAST_WEATHER_GRAPH, "temperature");
+        long viewport = prefs.getLong(PREF_LAST_WEATHER_VIEWPORT, DAY_MS);
 
         String temperature_unit = prefs.getString(PREF_TEMPERATURE, DEFAULT_TEMPERATURE);
         String speed_unit = prefs.getString(PREF_SPEED, DEFAULT_SPEED);
@@ -2116,10 +2128,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         if (data) {
             graph.getViewport().setXAxisBoundsManual(true);
-            if ("pressure".equals(column))
-                graph.getViewport().setMinX(maxTime - DAYS_VIEWPORT * DAY_MS);
-            else
-                graph.getViewport().setMinX(maxTime - DAY_MS);
+            graph.getViewport().setMinX(maxTime - viewport);
             graph.getViewport().setMaxX(maxTime);
 
             graph.getViewport().setYAxisBoundsManual(true);

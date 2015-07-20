@@ -16,14 +16,22 @@
         android:layout_marginTop="6dp"
         android:orientation="horizontal">
 
-        <TextView
+        <LinearLayout
             android:layout_width="120dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="24dp">
+
+            <ImageView
+                android:id="@+id/ivViewport"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_day" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvHeaderTemperature"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:gravity="right"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
@@ -32,6 +40,7 @@
             android:id="@+id/tvHeaderHumidity"
             android:layout_width="30dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:gravity="right"
             android:text="@string/header_percent"
             android:textAppearance="?android:attr/textAppearanceSmall"
@@ -41,6 +50,7 @@
             android:id="@+id/tvHeaderPressure"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:gravity="right"
             android:text="@string/header_hpa"
             android:textAppearance="?android:attr/textAppearanceSmall"
@@ -50,6 +60,7 @@
             android:id="@+id/tvHeaderWindSpeed"
             android:layout_width="40dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:gravity="right"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
