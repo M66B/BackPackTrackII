@@ -17,6 +17,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -26,6 +27,7 @@ public class OpenWeatherMap {
     private static final String TAG = "BPT2.OpenWeatherMap";
 
     private static final int cTimeOutMs = 30 * 1000;
+    private static final long cMaxAge = 24 * 3600 * 1000;
     private static final DecimalFormat DF = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ROOT));
 
     public static class Weather {
@@ -89,6 +91,7 @@ public class OpenWeatherMap {
 
             // Get pressure
             boolean found = false;
+            long time = new Date().getTime();
             List<Weather> listResult = new ArrayList<Weather>();
             for (int i = 0; i < jroot.length(); i++) {
                 JSONObject entry = jroot.getJSONObject(i);
@@ -108,6 +111,8 @@ public class OpenWeatherMap {
                 // Get data
                 Weather weather = new Weather();
                 weather.time = last.getLong("dt") * 1000;
+                if (weather.time + cMaxAge < time)
+                    continue;
 
                 weather.station_id = station.getLong("id");
                 weather.station_type = (station.has("type") ? station.getInt("type") : -1);
