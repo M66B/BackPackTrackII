@@ -42,6 +42,7 @@
     <string name="title_altitude_settings">Altitude</string>
     <string name="title_correction_enabled">Correction enabled</string>
     <string name="title_correction_egm96">EGM96 license</string>
+
     <string name="title_altitude_waypoint">Google elevation for waypoints</string>
     <string name="title_altitude_trackpoint">Google elevation for trackpoints</string>
     <string name="title_altitude_google_terms">Powered by Google</string>
@@ -51,7 +52,7 @@
     <string name="title_pressure_offset">Pressure calibration: %s hPa</string>
     <string name="title_pressure_maxage">Reference pressure max. age: %s minutes</string>
     <string name="title_pressure_maxdist">Reference pressure max. distance: %s km</string>
-    <string name="title_pressure_invehicle">Use pressure in vehicle</string>
+    <string name="title_pressure_invehicle">Use reference pressure in vehicle</string>
 
     <string name="title_altitude_avg">Moving average: %s samples</string>
 
@@ -128,6 +129,7 @@
 
     <string name="summary_correction_enabled">GPS altitude correction using EGM96</string>
     <string name="summary_correction_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nTap for more information (will start the browser)</string>
+
     <string name="summary_altitude_google">Request Google elevation data for locations without altitude information (typical network locations)</string>
     <string name="summary_altitude_google_terms">Google Maps/Google Earth APIs Terms of Services\nTap to read (will start the browser)</string>
 

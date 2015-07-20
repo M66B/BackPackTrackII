@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="listTemperatureName">
+        <item>&#176;C</item>
+        <item>&#176;F</item>
+    </string-array>
+</resources>

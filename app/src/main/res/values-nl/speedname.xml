@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="listSpeedName">
+        <item>Beaufort</item>
+        <item>m/s</item>
+        <item>km/h</item>
+    </string-array>
+</resources>

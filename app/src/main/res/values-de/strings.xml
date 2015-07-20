@@ -10,6 +10,7 @@
     <string name="title_location_history">Positionsverlauf</string>
     <string name="title_activity_history">Aktivitätenverlauf</string>
     <string name="title_step_history">Schrittverlauf</string>
+    <string name="title_weather_history">Weather history</string>
     <string name="title_loc_settings">Standorteinstellungen</string>
 
     <string name="title_geocode">Geocode-Adresse</string>
@@ -41,10 +42,30 @@
     <string name="title_altitude_settings">Höhe</string>
     <string name="title_correction_enabled">Korrektur aktiviert</string>
     <string name="title_correction_egm96">EGM96 Lizenz</string>
+
     <string name="title_altitude_waypoint">Google Höhe für  Waypoints</string>
     <string name="title_altitude_trackpoint">Google Höhe für Trackpoints</string>
     <string name="title_altitude_google_terms">Powered by Google</string>
+
+    <string name="title_pressure_enabled">Use pressure to determine altitude</string>
+    <string name="title_pressure_wait">Pressure averaging time: %s seconds</string>
+    <string name="title_pressure_offset">Pressure calibration: %s hPa</string>
+    <string name="title_pressure_maxage">Reference pressure max. age: %s minutes</string>
+    <string name="title_pressure_maxdist">Reference pressure max. distance: %s km</string>
+    <string name="title_pressure_invehicle">Use reference pressure in vehicle</string>
+
     <string name="title_altitude_avg">Gleitender Mittelwert: %s Proben</string>
+
+    <string name="title_weather_settings">Weather</string>
+    <string name="title_weather_enabled">Weather updates enabled</string>
+    <string name="title_weather_interval">Weather fetch interval: %s minutes</string>
+    <string name="title_weather_stations">Number of weather stations: %s</string>
+    <string name="title_weather_airport">Use airport stations</string>
+    <string name="title_weather_swop">Use SWOP stations</string>
+    <string name="title_weather_synop">Use SYNOP stations</string>
+    <string name="title_weather_diy">Use DIY stations</string>
+    <string name="title_weather_other">Use other stations</string>
+    <string name="title_weather_tos">OpenWeatherMap TOS</string>
 
     <string name="title_recognition">Aktivitätserkennung</string>
     <string name="title_recognition_enabled">Aktivitätserkennung aktiviert</string>
@@ -69,6 +90,10 @@
     <string name="title_blogpwd">Passwort: %s</string>
     <string name="title_plugin">Plugin</string>
 
+    <string name="title_units">Units</string>
+    <string name="title_temperature">Temperature: %s</string>
+    <string name="title_speed">Speed: %s</string>
+
     <string name="title_info">Information</string>
     <string name="title_legend">Legende</string>
     <string name="title_version">Version</string>
@@ -84,6 +109,7 @@
     <string name="summary_location_history">Zeige den Positionsverlauf um zu verifizieren, dass alles funktioniert</string>
     <string name="summary_activity_history">Zeige den Aktivitätenverlauf um zu verifizieren, dass alles funktioniert</string>
     <string name="summary_step_history">Zeige die täglich Schrittzahl, gelaufene Strecke und verbrante Kalorien</string>
+    <string name="summary_weather_history">Show local weather history</string>
     <string name="summary_loc_settings">Klicken um Android Standorteinstellungen zu öffnen</string>
 
     <string name="summary_interval">Versuche eine neue Position jede Anzahl von Sekunden zu bestimmen</string>
@@ -103,9 +129,27 @@
 
     <string name="summary_correction_enabled">Höhenkorrektur mittels EGM96</string>
     <string name="summary_correction_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nKlicken für Details (Öffnet im Browser)</string>
+
     <string name="summary_altitude_google">Nutze Google Höhe Daten für Standorte ohne Höheninformation (typische Netzwerkstandorte)</string>
     <string name="summary_altitude_google_terms">Google Maps/Google Earth APIs Nutzungsbedingungen\nKlicken um anzugeigen (Öffnet im Browser)</string>
+
+    <string name="summary_pressure_enabled">Requires weather data</string>
+    <string name="summary_pressure_wait">Number of seconds to wait for an average messured pressure</string>
+    <string name="summary_pressure_offset">Number of hPa to add or substract from the meassure pressure</string>
+    <string name="summary_pressure_maxage">Use the reference pressure for maximum the selected number of minutes</string>
+    <string name="summary_pressure_maxdist">Use the referene pressure with the selected number of kilometers</string>
+    <string name="summary_pressure_invehicle">Determine altitude from the pressure while in a vehicle (requires activity recognition)</string>
+
     <string name="summary_altitude_avg">Filtern des Rauschens der GPS-Höhe unter Verwendung eines gleitenden Mittelwerts der ausgewählten Anzahl von Proben</string>
+
+    <string name="summary_weather_interval">Fetch weather data every selected number of minutes</string>
+    <string name="summary_weather_stations">Fetch data for the selected number of weather stations</string>
+    <string name="summary_weather_airport">Use data of airport weather stations</string>
+    <string name="summary_weather_swop">Use data of SWOP weather stations</string>
+    <string name="summary_weather_synop">Use data of SYNOP weather stations</string>
+    <string name="summary_weather_diy">Use data of amateur weather stations</string>
+    <string name="summary_weather_other">Use data of other weather station types</string>
+    <string name="summary_weather_tos">Tap to read the terms of service of OpenWeatherMap (will start the browser)</string>
 
     <string name="summary_recognition_enabled">Erkennen ob Sie sich bewegen oder stillstehen, und Tracking ausschalten wenn Sie stillstehen</string>
     <string name="summary_recognition_interval">Aktivität jede Anzahl von Sekunden ermitteln</string>
@@ -150,6 +194,14 @@
 
     <string name="header_steps">Schritte</string>
     <string name="header_calories">Kcal</string>
+
+    <string name="header_celcius">&#176;C</string>
+    <string name="header_fahrenheit">&#176;F</string>
+    <string name="header_percent">%</string>
+    <string name="header_hpa">hPa</string>
+    <string name="header_beaufort">Bft</string>
+    <string name="header_ms">m/s</string>
+    <string name="header_kph">km/h</string>
 
     <string name="msg_gps">GPS Provider verfügbar: %s</string>
     <string name="msg_network">Netzwerk Provider verfügbar: %s</string>
