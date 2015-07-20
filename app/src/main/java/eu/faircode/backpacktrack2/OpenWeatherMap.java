@@ -13,8 +13,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -22,6 +26,7 @@ public class OpenWeatherMap {
     private static final String TAG = "BPT2.OpenWeatherMap";
 
     private static final int cTimeOutMs = 30 * 1000;
+    private static final DecimalFormat DF = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ROOT));
 
     public static class Weather {
         public long time;
@@ -34,6 +39,14 @@ public class OpenWeatherMap {
         double pressure = Double.NaN;
         double wind_speed = Double.NaN;
         double wind_direction = Double.NaN;
+
+        @Override
+        public String toString() {
+            return SimpleDateFormat.getDateTimeInstance().format(time) + " " +
+                    station_name + ":" + station_id + ":" + station_type + " " +
+                    DF.format(temperature) + " °C " + DF.format(humidity) + " % " + DF.format(pressure) + " HPa " +
+                    DF.format(wind_speed) + " m/s " + DF.format(wind_direction) + "°";
+        }
     }
 
     public static List<Weather> getWeather(String apikey, Location location, int stations, Context context)

@@ -2112,7 +2112,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.removeAllSeries();
             graph.addSeries(seriesValue);
 
-            final DecimalFormat DF = new DecimalFormat("humidity".equals(column) ? "#" : "#.0", new DecimalFormatSymbols(Locale.ROOT));
+            final DecimalFormat DF = new DecimalFormat("humidity".equals(column) ? "0" : "0.0", new DecimalFormatSymbols(Locale.ROOT));
 
             graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity(), SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)) {
                 @Override

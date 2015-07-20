@@ -820,8 +820,12 @@ public class LocationService extends IntentService {
 
             boolean found = false;
             for (OpenWeatherMap.Weather weather : listWeather) {
+                float distance = weather.station_location.distanceTo(lastLocation);
+                Log.w(TAG, weather.toString() + " " + Math.round(distance) + "m");
+
                 long time = new Date().getTime();
-                if (weather.time + maxage * 60 * 1000 >= time &&
+                if (!found &&
+                        weather.time + maxage * 60 * 1000 >= time &&
                         ((weather.station_type == 1 && airport) ||
                                 (weather.station_type == 2 && swop) ||
                                 (weather.station_type == 3 && synop) ||
@@ -831,7 +835,6 @@ public class LocationService extends IntentService {
 
                     found = true;
 
-                    float distance = weather.station_location.distanceTo(lastLocation);
                     new DatabaseHelper(this).insertWeather(weather, distance).close();
 
                     Log.w(TAG, "Reference pressure " + weather.pressure + "hPa " +
@@ -840,8 +843,6 @@ public class LocationService extends IntentService {
                     prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_LON, (float) weather.station_location.getLongitude()).apply();
                     prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, (float) weather.pressure).apply();
                     prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, weather.time).apply();
-
-                    break;
                 }
             }
 
