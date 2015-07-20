@@ -25,7 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 10;
+    private static final int DB_VERSION = 11;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
@@ -137,7 +137,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", station_id INTEGER NOT NULL" +
                 ", station_type INTEGER NOT NULL" +
                 ", station_name TEXT NULL" +
-                ", distance REAL NULL" +
+                ", station_latitude REAL NULL" +
+                ", station_longitude REAL NULL" +
                 ", latitude REAL NULL" +
                 ", longitude REAL NULL" +
                 ", temperature REAL NULL" +
@@ -201,6 +202,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         if (oldVersion < 10)
             createTableWeather(db);
+
+        if (oldVersion < 11) {
+            db.beginTransaction();
+            try {
+                db.execSQL("ALTER TABLE weather ADD COLUMN station_latitude REAL NULL");
+                db.execSQL("ALTER TABLE weather ADD COLUMN station_longitude REAL NULL");
+                //db.execSQL("ALTER TABLE weather DROP COLUMN distance");
+                db.execSQL("UPDATE weather SET station_latitude = latitude");
+                db.execSQL("UPDATE weather SET station_longitude = longitude");
+                db.execSQL("UPDATE weather SET latitude = NULL");
+                db.execSQL("UPDATE weather SET longitude = NULL");
+                db.setTransactionSuccessful();
+            } finally {
+                db.endTransaction();
+            }
+        }
 
         db.setVersion(DB_VERSION);
     }
@@ -562,7 +579,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Weather
 
-    public DatabaseHelper insertWeather(OpenWeatherMap.Weather weather, float distance) {
+    public DatabaseHelper insertWeather(OpenWeatherMap.Weather weather, Location location) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
 
@@ -582,9 +599,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cv.put("station_id", weather.station_id);
             cv.put("station_type", weather.station_type);
             cv.put("station_name", weather.station_name);
-            cv.put("distance", distance);
-            cv.put("latitude", weather.station_location.getLatitude());
-            cv.put("longitude", weather.station_location.getLongitude());
+            cv.put("station_latitude", weather.station_location.getLatitude());
+            cv.put("station_longitude", weather.station_location.getLongitude());
+            cv.put("latitude", location.getLatitude());
+            cv.put("longitude", location.getLongitude());
 
             if (Double.isNaN(weather.temperature))
                 cv.putNull("temperature");

@@ -837,7 +837,7 @@ public class LocationService extends IntentService {
 
                     found = true;
 
-                    new DatabaseHelper(this).insertWeather(weather, distance).close();
+                    new DatabaseHelper(this).insertWeather(weather, lastLocation).close();
 
                     Log.w(TAG, "Reference pressure " + weather.pressure + "hPa " +
                             weather.station_name + " @" + SimpleDateFormat.getDateTimeInstance().format(weather.time));

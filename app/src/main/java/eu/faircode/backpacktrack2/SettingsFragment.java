@@ -2036,10 +2036,28 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     long station_id = cursor.getLong(cursor.getColumnIndex("station_id"));
                     int station_type = cursor.getInt(cursor.getColumnIndex("station_type"));
                     String station_name = cursor.getString(cursor.getColumnIndex("station_name"));
-                    double distance = cursor.getDouble(cursor.getColumnIndex("distance"));
+
+                    Location station = null;
+                    if (!cursor.isNull(cursor.getColumnIndex("station_latitude")) &&
+                            !cursor.isNull(cursor.getColumnIndex("station_longitude"))) {
+                        station = new Location("station");
+                        station.setLatitude(cursor.getDouble(cursor.getColumnIndex("station_latitude")));
+                        station.setLongitude(cursor.getDouble(cursor.getColumnIndex("station_longitude")));
+                    }
+
+                    Location observer = null;
+                    if (!cursor.isNull(cursor.getColumnIndex("latitude")) &&
+                            !cursor.isNull(cursor.getColumnIndex("longitude"))) {
+                        observer = new Location("station");
+                        observer.setLatitude(cursor.getDouble(cursor.getColumnIndex("latitude")));
+                        observer.setLongitude(cursor.getDouble(cursor.getColumnIndex("longitude")));
+                    }
+
+                    float distance = (station == null || observer == null ? Float.NaN : station.distanceTo(observer));
+
                     Toast.makeText(getActivity(),
                             station_id + " " + station_name + " " + station_type + " " +
-                                    Math.round(distance / 1000) + " km", Toast.LENGTH_LONG).show();
+                                    (Float.isNaN(distance) ? "-" : Math.round(distance / 1000)) + " km", Toast.LENGTH_LONG).show();
                 }
             }
         });
