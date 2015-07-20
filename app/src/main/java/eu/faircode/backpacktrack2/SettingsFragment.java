@@ -1122,19 +1122,38 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final LocationAdapter adapter = new LocationAdapter(getActivity(), cursor);
         lv.setAdapter(adapter);
 
-        // Handle list item click
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        // Live updates
+        final DatabaseHelper.LocationChangedListener listener = new DatabaseHelper.LocationChangedListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Cursor cursor = (Cursor) lv.getItemAtPosition(position);
-                if (cursor != null) {
-                    String name = cursor.getString(cursor.getColumnIndex("name"));
-                    if (name != null)
-                        Toast.makeText(getActivity(), name, Toast.LENGTH_SHORT).show();
-                }
+            public void onLocationAdded(Location location) {
+                update();
             }
-        });
 
+            @Override
+            public void onLocationUpdated() {
+                update();
+            }
+
+            @Override
+            public void onLocationDeleted() {
+                update();
+            }
+
+            private void update() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
+                        adapter.changeCursor(cursor);
+                        adapter.init(); // Possible new last location
+                        showAltitudeGraph(graphView);
+                    }
+                });
+            }
+        };
+        DatabaseHelper.addLocationChangedListener(listener);
+
+        // Handle list item click
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, final int position, long id) {
@@ -1278,37 +1297,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 popupMenu.show();
             }
         });
-
-        // Live updates
-        final DatabaseHelper.LocationChangedListener listener = new DatabaseHelper.LocationChangedListener() {
-            @Override
-            public void onLocationAdded(Location location) {
-                update();
-            }
-
-            @Override
-            public void onLocationUpdated() {
-                update();
-            }
-
-            @Override
-            public void onLocationDeleted() {
-                update();
-            }
-
-            private void update() {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
-                        adapter.changeCursor(cursor);
-                        adapter.init(); // Possible new last location
-                        showAltitudeGraph(graphView);
-                    }
-                });
-            }
-        };
-        DatabaseHelper.addLocationChangedListener(listener);
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
@@ -1499,18 +1487,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final ActivityDurationAdapter adapter = new ActivityDurationAdapter(getActivity(), cursor);
         lv.setAdapter(adapter);
 
-        // Handle list item click
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Cursor cursor = (Cursor) lv.getItemAtPosition(position);
-                if (cursor != null) {
-                    long time = cursor.getLong(cursor.getColumnIndex("time"));
-                    activity_log(time, time + 24 * 3600 * 1000L);
-                }
-            }
-        });
-
         // Live updates
         final DatabaseHelper.ActivityDurationChangedListener listener = new DatabaseHelper.ActivityDurationChangedListener() {
             @Override
@@ -1535,6 +1511,18 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         };
         DatabaseHelper.addActivityDurationChangedListener(listener);
+
+        // Handle list item click
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Cursor cursor = (Cursor) lv.getItemAtPosition(position);
+                if (cursor != null) {
+                    long time = cursor.getLong(cursor.getColumnIndex("time"));
+                    activity_log(time, time + 24 * 3600 * 1000L);
+                }
+            }
+        });
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
