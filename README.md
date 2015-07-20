@@ -36,7 +36,8 @@ If you want to see the status of the GPS, you could use the application [GPS Sta
 As a bonus BackPackTrack includes:
 
 * an activity history, so you can see when you were doing what
-* a step counter which doesn't count false steps, because activity recognition will be used to count steps only while you are walking. Your device needs to have a hardware step counter for this to work.
+* a step counter which doesn't count false steps, because activity recognition will be used to count steps only while you are walking (your device needs to have a hardware step counter for this to work)
+* tabular and graphical actual and historical weather information
 
 BackPackTrack II is a complete rewrite of [BackPackTrack](https://github.com/M66B/BackPackTrack), the first Android application I wrote in 2011.
 
@@ -190,6 +191,26 @@ Capture a Trackpoint when a photo is taken:
 * Select System - Intent Recieved
 * Under Action enter: *android.hardware.action:NEW_PICTURE*
 * Link it to the Task create above.
+
+<a name="FAQ9"></a>
+**(9) How can I calibrate my pressure sensor?**
+
+Adjust the calibration offset value until the menu *Determine altitude for last location* shows the correct altitude for your current location.
+You should hold your device at ground level and you must know the altitude for the current location.
+Note that the altitude reading from the GPS is not accurate enough for this purpose.
+Elevations fetched from the Google elevation API are suitable for this purpose.
+
+The pressure sensor of the LG Nexus 5 is accurate enough to meassure one meter of difference,
+so ground level should be taken literally!
+
+The pressure sensor of the LG Nexus 5 seems out of the box accurate enough for the purpose of BackPackTrack II.
+
+<a name="FAQ10"></a>
+**(10) How often is the weather information updated?**
+
+The configured update interval determines the frequency weather information is fetched from [OpenWeatherMap](http://openweathermap.org/),
+but the update frequency of the weather reports depends on the used nearby weather station and on the OpenWeatherMap infrastructure.
+The weather history shows the time of the weather reports (not the time of fetching the weather reports).
 
 Android permissions
 -------------------
