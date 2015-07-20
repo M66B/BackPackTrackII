@@ -5,4 +5,10 @@
         <item>m/s</item>
         <item>km/h</item>
     </string-array>
+    <!-- do not translate values -->
+    <string-array name="listSpeedValue">
+        <item>bft</item>
+        <item>ms</item>
+        <item>kmh</item>
+    </string-array>
 </resources>

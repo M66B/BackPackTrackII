@@ -4,4 +4,9 @@
         <item>&#176;C</item>
         <item>&#176;F</item>
     </string-array>
+    <!-- do not translate values -->
+    <string-array name="listTemperatureValue">
+        <item>c</item>
+        <item>f</item>
+    </string-array>
 </resources>
