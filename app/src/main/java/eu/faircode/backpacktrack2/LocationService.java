@@ -1468,7 +1468,7 @@ public class LocationService extends IntentService {
         }
     }
 
-    private static String getWindDirectionName(float bearing, Context context) {
+    public static String getWindDirectionName(float bearing, Context context) {
         int b = Math.round(bearing) + 15;
         b = (b % 360) / 30 * 30;
         int resId = context.getResources().getIdentifier("direction_" + b, "string", context.getPackageName());

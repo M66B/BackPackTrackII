@@ -67,12 +67,15 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "BPT2.Settings";
@@ -116,10 +119,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_ALTITUDE_TRACKPOINT = "pref_altitude_trackpoint";
 
     public static final String PREF_PRESSURE_ENABLED = "pref_pressure_enabled";
-    public static final String PREF_PRESSURE_MAXAGE = "pref_pressure_maxage";
-    public static final String PREF_PRESSURE_MAXDIST = "pref_pressure_maxdist";
     public static final String PREF_PRESSURE_WAIT = "pref_pressure_wait";
     public static final String PREF_PRESSURE_OFFSET = "pref_pressure_offset";
+    public static final String PREF_PRESSURE_MAXAGE = "pref_pressure_maxage";
+    public static final String PREF_PRESSURE_MAXDIST = "pref_pressure_maxdist";
     public static final String PREF_PRESSURE_INVEHICLE = "pref_pressure_invehicle";
 
     public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
@@ -153,6 +156,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_BLOGID = "pref_blogid";
     public static final String PREF_BLOGUSER = "pref_bloguser";
     public static final String PREF_BLOGPWD = "pref_blogpwd";
+
+    public static final String PREF_TEMPERATURE = "pref_temperature";
+    public static final String PREF_SPEED = "pref_speed";
 
     public static final String PREF_VERSION = "pref_version";
     public static final String PREF_SUPPORT = "pref_support";
@@ -195,16 +201,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final boolean DEFAULT_ALTITUDE_TRACKPOINT = false;
 
     public static final boolean DEFAULT_PRESSURE_ENABLED = false;
-    public static final String DEFAULT_PRESSURE_MAXAGE = "180"; // minutes
-    public static final String DEFAULT_PRESSURE_MAXDIST = "25"; // kilometer
     public static final String DEFAULT_PRESSURE_WAIT = "3"; // seconds
     public static final String DEFAULT_PRESSURE_OFFSET = "0"; // hPa
+    public static final String DEFAULT_PRESSURE_MAXAGE = "180"; // minutes
+    public static final String DEFAULT_PRESSURE_MAXDIST = "25"; // kilometer
     public static final boolean DEFAULT_PRESSURE_INVEHICLE = false;
 
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
 
     public static final boolean DEFAULT_WEATHER_ENABLED = true;
-    public static final String DEFAULT_WEATHER_INTERVAL = "60"; // minutes
+    public static final String DEFAULT_WEATHER_INTERVAL = "30"; // minutes
     public static final String DEFAULT_WEATHER_STATIONS = "10"; // count
     public static final boolean DEFAULT_WEATHER_AIRPORT = true;
     public static final boolean DEFAULT_WEATHER_SWOP = true;
@@ -226,6 +232,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_STEP_DELTA = "10"; // steps
     public static final String DEFAULT_STEP_SIZE = "75"; // centimeters
     public static final String DEFAULT_WEIGHT = "75"; // kilograms
+
+    public static final String DEFAULT_TEMPERATURE = "c";
+    public static final String DEFAULT_SPEED = "bft";
 
     public static final boolean DEFAULT_GRAPH_STILL = false;
     public static final boolean DEFAULT_GRAPH_WALKING = true;
@@ -260,6 +269,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_LAST_SHARE_GPX = "pref_last_share_gpx";
     public static final String PREF_LAST_SHARE_KML = "pref_last_share_kml";
     public static final String PREF_LAST_UPLOAD_GPX = "pref_last_gpx_upload";
+    public static final String PREF_LAST_WEATHER_GRAPH = "pref_last_weather_graph";
 
     public static final String PREF_LAST_TRACK = "pref_last_track";
     public static final String PREF_LAST_EXTENSIONS = "pref_last_extensions";
@@ -415,6 +425,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_BLOGUSER);
         updateTitle(prefs, PREF_BLOGPWD);
 
+        updateTitle(prefs, PREF_TEMPERATURE);
+        updateTitle(prefs, PREF_SPEED);
+
         updateTitle(prefs, PREF_SUPPORT);
 
         // Handle waypoint_edit waypoints
@@ -506,6 +519,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         pref_weather_history.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
+                weather_history();
                 return true;
             }
         });
@@ -1917,6 +1931,205 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.setVisibility(View.GONE);
     }
 
+    private void weather_history() {
+        final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+
+        // Get layout
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        View viewHistory = inflater.inflate(R.layout.weather_history, null);
+
+        // Show steps bar graph
+        final GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvWeather);
+        showWeatherGraph(graph);
+
+        TextView tvHeaderTemperature = (TextView) viewHistory.findViewById(R.id.tvHeaderTemperature);
+        TextView tvHeaderHumidity = (TextView) viewHistory.findViewById(R.id.tvHeaderHumidity);
+        TextView tvHeaderPressure = (TextView) viewHistory.findViewById(R.id.tvHeaderPressure);
+        TextView tvHeaderWindSpeed = (TextView) viewHistory.findViewById(R.id.tvHeaderWindSpeed);
+
+        String temperature_unit = prefs.getString(PREF_TEMPERATURE, DEFAULT_TEMPERATURE);
+        if ("c".equals(temperature_unit))
+            tvHeaderTemperature.setText(R.string.header_celcius);
+        else if ("f".equals(temperature_unit))
+            tvHeaderTemperature.setText(R.string.header_fahrenheit);
+
+        String speed_unit = prefs.getString(PREF_SPEED, DEFAULT_SPEED);
+        if ("bft".equals(speed_unit))
+            tvHeaderWindSpeed.setText(R.string.header_beaufort);
+        else if ("ms".equals(speed_unit))
+            tvHeaderWindSpeed.setText(R.string.header_ms);
+        else if ("kmh".equals(speed_unit))
+            tvHeaderWindSpeed.setText(R.string.header_kph);
+
+        tvHeaderTemperature.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putString(PREF_LAST_WEATHER_GRAPH, "temperature").apply();
+                showWeatherGraph(graph);
+            }
+        });
+
+        tvHeaderHumidity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putString(PREF_LAST_WEATHER_GRAPH, "humidity").apply();
+                showWeatherGraph(graph);
+            }
+        });
+
+        tvHeaderPressure.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putString(PREF_LAST_WEATHER_GRAPH, "pressure").apply();
+                showWeatherGraph(graph);
+            }
+        });
+
+        tvHeaderWindSpeed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putString(PREF_LAST_WEATHER_GRAPH, "wind_speed").apply();
+                showWeatherGraph(graph);
+            }
+        });
+
+        // Fill list
+        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvWeatherHistory);
+        Cursor cursor = db.getWeather(false);
+        final WeatherAdapter adapter = new WeatherAdapter(getActivity(), cursor);
+        lv.setAdapter(adapter);
+
+        // Live updates
+        final DatabaseHelper.WeatherChangedListener listener = new DatabaseHelper.WeatherChangedListener() {
+
+            @Override
+            public void onWeatherAdded(long time, long station_id) {
+                update();
+            }
+
+            private void update() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Cursor cursor = db.getWeather(false);
+                        adapter.changeCursor(cursor);
+                        lv.setAdapter(adapter);
+                        showWeatherGraph(graph);
+                    }
+                });
+            }
+        };
+        DatabaseHelper.addWeatherChangedListener(listener);
+
+        // Show layout
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+        alertDialogBuilder.setTitle(R.string.title_weather_history);
+        alertDialogBuilder.setIcon(R.drawable.sunny_60);
+        alertDialogBuilder.setView(viewHistory);
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                DatabaseHelper.removeWeatherChangedListener(listener);
+            }
+        });
+        alertDialog.show();
+    }
+
+    private void showWeatherGraph(GraphView graph) {
+        SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+
+        boolean data = false;
+        long maxTime = 0;
+        double minValue = Double.MAX_VALUE;
+        double maxValue = 0;
+
+        String column = prefs.getString(PREF_LAST_WEATHER_GRAPH, "temperature");
+
+        String temperature_unit = prefs.getString(PREF_TEMPERATURE, DEFAULT_TEMPERATURE);
+        String speed_unit = prefs.getString(PREF_SPEED, DEFAULT_SPEED);
+
+        if ("humidity".equals(column)) {
+            minValue = 0;
+            maxValue = 100;
+        }
+        if ("wind_speed".equals(column))
+            if ("bft".equals(speed_unit))
+                maxValue = 10; // beaufort
+            else if ("ms".equals(speed_unit))
+                maxValue = 28.4; // m/s
+            else if ("kmh".equals(speed_unit))
+                maxValue = 102; // km/h
+
+        Cursor cursor = db.getWeather(true);
+
+        int colTime = cursor.getColumnIndex("time");
+        int colValue = cursor.getColumnIndex(column);
+
+        LineGraphSeries<DataPoint> seriesValue = new LineGraphSeries<DataPoint>();
+
+        while (cursor.moveToNext())
+            if (!cursor.isNull(colValue)) {
+                data = true;
+
+                long time = cursor.getLong(colTime);
+
+                if (time > maxTime)
+                    maxTime = time;
+
+                double value = cursor.getDouble(colValue);
+
+                if ("temperature".equals(column))
+                    if ("f".equals(temperature_unit))
+                        value = 9 / 5 * value + 32;
+
+                if ("wind_speed".equals(column))
+                    if ("bft".equals(speed_unit))
+                        value = Math.pow(10.0, (Math.log10(value / 0.836) / 1.5));
+                    else if ("kmh".equals(speed_unit))
+                        value = value * 3600 / 1000;
+
+                if (value < minValue)
+                    minValue = value;
+                if (value > maxValue)
+                    maxValue = value;
+
+                seriesValue.appendData(new DataPoint(new Date(time), value), true, Integer.MAX_VALUE);
+            }
+
+        if (data) {
+            graph.getViewport().setXAxisBoundsManual(true);
+            graph.getViewport().setMinX(maxTime - DAY_MS);
+            graph.getViewport().setMaxX(maxTime);
+
+            graph.getViewport().setYAxisBoundsManual(true);
+            graph.getViewport().setMinY(minValue);
+            graph.getViewport().setMaxY(maxValue);
+
+            seriesValue.setDrawDataPoints(true);
+            seriesValue.setDataPointsRadius(3);
+
+            graph.removeAllSeries();
+            graph.addSeries(seriesValue);
+
+            final DecimalFormat DF = new DecimalFormat("humidity".equals(column) ? "#" : "#.0", new DecimalFormatSymbols(Locale.ROOT));
+
+            graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity(), SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)) {
+                @Override
+                public String formatLabel(double value, boolean isValueX) {
+                    if (isValueX)
+                        return super.formatLabel(value, isValueX);
+                    else
+                        return DF.format(value);
+                }
+            });
+
+            graph.getGridLabelRenderer().setNumHorizontalLabels(2);
+            graph.getViewport().setScrollable(true);
+        } else
+            graph.setVisibility(View.GONE);
+    }
+
     private void updateTitle(SharedPreferences prefs, String key) {
         Preference pref = findPreference(key);
 
@@ -2010,6 +2223,24 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 pref.setTitle(getString(R.string.title_blogpwd, getString(R.string.msg_notset)));
             else
                 pref.setTitle(getString(R.string.title_blogpwd, "********"));
+
+        else if (PREF_TEMPERATURE.equals(key)) {
+            String temperature_unit = prefs.getString(key, DEFAULT_TEMPERATURE);
+            if ("c".equals(temperature_unit))
+                temperature_unit = getString(R.string.header_celcius);
+            else if ("f".equals(temperature_unit))
+                temperature_unit = getString(R.string.header_fahrenheit);
+            pref.setTitle(getString(R.string.title_temperature, temperature_unit));
+        } else if (PREF_SPEED.equals(key)) {
+            String speed_unit = prefs.getString(key, DEFAULT_SPEED);
+            if ("bft".equals(speed_unit))
+                speed_unit = getString(R.string.header_beaufort);
+            else if ("ms".equals(speed_unit))
+                speed_unit = getString(R.string.header_ms);
+            else if ("kmh".equals(speed_unit))
+                speed_unit = getString(R.string.header_kph);
+            pref.setTitle(getString(R.string.title_speed, speed_unit));
+        }
     }
 
     public static boolean isConnected(Context context) {

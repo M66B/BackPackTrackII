@@ -56,7 +56,7 @@
     <string name="title_altitude_avg">Moving average: %s samples</string>
 
     <string name="title_weather_settings">Weather</string>
-    <string name="title_weather_enabled">Enabled</string>
+    <string name="title_weather_enabled">Weather updates enabled</string>
     <string name="title_weather_interval">Weather fetch interval: %s minutes</string>
     <string name="title_weather_stations">Number of weather stations: %s</string>
     <string name="title_weather_airport">Use airport stations</string>
@@ -89,6 +89,10 @@
     <string name="title_blogpwd">Password: %s</string>
     <string name="title_plugin">Plugin</string>
 
+    <string name="title_units">Units</string>
+    <string name="title_temperature">Temperature: %s</string>
+    <string name="title_speed">Speed: %s</string>
+
     <string name="title_info">Information</string>
     <string name="title_legend">Legend</string>
     <string name="title_version">Version</string>
@@ -104,7 +108,7 @@
     <string name="summary_location_history">Show the location history to verify everything works</string>
     <string name="summary_activity_history">Show the activity history to verify everything works</string>
     <string name="summary_step_history">Show the daily number of steps taken, distance walked and calories burned</string>
-    <string name="summary_weather_history">Show the local weather history</string>
+    <string name="summary_weather_history">Show local weather history</string>
     <string name="summary_loc_settings">Tap to open the Android location settings</string>
 
     <string name="summary_interval">Try to acquire a new location every selected number of seconds</string>
@@ -188,6 +192,14 @@
 
     <string name="header_steps">Steps</string>
     <string name="header_calories">kcal</string>
+
+    <string name="header_celcius">&#176;C</string>
+    <string name="header_fahrenheit">&#176;F</string>
+    <string name="header_percent">%</string>
+    <string name="header_hpa">hPa</string>
+    <string name="header_beaufort">Bft</string>
+    <string name="header_ms">m/s</string>
+    <string name="header_kph">km/h</string>
 
     <string name="msg_gps">GPS provider available: %s</string>
     <string name="msg_network">Network provider available: %s</string>

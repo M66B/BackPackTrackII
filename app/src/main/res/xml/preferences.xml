@@ -233,7 +233,7 @@
                 android:key="pref_pressure_offset"
                 android:summary="@string/summary_pressure_offset" />
             <EditTextPreference
-                android:defaultValue="720"
+                android:defaultValue="180"
                 android:dependency="pref_pressure_enabled"
                 android:inputType="number"
                 android:key="pref_pressure_maxage"
@@ -264,13 +264,13 @@
                 android:key="pref_weather_enabled"
                 android:title="@string/title_weather_enabled" />
             <EditTextPreference
-                android:defaultValue="60"
+                android:defaultValue="30"
                 android:dependency="pref_weather_enabled"
                 android:inputType="number"
                 android:key="pref_weather_interval"
                 android:summary="@string/summary_weather_interval" />
             <EditTextPreference
-                android:defaultValue="5"
+                android:defaultValue="10"
                 android:dependency="pref_weather_enabled"
                 android:inputType="number"
                 android:key="pref_weather_stations"
@@ -415,6 +415,18 @@
                     android:action="android.intent.action.VIEW"
                     android:data="https://wordpress.org/plugins/backpacktrack-for-android/" />
             </Preference>
+        </PreferenceScreen>
+        <PreferenceScreen android:title="@string/title_units">
+            <ListPreference
+                android:defaultValue="c"
+                android:entries="@array/listTemperatureName"
+                android:entryValues="@array/listTemperatureValue"
+                android:key="pref_temperature" />
+            <ListPreference
+                android:defaultValue="bft"
+                android:entries="@array/listSpeedName"
+                android:entryValues="@array/listSpeedValue"
+                android:key="pref_speed" />
         </PreferenceScreen>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_info">
