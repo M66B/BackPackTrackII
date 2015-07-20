@@ -2027,6 +2027,23 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final WeatherAdapter adapter = new WeatherAdapter(getActivity(), cursor);
         lv.setAdapter(adapter);
 
+        // Handle list item click
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Cursor cursor = (Cursor) lv.getItemAtPosition(position);
+                if (cursor != null) {
+                    long station_id = cursor.getLong(cursor.getColumnIndex("station_id"));
+                    int station_type = cursor.getInt(cursor.getColumnIndex("station_type"));
+                    String station_name = cursor.getString(cursor.getColumnIndex("station_name"));
+                    double distance = cursor.getDouble(cursor.getColumnIndex("distance"));
+                    Toast.makeText(getActivity(),
+                            station_id + " " + station_name + " " + station_type + " " +
+                                    Math.round(distance / 1000) + " km", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
         // Live updates
         final DatabaseHelper.WeatherChangedListener listener = new DatabaseHelper.WeatherChangedListener() {
 
