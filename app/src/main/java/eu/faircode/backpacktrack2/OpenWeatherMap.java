@@ -44,8 +44,9 @@ public class OpenWeatherMap {
 
         @Override
         public String toString() {
-            return SimpleDateFormat.getDateTimeInstance().format(time) + " " +
-                    station_id + ":" + station_name + ":" + station_type + " " +
+            return SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT).format(time) + " " +
+                    station_id + " " + station_name + " " +
+                    "" + station_type + " " +
                     DF.format(temperature) + " °C " + DF.format(humidity) + " % " + DF.format(pressure) + " HPa " +
                     DF.format(wind_speed) + " m/s " + DF.format(wind_direction) + "°";
         }

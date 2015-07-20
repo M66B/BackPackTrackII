@@ -279,6 +279,11 @@
                 android:inputType="number"
                 android:key="pref_weather_stations"
                 android:summary="@string/summary_weather_stations" />
+            <Preference
+                android:dependency="pref_weather_enabled"
+                android:key="pref_weather_test"
+                android:summary="@string/summary_weather_test"
+                android:title="@string/title_weather_test" />
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="pref_weather_enabled"

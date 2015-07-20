@@ -61,6 +61,7 @@
     <string name="title_weather_enabled">Weer bijwerken aan</string>
     <string name="title_weather_interval">Weer ververs interval: %s minuten</string>
     <string name="title_weather_stations">Aantal weerstations: %s</string>
+    <string name="title_weather_test">Toon weergegevens</string>
     <string name="title_weather_airport">Gebruik luchthaven stations</string>
     <string name="title_weather_swop">Gebruik SWOP stations</string>
     <string name="title_weather_synop">Gebruik SYNOP stations</string>
@@ -145,6 +146,7 @@
 
     <string name="summary_weather_interval">Fetch weather data every selected number of minutes</string>
     <string name="summary_weather_stations">Fetch data for the selected number of weather stations</string>
+    <string name="summary_weather_test">Tap to display raw weather data</string>
     <string name="summary_weather_airport">Use data of airport weather stations</string>
     <string name="summary_weather_swop">Use data of SWOP weather stations</string>
     <string name="summary_weather_synop">Use data of SYNOP weather stations</string>

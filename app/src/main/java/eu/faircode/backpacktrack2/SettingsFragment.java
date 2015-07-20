@@ -14,6 +14,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -131,6 +132,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_WEATHER_ENABLED = "pref_weather_enabled";
     public static final String PREF_WEATHER_INTERVAL = "pref_weather_interval";
     public static final String PREF_WEATHER_STATIONS = "pref_weather_stations";
+    public static final String PREF_WEATHER_TEST = "pref_weather_test";
     public static final String PREF_WEATHER_AIRPORT = "pref_weather_airport";
     public static final String PREF_WEATHER_SWOP = "pref_weather_swop";
     public static final String PREF_WEATHER_SYNOP = "pref_weather_synop";
@@ -376,6 +378,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Preference pref_enabled = findPreference(PREF_ENABLED);
         Preference pref_pressure_enabled = findPreference(PREF_PRESSURE_ENABLED);
         final Preference pref_pressure_test = findPreference(PREF_PRESSURE_TEST);
+        final Preference pref_weather_test = findPreference(PREF_WEATHER_TEST);
         Preference pref_recognize_steps = findPreference(PREF_RECOGNITION_STEPS);
         Preference pref_step_update = findPreference(PREF_STEP_DELTA);
         Preference pref_step_size = findPreference(PREF_STEP_SIZE);
@@ -541,6 +544,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         long ref_time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
         final Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
 
+        // Handle pressure reading test
         pref_pressure_test.setEnabled(ref_pressure != 0 && ref_time != 0 && lastLocation != null);
         pref_pressure_test.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
@@ -560,6 +564,51 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         }
                     }
                 });
+                return true;
+            }
+        });
+
+        // Handle weather report test
+        pref_weather_test.setEnabled(lastLocation != null && isConnected(getActivity()));
+        pref_weather_test.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                pref_weather_test.setEnabled(false);
+                pref_weather_test.setSummary(null);
+                new AsyncTask<Object, Object, Object>() {
+
+                    @Override
+                    protected Object doInBackground(Object... objects) {
+                        try {
+                            // Get API key
+                            ApplicationInfo app = getActivity().getPackageManager().getApplicationInfo(getActivity().getPackageName(), PackageManager.GET_META_DATA);
+                            String apikey = app.metaData.getString("org.openweathermap.API_KEY", null);
+
+                            int stations = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_STATIONS, SettingsFragment.DEFAULT_WEATHER_STATIONS));
+                            return OpenWeatherMap.getWeather(apikey, lastLocation, stations, getActivity());
+                        } catch (Throwable ex) {
+                            return ex;
+                        }
+                    }
+
+                    @Override
+                    protected void onPostExecute(Object result) {
+                        if (result instanceof Throwable)
+                            pref_weather_test.setSummary(((Throwable) result).toString());
+                        else if (result instanceof List) {
+                            StringBuilder sb = new StringBuilder();
+                            for (OpenWeatherMap.Weather weather : (List<OpenWeatherMap.Weather>) result) {
+                                if (sb.length() != 0)
+                                    sb.append("\n");
+                                sb.append(weather.toString());
+                            }
+
+                            pref_weather_test.setSummary(sb.toString());
+                        }
+                        pref_weather_test.setEnabled(true);
+                    }
+                }.execute();
+
                 return true;
             }
         });
@@ -831,7 +880,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     private void add_waypoint(final String name) {
         // Geocode name
-        Toast.makeText(getActivity(), getString(R.string.msg_geocoding, name), Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), getString(R.string.msg_geocoding, name), Toast.LENGTH_SHORT).show();
 
         new AsyncTask<Object, Object, List<Address>>() {
             protected List<Address> doInBackground(Object... params) {
@@ -884,7 +933,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                                 @Override
                                 protected void onPostExecute(Object result) {
-                                    Toast.makeText(getActivity(), getString(R.string.msg_added, geocodedName), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getActivity(), getString(R.string.msg_added, geocodedName), Toast.LENGTH_SHORT).show();
                                 }
                             }.execute();
                         }
@@ -897,7 +946,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     });
                     alertDialogBuilder.show();
                 } else
-                    Toast.makeText(getActivity(), getString(R.string.msg_nolocation, name), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
             }
         }.execute();
     }
@@ -932,7 +981,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                 @Override
                 protected void onPostExecute(Object result) {
-                    Toast.makeText(getActivity(), getString(R.string.msg_added, name.toString()), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), getString(R.string.msg_added, name.toString()), Toast.LENGTH_SHORT).show();
                 }
             }.execute();
 
@@ -1179,7 +1228,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                         uri += "(" + Uri.encode(name) + ")";
                                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
                                 } catch (Throwable ex) {
-                                    Toast.makeText(getActivity(), ex.toString(), Toast.LENGTH_SHORT).show();
+                                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                                 }
                                 return true;
 
@@ -1996,7 +2045,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 Intent intent = new Intent(getActivity(), LocationService.class);
                 intent.setAction(LocationService.EXPORTED_ACTION_UPDATE_WEATHER);
                 getActivity().startService(intent);
-                Toast.makeText(getActivity(), R.string.msg_requesting, Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), R.string.msg_requesting, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -2068,7 +2117,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                     Toast.makeText(getActivity(),
                             station_id + " " + station_name + " " + station_type + " " +
-                                    (Float.isNaN(distance) ? "-" : Math.round(distance / 1000)) + " km", Toast.LENGTH_LONG).show();
+                                    (Float.isNaN(distance) ? "-" : Math.round(distance / 1000)) + " km", Toast.LENGTH_SHORT).show();
                 }
             }
         });
