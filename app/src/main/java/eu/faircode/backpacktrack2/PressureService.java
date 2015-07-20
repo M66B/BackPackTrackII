@@ -17,6 +17,7 @@ import android.util.Log;
 
 import com.google.android.gms.location.DetectedActivity;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -108,6 +109,8 @@ public class PressureService extends Service {
         int maxdist = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXDIST, SettingsFragment.DEFAULT_PRESSURE_MAXDIST));
         boolean invehicle = prefs.getBoolean(SettingsFragment.PREF_PRESSURE_INVEHICLE, SettingsFragment.DEFAULT_PRESSURE_INVEHICLE);
 
+        Log.w(TAG, "Get altitude location=" + location + " maxage=" + maxage + " maxdist=" + maxdist + " vehicle=" + invehicle);
+
         // Check last activity
         int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
         if (lastActivity == DetectedActivity.IN_VEHICLE && !invehicle) {
@@ -137,13 +140,14 @@ public class PressureService extends Service {
 
         // Check age
         if (ref_time + maxage * 60 * 1000 <= location.getTime()) {
-            Log.w(TAG, "Reference pressure too old");
+            Log.w(TAG, "Reference pressure too old, time=" + SimpleDateFormat.getDateTimeInstance().format(ref_time));
             return Float.NaN;
         }
 
         // Check distance
-        if (location.distanceTo(station) > maxdist * 1000) {
-            Log.w(TAG, "Reference pressure too far");
+        float distance = location.distanceTo(station);
+        if (distance > maxdist * 1000) {
+            Log.w(TAG, "Reference pressure too far, distance=" + distance + "m");
             return Float.NaN;
         }
 
