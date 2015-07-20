@@ -112,6 +112,7 @@
                 <action android:name="eu.faircode.backpacktrack2.WRITE_KML" />
                 <action android:name="eu.faircode.backpacktrack2.UPLOAD_GPX" />
                 <action android:name="eu.faircode.backpacktrack2.GET_ALTITUDE" />
+                <action android:name="eu.faircode.backpacktrack2.UPDATE_WEATHER" />
             </intent-filter>
 
         </service>

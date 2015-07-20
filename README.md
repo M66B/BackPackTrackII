@@ -155,6 +155,12 @@ Get Google elevation data:
 
 When no time from/to is specified, the default is yesterday.
 
+Update weather information
+
+* *am startservice -a eu.faircode.backpacktrack2.UPDATE_WEATHER*
+
+This will work even when weather updates are disabled.
+
 Tasker use case examples
 
 Starting/stopping tracking based on a location:

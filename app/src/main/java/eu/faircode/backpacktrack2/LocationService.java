@@ -75,7 +75,7 @@ public class LocationService extends IntentService {
     // Actions
     public static final String ACTION_ALARM = "Alarm";
     public static final String ACTION_DAILY = "Daily";
-    public static final String ACTION_WEATHER_UPDATE = "Weather";
+    public static final String ACTION_UPDATE_WEATHER = "Weather";
     public static final String ACTION_ACTIVITY = "Activity";
     public static final String ACTION_LOCATION_FINE = "LocationFine";
     public static final String ACTION_LOCATION_COARSE = "LocationCoarse";
@@ -98,6 +98,7 @@ public class LocationService extends IntentService {
     private static final String EXPORTED_ACTION_WRITE_KML = "eu.faircode.backpacktrack2.WRITE_KML";
     private static final String EXPORTED_ACTION_UPLOAD_GPX = "eu.faircode.backpacktrack2.UPLOAD_GPX";
     private static final String EXPORTED_ACTION_GET_ALTITUDE = "eu.faircode.backpacktrack2.GET_ALTITUDE";
+    private static final String EXPORTED_ACTION_UPDATE_WEATHER = "eu.faircode.backpacktrack2.UPDATE_WEATHER";
 
     // Extras
     public static final String EXTRA_ENABLE = "Enable";
@@ -211,7 +212,8 @@ public class LocationService extends IntentService {
             } else if (ACTION_DAILY.equals(intent.getAction()))
                 handleDaily(intent);
 
-            else if (ACTION_WEATHER_UPDATE.equals(intent.getAction()))
+            else if (ACTION_UPDATE_WEATHER.equals(intent.getAction()) ||
+                    EXPORTED_ACTION_UPDATE_WEATHER.equals(intent.getAction()))
                 handleWeatherUpdate(intent);
 
             else
@@ -1118,7 +1120,7 @@ public class LocationService extends IntentService {
 
         // Set repeating alarm
         Intent alarmIntent = new Intent(context, LocationService.class);
-        alarmIntent.setAction(LocationService.ACTION_WEATHER_UPDATE);
+        alarmIntent.setAction(LocationService.ACTION_UPDATE_WEATHER);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_INTERVAL, SettingsFragment.DEFAULT_WEATHER_INTERVAL));
@@ -1129,7 +1131,7 @@ public class LocationService extends IntentService {
     public static void stopWeatherUpdates(Context context) {
         // Cancel repeating alarm
         Intent alarmIntent = new Intent(context, LocationService.class);
-        alarmIntent.setAction(LocationService.ACTION_WEATHER_UPDATE);
+        alarmIntent.setAction(LocationService.ACTION_UPDATE_WEATHER);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
