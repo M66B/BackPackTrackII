@@ -50,7 +50,7 @@
     <string name="title_pressure_enabled">Gebruik luchtdruk voor hoogtebepaling</string>
     <string name="title_pressure_wait">Luchtdruk middelingstijd: %s seconden</string>
     <string name="title_pressure_offset">Luchtdruk kalibratie: %s hPa</string>
-    <string name="title_pressure_test">Bepaal hoogte voor laaste locatie</string>
+    <string name="title_pressure_test">Bepaal hoogte voor laatste locatie</string>
     <string name="title_pressure_maxage">Referentie luchtdruk max. leeftijd: %s minuten</string>
     <string name="title_pressure_maxdist">Referentie luchtdruk max. afstand: %s km</string>
     <string name="title_pressure_invehicle">Gebruik referentie luchtdruk in voertuig</string>
