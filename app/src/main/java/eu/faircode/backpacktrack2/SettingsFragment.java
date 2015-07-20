@@ -121,6 +121,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_PRESSURE_ENABLED = "pref_pressure_enabled";
     public static final String PREF_PRESSURE_WAIT = "pref_pressure_wait";
     public static final String PREF_PRESSURE_OFFSET = "pref_pressure_offset";
+    public static final String PREF_PRESSURE_TEST = "pref_pressure_test";
     public static final String PREF_PRESSURE_MAXAGE = "pref_pressure_maxage";
     public static final String PREF_PRESSURE_MAXDIST = "pref_pressure_maxdist";
     public static final String PREF_PRESSURE_INVEHICLE = "pref_pressure_invehicle";
@@ -373,6 +374,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         Preference pref_enabled = findPreference(PREF_ENABLED);
         Preference pref_pressure_enabled = findPreference(PREF_PRESSURE_ENABLED);
+        final Preference pref_pressure_test = findPreference(PREF_PRESSURE_TEST);
         Preference pref_recognize_steps = findPreference(PREF_RECOGNITION_STEPS);
         Preference pref_step_update = findPreference(PREF_STEP_DELTA);
         Preference pref_step_size = findPreference(PREF_STEP_SIZE);
@@ -533,6 +535,33 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Check for pressure sensor
         pref_pressure_enabled.setEnabled(LocationService.hasPressureSensor(getActivity()));
+
+        float ref_pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, 0);
+        long ref_time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
+        final Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+
+        pref_pressure_test.setEnabled(ref_pressure != 0 && ref_time != 0 && lastLocation != null);
+        pref_pressure_test.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                pref_pressure_test.setEnabled(false);
+                pref_pressure_test.setSummary(null);
+                prefs.edit().remove(PREF_PRESSURE_TIME).apply();
+                getActivity().startService(new Intent(getActivity(), PressureService.class));
+                getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(new SharedPreferences.OnSharedPreferenceChangeListener() {
+                    @Override
+                    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                        if (PREF_PRESSURE_TIME.equals(key)) {
+                            getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+                            float altitude = PressureService.getAltitude(lastLocation, getActivity());
+                            pref_pressure_test.setSummary((Float.isNaN(altitude) ? "-" : Math.round(altitude)) + " m");
+                            pref_pressure_test.setEnabled(true);
+                        }
+                    }
+                });
+                return true;
+            }
+        });
 
         // Check for Play services
         boolean playServices = LocationService.hasPlayServices(getActivity());

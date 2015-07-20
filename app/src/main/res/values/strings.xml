@@ -50,6 +50,7 @@
     <string name="title_pressure_enabled">Use pressure to determine altitude</string>
     <string name="title_pressure_wait">Pressure averaging time: %s seconds</string>
     <string name="title_pressure_offset">Pressure calibration: %s hPa</string>
+    <string name="title_pressure_test">Determine altitude for last location</string>
     <string name="title_pressure_maxage">Reference pressure max. age: %s minutes</string>
     <string name="title_pressure_maxdist">Reference pressure max. distance: %s km</string>
     <string name="title_pressure_invehicle">Use reference pressure in vehicle</string>

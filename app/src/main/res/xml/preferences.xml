@@ -232,6 +232,10 @@
                 android:inputType="numberSigned|numberDecimal"
                 android:key="pref_pressure_offset"
                 android:summary="@string/summary_pressure_offset" />
+            <Preference
+                android:dependency="pref_pressure_enabled"
+                android:key="pref_pressure_test"
+                android:title="@string/title_pressure_test" />
             <EditTextPreference
                 android:defaultValue="180"
                 android:dependency="pref_pressure_enabled"
