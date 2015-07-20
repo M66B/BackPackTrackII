@@ -2116,7 +2116,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         if (data) {
             graph.getViewport().setXAxisBoundsManual(true);
-            graph.getViewport().setMinX(maxTime - DAY_MS);
+            if ("pressure".equals(column))
+                graph.getViewport().setMinX(maxTime - DAYS_VIEWPORT * DAY_MS);
+            else
+                graph.getViewport().setMinX(maxTime - DAY_MS);
             graph.getViewport().setMaxX(maxTime);
 
             graph.getViewport().setYAxisBoundsManual(true);
