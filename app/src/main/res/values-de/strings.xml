@@ -57,18 +57,6 @@
 
     <string name="title_altitude_avg">Gleitender Mittelwert: %s Proben</string>
 
-    <string name="title_weather_settings">Weather</string>
-    <string name="title_weather_enabled">Weather updates enabled</string>
-    <string name="title_weather_interval">Weather fetch interval: %s minutes</string>
-    <string name="title_weather_stations">Number of weather stations: %s</string>
-    <string name="title_weather_test">Show weather data</string>
-    <string name="title_weather_airport">Use airport stations</string>
-    <string name="title_weather_swop">Use SWOP stations</string>
-    <string name="title_weather_synop">Use SYNOP stations</string>
-    <string name="title_weather_diy">Use DIY stations</string>
-    <string name="title_weather_other">Use other stations</string>
-    <string name="title_weather_tos">OpenWeatherMap TOS</string>
-
     <string name="title_recognition">Aktivitätserkennung</string>
     <string name="title_recognition_enabled">Aktivitätserkennung aktiviert</string>
     <string name="title_recognition_interval_still">Aktivitätserkennung bei Stillstand: %s Sekunden</string>
@@ -84,6 +72,18 @@
     <string name="title_step_delta">Update: %s Schritte</string>
     <string name="title_step_size">Schrittgröße: %s Zentimeter</string>
     <string name="title_weight">Gewicht: %s Kilogram</string>
+
+    <string name="title_weather_settings">Weather</string>
+    <string name="title_weather_enabled">Weather updates enabled</string>
+    <string name="title_weather_interval">Weather fetch interval: %s minutes</string>
+    <string name="title_weather_stations">Number of weather stations: %s</string>
+    <string name="title_weather_test">Show weather data</string>
+    <string name="title_weather_airport">Use airport stations</string>
+    <string name="title_weather_swop">Use SWOP stations</string>
+    <string name="title_weather_synop">Use SYNOP stations</string>
+    <string name="title_weather_diy">Use DIY stations</string>
+    <string name="title_weather_other">Use other stations</string>
+    <string name="title_weather_tos">OpenWeatherMap TOS</string>
 
     <string name="title_blog">WordPress Weblog</string>
     <string name="title_blogurl">URL: %s</string>
@@ -144,16 +144,6 @@
 
     <string name="summary_altitude_avg">Filtern des Rauschens der GPS-Höhe unter Verwendung eines gleitenden Mittelwerts der ausgewählten Anzahl von Proben</string>
 
-    <string name="summary_weather_interval">Fetch weather data every selected number of minutes</string>
-    <string name="summary_weather_stations">Fetch data for the selected number of weather stations</string>
-    <string name="summary_weather_test">Tap to display raw weather data</string>
-    <string name="summary_weather_airport">Use data of airport weather stations</string>
-    <string name="summary_weather_swop">Use data of SWOP weather stations</string>
-    <string name="summary_weather_synop">Use data of SYNOP weather stations</string>
-    <string name="summary_weather_diy">Use data of amateur weather stations</string>
-    <string name="summary_weather_other">Use data of other weather station types</string>
-    <string name="summary_weather_tos">Tap to read the terms of service of OpenWeatherMap (will start the browser)</string>
-
     <string name="summary_recognition_enabled">Erkennen ob Sie sich bewegen oder stillstehen, und Tracking ausschalten wenn Sie stillstehen</string>
     <string name="summary_recognition_interval">Aktivität jede Anzahl von Sekunden ermitteln</string>
     <string name="summary_recognition_confidence">Eine neue Aktivität erkennen wenn die Präzision höher ist als die ausgewählte Prozentzahl</string>
@@ -166,6 +156,16 @@
     <string name="summary_step_delta">Schrittzähler jede Anzahl von Schritte aktualizierenn</string>
     <string name="summary_step_size">Ihre Schrittgröße in Zentimeter um die gelaufe Strecke zu ermitteln</string>
     <string name="summary_weight">Ihr Gewicht in Kilogramm um die Anzahl von verbrannten Kalorien zu ermitteln</string>
+
+    <string name="summary_weather_interval">Fetch weather data every selected number of minutes</string>
+    <string name="summary_weather_stations">Fetch data for the selected number of weather stations</string>
+    <string name="summary_weather_test">Tap to display raw weather data</string>
+    <string name="summary_weather_airport">Use data of airport weather stations</string>
+    <string name="summary_weather_swop">Use data of SWOP weather stations</string>
+    <string name="summary_weather_synop">Use data of SYNOP weather stations</string>
+    <string name="summary_weather_diy">Use data of amateur weather stations</string>
+    <string name="summary_weather_other">Use data of other weather station types</string>
+    <string name="summary_weather_tos">Tap to read the terms of service of OpenWeatherMap (will start the browser)</string>
 
     <string name="summary_blogurl">WordPress Weblog Adresse</string>
     <string name="summary_blogid">WordPress Weblog Identifikation\nBenutze 1 für eine Single-Site Installation</string>

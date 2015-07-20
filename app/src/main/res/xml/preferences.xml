@@ -261,68 +261,6 @@
                 android:key="pref_altitude_avg"
                 android:summary="@string/summary_altitude_avg" />
         </PreferenceScreen>
-        <PreferenceScreen android:title="@string/title_weather_settings">
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:dependency="pref_enabled"
-                android:key="pref_weather_enabled"
-                android:title="@string/title_weather_enabled" />
-            <EditTextPreference
-                android:defaultValue="30"
-                android:dependency="pref_weather_enabled"
-                android:inputType="number"
-                android:key="pref_weather_interval"
-                android:summary="@string/summary_weather_interval" />
-            <EditTextPreference
-                android:defaultValue="10"
-                android:dependency="pref_weather_enabled"
-                android:inputType="number"
-                android:key="pref_weather_stations"
-                android:summary="@string/summary_weather_stations" />
-            <Preference
-                android:dependency="pref_weather_enabled"
-                android:key="pref_weather_test"
-                android:summary="@string/summary_weather_test"
-                android:title="@string/title_weather_test" />
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:dependency="pref_weather_enabled"
-                android:key="pref_weather_airport"
-                android:summary="@string/summary_weather_airport"
-                android:title="@string/title_weather_airport" />
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:dependency="pref_weather_enabled"
-                android:key="pref_weather_swop"
-                android:summary="@string/summary_weather_swop"
-                android:title="@string/title_weather_swop" />
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:dependency="pref_weather_enabled"
-                android:key="pref_weather_synop"
-                android:summary="@string/summary_weather_synop"
-                android:title="@string/title_weather_synop" />
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:dependency="pref_weather_enabled"
-                android:key="pref_weather_diy"
-                android:summary="@string/summary_weather_diy"
-                android:title="@string/title_weather_diy" />
-            <CheckBoxPreference
-                android:defaultValue="false"
-                android:dependency="pref_weather_enabled"
-                android:key="pref_weather_other"
-                android:summary="@string/summary_weather_other"
-                android:title="@string/title_weather_other" />
-            <Preference
-                android:dependency="pref_weather_enabled"
-                android:summary="@string/summary_weather_tos"
-                android:title="@string/title_weather_tos">
-                <intent
-                    android:action="android.intent.action.VIEW"
-                    android:data="http://openweathermap.org/terms" />
-            </Preference>
-        </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_recognition">
             <CheckBoxPreference
                 android:defaultValue="true"
@@ -398,6 +336,67 @@
                 android:inputType="number"
                 android:key="pref_weight"
                 android:summary="@string/summary_weight" />
+        </PreferenceScreen>
+        <PreferenceScreen android:title="@string/title_weather_settings">
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:key="pref_weather_enabled"
+                android:title="@string/title_weather_enabled" />
+            <EditTextPreference
+                android:defaultValue="30"
+                android:dependency="pref_weather_enabled"
+                android:inputType="number"
+                android:key="pref_weather_interval"
+                android:summary="@string/summary_weather_interval" />
+            <EditTextPreference
+                android:defaultValue="10"
+                android:dependency="pref_weather_enabled"
+                android:inputType="number"
+                android:key="pref_weather_stations"
+                android:summary="@string/summary_weather_stations" />
+            <Preference
+                android:dependency="pref_weather_enabled"
+                android:key="pref_weather_test"
+                android:summary="@string/summary_weather_test"
+                android:title="@string/title_weather_test" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="pref_weather_enabled"
+                android:key="pref_weather_airport"
+                android:summary="@string/summary_weather_airport"
+                android:title="@string/title_weather_airport" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="pref_weather_enabled"
+                android:key="pref_weather_swop"
+                android:summary="@string/summary_weather_swop"
+                android:title="@string/title_weather_swop" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="pref_weather_enabled"
+                android:key="pref_weather_synop"
+                android:summary="@string/summary_weather_synop"
+                android:title="@string/title_weather_synop" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="pref_weather_enabled"
+                android:key="pref_weather_diy"
+                android:summary="@string/summary_weather_diy"
+                android:title="@string/title_weather_diy" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="pref_weather_enabled"
+                android:key="pref_weather_other"
+                android:summary="@string/summary_weather_other"
+                android:title="@string/title_weather_other" />
+            <Preference
+                android:dependency="pref_weather_enabled"
+                android:summary="@string/summary_weather_tos"
+                android:title="@string/title_weather_tos">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="http://openweathermap.org/terms" />
+            </Preference>
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_blog">
             <EditTextPreference
