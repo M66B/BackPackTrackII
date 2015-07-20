@@ -1996,6 +1996,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 Intent intent = new Intent(getActivity(), LocationService.class);
                 intent.setAction(LocationService.EXPORTED_ACTION_UPDATE_WEATHER);
                 getActivity().startService(intent);
+                Toast.makeText(getActivity(), R.string.msg_requesting, Toast.LENGTH_LONG).show();
             }
         });
 
