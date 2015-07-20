@@ -266,11 +266,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (stepcount >= 0)
                 cv.put("stepcount", stepcount);
 
-            db.insert("location", null, cv);
+            if (db.insert("location", null, cv) == -1)
+                Log.e(TAG, "Insert location failed");
         }
 
         for (LocationChangedListener listener : mLocationChangedListeners)
-            listener.onLocationAdded(location);
+            try {
+                listener.onLocationAdded(location);
+            } catch (Throwable ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
 
         return this;
     }
@@ -280,11 +285,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues cv = new ContentValues();
             cv.put("name", name);
-            db.update("location", cv, "ID = ?", new String[]{Long.toString(id)});
+            if (db.update("location", cv, "ID = ?", new String[]{Long.toString(id)}) != 1)
+                Log.e(TAG, "Update location failed");
         }
 
         for (LocationChangedListener listener : mLocationChangedListeners)
-            listener.onLocationUpdated();
+            try {
+                listener.onLocationUpdated();
+            } catch (Throwable ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
 
         return this;
     }
@@ -294,11 +304,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues cv = new ContentValues();
             cv.put("altitude", altitude);
-            db.update("location", cv, "ID = ?", new String[]{Long.toString(id)});
+            if (db.update("location", cv, "ID = ?", new String[]{Long.toString(id)}) != 1)
+                Log.e(TAG, "Update location altitude failed");
         }
 
         for (LocationChangedListener listener : mLocationChangedListeners)
-            listener.onLocationUpdated();
+            try {
+                listener.onLocationUpdated();
+            } catch (Throwable ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
 
         return this;
     }
@@ -306,11 +321,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public DatabaseHelper deleteLocation(long id) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
-            db.delete("location", "ID = ?", new String[]{Long.toString(id)});
+            if (db.delete("location", "ID = ?", new String[]{Long.toString(id)}) != 1)
+                Log.e(TAG, "Delete location failed");
         }
 
         for (LocationChangedListener listener : mLocationChangedListeners)
-            listener.onLocationDeleted();
+            try {
+                listener.onLocationDeleted();
+            } catch (Throwable ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
 
         return this;
     }
@@ -323,7 +343,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         for (LocationChangedListener listener : mLocationChangedListeners)
-            listener.onLocationDeleted();
+            try {
+                listener.onLocationDeleted();
+            } catch (Throwable ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
 
         return this;
     }
@@ -353,11 +377,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cv.put("activity", activity);
             cv.put("confidence", confidence);
 
-            db.insert("activitytype", null, cv);
+            if (db.insert("activitytype", null, cv) == -1)
+                Log.e(TAG, "Insert activity type failed");
         }
 
         for (ActivityTypeChangedListener listener : mActivityTypeChangedListeners)
-            listener.onActivityAdded(time, activity, confidence);
+            try {
+                listener.onActivityAdded(time, activity, confidence);
+            } catch (Throwable ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
 
         return this;
     }
@@ -369,7 +398,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         for (ActivityTypeChangedListener listener : mActivityTypeChangedListeners)
-            listener.onActivityDeleted();
+            try {
+                listener.onActivityDeleted();
+            } catch (Throwable ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
 
         return this;
     }
@@ -434,22 +467,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cv.put("onbicycle", 0);
                 cv.put("invehicle", 0);
                 cv.put("unknown", 0);
-                db.insert("activityduration", null, cv);
+                if (db.insert("activityduration", null, cv) == -1)
+                    Log.e(TAG, "Insert activity duration failed");
             }
 
             if (duration > 0) {
                 ContentValues cv = new ContentValues();
                 cv.put(column, prev + duration);
-                db.update("activityduration", cv, "time = ?", new String[]{Long.toString(day)});
+                if (db.update("activityduration", cv, "time = ?", new String[]{Long.toString(day)}) != 1)
+                    Log.e(TAG, "Update activity duration failed");
             }
         }
 
         if (prev < 0)
             for (ActivityDurationChangedListener listener : mActivityDurationChangedListeners)
-                listener.onActivityAdded(day);
+                try {
+                    listener.onActivityAdded(day);
+                } catch (Throwable ex) {
+                    Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                }
         else if (duration > 0)
             for (ActivityDurationChangedListener listener : mActivityDurationChangedListeners)
-                listener.onActivityUpdated(day, activity, prev + duration);
+                try {
+                    listener.onActivityUpdated(day, activity, prev + duration);
+                } catch (Throwable ex) {
+                    Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                }
 
         // Activity log
         long start = -1;
@@ -474,20 +517,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cv.put("start", time);
                 cv.put("finish", time + duration);
                 cv.put("activity", activity);
-                db.insert("activitylog", null, cv);
+                if (db.insert("activitylog", null, cv) == -1)
+                    Log.e(TAG, "Insert activity log failed");
             } else {
                 ContentValues cv = new ContentValues();
                 cv.put("finish", time + duration);
-                db.update("activitylog", cv, "start = ?", new String[]{Long.toString(start)});
+                if (db.update("activitylog", cv, "start = ?", new String[]{Long.toString(start)}) != 1)
+                    Log.e(TAG, "Update activity log failed");
             }
         }
 
         if (start < 0)
             for (ActivityLogChangedListener listener : mActivityLogChangedListeners)
-                listener.onActivityAdded(time, time + duration, activity);
+                try {
+                    listener.onActivityAdded(time, time + duration, activity);
+                } catch (Throwable ex) {
+                    Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                }
         else
             for (ActivityLogChangedListener listener : mActivityLogChangedListeners)
-                listener.onActivityUpdated(start, time + duration, activity);
+                try {
+                    listener.onActivityUpdated(start, time + duration, activity);
+                } catch (Throwable ex) {
+                    Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                }
 
         return this;
     }
@@ -535,19 +588,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ContentValues cv = new ContentValues();
                 cv.put("time", day);
                 cv.put("count", delta);
-                db.insert("step", null, cv);
+                if (db.insert("step", null, cv) == -1)
+                    Log.e(TAG, "Insert step failed");
             } else {
                 ContentValues cv = new ContentValues();
                 cv.put("count", count + delta);
-                db.update("step", cv, "time = ?", new String[]{Long.toString(day)});
+                if (db.update("step", cv, "time = ?", new String[]{Long.toString(day)}) != 1)
+                    Log.e(TAG, "Update step failed");
             }
         }
 
         for (StepCountChangedListener listener : mStepCountChangedListeners)
-            if (count < 0)
-                listener.onStepCountAdded(day, delta);
-            else
-                listener.onStepCountUpdated(day, count + delta);
+            try {
+                if (count < 0)
+                    listener.onStepCountAdded(day, delta);
+                else
+                    listener.onStepCountUpdated(day, count + delta);
+            } catch (Throwable ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
 
         return this;
     }
@@ -631,11 +690,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             cv.put("created", new Date().getTime());
 
-            db.insert("weather", null, cv);
+            if (db.insert("weather", null, cv) == -1)
+                Log.e(TAG, "Insert weather failed");
         }
 
         for (WeatherChangedListener listener : mWeatherChangedListeners)
-            listener.onWeatherAdded(weather.time, weather.station_id);
+            try {
+                listener.onWeatherAdded(weather.time, weather.station_id);
+            } catch (Throwable ex) {
+                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
 
         return this;
     }
