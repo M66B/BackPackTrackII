@@ -42,7 +42,7 @@ public class WeatherAdapter extends CursorAdapter {
         double wind_speed = cursor.getDouble(cursor.getColumnIndex("wind_speed"));
 
         if ("f".equals(temperature_unit))
-            temperature = 9 / 5 * temperature + 32;
+            temperature = temperature * 9 / 5 + 32;
 
         if ("bft".equals(speed_unit))
             wind_speed = Math.pow(10.0, (Math.log10(wind_speed / 0.836) / 1.5));

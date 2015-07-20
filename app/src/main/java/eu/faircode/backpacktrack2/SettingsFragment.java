@@ -2098,7 +2098,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                 if ("temperature".equals(column))
                     if ("f".equals(temperature_unit))
-                        value = 9 / 5 * value + 32;
+                        value = value * 9 / 5 + 32;
 
                 if ("wind_speed".equals(column))
                     if ("bft".equals(speed_unit))
