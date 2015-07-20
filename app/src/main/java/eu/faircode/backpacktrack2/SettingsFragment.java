@@ -1209,19 +1209,21 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Handle list item click
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, final int position, long id) {
+            public void onItemClick(AdapterView<?> adapterView, View view, final int position, long iid) {
+                Cursor cursor = (Cursor) lv.getItemAtPosition(position);
+                if (cursor == null)
+                    return;
+                final long id = cursor.getLong(cursor.getColumnIndex("ID"));
+                final long time = cursor.getLong(cursor.getColumnIndex("time"));
+                final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
+                final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
+                final String name = cursor.getString(cursor.getColumnIndex("name"));
+
                 PopupMenu popupMenu = new PopupMenu(getActivity(), view);
+
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        Cursor cursor = (Cursor) lv.getItemAtPosition(position);
-                        if (cursor == null)
-                            return false;
-                        final long id = cursor.getLong(cursor.getColumnIndex("ID"));
-                        final long time = cursor.getLong(cursor.getColumnIndex("time"));
-                        final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
-                        final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
-                        final String name = cursor.getString(cursor.getColumnIndex("name"));
 
                         switch (item.getItemId()) {
                             case R.id.menu_share:
@@ -1344,7 +1346,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         }
                     }
                 });
+
                 popupMenu.inflate(R.menu.location);
+                if (name != null) {
+                    popupMenu.getMenu().findItem(R.id.menu_name).setTitle(name);
+                    popupMenu.getMenu().findItem(R.id.menu_name).setVisible(true);
+                }
                 popupMenu.getMenu().findItem(R.id.menu_elevation_loc).setEnabled(isConnected(getActivity()));
                 popupMenu.getMenu().findItem(R.id.menu_elevation_day).setEnabled(isConnected(getActivity()));
                 popupMenu.show();
