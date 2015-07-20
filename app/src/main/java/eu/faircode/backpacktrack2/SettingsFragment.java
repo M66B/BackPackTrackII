@@ -292,7 +292,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         @Override
         public void onReceive(Context context, Intent intent) {
             Log.w(TAG, "Connectivity changed");
+            SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+            Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
             findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && storageMounted() && isConnected(SettingsFragment.this.getActivity()));
+            findPreference(PREF_WEATHER_TEST).setEnabled(lastLocation != null && isConnected(getActivity()));
         }
     };
 
