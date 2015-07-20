@@ -23,7 +23,7 @@ import java.util.Locale;
 
 public class KMLFileWriter {
     private static final String NS = "http://www.opengis.net/kml/2.2";
-    private static final DecimalFormat DF = new DecimalFormat("#.##", new DecimalFormatSymbols(Locale.ROOT));
+    private static final DecimalFormat DF = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ROOT));
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
 
     // Main logic

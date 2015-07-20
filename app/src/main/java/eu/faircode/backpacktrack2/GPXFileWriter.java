@@ -23,7 +23,7 @@ import org.jdom2.output.XMLOutputter;
 
 public class GPXFileWriter {
     private static final String NS = "http://www.topografix.com/GPX/1/1";
-    private static final DecimalFormat DF = new DecimalFormat("#.##", new DecimalFormatSymbols(Locale.ROOT));
+    private static final DecimalFormat DF = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ROOT));
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
 
     // Main logic
