@@ -698,7 +698,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if (PREF_RECOGNITION_ENABLED.equals(key))
             prefs.edit().remove(PREF_LAST_ACTIVITY).apply();
 
-        if (PREF_WEATHER_MAXAGE.equals(key)) {
+        if (PREF_WEATHER_MAXAGE.equals(key) ||
+                PREF_TEMPERATURE.equals(key)) {
             Intent intent = new Intent(getActivity(), LocationService.class);
             intent.setAction(LocationService.ACTION_STATE_CHANGED);
             getActivity().startService(intent);

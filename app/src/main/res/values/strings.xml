@@ -133,14 +133,14 @@
     <string name="summary_passive_altitude">Use passive location updates when altitude changes for more than the selected number of meters</string>
 
     <string name="summary_correction_enabled">GPS altitude correction using EGM96</string>
-    <string name="summary_correction_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nTap for more information (will start the browser)</string>
+    <string name="summary_correction_egm96">Copyright &#169; 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nTap for more information (will start the browser)</string>
 
     <string name="summary_altitude_google">Request Google elevation data for locations without altitude information (typical network locations)</string>
     <string name="summary_altitude_google_terms">Google Maps/Google Earth APIs Terms of Services\nTap to read (will start the browser)</string>
 
     <string name="summary_pressure_enabled">Requires weather data</string>
     <string name="summary_pressure_wait">Number of seconds to wait for an average messured pressure</string>
-    <string name="summary_pressure_offset">Number of hPa to add or substract from the meassure pressure</string>
+    <string name="summary_pressure_offset">Number of hPa to add or subtract from the meassure pressure</string>
     <string name="summary_pressure_maxage">Use the reference pressure for maximum the selected number of minutes</string>
     <string name="summary_pressure_maxdist">Use the referene pressure with the selected number of kilometers</string>
     <string name="summary_pressure_invehicle">Determine altitude from the pressure while in a vehicle (requires activity recognition)</string>
@@ -226,7 +226,7 @@
 
     <string name="msg_notification">%1$s %2$s @%3$sm #%4$d</string>
     <string name="msg_idle">Last @%1$s %2$s</string>
-    <string name="msg_acquiring">Acquiring ...</string>
+    <string name="msg_acquiring">Acquiring &#8230;</string>
     <string name="msg_acquired">Acquired @%1$s %2$s &#177;%3$dm</string>
 
     <string name="msg_added">Added \'%s\'</string>
@@ -236,8 +236,8 @@
     <string name="msg_uploaded">Uploaded \'%s\'</string>
     <string name="msg_nolocation">Address \'%s\' not found</string>
     <string name="msg_noaddress">No addresses found</string>
-    <string name="msg_geocoding">Geocoding \'%s\' ...</string>
-    <string name="msg_rgeocoding">Reverse geocoding ...</string>
+    <string name="msg_geocoding">Geocoding \'%s\' &#8230;</string>
+    <string name="msg_rgeocoding">Reverse geocoding &#8230;</string>
     <string name="msg_requesting">Requesting</string>
 
     <string name="provider_gps">GPS</string>

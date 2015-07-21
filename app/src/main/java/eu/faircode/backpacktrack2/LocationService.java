@@ -1383,6 +1383,7 @@ public class LocationService extends IntentService {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.backpacker_grey).copy(Bitmap.Config.ARGB_8888, true);
 
+            // Show temperature
             float ref_temp = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_TEMP, Float.NaN);
             long ref_time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
             int maxage = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_MAXAGE, SettingsFragment.DEFAULT_WEATHER_MAXAGE));
@@ -1406,6 +1407,7 @@ public class LocationService extends IntentService {
                 Canvas canvas = new Canvas(largeIcon);
                 canvas.drawText(label, 0, bounds.height(), paint);
             }
+
             notificationBuilder.setLargeIcon(largeIcon);
         }
 

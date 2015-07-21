@@ -133,7 +133,7 @@
     <string name="summary_passive_altitude">Benutze passive Standortabfragen wen sich die Höhe um mehr als die ausgewählte Anzahl von Meter ändert</string>
 
     <string name="summary_correction_enabled">Höhenkorrektur mittels EGM96</string>
-    <string name="summary_correction_egm96">Copyright (C) 2001 United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nKlicken für Details (Öffnet im Browser)</string>
+    <string name="summary_correction_egm96">Copyright &#169; United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nKlicken für Details (Öffnet im Browser)</string>
 
     <string name="summary_altitude_google">Nutze Google Höhe Daten für Standorte ohne Höheninformation (typische Netzwerkstandorte)</string>
     <string name="summary_altitude_google_terms">Google Maps/Google Earth APIs Nutzungsbedingungen\nKlicken um anzugeigen (Öffnet im Browser)</string>
@@ -226,7 +226,7 @@
 
     <string name="msg_notification">%1$s %2$s @%3$sm #%4$d</string>
     <string name="msg_idle">Letzte @%1$s %2$s</string>
-    <string name="msg_acquiring">Ermitteln ...</string>
+    <string name="msg_acquiring">Ermitteln &#8230;</string>
     <string name="msg_acquired">Ermittelt @%1$s %2$s &#177;%3$dm</string>
 
     <string name="msg_added">Hinzugefügt \'%s\'</string>
@@ -236,8 +236,8 @@
     <string name="msg_uploaded">Hochgeladen \'%s\'</string>
     <string name="msg_nolocation">Adresse \'%s\' nicht gefunden</string>
     <string name="msg_noaddress">Keine Adressen gefunden</string>
-    <string name="msg_geocoding">Geocoding \'%s\' ...</string>
-    <string name="msg_rgeocoding">Umgewandelte Geocoding ...</string>
+    <string name="msg_geocoding">Geocoding \'%s\' &#8230;</string>
+    <string name="msg_rgeocoding">Umgewandelte Geocoding &#8230;</string>
     <string name="msg_requesting">Abfragen</string>
 
     <string name="provider_gps">GPS</string>

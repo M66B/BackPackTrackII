@@ -359,7 +359,7 @@
                 android:summary="@string/summary_weather_stations" />
             <EditTextPreference
                 android:defaultValue="90"
-                android:dependency="pref_weather_maxage"
+                android:dependency="pref_weather_enabled"
                 android:inputType="number"
                 android:key="pref_weather_maxage"
                 android:summary="@string/summary_weather_maxage" />
