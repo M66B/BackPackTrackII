@@ -553,7 +553,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         final float ref_pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, 0);
         final long ref_time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
-        final Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+        Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
 
         // Handle pressure reading test
         pref_pressure_test.setEnabled(ref_pressure != 0 && ref_time != 0 && lastLocation != null);
@@ -571,6 +571,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 
                             // Get altitude
+                            Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
                             float altitude = PressureService.getAltitude(lastLocation, getActivity());
 
                             // Show reference/altitude
@@ -596,6 +597,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 pref_weather_test.setSummary(null);
 
                 new AsyncTask<Object, Object, Object>() {
+                    Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+
                     @Override
                     protected Object doInBackground(Object... objects) {
                         try {
@@ -622,7 +625,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             for (OpenWeatherMap.Weather weather : (List<OpenWeatherMap.Weather>) result) {
                                 if (sb.length() != 0)
                                     sb.append("\n");
+
                                 sb.append(weather.toString());
+
+                                float distance = weather.station_location.distanceTo(lastLocation);
+                                sb.append(" ");
+                                sb.append(Integer.toString(Math.round(distance / 1000)));
+                                sb.append(" km");
                             }
 
                             pref_weather_test.setSummary(sb.toString());
