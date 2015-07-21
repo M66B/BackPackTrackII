@@ -43,17 +43,17 @@
     <string name="title_correction_enabled">Korrektur aktiviert</string>
     <string name="title_correction_egm96">EGM96 Lizenz</string>
 
-    <string name="title_altitude_waypoint">Google Höhe für  Waypoints</string>
+    <string name="title_altitude_waypoint">Google Höhe für Wegpunkte</string>
     <string name="title_altitude_trackpoint">Google Höhe für Trackpoints</string>
     <string name="title_altitude_google_terms">Powered by Google</string>
 
-    <string name="title_pressure_enabled">Use pressure to determine altitude</string>
-    <string name="title_pressure_wait">Pressure averaging time: %s seconds</string>
-    <string name="title_pressure_offset">Pressure calibration: %s hPa</string>
-    <string name="title_pressure_test">Determine altitude for last location</string>
-    <string name="title_pressure_maxage">Reference pressure max. age: %s minutes</string>
-    <string name="title_pressure_maxdist">Reference pressure max. distance: %s km</string>
-    <string name="title_pressure_invehicle">Use reference pressure in vehicle</string>
+    <string name="title_pressure_enabled">Druck nutzen um Höhe zu ermitteln</string>
+    <string name="title_pressure_wait">Druck Mittelungszeit: %s Sekunden</string>
+    <string name="title_pressure_offset">Druck Kalibrierung: %s hPa</string>
+    <string name="title_pressure_test">Höhe für letzte Position ermitteln</string>
+    <string name="title_pressure_maxage">Max. Druck Referenzalter: %s Minuten</string>
+    <string name="title_pressure_maxdist">Max Druck Referenzentfernung: %s km</string>
+    <string name="title_pressure_invehicle">Nutze Druckreferenz im Fahrzeug</string>
 
     <string name="title_altitude_avg">Gleitender Mittelwert: %s Proben</string>
 
@@ -71,19 +71,19 @@
     <string name="title_step_counter">Schrittzähler</string>
     <string name="title_step_delta">Update: %s Schritte</string>
     <string name="title_step_size">Schrittgröße: %s Zentimeter</string>
-    <string name="title_weight">Gewicht: %s Kilogram</string>
+    <string name="title_weight">Gewicht: %s Kilogramm</string>
 
-    <string name="title_weather_settings">Weather</string>
-    <string name="title_weather_enabled">Weather updates enabled</string>
-    <string name="title_weather_interval">Weather fetch interval: %s minutes</string>
-    <string name="title_weather_stations">Number of weather stations: %s</string>
-    <string name="title_weather_test">Show weather data</string>
-    <string name="title_weather_airport">Use airport stations</string>
-    <string name="title_weather_swop">Use SWOP stations</string>
-    <string name="title_weather_synop">Use SYNOP stations</string>
-    <string name="title_weather_diy">Use DIY stations</string>
-    <string name="title_weather_other">Use other stations</string>
-    <string name="title_weather_tos">OpenWeatherMap TOS</string>
+    <string name="title_weather_settings">Wetter</string>
+    <string name="title_weather_enabled">Wetter Aktualisierungen aktiviert</string>
+    <string name="title_weather_interval">Wetter Aktualisierungsintervall: %s Minuten</string>
+    <string name="title_weather_stations">Anzahl der Wetterstationen: %s</string>
+    <string name="title_weather_test">Zeige Wetter Daten</string>
+    <string name="title_weather_airport">Nutze Flughafenstationen</string>
+    <string name="title_weather_swop">Nutze SWOP Stationen</string>
+    <string name="title_weather_synop">Nutze SYNOP Stationen</string>
+    <string name="title_weather_diy">Nutze DIY Stationen</string>
+    <string name="title_weather_other">Nutze andere Stationen</string>
+    <string name="title_weather_tos">OpenWeatherMap Nutzungsbedingungen</string>
 
     <string name="title_blog">WordPress Weblog</string>
     <string name="title_blogurl">URL: %s</string>
@@ -92,11 +92,11 @@
     <string name="title_blogpwd">Passwort: %s</string>
     <string name="title_plugin">Plugin</string>
 
-    <string name="title_units">Units</string>
-    <string name="title_temperature">Temperature: %s</string>
-    <string name="title_speed">Speed: %s</string>
+    <string name="title_units">Einheiten</string>
+    <string name="title_temperature">Temperatur: %s</string>
+    <string name="title_speed">Geschwindigkeit: %s</string>
 
-    <string name="title_info">Information</string>
+    <string name="title_info">Informationen</string>
     <string name="title_legend">Legende</string>
     <string name="title_version">Version</string>
     <string name="title_support">Problem melden</string>
@@ -111,7 +111,7 @@
     <string name="summary_location_history">Zeige den Positionsverlauf um zu verifizieren, dass alles funktioniert</string>
     <string name="summary_activity_history">Zeige den Aktivitätenverlauf um zu verifizieren, dass alles funktioniert</string>
     <string name="summary_step_history">Zeige die täglich Schrittzahl, gelaufene Strecke und verbrante Kalorien</string>
-    <string name="summary_weather_history">Show local weather history</string>
+    <string name="summary_weather_history">Zeige lokale Wetterhistorie</string>
     <string name="summary_loc_settings">Klicken um Android Standorteinstellungen zu öffnen</string>
 
     <string name="summary_interval">Versuche eine neue Position jede Anzahl von Sekunden zu bestimmen</string>
@@ -122,8 +122,8 @@
     <string name="summary_check_sat">Erforderliche Anzahl von Satelliten um eine Bestimmung per GPS fortzuführen</string>
     <string name="summary_inaccurate">Standorte ohne die ausgewählte Präzision in Meter ausblenden</string>
     <string name="summary_nearby">Standorte ausblenden die näher sind als die angegebene Meteranzahl, außer wenn eine Position eine höhere Präzision hat als die letzte Position</string>
-    <string name="summary_mintime">Zeitminimum zwischen Positionabfragen</string>
-    <string name="summary_mindist">Entfernungsminimum zwischen Positionabfragen</string>
+    <string name="summary_mintime">Zeitminimum zwischen Positionsabfragen</string>
+    <string name="summary_mindist">Entfernungsminimum zwischen Positionsabfragen</string>
 
     <string name="summary_passive_enabled">Benutze Positionsabfragen von anderen Applikationen</string>
     <string name="summary_passive_bearing">Benutze passive Standortabfragen wen sich die Richtung um mehr als die ausgewählte Gradzahl ändert</string>
@@ -135,12 +135,12 @@
     <string name="summary_altitude_google">Nutze Google Höhe Daten für Standorte ohne Höheninformation (typische Netzwerkstandorte)</string>
     <string name="summary_altitude_google_terms">Google Maps/Google Earth APIs Nutzungsbedingungen\nKlicken um anzugeigen (Öffnet im Browser)</string>
 
-    <string name="summary_pressure_enabled">Requires weather data</string>
-    <string name="summary_pressure_wait">Number of seconds to wait for an average messured pressure</string>
-    <string name="summary_pressure_offset">Number of hPa to add or substract from the meassure pressure</string>
-    <string name="summary_pressure_maxage">Use the reference pressure for maximum the selected number of minutes</string>
-    <string name="summary_pressure_maxdist">Use the referene pressure with the selected number of kilometers</string>
-    <string name="summary_pressure_invehicle">Determine altitude from the pressure while in a vehicle (requires activity recognition)</string>
+    <string name="summary_pressure_enabled">Benötigt Wetterdaten</string>
+    <string name="summary_pressure_wait">Anzahl von Sekunden zu warten für eine Durchschnittsdruckmessung</string>
+    <string name="summary_pressure_offset">Anzahl von hPa vom gemessenen Druck zu addieren oder subtrahieren</string>
+    <string name="summary_pressure_maxage">Nutze den Referenzdruck für maximal die ausgewählte Anzah von Minuten</string>
+    <string name="summary_pressure_maxdist">Nutze den Referenzdruck mit der ausgewählten Anzahl von Kilometer</string>
+    <string name="summary_pressure_invehicle">Die Höhe im Fahrzeug durch Druck ermitteln (benötigt Aktivitätserkennung)</string>
 
     <string name="summary_altitude_avg">Filtern des Rauschens der GPS-Höhe unter Verwendung eines gleitenden Mittelwerts der ausgewählten Anzahl von Proben</string>
 
@@ -154,18 +154,18 @@
     <string name="summary_recognition_unknown_steps">Zähle Schritte wenn eine \'unbekannte\' Aktivität erkannt wurde</string>
 
     <string name="summary_step_delta">Schrittzähler jede Anzahl von Schritte aktualizierenn</string>
-    <string name="summary_step_size">Ihre Schrittgröße in Zentimeter um die gelaufe Strecke zu ermitteln</string>
+    <string name="summary_step_size">Ihre Schrittgröße in Zentimeter um die gelaufene Strecke zu ermitteln</string>
     <string name="summary_weight">Ihr Gewicht in Kilogramm um die Anzahl von verbrannten Kalorien zu ermitteln</string>
 
-    <string name="summary_weather_interval">Fetch weather data every selected number of minutes</string>
-    <string name="summary_weather_stations">Fetch data for the selected number of weather stations</string>
-    <string name="summary_weather_test">Tap to display raw weather data</string>
-    <string name="summary_weather_airport">Use data of airport weather stations</string>
-    <string name="summary_weather_swop">Use data of SWOP weather stations</string>
-    <string name="summary_weather_synop">Use data of SYNOP weather stations</string>
-    <string name="summary_weather_diy">Use data of amateur weather stations</string>
-    <string name="summary_weather_other">Use data of other weather station types</string>
-    <string name="summary_weather_tos">Tap to read the terms of service of OpenWeatherMap (will start the browser)</string>
+    <string name="summary_weather_interval">Wetterdaten jede Anzahl von Minuten abrufen</string>
+    <string name="summary_weather_stations">Wetterdaten für die ausgewählte Anzahl von Wetterstationen abrufen</string>
+    <string name="summary_weather_test">Drücken um rohe Wetterdaten anzuzeigen</string>
+    <string name="summary_weather_airport">Nutze Daten von Flughafen Wetterstationen</string>
+    <string name="summary_weather_swop">Nutze Daten von SWOP Wetterstationen</string>
+    <string name="summary_weather_synop">Nutze Daten SYNOP Wetterstationen</string>
+    <string name="summary_weather_diy">Nutze Daten von Amateur-Wetterstation</string>
+    <string name="summary_weather_other">Nutze Daten anderen Wetterstationen</string>
+    <string name="summary_weather_tos">Klicken um Nutzungsbedingungen von OpenWeatherMap (Öffnet im Browser)</string>
 
     <string name="summary_blogurl">WordPress Weblog Adresse</string>
     <string name="summary_blogid">WordPress Weblog Identifikation\nBenutze 1 für eine Single-Site Installation</string>
@@ -215,7 +215,7 @@
     <string name="msg_playservices">Play Dienste: %s</string>
     <string name="msg_stepcounter">Schrittzähler: %s</string>
     <string name="msg_significantmotion">Signifikante Bewegung: %s</string>
-    <string name="msg_pressure">Atmospheric pressure: %s</string>
+    <string name="msg_pressure">Atmosphärendruck: %s</string>
     <string name="msg_yes">ja</string>
     <string name="msg_no">nein</string>
 
@@ -233,13 +233,13 @@
     <string name="msg_noaddress">Keine Adressen gefunden</string>
     <string name="msg_geocoding">Geocoding \'%s\' ...</string>
     <string name="msg_rgeocoding">Umgewandelte Geocoding ...</string>
-    <string name="msg_requesting">Requesting</string>
+    <string name="msg_requesting">Abfragen</string>
 
     <string name="provider_gps">GPS</string>
     <string name="provider_network">Netzwerk</string>
 
     <string name="menu_share">Teilen</string>
-    <string name="menu_elevation_loc">Höhe für Standort bezeihen</string>
+    <string name="menu_elevation_loc">Höhe für Standort beziehen</string>
     <string name="menu_elevation_day">Höhe für Tag beziehen</string>
     <string name="menu_delete">Löschen</string>
 
