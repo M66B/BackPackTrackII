@@ -551,8 +551,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Check for pressure sensor
         pref_pressure_enabled.setEnabled(LocationService.hasPressureSensor(getActivity()));
 
-        float ref_pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, 0);
-        long ref_time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
+        final float ref_pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, 0);
+        final long ref_time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
         final Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
 
         // Handle pressure reading test
@@ -569,8 +569,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
                         if (PREF_PRESSURE_TIME.equals(key)) {
                             getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+
+                            // Get altitude
                             float altitude = PressureService.getAltitude(lastLocation, getActivity());
-                            pref_pressure_test.setSummary((Float.isNaN(altitude) ? "-" : Math.round(altitude)) + " m");
+
+                            // Show reference/altitude
+                            DecimalFormat DF = new DecimalFormat("0.#", new DecimalFormatSymbols(Locale.ROOT));
+                            pref_pressure_test.setSummary(
+                                    DF.format(ref_pressure) + " hPa " +
+                                            SimpleDateFormat.getDateTimeInstance().format(ref_time) + " " +
+                                            (Float.isNaN(altitude) ? "-" : Math.round(altitude)) + " m");
                             pref_pressure_test.setEnabled(true);
                         }
                     }
@@ -586,6 +594,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             public boolean onPreferenceClick(Preference preference) {
                 pref_weather_test.setEnabled(false);
                 pref_weather_test.setSummary(null);
+
                 new AsyncTask<Object, Object, Object>() {
                     @Override
                     protected Object doInBackground(Object... objects) {
