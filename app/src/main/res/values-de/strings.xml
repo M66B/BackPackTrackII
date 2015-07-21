@@ -164,9 +164,9 @@
     <string name="summary_weather_interval">Wetterdaten jede Anzahl von Minuten abrufen</string>
     <string name="summary_weather_stations">Wetterdaten für die ausgewählte Anzahl von Wetterstationen abrufen</string>
     <string name="summary_weather_maxage">Wetterdaten maximal für die ausgewählte Anzahl von Mintuen zeigen</string>
-    <string name="summary_weather_weight">0=sort on distance; &#8734;=sort on age</string>
+    <string name="summary_weather_weight">0=Sortiere nach Entfernung; &#8734;=Sortiere nach Alter</string>
     <string name="summary_weather_test">Drücken um rohe Wetterdaten anzuzeigen</string>
-    <string name="summary_weather_id">Use specific weather station designated by ID</string>
+    <string name="summary_weather_id">Nutze Wetterstation designiert anhand von einer IDU</string>
     <string name="summary_weather_airport">Nutze Daten von Flughafen Wetterstationen</string>
     <string name="summary_weather_cwop">Nutze Daten von Citizen Weather Observer Program Wetterstationen</string>
     <string name="summary_weather_synop">Nutze Daten Surface Synoptic Observations Wetterstationen</string>
