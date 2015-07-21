@@ -25,7 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 11;
+    private static final int DB_VERSION = 12;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
@@ -201,6 +201,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.execSQL("UPDATE weather SET station_longitude = longitude");
                 db.execSQL("UPDATE weather SET latitude = NULL");
                 db.execSQL("UPDATE weather SET longitude = NULL");
+            }
+
+            if (oldVersion == 11) {
+                db.execSQL("ALTER TABLE weather RENAME TO weather_orig");
+                db.execSQL("DROP INDEX idx_weather_time");
+                db.execSQL("DROP INDEX idx_weather_station_id");
+                createTableWeather(db);
+                db.execSQL(
+                        "INSERT INTO weather (time, station_id, station_type, station_name, station_latitude, station_longitude" +
+                                ", latitude, longitude, temperature, humidity, pressure, wind_speed, wind_direction, created)" +
+                                " SELECT time, station_id, station_type, station_name, station_latitude, station_longitude" +
+                                ", latitude, longitude, temperature, humidity, pressure, wind_speed, wind_direction, created FROM weather_orig");
+                db.execSQL("DROP TABLE weather_orig");
             }
 
             db.setVersion(DB_VERSION);
