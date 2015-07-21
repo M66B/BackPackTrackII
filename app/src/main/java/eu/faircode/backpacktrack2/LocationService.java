@@ -875,6 +875,8 @@ public class LocationService extends IntentService {
                 prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_TEMP).apply();
                 prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, lastLocation.getTime()).apply();
             }
+
+            updateState(this, "weather");
         } catch (Throwable ex) {
             Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
         }
