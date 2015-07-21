@@ -79,7 +79,7 @@
     <string name="title_weather_interval">Wetter Aktualisierungsintervall: %s Minuten</string>
     <string name="title_weather_stations">Anzahl der Wetterstationen: %s</string>
     <string name="title_weather_maxage">Max. Alter für Wetterdaten: %s Minuten</string>
-    <string name="title_weather_weight">Weather data sort factor: %s</string>
+    <string name="title_weather_weight">Wetterdaten Sortierungsfaktor: %s</string>
     <string name="title_weather_test">Zeige Wetter Daten</string>
     <string name="title_weather_id">Nutze Wetterstation: %s</string>
     <string name="title_weather_airport">Nutze Flughafenstationen</string>
