@@ -79,6 +79,7 @@
     <string name="title_weather_interval">Weather fetch interval: %s minutes</string>
     <string name="title_weather_stations">Number of weather stations: %s</string>
     <string name="title_weather_maxage">Weather data max. age: %s minutes</string>
+    <string name="title_weather_weight">Weather data sort factor: %s</string>
     <string name="title_weather_test">Show weather data</string>
     <string name="title_weather_id">Use weather station: %s</string>
     <string name="title_weather_airport">Use airport stations</string>
@@ -163,6 +164,7 @@
     <string name="summary_weather_interval">Fetch weather data every selected number of minutes</string>
     <string name="summary_weather_stations">Fetch data for the selected number of weather stations</string>
     <string name="summary_weather_maxage">Display weather data for maximum the selected number of minutes</string>
+    <string name="summary_weather_weight">0=sort on distance; &#8734;=sort on age</string>
     <string name="summary_weather_test">Tap to display raw weather data</string>
     <string name="summary_weather_id">Use specific weather station designated by ID</string>
     <string name="summary_weather_airport">Use data of airport weather stations</string>

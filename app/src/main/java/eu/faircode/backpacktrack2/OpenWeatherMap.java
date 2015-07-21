@@ -17,6 +17,8 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -28,7 +30,6 @@ public class OpenWeatherMap {
 
     private static final String BASE_URL = "http://api.openweathermap.org/data/2.5";
     private static final int cTimeOutMs = 30 * 1000;
-    private static final long cMaxAge = 24 * 3600 * 1000;
     private static final DecimalFormat DF = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ROOT));
 
     // http://bugs.openweathermap.org/projects/api/wiki/Station_Data
@@ -109,7 +110,8 @@ public class OpenWeatherMap {
         }
     }
 
-    public static List<Weather> getWeatherByStation(String apikey, Location location, int stations, Context context)
+    public static List<Weather> getWeatherByStation(
+            String apikey, final Location location, int stations, final int maxage, final int maxdist, final float weight, Context context)
             throws IOException, JSONException {
         // http://openweathermap.org/api
         URL url = new URL(BASE_URL + "/station/find" +
@@ -118,7 +120,7 @@ public class OpenWeatherMap {
                 "&cnt=" + stations +
                 "&lat=" + String.valueOf(location.getLatitude()) + "," +
                 "&lon=" + String.valueOf(location.getLongitude()));
-        Log.d(TAG, "url=" + url);
+        Log.i(TAG, "url=" + url);
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setConnectTimeout(cTimeOutMs);
         urlConnection.setReadTimeout(cTimeOutMs);
@@ -147,13 +149,40 @@ public class OpenWeatherMap {
             JSONArray jroot = new JSONArray(json.toString());
 
             // Get weather
+            long mt = 0;
+            float md = Float.MAX_VALUE;
+            final long time = new Date().getTime();
             List<Weather> listResult = new ArrayList<Weather>();
             for (int i = 0; i < jroot.length(); i++) {
                 JSONObject entry = jroot.getJSONObject(i);
                 Weather weather = getWeatherReport(entry);
-                if (weather != null)
+                if (weather != null) {
                     listResult.add(weather);
+
+                    if (weather.time > mt)
+                        mt = weather.time;
+
+                    float distance = weather.station_location.distanceTo(location);
+                    if (distance < md)
+                        md = distance;
+                }
             }
+
+            final long maxTime = mt;
+            final float minDist = md;
+            Log.i(TAG, "mt=" + SimpleDateFormat.getDateTimeInstance().format(mt) + " md=" + md + " weight=" + weight);
+            Collections.sort(listResult, new Comparator<Weather>() {
+                @Override
+                public int compare(Weather w1, Weather w2) {
+                    float f1 =
+                            (maxTime - w1.time) / (maxage * 60f * 1000f) * weight +
+                                    (w1.station_location.distanceTo(location) - minDist) / (maxdist * 1000);
+                    float f2 =
+                            (maxTime - w2.time) / (maxage * 60f * 1000f) * weight +
+                                    (w2.station_location.distanceTo(location) - minDist) / (maxdist * 1000);
+                    return Float.compare(f1, f2);
+                }
+            });
             return listResult;
         } finally {
             urlConnection.disconnect();
@@ -178,8 +207,6 @@ public class OpenWeatherMap {
         long time = new Date().getTime();
         Weather weather = new Weather();
         weather.time = last.getLong("dt") * 1000;
-        if (weather.time + cMaxAge < time)
-            return null;
 
         weather.station_id = station.getLong("id");
         weather.station_type = (station.has("type") ? station.getInt("type") : -1);

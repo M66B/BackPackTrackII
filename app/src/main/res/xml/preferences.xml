@@ -363,6 +363,12 @@
                 android:inputType="number"
                 android:key="pref_weather_maxage"
                 android:summary="@string/summary_weather_maxage" />
+            <EditTextPreference
+                android:defaultValue="0.2"
+                android:dependency="pref_weather_enabled"
+                android:inputType="numberDecimal"
+                android:key="pref_weather_weight"
+                android:summary="@string/summary_weather_weight" />
             <Preference
                 android:dependency="pref_weather_enabled"
                 android:key="pref_weather_test"

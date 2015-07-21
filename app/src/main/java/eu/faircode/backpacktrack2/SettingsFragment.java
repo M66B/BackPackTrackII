@@ -134,6 +134,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_WEATHER_INTERVAL = "pref_weather_interval";
     public static final String PREF_WEATHER_STATIONS = "pref_weather_stations";
     public static final String PREF_WEATHER_MAXAGE = "pref_weather_maxage";
+    public static final String PREF_WEATHER_WEIGHT = "pref_weather_weight";
     public static final String PREF_WEATHER_TEST = "pref_weather_test";
     public static final String PREF_WEATHER_ID = "pref_weather_id";
     public static final String PREF_WEATHER_AIRPORT = "pref_weather_airport";
@@ -219,6 +220,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_WEATHER_INTERVAL = "60"; // minutes
     public static final String DEFAULT_WEATHER_STATIONS = "10"; // count
     public static final String DEFAULT_WEATHER_MAXAGE = "120"; // minutes
+    public static final String DEFAULT_WEATHER_WEIGHT = "0.2";
     public static final boolean DEFAULT_WEATHER_AIRPORT = true;
     public static final boolean DEFAULT_WEATHER_CWOP = false;
     public static final boolean DEFAULT_WEATHER_SYNOP = false;
@@ -427,6 +429,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_WEATHER_APIKEY);
         updateTitle(prefs, PREF_WEATHER_STATIONS);
         updateTitle(prefs, PREF_WEATHER_MAXAGE);
+        updateTitle(prefs, PREF_WEATHER_WEIGHT);
         updateTitle(prefs, PREF_WEATHER_ID);
 
         updateTitle(prefs, PREF_RECOGNITION_INTERVAL_STILL);
@@ -610,7 +613,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             }
 
                             int stations = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_STATIONS, SettingsFragment.DEFAULT_WEATHER_STATIONS));
-                            return OpenWeatherMap.getWeatherByStation(apikey, lastLocation, stations, getActivity());
+                            int maxage = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXAGE, SettingsFragment.DEFAULT_PRESSURE_MAXAGE));
+                            int maxdist = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXDIST, SettingsFragment.DEFAULT_PRESSURE_MAXDIST));
+                            float weight = Float.parseFloat(prefs.getString(SettingsFragment.PREF_WEATHER_WEIGHT, SettingsFragment.DEFAULT_WEATHER_WEIGHT));
+                            return OpenWeatherMap.getWeatherByStation(apikey, lastLocation, stations, maxage, maxdist, weight, getActivity());
                         } catch (Throwable ex) {
                             return ex;
                         }
@@ -2386,6 +2392,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref.setTitle(getString(R.string.title_weather_stations, prefs.getString(key, DEFAULT_WEATHER_STATIONS)));
         else if (PREF_WEATHER_MAXAGE.equals(key))
             pref.setTitle(getString(R.string.title_weather_maxage, prefs.getString(key, DEFAULT_WEATHER_MAXAGE)));
+        else if (PREF_WEATHER_WEIGHT.equals(key))
+            pref.setTitle(getString(R.string.title_weather_weight, prefs.getString(key, DEFAULT_WEATHER_WEIGHT)));
         else if (PREF_WEATHER_ID.equals(key))
             pref.setTitle(getString(R.string.title_weather_id, prefs.getString(key, getString(R.string.msg_notset))));
 

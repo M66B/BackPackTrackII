@@ -18,7 +18,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.Address;
@@ -821,6 +820,8 @@ public class LocationService extends IntentService {
             // Get settings
             int stations = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_STATIONS, SettingsFragment.DEFAULT_WEATHER_STATIONS));
             int maxage = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXAGE, SettingsFragment.DEFAULT_PRESSURE_MAXAGE));
+            int maxdist = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXDIST, SettingsFragment.DEFAULT_PRESSURE_MAXDIST));
+            float weight = Float.parseFloat(prefs.getString(SettingsFragment.PREF_WEATHER_WEIGHT, SettingsFragment.DEFAULT_WEATHER_WEIGHT));
             long id = Long.parseLong(prefs.getString(SettingsFragment.PREF_WEATHER_ID, "-1"));
             boolean airport = prefs.getBoolean(SettingsFragment.PREF_WEATHER_AIRPORT, SettingsFragment.DEFAULT_WEATHER_AIRPORT);
             boolean cwop = prefs.getBoolean(SettingsFragment.PREF_WEATHER_CWOP, SettingsFragment.DEFAULT_WEATHER_CWOP);
@@ -831,7 +832,7 @@ public class LocationService extends IntentService {
             // Fetch weather
             List<OpenWeatherMap.Weather> listWeather;
             if (id < 0)
-                listWeather = OpenWeatherMap.getWeatherByStation(apikey, lastLocation, stations, this);
+                listWeather = OpenWeatherMap.getWeatherByStation(apikey, lastLocation, stations, maxage, maxdist, weight, this);
             else {
                 listWeather = new ArrayList<OpenWeatherMap.Weather>();
                 OpenWeatherMap.Weather w = OpenWeatherMap.getWeatherByStation(apikey, id, this);
