@@ -216,9 +216,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
 
     public static final boolean DEFAULT_WEATHER_ENABLED = true;
-    public static final String DEFAULT_WEATHER_INTERVAL = "30"; // minutes
+    public static final String DEFAULT_WEATHER_INTERVAL = "60"; // minutes
     public static final String DEFAULT_WEATHER_STATIONS = "10"; // count
-    public static final String DEFAULT_WEATHER_MAXAGE = "90"; // minutes
+    public static final String DEFAULT_WEATHER_MAXAGE = "120"; // minutes
     public static final boolean DEFAULT_WEATHER_AIRPORT = true;
     public static final boolean DEFAULT_WEATHER_CWOP = false;
     public static final boolean DEFAULT_WEATHER_SYNOP = false;
