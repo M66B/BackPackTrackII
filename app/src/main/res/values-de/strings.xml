@@ -238,7 +238,7 @@
     <string name="msg_noaddress">Keine Adressen gefunden</string>
     <string name="msg_geocoding">Geocoding \'%s\' &#8230;</string>
     <string name="msg_rgeocoding">Umgewandelte Geocoding &#8230;</string>
-    <string name="msg_requesting">Abfragen</string>
+    <string name="msg_requesting">Abfragen &#8230;</string>
 
     <string name="provider_gps">GPS</string>
     <string name="provider_network">Netzwerk</string>
