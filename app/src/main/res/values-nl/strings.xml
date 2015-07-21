@@ -75,11 +75,13 @@
 
     <string name="title_weather_settings">Weer</string>
     <string name="title_weather_enabled">Weer bijwerken aan</string>
+    <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_interval">Weer ververs interval: %s minuten</string>
     <string name="title_weather_stations">Aantal weerstations: %s</string>
     <string name="title_weather_test">Toon weergegevens</string>
+    <string name="title_weather_id">Gebruik station: %s</string>
     <string name="title_weather_airport">Gebruik luchthaven stations</string>
-    <string name="title_weather_swop">Gebruik SWOP stations</string>
+    <string name="title_weather_cwop">Gebruik CWOP stations</string>
     <string name="title_weather_synop">Gebruik SYNOP stations</string>
     <string name="title_weather_diy">Gebruik DIY stations</string>
     <string name="title_weather_other">Gebruik andere stations</string>
@@ -160,9 +162,10 @@
     <string name="summary_weather_interval">Fetch weather data every selected number of minutes</string>
     <string name="summary_weather_stations">Fetch data for the selected number of weather stations</string>
     <string name="summary_weather_test">Tap to display raw weather data</string>
+    <string name="summary_weather_id">Use specific weather station designated by ID</string>
     <string name="summary_weather_airport">Use data of airport weather stations</string>
-    <string name="summary_weather_swop">Use data of SWOP weather stations</string>
-    <string name="summary_weather_synop">Use data of SYNOP weather stations</string>
+    <string name="summary_weather_cwop">Use data of Citizen Weather Observer Program weather stations</string>
+    <string name="summary_weather_synop">Use data of Surface Synoptic Observations weather stations</string>
     <string name="summary_weather_diy">Use data of amateur weather stations</string>
     <string name="summary_weather_other">Use data of other weather station types</string>
     <string name="summary_weather_tos">Tap to read the terms of service of OpenWeatherMap (will start the browser)</string>

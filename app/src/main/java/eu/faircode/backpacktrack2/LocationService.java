@@ -805,20 +805,32 @@ public class LocationService extends IntentService {
                 return;
 
             // Get API key
-            ApplicationInfo app = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
-            String apikey = app.metaData.getString("org.openweathermap.API_KEY", null);
+            String apikey = prefs.getString(SettingsFragment.PREF_WEATHER_APIKEY, null);
+            if (apikey == null) {
+                ApplicationInfo app = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
+                apikey = app.metaData.getString("org.openweathermap.API_KEY", null);
+            }
 
             // Get settings
             int stations = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_STATIONS, SettingsFragment.DEFAULT_WEATHER_STATIONS));
             int maxage = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXAGE, SettingsFragment.DEFAULT_PRESSURE_MAXAGE));
+            long id = Long.parseLong(prefs.getString(SettingsFragment.PREF_WEATHER_ID, "-1"));
             boolean airport = prefs.getBoolean(SettingsFragment.PREF_WEATHER_AIRPORT, SettingsFragment.DEFAULT_WEATHER_AIRPORT);
-            boolean swop = prefs.getBoolean(SettingsFragment.PREF_WEATHER_SWOP, SettingsFragment.DEFAULT_WEATHER_SWOP);
+            boolean cwop = prefs.getBoolean(SettingsFragment.PREF_WEATHER_CWOP, SettingsFragment.DEFAULT_WEATHER_CWOP);
             boolean synop = prefs.getBoolean(SettingsFragment.PREF_WEATHER_SYNOP, SettingsFragment.DEFAULT_WEATHER_SYNOP);
             boolean diy = prefs.getBoolean(SettingsFragment.PREF_WEATHER_DIY, SettingsFragment.DEFAULT_WEATHER_DIY);
             boolean other = prefs.getBoolean(SettingsFragment.PREF_WEATHER_OTHER, SettingsFragment.DEFAULT_WEATHER_OTHER);
 
             // Fetch weather
-            List<OpenWeatherMap.Weather> listWeather = OpenWeatherMap.getWeather(apikey, lastLocation, stations, this);
+            List<OpenWeatherMap.Weather> listWeather;
+            if (id < 0)
+                listWeather = OpenWeatherMap.getWeather(apikey, lastLocation, stations, this);
+            else {
+                listWeather = new ArrayList<OpenWeatherMap.Weather>();
+                OpenWeatherMap.Weather w = OpenWeatherMap.getStation(apikey, id, this);
+                if (w != null)
+                    listWeather.add(w);
+            }
 
             boolean found = false;
             for (OpenWeatherMap.Weather weather : listWeather) {
@@ -828,13 +840,13 @@ public class LocationService extends IntentService {
                 long time = new Date().getTime();
                 if (!found &&
                         weather.time + maxage * 60 * 1000 >= time &&
-                        ((weather.station_type == 1 && airport) ||
-                                (weather.station_type == 2 && swop) ||
+                        (id < 0 ||
+                                (weather.station_type == 1 && airport) ||
+                                (weather.station_type == 2 && cwop) ||
                                 (weather.station_type == 3 && synop) ||
                                 (weather.station_type == 5 && diy) ||
                                 ((weather.station_type < 1 || weather.station_type > 5 || weather.station_type == 4) && other))
                         && !Double.isNaN(weather.pressure)) {
-
                     found = true;
 
                     new DatabaseHelper(this).insertWeather(weather, lastLocation).close();
