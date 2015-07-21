@@ -133,6 +133,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_WEATHER_APIKEY = "pref_weather_apikey";
     public static final String PREF_WEATHER_INTERVAL = "pref_weather_interval";
     public static final String PREF_WEATHER_STATIONS = "pref_weather_stations";
+    public static final String PREF_WEATHER_MAXAGE = "pref_weather_maxage";
     public static final String PREF_WEATHER_TEST = "pref_weather_test";
     public static final String PREF_WEATHER_ID = "pref_weather_id";
     public static final String PREF_WEATHER_AIRPORT = "pref_weather_airport";
@@ -217,6 +218,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final boolean DEFAULT_WEATHER_ENABLED = true;
     public static final String DEFAULT_WEATHER_INTERVAL = "30"; // minutes
     public static final String DEFAULT_WEATHER_STATIONS = "10"; // count
+    public static final String DEFAULT_WEATHER_MAXAGE = "90"; // minutes
     public static final boolean DEFAULT_WEATHER_AIRPORT = true;
     public static final boolean DEFAULT_WEATHER_CWOP = false;
     public static final boolean DEFAULT_WEATHER_SYNOP = false;
@@ -263,6 +265,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_PRESSURE_REF_LAT = "pref_pressure_ref_lat";
     public static final String PREF_PRESSURE_REF_LON = "pref_pressure_ref_lon";
     public static final String PREF_PRESSURE_REF_VALUE = "pref_pressure_ref_value";
+    public static final String PREF_PRESSURE_REF_TEMP = "pref_pressure_ref_temp";
     public static final String PREF_PRESSURE_REF_TIME = "pref_pressure_ref_time";
 
     // Remember last values
@@ -423,6 +426,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_WEATHER_INTERVAL);
         updateTitle(prefs, PREF_WEATHER_APIKEY);
         updateTitle(prefs, PREF_WEATHER_STATIONS);
+        updateTitle(prefs, PREF_WEATHER_MAXAGE);
         updateTitle(prefs, PREF_WEATHER_ID);
 
         updateTitle(prefs, PREF_RECOGNITION_INTERVAL_STILL);
@@ -693,6 +697,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Reset activity
         if (PREF_RECOGNITION_ENABLED.equals(key))
             prefs.edit().remove(PREF_LAST_ACTIVITY).apply();
+
+        if (PREF_WEATHER_MAXAGE.equals(key)) {
+            Intent intent = new Intent(getActivity(), LocationService.class);
+            intent.setAction(LocationService.ACTION_STATE_CHANGED);
+            getActivity().startService(intent);
+        }
 
         // Update blog URL
         if (PREF_BLOGURL.equals(key)) {
@@ -2339,6 +2349,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref.setTitle(getString(R.string.title_pressure_maxdist, prefs.getString(key, DEFAULT_PRESSURE_MAXDIST)));
         else if (PREF_WEATHER_STATIONS.equals(key))
             pref.setTitle(getString(R.string.title_weather_stations, prefs.getString(key, DEFAULT_WEATHER_STATIONS)));
+        else if (PREF_WEATHER_MAXAGE.equals(key))
+            pref.setTitle(getString(R.string.title_weather_maxage, prefs.getString(key, DEFAULT_WEATHER_MAXAGE)));
         else if (PREF_WEATHER_ID.equals(key))
             pref.setTitle(getString(R.string.title_weather_id, prefs.getString(key, getString(R.string.msg_notset))));
 

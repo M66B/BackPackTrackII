@@ -78,8 +78,9 @@
     <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_interval">Wetter Aktualisierungsintervall: %s Minuten</string>
     <string name="title_weather_stations">Anzahl der Wetterstationen: %s</string>
+    <string name="title_weather_maxage">Weather data max. age: %s minutes</string>
     <string name="title_weather_test">Zeige Wetter Daten</string>
-    <string name="title_weather_id">Use station: %s</string>
+    <string name="title_weather_id">Use weather station: %s</string>
     <string name="title_weather_airport">Nutze Flughafenstationen</string>
     <string name="title_weather_cwop">Nutze CWOP Stationen</string>
     <string name="title_weather_synop">Nutze SYNOP Stationen</string>
@@ -161,6 +162,7 @@
 
     <string name="summary_weather_interval">Wetterdaten jede Anzahl von Minuten abrufen</string>
     <string name="summary_weather_stations">Wetterdaten für die ausgewählte Anzahl von Wetterstationen abrufen</string>
+    <string name="summary_weather_maxage">Display weather data for maximum the selected number of minutes</string>
     <string name="summary_weather_test">Drücken um rohe Wetterdaten anzuzeigen</string>
     <string name="summary_weather_id">Use specific weather station designated by ID</string>
     <string name="summary_weather_airport">Nutze Daten von Flughafen Wetterstationen</string>

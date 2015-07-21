@@ -19,8 +19,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-// TODO: check statement results
-
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 

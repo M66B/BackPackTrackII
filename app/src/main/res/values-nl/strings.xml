@@ -78,8 +78,9 @@
     <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_interval">Weer ververs interval: %s minuten</string>
     <string name="title_weather_stations">Aantal weerstations: %s</string>
+    <string name="title_weather_maxage">Weergegevens max. leeftijd: %s minuten</string>
     <string name="title_weather_test">Toon weergegevens</string>
-    <string name="title_weather_id">Gebruik station: %s</string>
+    <string name="title_weather_id">Gebruik weerstation: %s</string>
     <string name="title_weather_airport">Gebruik luchthaven stations</string>
     <string name="title_weather_cwop">Gebruik CWOP stations</string>
     <string name="title_weather_synop">Gebruik SYNOP stations</string>
@@ -161,6 +162,7 @@
 
     <string name="summary_weather_interval">Fetch weather data every selected number of minutes</string>
     <string name="summary_weather_stations">Fetch data for the selected number of weather stations</string>
+    <string name="summary_weather_maxage">Display weather data for maximum the selected number of minutes</string>
     <string name="summary_weather_test">Tap to display raw weather data</string>
     <string name="summary_weather_id">Use specific weather station designated by ID</string>
     <string name="summary_weather_airport">Use data of airport weather stations</string>
