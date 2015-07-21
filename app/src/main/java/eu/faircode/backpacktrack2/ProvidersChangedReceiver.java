@@ -10,7 +10,7 @@ public class ProvidersChangedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, Intent intent) {
-        Log.w(TAG, "Received " + intent);
+        Log.i(TAG, "Received " + intent);
         new Thread(new Runnable() {
             @Override
             public void run() {

@@ -12,7 +12,7 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, Intent intent) {
-        Log.w(TAG, "Received " + intent);
+        Log.i(TAG, "Received " + intent);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         prefs.edit().remove(SettingsFragment.PREF_LAST_ACTIVITY).apply();

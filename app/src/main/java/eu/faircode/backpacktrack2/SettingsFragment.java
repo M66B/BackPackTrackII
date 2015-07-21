@@ -298,7 +298,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private BroadcastReceiver mConnectivityChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.w(TAG, "Connectivity changed");
+            Log.i(TAG, "Connectivity changed");
             SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
             Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
             findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && storageMounted() && isConnected(SettingsFragment.this.getActivity()));
@@ -309,7 +309,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private BroadcastReceiver mExternalStorageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.w(TAG, "External storage changed");
+            Log.i(TAG, "External storage changed");
             findPreference(PREF_SHARE_GPX).setEnabled(storageMounted());
             findPreference(PREF_SHARE_KML).setEnabled(storageMounted());
             findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && storageMounted() && isConnected(SettingsFragment.this.getActivity()));
@@ -781,7 +781,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     // Helper methods
 
     public static void firstRun(Context context) {
-        Log.w(TAG, "First run");
+        Log.i(TAG, "First run");
 
         // Initialize step counting
         long time = new Date().getTime();
@@ -806,7 +806,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
-        Log.w(TAG, "Settings daily task from " + SimpleDateFormat.getDateTimeInstance().format(calendar.getTimeInMillis()));
+        Log.i(TAG, "Settings daily task from " + SimpleDateFormat.getDateTimeInstance().format(calendar.getTimeInMillis()));
 
         // Initialize weather updates
         LocationService.startWeatherUpdates(context);
@@ -932,7 +932,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     Geocoder geocoder = new Geocoder(getActivity());
                     return geocoder.getFromLocationName(name, GEOCODER_RESULTS);
                 } catch (IOException ex) {
-                    Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                     return null;
                 }
             }

@@ -41,21 +41,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         File oldName = context.getDatabasePath("BACKPACKTRACKII");
         if (oldName.exists()) {
             File newName = new File(oldName.getParentFile(), DB_NAME);
-            Log.w(TAG, "Renaming " + oldName.getAbsolutePath() + " to " + newName.getAbsolutePath());
+            Log.i(TAG, "Renaming " + oldName.getAbsolutePath() + " to " + newName.getAbsolutePath());
             oldName.renameTo(newName);
         }
 
         oldName = context.getDatabasePath("BACKPACKTRACKII-journal");
         if (oldName.exists()) {
             File newName = new File(oldName.getParentFile(), DB_NAME + "-journal");
-            Log.w(TAG, "Renaming " + oldName.getAbsolutePath() + " to " + newName.getAbsolutePath());
+            Log.i(TAG, "Renaming " + oldName.getAbsolutePath() + " to " + newName.getAbsolutePath());
             oldName.renameTo(newName);
         }
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        Log.w(TAG, "Creating database " + DB_NAME + ":" + DB_VERSION);
+        Log.i(TAG, "Creating database " + DB_NAME + ":" + DB_VERSION);
         createTableLocation(db);
         createTableActivityType(db);
         createTableActivityDuration(db);
@@ -94,7 +94,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void createTableActivityDuration(SQLiteDatabase db) {
-        Log.w(TAG, "Adding table activityduration");
+        Log.i(TAG, "Adding table activityduration");
         db.execSQL("CREATE TABLE activityduration (" +
                 " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
                 ", time INTEGER NOT NULL" +
@@ -119,7 +119,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void createTableStep(SQLiteDatabase db) {
-        Log.w(TAG, "Adding table step");
+        Log.i(TAG, "Adding table step");
         db.execSQL("CREATE TABLE step (" +
                 " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
                 ", time INTEGER NOT NULL" +
@@ -128,7 +128,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void createTableWeather(SQLiteDatabase db) {
-        Log.w(TAG, "Adding table weather");
+        Log.i(TAG, "Adding table weather");
         db.execSQL("CREATE TABLE weather (" +
                 " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
                 ", time INTEGER NOT NULL" +
@@ -151,7 +151,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.w(TAG, "Upgrading from version " + oldVersion + " to " + newVersion);
+        Log.i(TAG, "Upgrading from version " + oldVersion + " to " + newVersion);
 
         db.beginTransaction();
         try {
@@ -276,7 +276,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             try {
                 listener.onLocationAdded(location);
             } catch (Throwable ex) {
-                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
         return this;
@@ -295,7 +295,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             try {
                 listener.onLocationUpdated();
             } catch (Throwable ex) {
-                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
         return this;
@@ -314,7 +314,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             try {
                 listener.onLocationUpdated();
             } catch (Throwable ex) {
-                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
         return this;
@@ -331,7 +331,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             try {
                 listener.onLocationDeleted();
             } catch (Throwable ex) {
-                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
         return this;
@@ -339,7 +339,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public DatabaseHelper deleteLocations(long from, long to) {
         synchronized (mContext.getApplicationContext()) {
-            Log.w(TAG, "Delete from=" + from + " to=" + to);
+            Log.i(TAG, "Delete from=" + from + " to=" + to);
             SQLiteDatabase db = this.getWritableDatabase();
             db.delete("location", "time >= ? AND time <= ?", new String[]{Long.toString(from), Long.toString(to)});
         }
@@ -348,7 +348,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             try {
                 listener.onLocationDeleted();
             } catch (Throwable ex) {
-                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
         return this;
@@ -387,7 +387,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             try {
                 listener.onActivityAdded(time, activity, confidence);
             } catch (Throwable ex) {
-                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
         return this;
@@ -403,7 +403,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             try {
                 listener.onActivityDeleted();
             } catch (Throwable ex) {
-                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
         return this;
@@ -460,7 +460,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
 
             if (prev < 0) {
-                Log.w(TAG, "Creating new day time=" + day);
+                Log.i(TAG, "Creating new day time=" + day);
                 ContentValues cv = new ContentValues();
                 cv.put("time", day);
                 cv.put("still", 0);
@@ -486,14 +486,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 try {
                     listener.onActivityAdded(day);
                 } catch (Throwable ex) {
-                    Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                 }
         else if (duration > 0)
             for (ActivityDurationChangedListener listener : mActivityDurationChangedListeners)
                 try {
                     listener.onActivityUpdated(day, activity, prev + duration);
                 } catch (Throwable ex) {
-                    Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                 }
 
         // Activity log
@@ -534,14 +534,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 try {
                     listener.onActivityAdded(time, time + duration, activity);
                 } catch (Throwable ex) {
-                    Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                 }
         else
             for (ActivityLogChangedListener listener : mActivityLogChangedListeners)
                 try {
                     listener.onActivityUpdated(start, time + duration, activity);
                 } catch (Throwable ex) {
-                    Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                 }
 
         return this;
@@ -586,7 +586,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
 
             if (count < 0) {
-                Log.w(TAG, "Creating new day time=" + day);
+                Log.i(TAG, "Creating new day time=" + day);
                 ContentValues cv = new ContentValues();
                 cv.put("time", day);
                 cv.put("count", delta);
@@ -607,7 +607,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 else
                     listener.onStepCountUpdated(day, count + delta);
             } catch (Throwable ex) {
-                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
         return this;
@@ -700,7 +700,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             try {
                 listener.onWeatherAdded(weather.time, weather.station_id);
             } catch (Throwable ex) {
-                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
         return this;
@@ -719,7 +719,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public DatabaseHelper vacuum() {
         SQLiteDatabase db = this.getWritableDatabase();
-        Log.w(TAG, "Running vacuum");
+        Log.i(TAG, "Running vacuum");
         db.execSQL("VACUUM");
         return this;
     }

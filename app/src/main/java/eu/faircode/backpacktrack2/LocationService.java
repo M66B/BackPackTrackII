@@ -55,6 +55,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import org.joda.time.DateTime;
+import org.json.JSONException;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -74,6 +75,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.timroes.axmlrpc.XMLRPCClient;
+import de.timroes.axmlrpc.XMLRPCException;
 
 public class LocationService extends IntentService {
     private static final String TAG = "BPT2.Service";
@@ -147,7 +149,7 @@ public class LocationService extends IntentService {
             wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
             wakeLock.acquire();
 
-            Log.w(TAG, "Intent=" + intent);
+            Log.i(TAG, "Intent=" + intent);
 
             if (EXPORTED_ACTION_TRACKING.equals(intent.getAction()))
                 handleTrackingEnable(intent);
@@ -223,9 +225,10 @@ public class LocationService extends IntentService {
                 handleWeatherUpdate(intent);
 
             else
-                Log.w(TAG, "Unknown action");
+                Log.i(TAG, "Unknown action");
         } catch (Throwable ex) {
             Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            toast(ex.toString(), Toast.LENGTH_LONG, this);
         } finally {
             if (wakeLock != null)
                 wakeLock.release();
@@ -282,14 +285,14 @@ public class LocationService extends IntentService {
             boolean found = false;
             for (DetectedActivity act : listProbable)
                 if (act.getType() != DetectedActivity.TILTING) {
-                    Log.w(TAG, "Replacing " + activity + " by " + act);
+                    Log.i(TAG, "Replacing " + activity + " by " + act);
                     listProbable.remove(activity);
                     activity = act;
                     found = true;
                     break;
                 }
             if (!found) {
-                Log.w(TAG, "Filtering " + activity);
+                Log.i(TAG, "Filtering " + activity);
                 return;
             }
         }
@@ -298,7 +301,7 @@ public class LocationService extends IntentService {
         if (pref_known && activity.getType() == DetectedActivity.UNKNOWN)
             for (DetectedActivity act : listProbable)
                 if (act.getType() != DetectedActivity.UNKNOWN && act.getConfidence() > pref_confidence) {
-                    Log.w(TAG, "Replacing " + activity + " by " + act);
+                    Log.i(TAG, "Replacing " + activity + " by " + act);
                     listProbable.remove(activity);
                     activity = act;
                     break;
@@ -308,7 +311,7 @@ public class LocationService extends IntentService {
         if (activity.getType() == DetectedActivity.ON_FOOT)
             for (DetectedActivity act : activityResult.getProbableActivities())
                 if (act.getType() == DetectedActivity.WALKING || act.getType() == DetectedActivity.RUNNING) {
-                    Log.w(TAG, "Replacing " + activity + " by " + act);
+                    Log.i(TAG, "Replacing " + activity + " by " + act);
                     listProbable.remove(activity);
                     activity = act;
                     break;
@@ -316,11 +319,11 @@ public class LocationService extends IntentService {
 
         // Filter unknown activity
         if (pref_unknown && activity.getType() == DetectedActivity.UNKNOWN) {
-            Log.w(TAG, "Filtering " + activity);
+            Log.i(TAG, "Filtering " + activity);
             return;
         }
 
-        Log.w(TAG, "Activity=" + activity);
+        Log.i(TAG, "Activity=" + activity);
 
         // Check confidence
         if (activity.getConfidence() > pref_confidence) {
@@ -397,27 +400,27 @@ public class LocationService extends IntentService {
         // Process location update
         int locationType = prefs.getInt(SettingsFragment.PREF_LOCATION_TYPE, -1);
         Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
-        Log.w(TAG, "Update location=" + location + " type=" + locationType);
+        Log.i(TAG, "Update location=" + location + " type=" + locationType);
         if (location == null || (location.getLatitude() == 0.0 && location.getLongitude() == 0.0))
             return;
 
         // Check if still acquiring location
         if (prefs.getInt(SettingsFragment.PREF_STATE, STATE_IDLE) == STATE_IDLE) {
-            Log.w(TAG, "Not acquiring anymore");
+            Log.i(TAG, "Not acquiring anymore");
             return;
         }
 
         // Filter inaccurate location
         int pref_inaccurate = Integer.parseInt(prefs.getString(SettingsFragment.PREF_INACCURATE, SettingsFragment.DEFAULT_INACCURATE));
         if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
-            Log.w(TAG, "Filtering inaccurate location=" + location);
+            Log.i(TAG, "Filtering inaccurate location=" + location);
             return;
         }
 
         // Filter old locations
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
         if (lastLocation != null && location.getTime() <= lastLocation.getTime()) {
-            Log.w(TAG, "Location is older than last location, location=" + location);
+            Log.i(TAG, "Location is older than last location, location=" + location);
             return;
         }
 
@@ -427,7 +430,7 @@ public class LocationService extends IntentService {
         // Persist better location
         Location bestLocation = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_BEST_LOCATION, null));
         if (isBetterLocation(bestLocation, location)) {
-            Log.w(TAG, "Better location=" + location);
+            Log.i(TAG, "Better location=" + location);
             prefs.edit().putInt(SettingsFragment.PREF_STATE, STATE_ACQUIRED).apply();
             prefs.edit().putString(SettingsFragment.PREF_BEST_LOCATION, LocationSerializer.serialize(location)).apply();
             updateState(this, "better location");
@@ -436,7 +439,7 @@ public class LocationService extends IntentService {
         // Check altitude
         boolean pref_altitude = prefs.getBoolean(SettingsFragment.PREF_ALTITUDE, SettingsFragment.DEFAULT_ALTITUDE);
         if (!location.hasAltitude() && pref_altitude) {
-            Log.w(TAG, "No altitude, but preferred, location=" + location);
+            Log.i(TAG, "No altitude, but preferred, location=" + location);
             return;
         }
 
@@ -447,7 +450,7 @@ public class LocationService extends IntentService {
         else
             pref_accuracy = Integer.parseInt(prefs.getString(SettingsFragment.PREF_TP_ACCURACY, SettingsFragment.DEFAULT_TP_ACCURACY));
         if (!location.hasAccuracy() || location.getAccuracy() > pref_accuracy) {
-            Log.w(TAG, "Accuracy not reached, location=" + location);
+            Log.i(TAG, "Accuracy not reached, location=" + location);
             return;
         }
 
@@ -455,7 +458,7 @@ public class LocationService extends IntentService {
         boolean pressure_enabled = prefs.getBoolean(SettingsFragment.PREF_PRESSURE_ENABLED, SettingsFragment.DEFAULT_PRESSURE_ENABLED);
         if (pressure_enabled)
             if (prefs.getFloat(SettingsFragment.PREF_PRESSURE_VALUE, -1) < 0) {
-                Log.w(TAG, "Pressure not available yet");
+                Log.i(TAG, "Pressure not available yet");
                 return;
             }
 
@@ -470,27 +473,27 @@ public class LocationService extends IntentService {
 
         // Process passive location update
         Location location = (Location) intent.getExtras().get(LocationManager.KEY_LOCATION_CHANGED);
-        Log.w(TAG, "Update passive location=" + location);
+        Log.i(TAG, "Update passive location=" + location);
         if (location == null || (location.getLatitude() == 0.0 && location.getLongitude() == 0.0))
             return;
 
         // Filter inaccurate passive locations
         int pref_inaccurate = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PASSIVE_INACCURATE, SettingsFragment.DEFAULT_PASSIVE_INACCURATE));
         if (!location.hasAccuracy() || location.getAccuracy() > pref_inaccurate) {
-            Log.w(TAG, "Filtering inaccurate passive location=" + location);
+            Log.i(TAG, "Filtering inaccurate passive location=" + location);
             return;
         }
 
         // Get last location
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
         if (lastLocation == null) {
-            Log.w(TAG, "Passive location without last location, location=" + location);
+            Log.i(TAG, "Passive location without last location, location=" + location);
             return;
         }
 
         // Filter old locations
         if (location.getTime() <= lastLocation.getTime()) {
-            Log.w(TAG, "Passive location is older than last location, location=" + location);
+            Log.i(TAG, "Passive location is older than last location, location=" + location);
             return;
         }
 
@@ -502,7 +505,7 @@ public class LocationService extends IntentService {
         if (lastLocation.distanceTo(location) < pref_nearby &&
                 (lastLocation.hasAccuracy() ? lastLocation.getAccuracy() : Float.MAX_VALUE) <=
                         (location.hasAccuracy() ? location.getAccuracy() : Float.MAX_VALUE)) {
-            Log.w(TAG, "Filtering nearby passive location=" + location);
+            Log.i(TAG, "Filtering nearby passive location=" + location);
             return;
         }
 
@@ -517,7 +520,7 @@ public class LocationService extends IntentService {
             if (bchange > 180)
                 bchange = 360 - bchange;
             if (!lastLocation.hasBearing() || bchange > pref_bearing_change) {
-                Log.w(TAG, "Bearing changed to " + location.getBearing());
+                Log.i(TAG, "Bearing changed to " + location.getBearing());
                 update = true;
             }
         }
@@ -527,7 +530,7 @@ public class LocationService extends IntentService {
             int pref_altitude_change = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PASSIVE_ALTITUDE, SettingsFragment.DEFAULT_PASSIVE_ALTITUDE));
             achange = Math.abs(lastLocation.getAltitude() - location.getAltitude());
             if (!lastLocation.hasAltitude() || achange > pref_altitude_change) {
-                Log.w(TAG, "Altitude changed to " + location.getAltitude());
+                Log.i(TAG, "Altitude changed to " + location.getAltitude());
                 update = true;
             }
         }
@@ -560,25 +563,21 @@ public class LocationService extends IntentService {
     private void handleSatelliteCheck(Intent intent) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
-        try {
-            int fixed = prefs.getInt(SettingsFragment.PREF_SATS_FIXED, 0);
-            int visible = prefs.getInt(SettingsFragment.PREF_SATS_VISIBLE, 0);
-            int checksat = Integer.parseInt(prefs.getString(SettingsFragment.PREF_CHECK_SAT, SettingsFragment.DEFAULT_CHECK_SAT));
-            Log.w(TAG, "Check satellites fixed/visible=" + fixed + "/" + visible + " required=" + checksat);
+        int fixed = prefs.getInt(SettingsFragment.PREF_SATS_FIXED, 0);
+        int visible = prefs.getInt(SettingsFragment.PREF_SATS_VISIBLE, 0);
+        int checksat = Integer.parseInt(prefs.getString(SettingsFragment.PREF_CHECK_SAT, SettingsFragment.DEFAULT_CHECK_SAT));
+        Log.i(TAG, "Check satellites fixed/visible=" + fixed + "/" + visible + " required=" + checksat);
 
-            // Check if there is any chance for a GPS fix
-            if (fixed < checksat) {
-                // Cancel fine location updates
-                Intent locationIntent = new Intent(this, LocationService.class);
-                locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
-                PendingIntent pi = PendingIntent.getService(this, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
-                lm.removeUpdates(pi);
-                stopService(new Intent(this, GpsStatusService.class));
-                Log.w(TAG, "Canceled fine location updates");
-            }
-        } catch (Throwable ex) {
-            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+        // Check if there is any chance for a GPS fix
+        if (fixed < checksat) {
+            // Cancel fine location updates
+            Intent locationIntent = new Intent(this, LocationService.class);
+            locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
+            PendingIntent pi = PendingIntent.getService(this, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
+            lm.removeUpdates(pi);
+            stopService(new Intent(this, GpsStatusService.class));
+            Log.i(TAG, "Canceled fine location updates");
         }
     }
 
@@ -592,7 +591,7 @@ public class LocationService extends IntentService {
         // Process location time-out
         int locationType = prefs.getInt(SettingsFragment.PREF_LOCATION_TYPE, -1);
         Location bestLocation = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_BEST_LOCATION, null));
-        Log.w(TAG, "Timeout best location=" + bestLocation + " type=" + locationType);
+        Log.i(TAG, "Timeout best location=" + bestLocation + " type=" + locationType);
 
         stopLocating(this);
 
@@ -608,7 +607,7 @@ public class LocationService extends IntentService {
     private void handleGeopoint(Intent intent) {
         // geo:latitude,longitude?q=latitude,longitude(label)
         Uri data = (Uri) intent.getExtras().get(EXTRA_GEOURI);
-        Log.w(TAG, "Received geopoint q=" + data.toString());
+        Log.i(TAG, "Received geopoint q=" + data.toString());
 
         double lat = 0;
         double lon = 0;
@@ -653,101 +652,91 @@ public class LocationService extends IntentService {
         }
     }
 
-    private void handleShare(Intent intent) {
-        try {
-            // Write file
-            String trackName = intent.getStringExtra(EXTRA_TRACK_NAME);
-            boolean extensions = intent.getBooleanExtra(EXTRA_WRITE_EXTENSIONS, false);
-            boolean delete = intent.getBooleanExtra(EXTRA_DELETE_DATA, false);
-            long from = intent.getLongExtra(EXTRA_TIME_FROM, 0);
-            long to = intent.getLongExtra(EXTRA_TIME_TO, Long.MAX_VALUE);
-            boolean gpx = ACTION_SHARE_GPX.equals(intent.getAction()) || EXPORTED_ACTION_WRITE_GPX.equals(intent.getAction());
-            String fileName = writeFile(gpx, trackName, extensions, from, to, this);
+    private void handleShare(Intent intent) throws IOException {
+        // Write file
+        String trackName = intent.getStringExtra(EXTRA_TRACK_NAME);
+        boolean extensions = intent.getBooleanExtra(EXTRA_WRITE_EXTENSIONS, false);
+        boolean delete = intent.getBooleanExtra(EXTRA_DELETE_DATA, false);
+        long from = intent.getLongExtra(EXTRA_TIME_FROM, 0);
+        long to = intent.getLongExtra(EXTRA_TIME_TO, Long.MAX_VALUE);
+        boolean gpx = ACTION_SHARE_GPX.equals(intent.getAction()) || EXPORTED_ACTION_WRITE_GPX.equals(intent.getAction());
+        String fileName = writeFile(gpx, trackName, extensions, from, to, this);
 
-            // Persist last share time
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // Persist last share time
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (gpx)
+            prefs.edit().putLong(SettingsFragment.PREF_LAST_SHARE_GPX, new Date().getTime()).apply();
+        else
+            prefs.edit().putLong(SettingsFragment.PREF_LAST_SHARE_KML, new Date().getTime()).apply();
+
+        // Delete data on request
+        if (delete)
+            new DatabaseHelper(this).deleteLocations(from, to).close();
+
+        // View file
+        if (ACTION_SHARE_GPX.equals(intent.getAction()) || ACTION_SHARE_KML.equals(intent.getAction())) {
+            Intent viewIntent = new Intent();
+            viewIntent.setAction(Intent.ACTION_VIEW);
             if (gpx)
-                prefs.edit().putLong(SettingsFragment.PREF_LAST_SHARE_GPX, new Date().getTime()).apply();
+                viewIntent.setDataAndType(Uri.fromFile(new File(fileName)), "application/gpx+xml");
             else
-                prefs.edit().putLong(SettingsFragment.PREF_LAST_SHARE_KML, new Date().getTime()).apply();
-
-            // Delete data on request
-            if (delete)
-                new DatabaseHelper(this).deleteLocations(from, to).close();
-
-            // View file
-            if (ACTION_SHARE_GPX.equals(intent.getAction()) || ACTION_SHARE_KML.equals(intent.getAction())) {
-                Intent viewIntent = new Intent();
-                viewIntent.setAction(Intent.ACTION_VIEW);
-                if (gpx)
-                    viewIntent.setDataAndType(Uri.fromFile(new File(fileName)), "application/gpx+xml");
-                else
-                    viewIntent.setDataAndType(Uri.fromFile(new File(fileName)), "application/vnd.google-earth.kml+xml");
-                viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(viewIntent);
-            }
-        } catch (Throwable ex) {
-            Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            toast(ex.toString(), Toast.LENGTH_LONG, this);
+                viewIntent.setDataAndType(Uri.fromFile(new File(fileName)), "application/vnd.google-earth.kml+xml");
+            viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(viewIntent);
         }
     }
 
-    private void handleUploadGPX(Intent intent) {
-        try {
-            // Write GPX file
-            String trackName = intent.getStringExtra(EXTRA_TRACK_NAME);
-            boolean extensions = intent.getBooleanExtra(EXTRA_WRITE_EXTENSIONS, false);
-            boolean delete = intent.getBooleanExtra(EXTRA_DELETE_DATA, false);
-            long from = intent.getLongExtra(EXTRA_TIME_FROM, 0);
-            long to = intent.getLongExtra(EXTRA_TIME_TO, Long.MAX_VALUE);
-            String gpxFileName = writeFile(true, trackName, extensions, from, to, this);
+    private void handleUploadGPX(Intent intent) throws IOException, XMLRPCException {
+        // Write GPX file
+        String trackName = intent.getStringExtra(EXTRA_TRACK_NAME);
+        boolean extensions = intent.getBooleanExtra(EXTRA_WRITE_EXTENSIONS, false);
+        boolean delete = intent.getBooleanExtra(EXTRA_DELETE_DATA, false);
+        long from = intent.getLongExtra(EXTRA_TIME_FROM, 0);
+        long to = intent.getLongExtra(EXTRA_TIME_TO, Long.MAX_VALUE);
+        String gpxFileName = writeFile(true, trackName, extensions, from, to, this);
 
-            // Get GPX file content
-            File gpx = new File(gpxFileName);
-            byte[] bytes = new byte[(int) gpx.length()];
-            DataInputStream in = new DataInputStream(new FileInputStream(gpx));
-            in.readFully(bytes);
-            in.close();
+        // Get GPX file content
+        File gpx = new File(gpxFileName);
+        byte[] bytes = new byte[(int) gpx.length()];
+        DataInputStream in = new DataInputStream(new FileInputStream(gpx));
+        in.readFully(bytes);
+        in.close();
 
-            // Get parameters
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            String blogUrl = prefs.getString(SettingsFragment.PREF_BLOGURL, "");
-            int blogId = Integer.parseInt(prefs.getString(SettingsFragment.PREF_BLOGID, "1"));
-            String userName = prefs.getString(SettingsFragment.PREF_BLOGUSER, "");
-            String passWord = prefs.getString(SettingsFragment.PREF_BLOGPWD, "");
+        // Get parameters
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String blogUrl = prefs.getString(SettingsFragment.PREF_BLOGURL, "");
+        int blogId = Integer.parseInt(prefs.getString(SettingsFragment.PREF_BLOGID, "1"));
+        String userName = prefs.getString(SettingsFragment.PREF_BLOGUSER, "");
+        String passWord = prefs.getString(SettingsFragment.PREF_BLOGPWD, "");
 
-            // Create XML-RPC client
-            XMLRPCClient client = new XMLRPCClient(new URL(blogUrl + "xmlrpc.php"));
+        // Create XML-RPC client
+        XMLRPCClient client = new XMLRPCClient(new URL(blogUrl + "xmlrpc.php"));
 
-            // Create upload parameters
-            Map<String, Object> args = new HashMap<>();
-            args.put("name", trackName + ".gpx");
-            args.put("type", "text/xml");
-            args.put("bits", bytes);
-            args.put("overwrite", true);
-            Object[] params = {blogId, userName, passWord, args};
+        // Create upload parameters
+        Map<String, Object> args = new HashMap<>();
+        args.put("name", trackName + ".gpx");
+        args.put("type", "text/xml");
+        args.put("bits", bytes);
+        args.put("overwrite", true);
+        Object[] params = {blogId, userName, passWord, args};
 
-            // Call
-            HashMap<Object, Object> result = (HashMap<Object, Object>) client.call("bpt.upload", params);
-            String url = result.get("url").toString();
-            Log.w(TAG, "Uploaded url=" + url);
+        // Call
+        HashMap<Object, Object> result = (HashMap<Object, Object>) client.call("bpt.upload", params);
+        String url = result.get("url").toString();
+        Log.i(TAG, "Uploaded url=" + url);
 
-            // Persist last upload time
-            prefs.edit().putLong(SettingsFragment.PREF_LAST_UPLOAD_GPX, new Date().getTime()).apply();
+        // Persist last upload time
+        prefs.edit().putLong(SettingsFragment.PREF_LAST_UPLOAD_GPX, new Date().getTime()).apply();
 
-            // Delete data on request
-            if (delete)
-                new DatabaseHelper(this).deleteLocations(from, to).close();
+        // Delete data on request
+        if (delete)
+            new DatabaseHelper(this).deleteLocations(from, to).close();
 
-            // Feedback
-            if (ACTION_UPLOAD_GPX.equals(intent.getAction())) {
-                toast(getString(R.string.msg_uploaded, url), Toast.LENGTH_LONG, this);
-                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                vibrator.vibrate(500);
-            }
-        } catch (Throwable ex) {
-            Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            toast(ex.toString(), Toast.LENGTH_LONG, this);
+        // Feedback
+        if (ACTION_UPLOAD_GPX.equals(intent.getAction())) {
+            toast(getString(R.string.msg_uploaded, url), Toast.LENGTH_LONG, this);
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(500);
         }
     }
 
@@ -774,7 +763,7 @@ public class LocationService extends IntentService {
 
     private void handleDaily(Intent intent) {
         long time = new Date().getTime() / (5 * 60 * 1000) * (5 * 60 * 1000);
-        Log.w(TAG, "Daily task at " + SimpleDateFormat.getDateTimeInstance().format(time));
+        Log.i(TAG, "Daily task at " + SimpleDateFormat.getDateTimeInstance().format(time));
 
         // Reset step counter
         new DatabaseHelper(this).updateSteps(time, 0).close();
@@ -797,7 +786,7 @@ public class LocationService extends IntentService {
         new DatabaseHelper(this).vacuum().close();
     }
 
-    private void handleWeatherUpdate(Intent intent) {
+    private void handleWeatherUpdate(Intent intent) throws PackageManager.NameNotFoundException, IOException, JSONException {
         // Get weather
         try {
             // Check connectivity
@@ -843,7 +832,7 @@ public class LocationService extends IntentService {
             boolean found = false;
             for (OpenWeatherMap.Weather weather : listWeather) {
                 float distance = weather.station_location.distanceTo(lastLocation);
-                Log.w(TAG, weather.toString() + " " + Math.round(distance) + "m");
+                Log.i(TAG, weather.toString() + " " + Math.round(distance) + "m");
 
                 long time = new Date().getTime();
                 if (!found &&
@@ -859,7 +848,7 @@ public class LocationService extends IntentService {
 
                     new DatabaseHelper(this).insertWeather(weather, lastLocation).close();
 
-                    Log.w(TAG, "Reference pressure " + weather.pressure + "hPa " +
+                    Log.i(TAG, "Reference pressure " + weather.pressure + "hPa " +
                             weather.station_name + " @" + SimpleDateFormat.getDateTimeInstance().format(weather.time));
                     prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_LAT, (float) weather.station_location.getLatitude()).apply();
                     prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_LON, (float) weather.station_location.getLongitude()).apply();
@@ -868,8 +857,6 @@ public class LocationService extends IntentService {
                     prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, weather.time).apply();
                 }
             }
-        } catch (Throwable ex) {
-            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
         } finally {
             updateState(this, "weather");
         }
@@ -878,12 +865,12 @@ public class LocationService extends IntentService {
     // Start/stop methods
 
     public static void startTracking(final Context context) {
-        Log.w(TAG, "Start tracking");
+        Log.i(TAG, "Start tracking");
 
         // Check if enabled
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         if (!prefs.getBoolean(SettingsFragment.PREF_ENABLED, SettingsFragment.DEFAULT_ENABLED)) {
-            Log.w(TAG, "Tracking disabled");
+            Log.i(TAG, "Tracking disabled");
             return;
         }
 
@@ -911,12 +898,12 @@ public class LocationService extends IntentService {
             int minTime = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PASSIVE_MINTIME, SettingsFragment.DEFAULT_PASSIVE_MINTIME));
             int minDist = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PASSIVE_MINDIST, SettingsFragment.DEFAULT_PASSIVE_MINDIST));
             lm.requestLocationUpdates(LocationManager.PASSIVE_PROVIDER, minTime * 1000, minDist, pi);
-            Log.w(TAG, "Requested passive location updates");
+            Log.i(TAG, "Requested passive location updates");
         }
     }
 
     public static void stopTracking(final Context context) {
-        Log.w(TAG, "Stop tracking");
+        Log.i(TAG, "Stop tracking");
 
         stopPeriodicLocating(context);
         stopLocating(context);
@@ -940,7 +927,7 @@ public class LocationService extends IntentService {
         if (hasPlayServices(context)) {
             GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
             if (gac.blockingConnect().isSuccess()) {
-                Log.w(TAG, "GoogleApiClient connected");
+                Log.i(TAG, "GoogleApiClient connected");
                 Intent activityIntent = new Intent(context, LocationService.class);
                 activityIntent.setAction(LocationService.ACTION_ACTIVITY);
                 PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -952,7 +939,7 @@ public class LocationService extends IntentService {
                 int interval = Integer.parseInt(prefs.getString(setting, standard));
 
                 ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(gac, interval * 1000, pi);
-                Log.w(TAG, "Activity updates frequency=" + interval + "s");
+                Log.i(TAG, "Activity updates frequency=" + interval + "s");
             }
         }
     }
@@ -961,7 +948,7 @@ public class LocationService extends IntentService {
         if (hasPlayServices(context)) {
             GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
             if (gac.blockingConnect().isSuccess()) {
-                Log.w(TAG, "GoogleApiClient connected");
+                Log.i(TAG, "GoogleApiClient connected");
                 Intent activityIntent = new Intent(context, LocationService.class);
                 activityIntent.setAction(LocationService.ACTION_ACTIVITY);
                 PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -970,7 +957,7 @@ public class LocationService extends IntentService {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                 prefs.edit().remove(SettingsFragment.PREF_LAST_ACTIVITY).apply();
                 prefs.edit().remove(SettingsFragment.PREF_LAST_CONFIDENCE).apply();
-                Log.w(TAG, "Canceled activity updates");
+                Log.i(TAG, "Canceled activity updates");
             }
         }
     }
@@ -984,7 +971,7 @@ public class LocationService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_INTERVAL, SettingsFragment.DEFAULT_INTERVAL));
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + ALARM_DUE_TIME, interval * 1000, pi);
-        Log.w(TAG, "Start repeating alarm frequency=" + interval + "s" + " due=" + ALARM_DUE_TIME + "ms");
+        Log.i(TAG, "Start repeating alarm frequency=" + interval + "s" + " due=" + ALARM_DUE_TIME + "ms");
     }
 
     private static void stopPeriodicLocating(Context context) {
@@ -994,18 +981,18 @@ public class LocationService extends IntentService {
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
-        Log.w(TAG, "Stop repeating alarm");
+        Log.i(TAG, "Stop repeating alarm");
     }
 
     public static void startLocating(Context context) {
-        Log.w(TAG, "Start locating");
+        Log.i(TAG, "Start locating");
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 
         // Mark active
         if (prefs.getInt(SettingsFragment.PREF_STATE, STATE_IDLE) != STATE_IDLE) {
-            Log.w(TAG, "Already active");
+            Log.i(TAG, "Already active");
             return;
         }
 
@@ -1020,7 +1007,7 @@ public class LocationService extends IntentService {
             locationIntent.setAction(LocationService.ACTION_LOCATION_COARSE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTime * 1000, minDist, pi);
-            Log.w(TAG, "Requested network location updates");
+            Log.i(TAG, "Requested network location updates");
         }
 
         // Request fine location
@@ -1030,7 +1017,7 @@ public class LocationService extends IntentService {
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime * 1000, minDist, pi);
             context.startService(new Intent(context, GpsStatusService.class));
-            Log.w(TAG, "Requested GPS location updates");
+            Log.i(TAG, "Requested GPS location updates");
         }
 
         // Initiate location timeout
@@ -1041,12 +1028,12 @@ public class LocationService extends IntentService {
             PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + timeout * 1000, pi);
-            Log.w(TAG, "Set timeout=" + timeout + "s");
+            Log.i(TAG, "Set timeout=" + timeout + "s");
 
             prefs.edit().putInt(SettingsFragment.PREF_STATE, STATE_ACQUIRING).apply();
             updateState(context, "start locating");
         } else
-            Log.w(TAG, "No location providers");
+            Log.i(TAG, "No location providers");
 
         // Initiate satellite check
         if (gps && lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -1056,7 +1043,7 @@ public class LocationService extends IntentService {
             PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + check * 1000, pi);
-            Log.w(TAG, "Set check=" + check + "s");
+            Log.i(TAG, "Set check=" + check + "s");
         }
 
         // Start pressure service
@@ -1077,7 +1064,7 @@ public class LocationService extends IntentService {
     }
 
     private static void stopLocating(Context context) {
-        Log.w(TAG, "Stop locating");
+        Log.i(TAG, "Stop locating");
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
@@ -1130,7 +1117,7 @@ public class LocationService extends IntentService {
         // Check if weather updates enabled
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         if (!prefs.getBoolean(SettingsFragment.PREF_WEATHER_ENABLED, SettingsFragment.DEFAULT_WEATHER_ENABLED)) {
-            Log.w(TAG, "Weather updates disabled");
+            Log.i(TAG, "Weather updates disabled");
             return;
         }
 
@@ -1141,7 +1128,7 @@ public class LocationService extends IntentService {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_INTERVAL, SettingsFragment.DEFAULT_WEATHER_INTERVAL));
         am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + ALARM_DUE_TIME, interval * 60 * 1000, pi);
-        Log.w(TAG, "Start weather updates frequency=" + interval + "m");
+        Log.i(TAG, "Start weather updates frequency=" + interval + "m");
     }
 
     public static void stopWeatherUpdates(Context context) {
@@ -1151,7 +1138,7 @@ public class LocationService extends IntentService {
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
-        Log.w(TAG, "Stop weather updates");
+        Log.i(TAG, "Stop weather updates");
     }
 
     // Helper methods
@@ -1186,7 +1173,7 @@ public class LocationService extends IntentService {
                 (lastLocation.hasAccuracy() ? lastLocation.getAccuracy() : Float.MAX_VALUE) >
                         (location.hasAccuracy() ? location.getAccuracy() : Float.MAX_VALUE)) {
             // New location
-            Log.w(TAG, "New location=" + location + " type=" + locationType);
+            Log.i(TAG, "New location=" + location + " type=" + locationType);
 
             // Derive altitude from pressure
             float altitude = PressureService.getAltitude(location, this);
@@ -1238,7 +1225,7 @@ public class LocationService extends IntentService {
             } else if (debugMode(this))
                 toast(getString(R.string.title_trackpoint) + " " + getProviderName(location, this), Toast.LENGTH_SHORT, this);
         } else
-            Log.w(TAG, "Filtered location=" + location);
+            Log.i(TAG, "Filtered location=" + location);
     }
 
     private static void correctAltitude(Location location, Context context) {
@@ -1247,11 +1234,11 @@ public class LocationService extends IntentService {
             if (prefs.getBoolean(SettingsFragment.PREF_CORRECTION_ENABLED, SettingsFragment.DEFAULT_CORRECTION_ENABLED))
                 try {
                     double offset = getEGM96Offset(location, context);
-                    Log.w(TAG, "Offset=" + offset);
+                    Log.i(TAG, "Offset=" + offset);
                     location.setAltitude(location.getAltitude() - offset);
-                    Log.w(TAG, "Corrected location=" + location);
+                    Log.i(TAG, "Corrected location=" + location);
                 } catch (IOException ex) {
-                    Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                 }
         }
     }
@@ -1304,7 +1291,8 @@ public class LocationService extends IntentService {
                     for (int l = 0; l < listPlace.get(0).getMaxAddressLineIndex(); l++)
                         listline.add(listPlace.get(0).getAddressLine(l));
                 }
-            } catch (IOException ignored) {
+            } catch (IOException ex) {
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
         return listline;
     }
@@ -1537,7 +1525,7 @@ public class LocationService extends IntentService {
         File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "BackPackTrackII");
         folder.mkdirs();
         String fileName = folder.getAbsolutePath() + File.separatorChar + trackName + (gpx ? ".gpx" : ".kml");
-        Log.w(TAG, "Writing file=" + fileName +
+        Log.i(TAG, "Writing file=" + fileName +
                 " extensions=" + extensions +
                 " from=" + SimpleDateFormat.getDateTimeInstance().format(new Date(from)) +
                 " to=" + SimpleDateFormat.getDateTimeInstance().format(new Date(to)));
@@ -1564,7 +1552,7 @@ public class LocationService extends IntentService {
     }
 
     public static void getAltitude(long from, long to, Context context) {
-        Log.w(TAG, "Get altitude" +
+        Log.i(TAG, "Get altitude" +
                 " from=" + SimpleDateFormat.getDateTimeInstance().format(new Date(from)) +
                 " to=" + SimpleDateFormat.getDateTimeInstance().format(new Date(to)));
 
@@ -1601,7 +1589,7 @@ public class LocationService extends IntentService {
                             Thread.sleep(200);
                         } catch (InterruptedException ignored) {
                         }
-                    Log.w(TAG, "New altitude for location=" + location);
+                    Log.i(TAG, "New altitude for location=" + location);
                     dh.updateLocationAltitude(id, location.getAltitude());
                 } else
                     break;

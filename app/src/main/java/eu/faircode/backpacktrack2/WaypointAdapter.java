@@ -104,7 +104,7 @@ public class WaypointAdapter extends CursorAdapter {
                                 Geocoder geocoder = new Geocoder(context);
                                 return geocoder.getFromLocation(latitude, longitude, GEOCODER_RESULTS);
                             } catch (IOException ex) {
-                                Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                                 return null;
                             }
                         }

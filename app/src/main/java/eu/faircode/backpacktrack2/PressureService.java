@@ -39,7 +39,7 @@ public class PressureService extends Service {
             float hpa = sensorEvent.values[0];
             float offset = Float.parseFloat(prefs.getString(SettingsFragment.PREF_PRESSURE_OFFSET, SettingsFragment.DEFAULT_PRESSURE_OFFSET));
             hpa += offset;
-            Log.w(TAG, "Pressure " + hpa + "mb offset=" + offset);
+            Log.i(TAG, "Pressure " + hpa + "mb offset=" + offset);
 
             // Pressure averaging
             count++;
@@ -68,9 +68,9 @@ public class PressureService extends Service {
         SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         Sensor pressure = sm.getDefaultSensor(Sensor.TYPE_PRESSURE);
         if (pressure == null)
-            Log.w(TAG, "No pressure sensor available");
+            Log.i(TAG, "No pressure sensor available");
         else {
-            Log.w(TAG, "Registering pressure listener");
+            Log.i(TAG, "Registering pressure listener");
             sm.registerListener(pressureListener, pressure, SensorManager.SENSOR_DELAY_NORMAL);
         }
 
@@ -90,7 +90,7 @@ public class PressureService extends Service {
                 // Calculate average
                 long time = new Date().getTime();
                 float pressure = (count > 0 ? values / count : 0);
-                Log.w(TAG, "Average pressure " + pressure + "mb");
+                Log.i(TAG, "Average pressure " + pressure + "mb");
                 prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_VALUE, pressure).apply();
                 prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_TIME, time).apply();
 
@@ -109,19 +109,19 @@ public class PressureService extends Service {
         int maxdist = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXDIST, SettingsFragment.DEFAULT_PRESSURE_MAXDIST));
         boolean invehicle = prefs.getBoolean(SettingsFragment.PREF_PRESSURE_INVEHICLE, SettingsFragment.DEFAULT_PRESSURE_INVEHICLE);
 
-        Log.w(TAG, "Get altitude location=" + location + " maxage=" + maxage + " maxdist=" + maxdist + " vehicle=" + invehicle);
+        Log.i(TAG, "Get altitude location=" + location + " maxage=" + maxage + " maxdist=" + maxdist + " vehicle=" + invehicle);
 
         // Check last activity
         int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
         if (lastActivity == DetectedActivity.IN_VEHICLE && !invehicle) {
-            Log.w(TAG, "No altitude from pressure in vehicle");
+            Log.i(TAG, "No altitude from pressure in vehicle");
             return Float.NaN;
         }
 
         // Get current pressure
         float pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_VALUE, 0);
         if (pressure <= 0) {
-            Log.w(TAG, "No pressure value");
+            Log.i(TAG, "No pressure value");
             return Float.NaN;
         }
 
@@ -134,32 +134,32 @@ public class PressureService extends Service {
 
         // Check if reference
         if (ref_pressure == 0 || ref_time == 0) {
-            Log.w(TAG, "No reference pressure");
+            Log.i(TAG, "No reference pressure");
             return Float.NaN;
         }
 
         // Check age
         if (ref_time + maxage * 60 * 1000 <= location.getTime()) {
-            Log.w(TAG, "Reference pressure too old, time=" + SimpleDateFormat.getDateTimeInstance().format(ref_time));
+            Log.i(TAG, "Reference pressure too old, time=" + SimpleDateFormat.getDateTimeInstance().format(ref_time));
             return Float.NaN;
         }
 
         // Check distance
         float distance = location.distanceTo(station);
         if (distance > maxdist * 1000) {
-            Log.w(TAG, "Reference pressure too far, distance=" + distance + "m");
+            Log.i(TAG, "Reference pressure too far, distance=" + distance + "m");
             return Float.NaN;
         }
 
         // Get altitude
         float altitude = SensorManager.getAltitude(ref_pressure, pressure);
-        Log.w(TAG, "Altitude " + altitude + "m " + ref_pressure + "/" + pressure + "mb");
+        Log.i(TAG, "Altitude " + altitude + "m " + ref_pressure + "/" + pressure + "mb");
         return altitude;
     }
 
     @Override
     public void onDestroy() {
-        Log.w(TAG, "Unregistering pressure listener");
+        Log.i(TAG, "Unregistering pressure listener");
         SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         sm.unregisterListener(pressureListener);
 

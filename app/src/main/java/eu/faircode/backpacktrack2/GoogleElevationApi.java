@@ -57,7 +57,7 @@ public class GoogleElevationApi {
                     if (results.length() > 0) {
                         double elevation = results.getJSONObject(0).getDouble("elevation");
                         location.setAltitude(elevation);
-                        Log.w(TAG, "Elevation " + location);
+                        Log.i(TAG, "Elevation " + location);
                         return true;
                     } else
                         throw new IOException("JSON no results");
@@ -67,7 +67,7 @@ public class GoogleElevationApi {
                 urlConnection.disconnect();
             }
         } catch (Throwable ex) {
-            Log.w(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             return false;
         }
     }

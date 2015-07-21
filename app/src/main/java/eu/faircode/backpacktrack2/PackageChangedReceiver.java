@@ -11,7 +11,7 @@ public class PackageChangedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, Intent intent) {
-        Log.w(TAG, "Received " + intent);
+        Log.i(TAG, "Received " + intent);
 
         Uri inputUri = intent.getData();
         if (inputUri.getScheme().equals("package"))
