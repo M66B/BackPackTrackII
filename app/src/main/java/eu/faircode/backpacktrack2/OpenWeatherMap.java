@@ -26,6 +26,7 @@ import javax.net.ssl.HttpsURLConnection;
 public class OpenWeatherMap {
     private static final String TAG = "BPT2.OpenWeatherMap";
 
+    private static final String BASE_URL = "http://api.openweathermap.org/data/2.5";
     private static final int cTimeOutMs = 30 * 1000;
     private static final long cMaxAge = 24 * 3600 * 1000;
     private static final DecimalFormat DF = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ROOT));
@@ -68,10 +69,10 @@ public class OpenWeatherMap {
         }
     }
 
-    public static Weather getStation(String apikey, long id, Context context)
+    public static Weather getWeatherByStation(String apikey, long id, Context context)
             throws IOException, JSONException {
         // http://openweathermap.org/api
-        URL url = new URL("http://api.openweathermap.org/data/2.5/station" +
+        URL url = new URL(BASE_URL + "/station" +
                 "?APPID=" + apikey +
                 "&units=metric" +
                 "&id=" + id);
@@ -102,16 +103,16 @@ public class OpenWeatherMap {
 
             // Decode result
             JSONObject jroot = new JSONObject(json.toString());
-            return getWeather(jroot);
+            return getWeatherReport(jroot);
         } finally {
             urlConnection.disconnect();
         }
     }
 
-    public static List<Weather> getWeather(String apikey, Location location, int stations, Context context)
+    public static List<Weather> getWeatherByStation(String apikey, Location location, int stations, Context context)
             throws IOException, JSONException {
         // http://openweathermap.org/api
-        URL url = new URL("http://api.openweathermap.org/data/2.5/station/find" +
+        URL url = new URL(BASE_URL + "/station/find" +
                 "?APPID=" + apikey +
                 "&units=metric" +
                 "&cnt=" + stations +
@@ -149,7 +150,7 @@ public class OpenWeatherMap {
             List<Weather> listResult = new ArrayList<Weather>();
             for (int i = 0; i < jroot.length(); i++) {
                 JSONObject entry = jroot.getJSONObject(i);
-                Weather weather = getWeather(entry);
+                Weather weather = getWeatherReport(entry);
                 if (weather != null)
                     listResult.add(weather);
             }
@@ -159,7 +160,7 @@ public class OpenWeatherMap {
         }
     }
 
-    private static Weather getWeather(JSONObject entry) throws JSONException {
+    private static Weather getWeatherReport(JSONObject entry) throws JSONException {
         if (!entry.has("station") || !entry.has("last"))
             return null;
         JSONObject station = entry.getJSONObject("station");

@@ -824,10 +824,10 @@ public class LocationService extends IntentService {
             // Fetch weather
             List<OpenWeatherMap.Weather> listWeather;
             if (id < 0)
-                listWeather = OpenWeatherMap.getWeather(apikey, lastLocation, stations, this);
+                listWeather = OpenWeatherMap.getWeatherByStation(apikey, lastLocation, stations, this);
             else {
                 listWeather = new ArrayList<OpenWeatherMap.Weather>();
-                OpenWeatherMap.Weather w = OpenWeatherMap.getStation(apikey, id, this);
+                OpenWeatherMap.Weather w = OpenWeatherMap.getWeatherByStation(apikey, id, this);
                 if (w != null)
                     listWeather.add(w);
             }

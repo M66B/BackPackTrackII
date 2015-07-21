@@ -583,7 +583,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 pref_weather_test.setEnabled(false);
                 pref_weather_test.setSummary(null);
                 new AsyncTask<Object, Object, Object>() {
-
                     @Override
                     protected Object doInBackground(Object... objects) {
                         try {
@@ -595,7 +594,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             }
 
                             int stations = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_STATIONS, SettingsFragment.DEFAULT_WEATHER_STATIONS));
-                            return OpenWeatherMap.getWeather(apikey, lastLocation, stations, getActivity());
+                            return OpenWeatherMap.getWeatherByStation(apikey, lastLocation, stations, getActivity());
                         } catch (Throwable ex) {
                             return ex;
                         }
