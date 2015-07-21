@@ -865,18 +865,10 @@ public class LocationService extends IntentService {
                     prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_TEMP, (float) weather.temperature).apply();
                     prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, (float) weather.pressure).apply();
                     prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, weather.time).apply();
+
+                    updateState(this, "weather");
                 }
             }
-
-            if (!found) {
-                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_LAT).apply();
-                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_LON).apply();
-                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_VALUE).apply();
-                prefs.edit().remove(SettingsFragment.PREF_PRESSURE_REF_TEMP).apply();
-                prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, lastLocation.getTime()).apply();
-            }
-
-            updateState(this, "weather");
         } catch (Throwable ex) {
             Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
         }
