@@ -155,33 +155,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(TAG, "Upgrading from version " + oldVersion + " to " + newVersion);
 
-        if (oldVersion < 2)
-            createTableActivityType(db);
+        db.beginTransaction();
+        try {
+            if (oldVersion < 2)
+                createTableActivityType(db);
 
-        if (oldVersion < 3)
-            createTableStep(db);
+            if (oldVersion < 3)
+                createTableStep(db);
 
-        if (oldVersion < 4) {
-            db.beginTransaction();
-            try {
+            if (oldVersion == 3) {
                 db.execSQL("ALTER TABLE location ADD COLUMN activity_type INTEGER NULL");
                 db.execSQL("ALTER TABLE location ADD COLUMN activity_confidence INTEGER NULL");
                 db.execSQL("ALTER TABLE location ADD COLUMN stepcount INTEGER NULL");
-                db.setTransactionSuccessful();
-            } finally {
-                db.endTransaction();
             }
-        }
 
-        if (oldVersion < 5)
-            db.execSQL("UPDATE step SET time = time - " + TimeZone.getDefault().getOffset(new Date().getTime()));
+            if (oldVersion == 4)
+                db.execSQL("UPDATE step SET time = time - " + TimeZone.getDefault().getOffset(new Date().getTime()));
 
-        if (oldVersion < 7)
-            createTableActivityDuration(db);
+            if (oldVersion < 7)
+                createTableActivityDuration(db);
 
-        if (oldVersion == 7) {
-            db.beginTransaction();
-            try {
+            if (oldVersion == 7) {
                 db.execSQL("ALTER TABLE activity RENAME TO activitytype");
                 // Index activity_time not renamed
                 db.execSQL("ALTER TABLE activityduration RENAME TO activityduration_orig");
@@ -191,21 +185,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         "INSERT INTO activityduration (time, still, walking, running, onbicycle, invehicle, unknown)" +
                                 " SELECT time, still, onfoot, running, onbicycle, invehicle, unknown FROM activityduration_orig");
                 db.execSQL("DROP TABLE activityduration_orig");
-                db.setTransactionSuccessful();
-            } finally {
-                db.endTransaction();
             }
-        }
 
-        if (oldVersion < 9)
-            createTableActivityLog(db);
+            if (oldVersion < 9)
+                createTableActivityLog(db);
 
-        if (oldVersion < 10)
-            createTableWeather(db);
+            if (oldVersion < 10)
+                createTableWeather(db);
 
-        if (oldVersion < 11) {
-            db.beginTransaction();
-            try {
+            if (oldVersion == 10) {
                 db.execSQL("ALTER TABLE weather ADD COLUMN station_latitude REAL NULL");
                 db.execSQL("ALTER TABLE weather ADD COLUMN station_longitude REAL NULL");
                 //db.execSQL("ALTER TABLE weather DROP COLUMN distance");
@@ -213,13 +201,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.execSQL("UPDATE weather SET station_longitude = longitude");
                 db.execSQL("UPDATE weather SET latitude = NULL");
                 db.execSQL("UPDATE weather SET longitude = NULL");
-                db.setTransactionSuccessful();
-            } finally {
-                db.endTransaction();
             }
-        }
 
-        db.setVersion(DB_VERSION);
+            db.setVersion(DB_VERSION);
+
+            db.setTransactionSuccessful();
+        } catch (Throwable ex) {
+            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+        } finally {
+            db.endTransaction();
+        }
     }
 
     // Location
