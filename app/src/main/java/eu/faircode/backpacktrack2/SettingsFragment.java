@@ -208,8 +208,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final boolean DEFAULT_PRESSURE_ENABLED = false;
     public static final String DEFAULT_PRESSURE_WAIT = "3"; // seconds
     public static final String DEFAULT_PRESSURE_OFFSET = "0"; // hPa
-    public static final String DEFAULT_PRESSURE_MAXAGE = "180"; // minutes
-    public static final String DEFAULT_PRESSURE_MAXDIST = "25"; // kilometer
+    public static final String DEFAULT_PRESSURE_MAXAGE = "240"; // minutes
+    public static final String DEFAULT_PRESSURE_MAXDIST = "50"; // kilometer
     public static final boolean DEFAULT_PRESSURE_INVEHICLE = false;
 
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples

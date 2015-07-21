@@ -237,13 +237,13 @@
                 android:key="pref_pressure_test"
                 android:title="@string/title_pressure_test" />
             <EditTextPreference
-                android:defaultValue="180"
+                android:defaultValue="240"
                 android:dependency="pref_pressure_enabled"
                 android:inputType="number"
                 android:key="pref_pressure_maxage"
                 android:summary="@string/summary_pressure_maxage" />
             <EditTextPreference
-                android:defaultValue="25"
+                android:defaultValue="50"
                 android:dependency="pref_pressure_enabled"
                 android:inputType="number"
                 android:key="pref_pressure_maxdist"
