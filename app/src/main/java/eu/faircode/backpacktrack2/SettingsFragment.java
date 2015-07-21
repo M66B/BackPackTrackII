@@ -2060,6 +2060,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         TextView tvHeaderHumidity = (TextView) viewHistory.findViewById(R.id.tvHeaderHumidity);
         TextView tvHeaderPressure = (TextView) viewHistory.findViewById(R.id.tvHeaderPressure);
         TextView tvHeaderWindSpeed = (TextView) viewHistory.findViewById(R.id.tvHeaderWindSpeed);
+        TextView tvHeaderWindDirection = (TextView) viewHistory.findViewById(R.id.tvHeaderWindDirection);
 
         String temperature_unit = prefs.getString(PREF_TEMPERATURE, DEFAULT_TEMPERATURE);
         if ("c".equals(temperature_unit))
@@ -2122,6 +2123,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             @Override
             public void onClick(View view) {
                 prefs.edit().putString(PREF_LAST_WEATHER_GRAPH, "wind_speed").apply();
+                showWeatherGraph(graph);
+            }
+        });
+
+        tvHeaderWindDirection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putString(PREF_LAST_WEATHER_GRAPH, "wind_direction").apply();
                 showWeatherGraph(graph);
             }
         });
@@ -2212,8 +2221,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         double minValue = Double.MAX_VALUE;
         double maxValue = 0;
 
-        String column = prefs.getString(PREF_LAST_WEATHER_GRAPH, "temperature");
         long viewport = prefs.getLong(PREF_LAST_WEATHER_VIEWPORT, DAY_MS);
+        final String column = prefs.getString(PREF_LAST_WEATHER_GRAPH, "temperature");
 
         String temperature_unit = prefs.getString(PREF_TEMPERATURE, DEFAULT_TEMPERATURE);
         String speed_unit = prefs.getString(PREF_SPEED, DEFAULT_SPEED);
@@ -2229,6 +2238,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 maxValue = 28.4; // m/s
             else if ("kmh".equals(speed_unit))
                 maxValue = 102; // km/h
+
+        if ("wind_direction".equals(column)) {
+            minValue = 0;
+            maxValue = 360;
+        }
 
         Cursor cursor = db.getWeather(true);
 
@@ -2288,6 +2302,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 public String formatLabel(double value, boolean isValueX) {
                     if (isValueX)
                         return super.formatLabel(value, isValueX);
+                    else if ("wind_direction".equals(column))
+                        return LocationService.getWindDirectionName((float) value, getActivity());
                     else
                         return DF.format(value);
                 }

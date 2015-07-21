@@ -17,7 +17,7 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="120dp"
+            android:layout_width="80dp"
             android:layout_height="24dp">
 
             <ImageView
@@ -69,6 +69,16 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:gravity="right"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvHeaderWindDirection"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="right"
+            android:text="@string/header_bearing"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
 

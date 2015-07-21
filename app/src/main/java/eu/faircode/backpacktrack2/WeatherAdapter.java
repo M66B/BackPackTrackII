@@ -34,37 +34,68 @@ public class WeatherAdapter extends CursorAdapter {
 
     @Override
     public void bindView(final View view, final Context context, final Cursor cursor) {
-        // Get values
-        long time = cursor.getLong(cursor.getColumnIndex("time"));
-        double temperature = cursor.getDouble(cursor.getColumnIndex("temperature"));
-        long humidity = Math.round(cursor.getDouble(cursor.getColumnIndex("humidity")));
-        double pressure = cursor.getDouble(cursor.getColumnIndex("pressure"));
-        double wind_speed = cursor.getDouble(cursor.getColumnIndex("wind_speed"));
-
-        if ("f".equals(temperature_unit))
-            temperature = temperature * 9 / 5 + 32;
-
-        if ("bft".equals(speed_unit))
-            wind_speed = Math.pow(10.0, (Math.log10(wind_speed / 0.836) / 1.5));
-        else if ("kmh".equals(speed_unit))
-            wind_speed = wind_speed * 3600 / 1000;
-
         // Get views
         TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
         TextView tvTemperature = (TextView) view.findViewById(R.id.tvTemperature);
         TextView tvHumidity = (TextView) view.findViewById(R.id.tvHumidity);
         TextView tvPressure = (TextView) view.findViewById(R.id.tvPressure);
         TextView tvWindSpeed = (TextView) view.findViewById(R.id.tvWindSpeed);
+        TextView tvWindDirection = (TextView) view.findViewById(R.id.tvWindDirection);
 
-        // Set values
-        tvTime.setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT).format(time));
-        tvTemperature.setText(DF.format(temperature));
-        tvHumidity.setText(Long.toString(humidity));
-        tvPressure.setText(DF.format(pressure));
-        if ("bft".equals(speed_unit))
-            tvWindSpeed.setText(Long.toString(Math.round(wind_speed)));
-        else
-            tvWindSpeed.setText(DF.format(wind_speed));
+        // Time
+        long time = cursor.getLong(cursor.getColumnIndex("time"));
+        tvTime.setText(new SimpleDateFormat("dd").format(time) + " " + SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(time));
+
+        // Temperature
+        if (cursor.isNull(cursor.getColumnIndex("temperature")))
+            tvTemperature.setText("");
+        else {
+            double temperature = cursor.getDouble(cursor.getColumnIndex("temperature"));
+            if ("f".equals(temperature_unit))
+                temperature = temperature * 9 / 5 + 32;
+            tvTemperature.setText(DF.format(temperature));
+        }
+
+        // Humidity
+        if (cursor.isNull(cursor.getColumnIndex("humidity")))
+            tvHumidity.setText("");
+        else {
+            long humidity = Math.round(cursor.getDouble(cursor.getColumnIndex("humidity")));
+            tvHumidity.setText(Long.toString(humidity));
+        }
+
+        // Pressure
+        if (cursor.isNull(cursor.getColumnIndex("pressure")))
+            tvPressure.setText("");
+        else {
+            double pressure = cursor.getDouble(cursor.getColumnIndex("pressure"));
+            tvPressure.setText(DF.format(pressure));
+        }
+
+        // Wind speed
+        if (cursor.isNull(cursor.getColumnIndex("wind_speed")))
+            tvWindSpeed.setText("");
+        else {
+            double wind_speed = cursor.getDouble(cursor.getColumnIndex("wind_speed"));
+
+            if ("bft".equals(speed_unit))
+                wind_speed = Math.pow(10.0, (Math.log10(wind_speed / 0.836) / 1.5));
+            else if ("kmh".equals(speed_unit))
+                wind_speed = wind_speed * 3600 / 1000;
+
+            if ("bft".equals(speed_unit))
+                tvWindSpeed.setText(Long.toString(Math.round(wind_speed)));
+            else
+                tvWindSpeed.setText(DF.format(wind_speed));
+        }
+
+        // Wind direction
+        if (cursor.isNull(cursor.getColumnIndex("wind_direction")))
+            tvWindDirection.setText("");
+        else {
+            float wind_direction = cursor.getFloat(cursor.getColumnIndex("wind_direction"));
+            tvWindDirection.setText(LocationService.getWindDirectionName(wind_direction, context));
+        }
     }
 }
 
