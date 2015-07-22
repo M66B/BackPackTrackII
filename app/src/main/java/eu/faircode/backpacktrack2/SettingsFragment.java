@@ -1490,9 +1490,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.addSeries(seriesAltitudeReal);
             graph.addSeries(seriesAltitudeAvg);
 
-            graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity(), SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)));
-            graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+            graph.getGridLabelRenderer().setLabelFormatter(
+                    new DateAsXAxisLabelFormatter(getActivity(),
+                            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
+            graph.getGridLabelRenderer().setNumHorizontalLabels(2);
             graph.getViewport().setScrollable(true);
+            graph.getViewport().setScalable(true);
         } else
             graph.setVisibility(View.GONE);
     }
@@ -1812,20 +1815,23 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             if (showTotal && graphs > 1)
                 graph.addSeries(seriesTotal);
 
-            graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity(), SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)) {
-                @Override
-                public String formatLabel(double value, boolean isValueX) {
-                    if (isValueX)
-                        return super.formatLabel(value, isValueX);
-                    else {
-                        int minutes = (int) value % 60;
-                        int hours = (int) value / 60;
-                        return hours + ":" + (minutes < 10 ? "0" : "") + minutes;
-                    }
-                }
-            });
-            graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+            graph.getGridLabelRenderer().setLabelFormatter(
+                    new DateAsXAxisLabelFormatter(getActivity(),
+                            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)) {
+                        @Override
+                        public String formatLabel(double value, boolean isValueX) {
+                            if (isValueX)
+                                return super.formatLabel(value, isValueX);
+                            else {
+                                int minutes = (int) value % 60;
+                                int hours = (int) value / 60;
+                                return hours + ":" + (minutes < 10 ? "0" : "") + minutes;
+                            }
+                        }
+                    });
+            graph.getGridLabelRenderer().setNumHorizontalLabels(2);
             graph.getViewport().setScrollable(true);
+            graph.getViewport().setScalable(true);
         } else
             graph.setVisibility(View.GONE);
     }
@@ -2072,9 +2078,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.removeAllSeries();
             graph.addSeries(seriesStep);
 
-            graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity(), SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)));
-            graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+            graph.getGridLabelRenderer().setLabelFormatter(
+                    new DateAsXAxisLabelFormatter(getActivity(),
+                            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
+            graph.getGridLabelRenderer().setNumHorizontalLabels(2);
             graph.getViewport().setScrollable(true);
+            graph.getViewport().setScalable(true);
         } else
             graph.setVisibility(View.GONE);
     }
@@ -2334,20 +2343,23 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             final DecimalFormat DF = new DecimalFormat("humidity".equals(column) ? "0" : "0.0", new DecimalFormatSymbols(Locale.ROOT));
 
-            graph.getGridLabelRenderer().setLabelFormatter(new DateAsXAxisLabelFormatter(getActivity(), SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)) {
-                @Override
-                public String formatLabel(double value, boolean isValueX) {
-                    if (isValueX)
-                        return super.formatLabel(value, isValueX);
-                    else if ("wind_direction".equals(column))
-                        return LocationService.getWindDirectionName((float) value, getActivity());
-                    else
-                        return DF.format(value);
-                }
-            });
+            graph.getGridLabelRenderer().setLabelFormatter(
+                    new DateAsXAxisLabelFormatter(getActivity(),
+                            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)) {
+                        @Override
+                        public String formatLabel(double value, boolean isValueX) {
+                            if (isValueX)
+                                return super.formatLabel(value, isValueX);
+                            else if ("wind_direction".equals(column))
+                                return LocationService.getWindDirectionName((float) value, getActivity());
+                            else
+                                return DF.format(value);
+                        }
+                    });
 
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
             graph.getViewport().setScrollable(true);
+            graph.getViewport().setScalable(true);
             graph.setVisibility(View.VISIBLE);
         } else
             graph.setVisibility(View.GONE);
