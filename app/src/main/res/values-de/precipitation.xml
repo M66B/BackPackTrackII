@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="listPrecipitationName">
+        <item>mm</item>
+        <item>inch</item>
+    </string-array>
+    <!-- do not translate values -->
+    <string-array name="listPrecipitationValue">
+        <item>mm</item>
+        <item>in</item>
+    </string-array>
+</resources>

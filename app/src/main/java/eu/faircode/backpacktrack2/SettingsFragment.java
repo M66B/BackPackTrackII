@@ -169,6 +169,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     public static final String PREF_TEMPERATURE = "pref_temperature";
     public static final String PREF_SPEED = "pref_speed";
+    public static final String PREF_PRECIPITATION = "pref_precipitation";
 
     public static final String PREF_VERSION = "pref_version";
     public static final String PREF_SUPPORT = "pref_support";
@@ -247,6 +248,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     public static final String DEFAULT_TEMPERATURE = "c";
     public static final String DEFAULT_SPEED = "bft";
+    public static final String DEFAULT_PRECIPITATION = "mm";
 
     public static final boolean DEFAULT_GRAPH_STILL = false;
     public static final boolean DEFAULT_GRAPH_WALKING = true;
@@ -450,6 +452,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         updateTitle(prefs, PREF_TEMPERATURE);
         updateTitle(prefs, PREF_SPEED);
+        updateTitle(prefs, PREF_PRECIPITATION);
 
         updateTitle(prefs, PREF_SUPPORT);
 
@@ -2071,6 +2074,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         ImageView ivAdd = (ImageView) viewHistory.findViewById(R.id.ivAdd);
         TextView tvHeaderTemperature = (TextView) viewHistory.findViewById(R.id.tvHeaderTemperature);
         TextView tvHeaderWindSpeed = (TextView) viewHistory.findViewById(R.id.tvHeaderWindSpeed);
+        TextView tvHeaderPrecipitation = (TextView) viewHistory.findViewById(R.id.tvHeaderPrecipitation);
 
         // Select graph
         spGraph.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -2110,6 +2114,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             tvHeaderWindSpeed.setText(R.string.header_ms);
         else if ("kmh".equals(speed_unit))
             tvHeaderWindSpeed.setText(R.string.header_kph);
+
+        // Display precipitation unit
+        String rain_unit = prefs.getString(PREF_PRECIPITATION, DEFAULT_PRECIPITATION);
+        if ("mm".equals(rain_unit))
+            tvHeaderPrecipitation.setText(R.string.header_mm);
+        else if ("in".equals(rain_unit))
+            tvHeaderPrecipitation.setText(R.string.header_inch);
 
         // Handle viewport change
         ivViewport.setOnClickListener(new View.OnClickListener() {
@@ -2223,6 +2234,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         String temperature_unit = prefs.getString(PREF_TEMPERATURE, DEFAULT_TEMPERATURE);
         String speed_unit = prefs.getString(PREF_SPEED, DEFAULT_SPEED);
+        String rain_unit = prefs.getString(PREF_PRECIPITATION, DEFAULT_PRECIPITATION);
 
         if ("humidity".equals(column)) {
             minValue = 0;
@@ -2271,6 +2283,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         value = Math.pow(10.0, (Math.log10(value / 0.836) / 1.5));
                     else if ("kmh".equals(speed_unit))
                         value = value * 3600 / 1000;
+
+                if ("rain_1h".equals(column) || "rain_today".equals(column)) {
+                    if ("in".equals(rain_unit))
+                        value = value / 25.4;
+                }
 
                 if (value < minValue)
                     minValue = value;
@@ -2434,6 +2451,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             else if ("kmh".equals(speed_unit))
                 speed_unit = getString(R.string.header_kph);
             pref.setTitle(getString(R.string.title_speed, speed_unit));
+        } else if (PREF_PRECIPITATION.equals(key)) {
+            String rain_unit = prefs.getString(key, DEFAULT_PRECIPITATION);
+            if ("mm".equals(rain_unit))
+                rain_unit = getString(R.string.header_mm);
+            else if ("in".equals(rain_unit))
+                rain_unit = getString(R.string.header_inch);
+            pref.setTitle(getString(R.string.title_precipitation, rain_unit));
         }
     }
 

@@ -19,13 +19,16 @@ import java.util.Locale;
 public class WeatherAdapter extends CursorAdapter {
     private String temperature_unit;
     private String speed_unit;
+    private String rain_unit;
     private static final DecimalFormat DF = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ROOT));
+    private static final DecimalFormat DF2 = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.ROOT));
 
     public WeatherAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         temperature_unit = prefs.getString(SettingsFragment.PREF_TEMPERATURE, SettingsFragment.DEFAULT_TEMPERATURE);
         speed_unit = prefs.getString(SettingsFragment.PREF_SPEED, SettingsFragment.DEFAULT_SPEED);
+        rain_unit = prefs.getString(SettingsFragment.PREF_PRECIPITATION, SettingsFragment.DEFAULT_PRECIPITATION);
     }
 
     @Override
@@ -107,7 +110,12 @@ public class WeatherAdapter extends CursorAdapter {
             tvPrecipitation.setText("");
         else {
             float rain_1h = cursor.getFloat(cursor.getColumnIndex("rain_1h"));
-            tvPrecipitation.setText(Integer.toString(Math.round(rain_1h)));
+            if ("in".equals(rain_unit)) {
+                rain_1h = rain_1h / 25.4f;
+                tvPrecipitation.setText(DF2.format(rain_1h));
+            } else {
+                tvPrecipitation.setText(Integer.toString(Math.round(rain_1h)));
+            }
         }
     }
 }

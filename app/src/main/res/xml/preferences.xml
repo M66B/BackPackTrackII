@@ -455,6 +455,11 @@
                 android:entries="@array/listSpeedName"
                 android:entryValues="@array/listSpeedValue"
                 android:key="pref_speed" />
+            <ListPreference
+                android:defaultValue="mm"
+                android:entries="@array/listPrecipitationName"
+                android:entryValues="@array/listPrecipitationValue"
+                android:key="pref_precipitation" />
         </PreferenceScreen>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_info">

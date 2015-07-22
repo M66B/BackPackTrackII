@@ -87,7 +87,6 @@
             android:layout_gravity="bottom"
             android:layout_marginLeft="18dp"
             android:gravity="right"
-            android:text="@string/header_mm"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
     </LinearLayout>

@@ -99,6 +99,7 @@
     <string name="title_units">Units</string>
     <string name="title_temperature">Temperature: %s</string>
     <string name="title_speed">Speed: %s</string>
+    <string name="title_precipitation">Precipitation: %s</string>
 
     <string name="title_info">Information</string>
     <string name="title_legend">Legend</string>
@@ -213,6 +214,7 @@
     <string name="header_ms">m/s</string>
     <string name="header_kph">km/h</string>
     <string name="header_mm">mm</string>
+    <string name="header_inch">in</string>
 
     <string name="msg_gps">GPS provider available: %s</string>
     <string name="msg_network">Network provider available: %s</string>
