@@ -221,9 +221,9 @@ The weather history shows the time of the weather reports (not the time of fetch
 <a name="FAQ11"></a>
 **(11) Is any sensitve data sent when fetching information?**
 
-When fetching Google Elevation data, your location (lat/long coordinates) is sent securely to maps.googleapis.com.
-When fetching weather data, your location (lat/long coordinates) is sent insecurely to api.openweathermap.org. Note, if a station ID is enter in 'Settings - Weather - Use weather station' your actaul location will not be sent, except when manually selecting the 'Show weather data' option.
-
+When fetching Google Elevation data, your location (latitude/longitude) will be sent securely to maps.googleapis.com.
+When fetching weather data, your location (latitude/longitude) will be sent insecurely to api.openweathermap.org.
+Note, if a station ID is enter in 'Settings - Weather - Use weather station' your actaul location will not be sent, except when manually selecting the 'Show weather data' option.
 
 Android permissions
 -------------------
@@ -233,7 +233,7 @@ Android permissions
 * ACCESS_COARSE/FINE_LOCATION: to acquire locations from the Android location manager
 * VIBRATE: to give feedback after making a waypoint / uploading a GPX file (imagine bright sunlight)
 * READ/WRITE_EXTERNAL_STORAGE: to write GPX files to the external/shared storage
-* INTERNET: to upload GPX files,for fetching Google Elevation data (if enabled in settings), and for fetching weather data (if enabled in settings)
+* INTERNET: to (manually) upload GPX files, for fetching elevation data (if enabled in settings) and for fetching weather data (if enabled in settings)
 * ACCESS_NETWORK_STATE: to disable/enable the upload menu
 * WAKE_LOCK: to keep your device awake while processing locations, steps, etc in the background
 
