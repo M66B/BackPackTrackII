@@ -94,7 +94,7 @@ public class WeatherAdapter extends CursorAdapter {
             tvWindDirection.setText("");
         else {
             float wind_direction = cursor.getFloat(cursor.getColumnIndex("wind_direction"));
-            tvWindDirection.setText(LocationService.getWindDirectionName(wind_direction, context));
+            tvWindDirection.setText(Integer.toString(Math.round(wind_direction)));
         }
     }
 }

@@ -17,6 +17,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -52,6 +53,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -2061,24 +2063,39 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View viewHistory = inflater.inflate(R.layout.weather_history, null);
 
-        // Show steps bar graph
+        // Reference controls
         final GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvWeather);
-        showWeatherGraph(graph);
-
+        final Spinner spGraph = (Spinner) viewHistory.findViewById(R.id.spGraph);
+        final TypedArray listGraphValue = getActivity().getResources().obtainTypedArray(R.array.listGraphValue);
         ImageView ivViewport = (ImageView) viewHistory.findViewById(R.id.ivViewport);
         ImageView ivAdd = (ImageView) viewHistory.findViewById(R.id.ivAdd);
         TextView tvHeaderTemperature = (TextView) viewHistory.findViewById(R.id.tvHeaderTemperature);
-        TextView tvHeaderHumidity = (TextView) viewHistory.findViewById(R.id.tvHeaderHumidity);
-        TextView tvHeaderPressure = (TextView) viewHistory.findViewById(R.id.tvHeaderPressure);
         TextView tvHeaderWindSpeed = (TextView) viewHistory.findViewById(R.id.tvHeaderWindSpeed);
-        TextView tvHeaderWindDirection = (TextView) viewHistory.findViewById(R.id.tvHeaderWindDirection);
 
+        // Select graph
+        spGraph.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                String column = listGraphValue.getString(position);
+                prefs.edit().putString(PREF_LAST_WEATHER_GRAPH, column).apply();
+                showWeatherGraph(graph);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                prefs.edit().putString(PREF_LAST_WEATHER_GRAPH, "temperature").apply();
+                showWeatherGraph(graph);
+            }
+        });
+
+        // Display temperature unit
         String temperature_unit = prefs.getString(PREF_TEMPERATURE, DEFAULT_TEMPERATURE);
         if ("c".equals(temperature_unit))
             tvHeaderTemperature.setText(R.string.header_celcius);
         else if ("f".equals(temperature_unit))
             tvHeaderTemperature.setText(R.string.header_fahrenheit);
 
+        // Display speed unit
         String speed_unit = prefs.getString(PREF_SPEED, DEFAULT_SPEED);
         if ("bft".equals(speed_unit))
             tvHeaderWindSpeed.setText(R.string.header_beaufort);
@@ -2087,6 +2104,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if ("kmh".equals(speed_unit))
             tvHeaderWindSpeed.setText(R.string.header_kph);
 
+        // Handle viewport change
         ivViewport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -2096,6 +2114,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
+        // Handle update request
         ivAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -2103,46 +2122,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 intent.setAction(LocationService.EXPORTED_ACTION_UPDATE_WEATHER);
                 getActivity().startService(intent);
                 Toast.makeText(getActivity(), R.string.msg_requesting, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        tvHeaderTemperature.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                prefs.edit().putString(PREF_LAST_WEATHER_GRAPH, "temperature").apply();
-                showWeatherGraph(graph);
-            }
-        });
-
-        tvHeaderHumidity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                prefs.edit().putString(PREF_LAST_WEATHER_GRAPH, "humidity").apply();
-                showWeatherGraph(graph);
-            }
-        });
-
-        tvHeaderPressure.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                prefs.edit().putString(PREF_LAST_WEATHER_GRAPH, "pressure").apply();
-                showWeatherGraph(graph);
-            }
-        });
-
-        tvHeaderWindSpeed.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                prefs.edit().putString(PREF_LAST_WEATHER_GRAPH, "wind_speed").apply();
-                showWeatherGraph(graph);
-            }
-        });
-
-        tvHeaderWindDirection.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                prefs.edit().putString(PREF_LAST_WEATHER_GRAPH, "wind_direction").apply();
-                showWeatherGraph(graph);
             }
         });
 
@@ -2255,6 +2234,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             maxValue = 360;
         }
 
+        if ("rain_1h".equals(column) || "rain_today".equals(column))
+            minValue = 0;
+
         Cursor cursor = db.getWeather(true);
 
         int colTime = cursor.getColumnIndex("time");
@@ -2322,6 +2304,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
             graph.getViewport().setScrollable(true);
+            graph.setVisibility(View.VISIBLE);
         } else
             graph.setVisibility(View.GONE);
     }
