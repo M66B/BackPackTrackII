@@ -817,6 +817,8 @@ public class LocationService extends IntentService {
             boolean synop = prefs.getBoolean(SettingsFragment.PREF_WEATHER_SYNOP, SettingsFragment.DEFAULT_WEATHER_SYNOP);
             boolean diy = prefs.getBoolean(SettingsFragment.PREF_WEATHER_DIY, SettingsFragment.DEFAULT_WEATHER_DIY);
             boolean other = prefs.getBoolean(SettingsFragment.PREF_WEATHER_OTHER, SettingsFragment.DEFAULT_WEATHER_OTHER);
+            Log.i(TAG, "stations=" + stations + " maxage=" + maxage + " maxdist=" + maxdist + " weight=" + weight +
+                    " id=" + id + " airport=" + airport + " cwop=" + cwop + " synop=" + synop + " diy=" + diy + " other=" + other);
 
             // Fetch weather
             List<OpenWeatherMap.Weather> listWeather;
