@@ -125,7 +125,7 @@ public class OpenWeatherMap {
                 "?APPID=" + apikey +
                 "&units=metric" +
                 "&cnt=" + stations +
-                "&lat=" + String.valueOf(location.getLatitude()) + "," +
+                "&lat=" + String.valueOf(location.getLatitude()) +
                 "&lon=" + String.valueOf(location.getLongitude()));
         Log.i(TAG, "url=" + url);
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
