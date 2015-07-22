@@ -1641,6 +1641,13 @@ public class LocationService extends IntentService {
         return prefs.getBoolean(SettingsFragment.PREF_DEBUG, false);
     }
 
+    public static boolean isDebuggable(Context context) {
+        if (debugMode(context))
+            return ((context.getApplicationContext().getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0);
+        else
+            return false;
+    }
+
     // Serialization
 
     public static class LocationSerializer implements JsonSerializer<Location> {
