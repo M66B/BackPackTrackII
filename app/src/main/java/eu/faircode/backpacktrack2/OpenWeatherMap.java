@@ -66,7 +66,7 @@ public class OpenWeatherMap {
                 case 1:
                     return "Airport";
                 case 2:
-                    return "CSOP";
+                    return "CWOP";
                 case 3:
                     return "SYNOP";
                 case 5:
