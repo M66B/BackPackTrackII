@@ -456,6 +456,11 @@
                 android:entryValues="@array/listSpeedValue"
                 android:key="pref_speed" />
             <ListPreference
+                android:defaultValue="hpa"
+                android:entries="@array/listPressureName"
+                android:entryValues="@array/listPressureValue"
+                android:key="pref_pressure" />
+            <ListPreference
                 android:defaultValue="mm"
                 android:entries="@array/listPrecipitationName"
                 android:entryValues="@array/listPrecipitationValue"

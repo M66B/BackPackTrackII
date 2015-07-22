@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="listPressureName">
+        <item>hPa</item>
+        <item>mmHg</item>
+    </string-array>
+    <!-- do not translate values -->
+    <string-array name="listPressureValue">
+        <item>hpa</item>
+        <item>mmhg</item>
+    </string-array>
+</resources>

@@ -98,8 +98,9 @@
 
     <string name="title_units">Einheiten</string>
     <string name="title_temperature">Temperatur: %s</string>
+    <string name="title_pressure">Druck: %s</string>
     <string name="title_speed">Geschwindigkeit: %s</string>
-    <string name="title_precipitation">Precipitation: %s</string>
+    <string name="title_precipitation">Niederschlag: %s</string>
 
     <string name="title_info">Informationen</string>
     <string name="title_legend">Legende</string>
@@ -210,6 +211,7 @@
     <string name="header_fahrenheit">&#176;F</string>
     <string name="header_percent">%</string>
     <string name="header_hpa">hPa</string>
+    <string name="header_mmhg">mmHg</string>
     <string name="header_beaufort">Bft</string>
     <string name="header_ms">m/s</string>
     <string name="header_kph">km/h</string>

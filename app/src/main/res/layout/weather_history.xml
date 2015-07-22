@@ -67,7 +67,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:gravity="right"
-            android:text="@string/header_hpa"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
 
