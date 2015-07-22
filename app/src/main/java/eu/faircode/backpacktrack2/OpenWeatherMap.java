@@ -117,7 +117,7 @@ public class OpenWeatherMap {
         }
     }
 
-    public static List<Weather> getWeatherByStation(
+    public static List<Weather> getWeatherByLocation(
             String apikey, final Location location, int stations, final int maxage, final int maxdist, final float weight, Context context)
             throws IOException, JSONException {
         // http://openweathermap.org/api

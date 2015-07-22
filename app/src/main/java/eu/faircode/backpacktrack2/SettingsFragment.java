@@ -626,7 +626,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             int maxage = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXAGE, SettingsFragment.DEFAULT_PRESSURE_MAXAGE));
                             int maxdist = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXDIST, SettingsFragment.DEFAULT_PRESSURE_MAXDIST));
                             float weight = Float.parseFloat(prefs.getString(SettingsFragment.PREF_WEATHER_WEIGHT, SettingsFragment.DEFAULT_WEATHER_WEIGHT));
-                            return OpenWeatherMap.getWeatherByStation(apikey, lastLocation, stations, maxage, maxdist, weight, getActivity());
+                            return OpenWeatherMap.getWeatherByLocation(apikey, lastLocation, stations, maxage, maxdist, weight, getActivity());
                         } catch (Throwable ex) {
                             return ex;
                         }
