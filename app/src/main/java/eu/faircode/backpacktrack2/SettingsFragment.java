@@ -1767,12 +1767,32 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.getViewport().setMinY(0);
             graph.getViewport().setMaxY(maxDuration);
 
+            seriesStill.setDrawDataPoints(true);
+            seriesStill.setDataPointsRadius(3);
             seriesStill.setColor(Color.WHITE);
+
+            seriesWalking.setDrawDataPoints(true);
+            seriesWalking.setDataPointsRadius(3);
             seriesWalking.setColor(Color.CYAN);
+
+            seriesRunning.setDrawDataPoints(true);
+            seriesRunning.setDataPointsRadius(3);
             seriesRunning.setColor(Color.GREEN);
+
+            seriesOnbicyle.setDrawDataPoints(true);
+            seriesOnbicyle.setDataPointsRadius(3);
             seriesOnbicyle.setColor(Color.YELLOW);
+
+            seriesInvehicle.setDrawDataPoints(true);
+            seriesInvehicle.setDataPointsRadius(3);
             seriesInvehicle.setColor(Color.MAGENTA);
+
+            seriesUnknown.setDrawDataPoints(true);
+            seriesUnknown.setDataPointsRadius(3);
             seriesUnknown.setColor(Color.GRAY);
+
+            seriesTotal.setDrawDataPoints(true);
+            seriesTotal.setDataPointsRadius(3);
             seriesTotal.setColor(Color.BLUE);
 
             graph.removeAllSeries();
