@@ -839,7 +839,7 @@ public class LocationService extends IntentService {
                 long time = new Date().getTime();
                 if (!found &&
                         weather.time + maxage * 60 * 1000 >= time &&
-                        (id >= 0 ||
+                        (id > 0 ||
                                 (weather.station_type == 1 && airport) ||
                                 (weather.station_type == 2 && cwop) ||
                                 (weather.station_type == 3 && synop) ||
