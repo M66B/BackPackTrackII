@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -40,7 +41,8 @@ public class WeatherAdapter extends CursorAdapter {
         TextView tvHumidity = (TextView) view.findViewById(R.id.tvHumidity);
         TextView tvPressure = (TextView) view.findViewById(R.id.tvPressure);
         TextView tvWindSpeed = (TextView) view.findViewById(R.id.tvWindSpeed);
-        TextView tvWindDirection = (TextView) view.findViewById(R.id.tvWindDirection);
+        ImageView ivWindDirection = (ImageView) view.findViewById(R.id.ivWindDirection);
+        TextView tvPrecipitation = (TextView) view.findViewById(R.id.tvPrecipitation);
 
         // Time
         long time = cursor.getLong(cursor.getColumnIndex("time"));
@@ -50,7 +52,7 @@ public class WeatherAdapter extends CursorAdapter {
         if (cursor.isNull(cursor.getColumnIndex("temperature")))
             tvTemperature.setText("");
         else {
-            double temperature = cursor.getDouble(cursor.getColumnIndex("temperature"));
+            float temperature = cursor.getFloat(cursor.getColumnIndex("temperature"));
             if ("f".equals(temperature_unit))
                 temperature = temperature * 9 / 5 + 32;
             tvTemperature.setText(DF.format(temperature));
@@ -60,7 +62,9 @@ public class WeatherAdapter extends CursorAdapter {
         if (cursor.isNull(cursor.getColumnIndex("humidity")))
             tvHumidity.setText("");
         else {
-            long humidity = Math.round(cursor.getDouble(cursor.getColumnIndex("humidity")));
+            int humidity = Math.round(cursor.getFloat(cursor.getColumnIndex("humidity")));
+            if (humidity > 99)
+                humidity = 99;
             tvHumidity.setText(Long.toString(humidity));
         }
 
@@ -68,7 +72,7 @@ public class WeatherAdapter extends CursorAdapter {
         if (cursor.isNull(cursor.getColumnIndex("pressure")))
             tvPressure.setText("");
         else {
-            double pressure = cursor.getDouble(cursor.getColumnIndex("pressure"));
+            float pressure = cursor.getFloat(cursor.getColumnIndex("pressure"));
             tvPressure.setText(DF.format(pressure));
         }
 
@@ -76,10 +80,10 @@ public class WeatherAdapter extends CursorAdapter {
         if (cursor.isNull(cursor.getColumnIndex("wind_speed")))
             tvWindSpeed.setText("");
         else {
-            double wind_speed = cursor.getDouble(cursor.getColumnIndex("wind_speed"));
+            float wind_speed = cursor.getFloat(cursor.getColumnIndex("wind_speed"));
 
             if ("bft".equals(speed_unit))
-                wind_speed = Math.pow(10.0, (Math.log10(wind_speed / 0.836) / 1.5));
+                wind_speed = (float) Math.pow(10.0, (Math.log10(wind_speed / 0.836) / 1.5));
             else if ("kmh".equals(speed_unit))
                 wind_speed = wind_speed * 3600 / 1000;
 
@@ -91,10 +95,19 @@ public class WeatherAdapter extends CursorAdapter {
 
         // Wind direction
         if (cursor.isNull(cursor.getColumnIndex("wind_direction")))
-            tvWindDirection.setText("");
+            ivWindDirection.setVisibility(View.INVISIBLE);
         else {
             float wind_direction = cursor.getFloat(cursor.getColumnIndex("wind_direction"));
-            tvWindDirection.setText(Integer.toString(Math.round(wind_direction)));
+            ivWindDirection.setRotation(wind_direction + 180);
+            ivWindDirection.setVisibility(View.VISIBLE);
+        }
+
+        // Precipitation
+        if (cursor.isNull(cursor.getColumnIndex("rain_1h")))
+            tvPrecipitation.setText("");
+        else {
+            float rain_1h = cursor.getFloat(cursor.getColumnIndex("rain_1h"));
+            tvPrecipitation.setText(Integer.toString(Math.round(rain_1h)));
         }
     }
 }

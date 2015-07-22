@@ -2088,6 +2088,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
+        String column = prefs.getString(PREF_LAST_WEATHER_GRAPH, "temperature");
+        for (int p = 0; p < listGraphValue.length(); p++)
+            if (column.equals(listGraphValue.getString(p))) {
+                spGraph.setSelection(p);
+                break;
+            }
+
         // Display temperature unit
         String temperature_unit = prefs.getString(PREF_TEMPERATURE, DEFAULT_TEMPERATURE);
         if ("c".equals(temperature_unit))

@@ -19,7 +19,7 @@
 
     <TextView
         android:id="@+id/tvHumidity"
-        android:layout_width="30dp"
+        android:layout_width="25dp"
         android:layout_height="wrap_content"
         android:gravity="right"
         android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -38,8 +38,16 @@
         android:gravity="right"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
+    <ImageView
+        android:id="@+id/ivWindDirection"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="3dp"
+        android:src="@drawable/navigation_60" />
+
     <TextView
-        android:id="@+id/tvWindDirection"
+        android:id="@+id/tvPrecipitation"
         android:layout_width="30dp"
         android:layout_height="wrap_content"
         android:gravity="right"
