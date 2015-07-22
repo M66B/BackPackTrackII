@@ -83,8 +83,7 @@ public class OpenWeatherMap {
         URL url = new URL(BASE_URL + "/station" +
                 "?APPID=" + apikey +
                 "&units=metric" +
-                "&id=" + id +
-                (LocationService.isDebuggable(context) ? "&time=" + new Date().getTime() : ""));
+                "&id=" + id);
         Log.d(TAG, "url=" + url);
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setConnectTimeout(cTimeOutMs);
@@ -127,8 +126,7 @@ public class OpenWeatherMap {
                 "&units=metric" +
                 "&cnt=" + stations +
                 "&lat=" + String.valueOf(location.getLatitude()) + "," +
-                "&lon=" + String.valueOf(location.getLongitude()) +
-                (LocationService.isDebuggable(context) ? "&time=" + new Date().getTime() : ""));
+                "&lon=" + String.valueOf(location.getLongitude()));
         Log.i(TAG, "url=" + url);
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setConnectTimeout(cTimeOutMs);
