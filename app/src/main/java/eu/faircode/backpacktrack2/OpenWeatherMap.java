@@ -44,14 +44,21 @@ public class OpenWeatherMap {
         double pressure = Double.NaN;
         double wind_speed = Double.NaN;
         double wind_direction = Double.NaN;
+        double rain_1h = Double.NaN;
+        double rain_today = Double.NaN;
 
         @Override
         public String toString() {
             return SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT).format(time) + " " +
                     station_id + " " + station_name + " " +
                     "" + getStationType(station_type) + " " +
-                    DF.format(temperature) + "°C " + DF.format(humidity) + "% " + DF.format(pressure) + " HPa " +
-                    DF.format(wind_speed) + " m/s " + DF.format(wind_direction) + "°";
+                    (Double.isNaN(temperature) ? "-" : DF.format(temperature)) + "°C " +
+                    (Double.isNaN(humidity) ? "-" : DF.format(humidity)) + "% " +
+                    (Double.isNaN(pressure) ? "-" : DF.format(pressure)) + " HPa " +
+                    (Double.isNaN(wind_speed) ? "-" : DF.format(wind_speed)) + " m/s " +
+                    (Double.isNaN(wind_direction) ? "-" : DF.format(wind_direction)) + "° " +
+                    (Double.isNaN(rain_1h) ? "-" : DF.format(rain_1h)) + "/" +
+                    (Double.isNaN(rain_today) ? "-" : DF.format(rain_today)) + " mm";
         }
 
         private static String getStationType(int type) {
@@ -233,6 +240,15 @@ public class OpenWeatherMap {
             if (wind.has("deg"))
                 weather.wind_direction = wind.getDouble("deg");
         }
+
+        if (last.has("rain")) {
+            JSONObject rain = last.getJSONObject("rain");
+            if (rain.has("1h"))
+                weather.rain_1h = rain.getDouble("1h");
+            if (rain.has("today"))
+                weather.rain_today = rain.getDouble("today");
+        }
+
         return weather;
     }
 }

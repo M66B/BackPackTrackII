@@ -23,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 12;
+    private static final int DB_VERSION = 13;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
@@ -144,6 +144,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", pressure REAL NULL" +
                 ", wind_speed REAL NULL" +
                 ", wind_direction REAL NULL" +
+                ", rain_1h REAL NULL" +
+                ", rain_today REAL NULL" +
                 ", created INTEGER NULL" + ");");
         db.execSQL("CREATE INDEX idx_weather_time ON weather(time)");
         db.execSQL("CREATE INDEX idx_weather_station_id ON weather(station_id)");
@@ -212,6 +214,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                 " SELECT time, station_id, station_type, station_name, station_latitude, station_longitude" +
                                 ", latitude, longitude, temperature, humidity, pressure, wind_speed, wind_direction, created FROM weather_orig");
                 db.execSQL("DROP TABLE weather_orig");
+            }
+
+            if (oldVersion == 12) {
+                db.execSQL("ALTER TABLE weather ADD COLUMN rain_1h REAL NULL");
+                db.execSQL("ALTER TABLE weather ADD COLUMN rain_today REAL NULL");
             }
 
             db.setVersion(DB_VERSION);
@@ -690,10 +697,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             else
                 cv.put("wind_direction", weather.wind_direction);
 
+            if (Double.isNaN(weather.rain_1h))
+                cv.putNull("rain_1h");
+            else
+                cv.put("rain_1h", weather.rain_1h);
+
+            if (Double.isNaN(weather.rain_today))
+                cv.putNull("rain_today");
+            else
+                cv.put("rain_today", weather.rain_today);
+
             cv.put("created", new Date().getTime());
 
             if (db.insert("weather", null, cv) == -1)
                 Log.e(TAG, "Insert weather failed");
+            else
+                Log.i(TAG, "Stored " + weather);
         }
 
         for (WeatherChangedListener listener : mWeatherChangedListeners)
