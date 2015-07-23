@@ -2283,9 +2283,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         String speed_unit = prefs.getString(PREF_SPEED, DEFAULT_SPEED);
         String rain_unit = prefs.getString(PREF_PRECIPITATION, DEFAULT_PRECIPITATION);
 
-        if ("humidity".equals(column)) {
-            minValue = 0;
-            maxValue = 100;
+        if ("temperature".equals(column)) {
+            // humidity
+            minValue2 = 0;
+            maxValue2 = 100;
         }
 
         if ("wind_speed".equals(column)) {
@@ -2296,18 +2297,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 maxValue = 28.4; // m/s
             else if ("kmh".equals(speed_unit))
                 maxValue = 102; // km/h
+
+            // wind direction
             minValue2 = 0;
             maxValue2 = 360;
         }
 
-        if ("wind_direction".equals(column)) {
+        if ("rain_1h".equals(column)) {
             minValue = 0;
-            maxValue = 360;
-        }
-
-        if ("rain_1h".equals(column) || "rain_today".equals(column)) {
-            minValue = 0;
-            minValue2 = 0;
+            minValue2 = 0; // rain today
         }
 
         Cursor cursor = db.getWeather(true);
@@ -2315,7 +2313,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         int colTime = cursor.getColumnIndex("time");
         int colValue = cursor.getColumnIndex(column);
         int colValue2 = -1;
-        if ("wind_speed".equals(column))
+        if ("temperature".equals(column))
+            colValue2 = cursor.getColumnIndex("humidity");
+        else if ("wind_speed".equals(column))
             colValue2 = cursor.getColumnIndex("wind_direction");
         else if ("rain_1h".equals(column))
             colValue2 = cursor.getColumnIndex("rain_today");
@@ -2323,52 +2323,64 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         LineGraphSeries<DataPoint> seriesValue = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesValue2 = new LineGraphSeries<DataPoint>();
 
-        while (cursor.moveToNext())
-            if (!cursor.isNull(colValue)) {
-                data = true;
+        boolean first = false;
+        while (cursor.moveToNext()) {
+            data = true;
 
-                long time = cursor.getLong(colTime);
+            long time = cursor.getLong(colTime);
 
-                if (time > maxTime)
-                    maxTime = time;
+            if (time > maxTime)
+                maxTime = time;
 
-                double value = cursor.getDouble(colValue);
-                double value2 = (colValue2 >= 0 ? cursor.getDouble(colValue2) : 0);
+            double value = (cursor.isNull(colValue) ? Double.NaN : cursor.getDouble(colValue));
+            double value2 = (colValue2 < 0 || cursor.isNull(colValue2) ? Double.NaN : cursor.getDouble(colValue2));
 
-                if ("temperature".equals(column))
-                    if ("f".equals(temperature_unit))
+            if ("temperature".equals(column))
+                if (!Double.isNaN(value))
+                    if ("f".equals(temperature_unit)) {
                         value = value * 9 / 5 + 32;
+                        // humidity
+                    }
 
-                if ("pressure".equals(column))
+            if ("pressure".equals(column))
+                if (!Double.isNaN(value))
                     if ("mmhg".equals(pressure_unit))
                         value = value / 1.33322368f;
 
-                if ("wind_speed".equals(column))
+            if ("wind_speed".equals(column)) {
+                if (!Double.isNaN(value))
                     if ("bft".equals(speed_unit))
                         value = Math.pow(10.0, (Math.log10(value / 0.836) / 1.5));
                     else if ("kmh".equals(speed_unit))
                         value = value * 3600 / 1000;
+                // wind direction
+            }
 
-                if ("rain_1h".equals(column) || "rain_today".equals(column)) {
-                    if ("in".equals(rain_unit)) {
+            if ("rain_1h".equals(column))
+                if ("in".equals(rain_unit)) {
+                    if (!Double.isNaN(value))
                         value = value / 25.4;
-                        value2 = value2 / 25.4;
-                    }
+                    if (!Double.isNaN(value2))
+                        value2 = value2 / 25.4; // rain today
                 }
 
+            if (!Double.isNaN(value)) {
                 if (value < minValue)
                     minValue = value;
                 if (value > maxValue)
                     maxValue = value;
+            }
+
+            if (!Double.isNaN(value2)) {
                 if (value2 < minValue2)
                     minValue2 = value2;
                 if (value2 > maxValue2)
                     maxValue2 = value2;
-
-                seriesValue.appendData(new DataPoint(new Date(time), value), true, Integer.MAX_VALUE);
-                if (colValue2 >= 0)
-                    seriesValue2.appendData(new DataPoint(new Date(time), value2), true, Integer.MAX_VALUE);
             }
+
+            seriesValue.appendData(new DataPoint(new Date(time), value), true, Integer.MAX_VALUE);
+            seriesValue2.appendData(new DataPoint(new Date(time), value2), true, Integer.MAX_VALUE);
+        }
 
         if (data) {
             graph.removeAllSeries();
@@ -2377,6 +2389,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.getViewport().setXAxisBoundsManual(true);
             graph.getViewport().setMinX(maxTime - viewport);
             graph.getViewport().setMaxX(maxTime);
+
+            Log.w(TAG, "min=" + minValue + " max=" + maxValue + " min2=" + minValue2 + " max2=" + maxValue2);
 
             graph.getViewport().setYAxisBoundsManual(true);
             graph.getViewport().setMinY(minValue);
@@ -2413,10 +2427,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 @Override
                 public String formatLabel(double value, boolean isValueX) {
                     if (label2)
-                        if ("wind_speed".equals(column))
+                        if ("temperature".equals(column))
+                            return Long.toString(Math.round(value)); // humidity
+                        else if ("wind_speed".equals(column))
                             return LocationService.getWindDirectionName((float) value, getActivity());
                         else
-                            return DF.format(value);
+                            return DF.format(value); // rain today
                     else
                         return "";
                 }

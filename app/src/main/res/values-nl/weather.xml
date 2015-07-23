@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="listWeatherName">
-        <item>Luchttemperatuur</item>
-        <item>Luchtvochtigheid</item>
+        <item>Luchttemperatuur/vochtigheid</item>
         <item>Luchtdruk</item>
         <item>Windsnelheid/richting</item>
         <item>Neerslag 1 uur/vandaag</item>
@@ -10,7 +9,6 @@
     <!-- do not translate values -->
     <string-array name="listWeatherValue">
         <item>temperature</item>
-        <item>humidity</item>
         <item>pressure</item>
         <item>wind_speed</item>
         <item>rain_1h</item>
