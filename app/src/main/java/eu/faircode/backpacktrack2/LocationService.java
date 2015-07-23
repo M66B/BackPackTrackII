@@ -18,8 +18,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.hardware.Sensor;
-import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -31,15 +29,12 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
-import android.os.SystemClock;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.ActivityRecognitionResult;
@@ -113,7 +108,6 @@ public class LocationService extends IntentService {
     public static final String EXTRA_TRACK_NAME = "TrackName";
     public static final String EXTRA_WRITE_EXTENSIONS = "WriteExtensions";
     public static final String EXTRA_DELETE_DATA = "DeleteData";
-    public static final String EXTRA_TIME = "Time";
     public static final String EXTRA_TIME_FROM = "TimeFrom";
     public static final String EXTRA_TIME_TO = "TimeTo";
     public static final String EXTRA_GEOURI = "Geopoint";
@@ -552,7 +546,7 @@ public class LocationService extends IntentService {
 
             // Feedback
             updateState(this, "passive location");
-            if (debugMode(this))
+            if (Util.debugMode(this))
                 toast(getString(R.string.title_trackpoint) +
                         " " + getProviderName(location, this) +
                         " " + Math.round(bchange) +
@@ -792,7 +786,7 @@ public class LocationService extends IntentService {
         // Get weather
         try {
             // Check connectivity
-            if (!SettingsFragment.isConnected(this))
+            if (!Util.isConnected(this))
                 return;
 
             // Get last location
@@ -929,7 +923,7 @@ public class LocationService extends IntentService {
     }
 
     private static void startActivityRecognition(final Context context) {
-        if (hasPlayServices(context)) {
+        if (Util.hasPlayServices(context)) {
             GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
             if (gac.blockingConnect().isSuccess()) {
                 Log.i(TAG, "GoogleApiClient connected");
@@ -950,7 +944,7 @@ public class LocationService extends IntentService {
     }
 
     private static void stopActivityRecognition(final Context context) {
-        if (hasPlayServices(context)) {
+        if (Util.hasPlayServices(context)) {
             GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
             if (gac.blockingConnect().isSuccess()) {
                 Log.i(TAG, "GoogleApiClient connected");
@@ -1225,7 +1219,7 @@ public class LocationService extends IntentService {
                 location.setAltitude(altitude);
 
             // Add elevation data
-            if (!location.hasAltitude() && SettingsFragment.isConnected(this)) {
+            if (!location.hasAltitude() && Util.isConnected(this)) {
                 if (locationType == LOCATION_WAYPOINT) {
                     if (prefs.getBoolean(SettingsFragment.PREF_ALTITUDE_WAYPOINT, SettingsFragment.DEFAULT_ALTITUDE_WAYPOINT))
                         GoogleElevationApi.getElevation(location, this);
@@ -1266,7 +1260,7 @@ public class LocationService extends IntentService {
                     toast(waypointName, Toast.LENGTH_LONG, this);
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(locationType == LOCATION_TRACKPOINT ? VIBRATE_SHORT : VIBRATE_LONG);
-            } else if (debugMode(this))
+            } else if (Util.debugMode(this))
                 toast(getString(R.string.title_trackpoint) + " " + getProviderName(location, this), Toast.LENGTH_SHORT, this);
         } else
             Log.i(TAG, "Filtered location=" + location);
@@ -1653,36 +1647,6 @@ public class LocationService extends IntentService {
                 Toast.makeText(context, text, length).show();
             }
         });
-    }
-
-    public static boolean hasPlayServices(Context context) {
-        return (GooglePlayServicesUtil.isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS);
-    }
-
-    public static boolean hasStepCounter(Context context) {
-        SensorManager sm = (SensorManager) context.getSystemService(SENSOR_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            return (sm.getDefaultSensor(Sensor.TYPE_STEP_COUNTER) != null);
-        else
-            return false;
-    }
-
-    public static boolean hasSignificantMotionSensor(Context context) {
-        SensorManager sm = (SensorManager) context.getSystemService(SENSOR_SERVICE);
-        return (sm.getDefaultSensor(Sensor.TYPE_SIGNIFICANT_MOTION) != null);
-    }
-
-    public static boolean hasPressureSensor(Context context) {
-        SensorManager sm = (SensorManager) context.getSystemService(SENSOR_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-            return (sm.getDefaultSensor(Sensor.TYPE_PRESSURE) != null);
-        else
-            return false;
-    }
-
-    public static boolean debugMode(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getBoolean(SettingsFragment.PREF_DEBUG, false);
     }
 
     // Serialization

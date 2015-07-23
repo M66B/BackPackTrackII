@@ -1,7 +1,6 @@
 package eu.faircode.backpacktrack2;
 
 import android.app.Activity;
-import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -26,11 +25,9 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -305,8 +302,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private BroadcastReceiver mConnectivityChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            boolean mounted = storageMounted();
-            boolean connected = isConnected(SettingsFragment.this.getActivity());
+            boolean mounted = Util.storageMounted();
+            boolean connected = Util.isConnected(SettingsFragment.this.getActivity());
             Log.i(TAG, "Connectivity changed mounted=" + mounted + " connected=" + connected);
 
             SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
@@ -319,8 +316,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private BroadcastReceiver mExternalStorageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            boolean mounted = storageMounted();
-            boolean connected = isConnected(SettingsFragment.this.getActivity());
+            boolean mounted = Util.storageMounted();
+            boolean connected = Util.isConnected(SettingsFragment.this.getActivity());
             Log.i(TAG, "External storage changed mounted=" + mounted + " connected=" + connected);
 
             findPreference(PREF_SHARE_GPX).setEnabled(mounted);
@@ -475,7 +472,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         });
 
         // Handle share GPX
-        pref_share_gpx.setEnabled(storageMounted());
+        pref_share_gpx.setEnabled(Util.storageMounted());
         pref_share_gpx.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -487,7 +484,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         });
 
         // Handle share KML
-        pref_share_kml.setEnabled(storageMounted());
+        pref_share_kml.setEnabled(Util.storageMounted());
         pref_share_kml.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -499,7 +496,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         });
 
         // Handle upload GPX
-        pref_upload_gpx.setEnabled(blogConfigured() && storageMounted() && isConnected(getActivity()));
+        pref_upload_gpx.setEnabled(blogConfigured() && Util.storageMounted() && Util.isConnected(getActivity()));
         pref_upload_gpx.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -567,7 +564,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref_check.setEnabled(false);
 
         // Check for pressure sensor
-        pref_pressure_enabled.setEnabled(LocationService.hasPressureSensor(getActivity()));
+        pref_pressure_enabled.setEnabled(Util.hasPressureSensor(getActivity()));
 
         final float ref_pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, 0);
         final long ref_time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
@@ -611,7 +608,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         });
 
         // Handle weather report test
-        pref_weather_test.setEnabled(lastLocation != null && isConnected(getActivity()));
+        pref_weather_test.setEnabled(lastLocation != null && Util.isConnected(getActivity()));
         pref_weather_test.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -670,7 +667,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         });
 
         // Check for Play services
-        boolean playServices = LocationService.hasPlayServices(getActivity());
+        boolean playServices = Util.hasPlayServices(getActivity());
         findPreference(PREF_ACTIVITY_HISTORY).setEnabled(playServices);
         findPreference(PREF_RECOGNITION_ENABLED).setEnabled(playServices);
         findPreference(PREF_RECOGNITION_INTERVAL_STILL).setEnabled(playServices);
@@ -678,7 +675,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         findPreference(PREF_RECOGNITION_CONFIDENCE).setEnabled(playServices);
 
         // Check for step counter
-        boolean hasStepCounter = LocationService.hasStepCounter(getActivity());
+        boolean hasStepCounter = Util.hasStepCounter(getActivity());
         pref_recognize_steps.setEnabled(hasStepCounter);
         pref_step_history.setEnabled(hasStepCounter);
         pref_step_size.setEnabled(hasStepCounter);
@@ -698,10 +695,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             getString(R.string.msg_geocoder,
                                     getString(Geocoder.isPresent() ? R.string.msg_yes : R.string.msg_no)) + "\n" +
                             getString(R.string.msg_playservices,
-                                    getString(LocationService.hasPlayServices(getActivity()) ? R.string.msg_yes : R.string.msg_no)) + "\n" +
-                            getString(R.string.msg_stepcounter, getString(LocationService.hasStepCounter(getActivity()) ? R.string.msg_yes : R.string.msg_no)) + "\n" +
-                            getString(R.string.msg_significantmotion, getString(LocationService.hasSignificantMotionSensor(getActivity()) ? R.string.msg_yes : R.string.msg_no)) + "\n" +
-                            getString(R.string.msg_pressure, getString(LocationService.hasPressureSensor(getActivity()) ? R.string.msg_yes : R.string.msg_no)));
+                                    getString(Util.hasPlayServices(getActivity()) ? R.string.msg_yes : R.string.msg_no)) + "\n" +
+                            getString(R.string.msg_stepcounter, getString(Util.hasStepCounter(getActivity()) ? R.string.msg_yes : R.string.msg_no)) + "\n" +
+                            getString(R.string.msg_significantmotion, getString(Util.hasSignificantMotionSensor(getActivity()) ? R.string.msg_yes : R.string.msg_no)) + "\n" +
+                            getString(R.string.msg_pressure, getString(Util.hasPressureSensor(getActivity()) ? R.string.msg_yes : R.string.msg_no)));
         } catch (PackageManager.NameNotFoundException ex) {
             pref_version.setSummary(ex.toString());
         }
@@ -897,7 +894,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Handle add place
         ImageView ivPlace = (ImageView) viewEdit.findViewById(R.id.ivPlace);
-        if (LocationService.hasPlayServices(getActivity()))
+        if (Util.hasPlayServices(getActivity()))
             ivPlace.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -973,7 +970,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             new AsyncTask<Object, Object, Object>() {
                                 protected Object doInBackground(Object... params) {
                                     // Add elevation data
-                                    if (!location.hasAltitude() && isConnected(getActivity())) {
+                                    if (!location.hasAltitude() && Util.isConnected(getActivity())) {
                                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
                                         if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
                                             GoogleElevationApi.getElevation(location, getActivity());
@@ -1021,7 +1018,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             new AsyncTask<Object, Object, Object>() {
                 protected Object doInBackground(Object... params) {
                     // Add elevation data
-                    if (!location.hasAltitude() && isConnected(getActivity())) {
+                    if (!location.hasAltitude() && Util.isConnected(getActivity())) {
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
                         if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
                             GoogleElevationApi.getElevation(location, getActivity());
@@ -1402,8 +1399,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     popupMenu.getMenu().findItem(R.id.menu_name).setTitle(name);
                     popupMenu.getMenu().findItem(R.id.menu_name).setVisible(true);
                 }
-                popupMenu.getMenu().findItem(R.id.menu_elevation_loc).setEnabled(isConnected(getActivity()));
-                popupMenu.getMenu().findItem(R.id.menu_elevation_day).setEnabled(isConnected(getActivity()));
+                popupMenu.getMenu().findItem(R.id.menu_elevation_loc).setEnabled(Util.isConnected(getActivity()));
+                popupMenu.getMenu().findItem(R.id.menu_elevation_day).setEnabled(Util.isConnected(getActivity()));
                 popupMenu.show();
             }
         });
@@ -1516,7 +1513,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Handle view list
         ImageView ivList = (ImageView) viewHistory.findViewById(R.id.ivList);
-        if (LocationService.debugMode(getActivity()))
+        if (Util.debugMode(getActivity()))
             ivList.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -2572,16 +2569,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 rain_unit = getString(R.string.header_inch);
             pref.setTitle(getString(R.string.title_precipitation, rain_unit));
         }
-    }
-
-    public static boolean isConnected(Context context) {
-        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return (activeNetwork != null && activeNetwork.isConnectedOrConnecting());
-    }
-
-    private boolean storageMounted() {
-        return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
     }
 
     private boolean blogConfigured() {

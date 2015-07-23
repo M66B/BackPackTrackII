@@ -99,6 +99,13 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/step_widget_info" />
         </receiver>
+        <receiver
+            android:name=".ConnectivityChangedReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name=".LocationService"
