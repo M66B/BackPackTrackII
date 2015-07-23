@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="listGraphName">
+    <string-array name="listWeatherName">
         <item>Luchttemperatuur</item>
         <item>Luchtvochtigheid</item>
         <item>Luchtdruk</item>
-        <item>Windsnelheid</item>
-        <item>Windrichting</item>
-        <item>Neerslag 1 uur</item>
-        <item>Neerslag vandaag</item>
+        <item>Windsnelheid/richting</item>
+        <item>Neerslag 1 uur/vandaag</item>
     </string-array>
     <!-- do not translate values -->
-    <string-array name="listGraphValue">
+    <string-array name="listWeatherValue">
         <item>temperature</item>
         <item>humidity</item>
         <item>pressure</item>
         <item>wind_speed</item>
-        <item>wind_direction</item>
         <item>rain_1h</item>
-        <item>rain_today</item>
     </string-array>
 </resources>

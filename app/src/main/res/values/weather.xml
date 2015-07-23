@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="listGraphName">
+    <string-array name="listWeatherName">
         <item>Air temperature</item>
         <item>Air humidity</item>
         <item>Atmospheric pressure</item>
-        <item>Wind speed</item>
-        <item>Wind direction</item>
-        <item>Precipitation 1 hour</item>
-        <item>Precipitation today</item>
+        <item>Wind speed/direction</item>
+        <item>Precipitation 1 hour/today</item>
     </string-array>
     <!-- do not translate values -->
-    <string-array name="listGraphValue">
+    <string-array name="listWeatherValue">
         <item>temperature</item>
         <item>humidity</item>
         <item>pressure</item>
         <item>wind_speed</item>
-        <item>wind_direction</item>
         <item>rain_1h</item>
-        <item>rain_today</item>
     </string-array>
 </resources>

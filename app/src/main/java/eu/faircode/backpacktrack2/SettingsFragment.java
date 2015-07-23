@@ -63,11 +63,14 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
+import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
+import com.jjoe64.graphview.series.BaseSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.jjoe64.graphview.series.Series;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -1464,6 +1467,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
 
         if (data) {
+            graph.removeAllSeries();
+
             graph.getViewport().setXAxisBoundsManual(true);
             graph.getViewport().setMinX(maxTime - DAYS_VIEWPORT * DAY_MS);
             graph.getViewport().setMaxX(maxTime);
@@ -1472,20 +1477,22 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.getViewport().setMinY(minAlt);
             graph.getViewport().setMaxY(maxAlt);
 
-            seriesAltitudeAvg.setDrawDataPoints(true);
-            seriesAltitudeAvg.setDataPointsRadius(3);
-            seriesAltitudeReal.setColor(Color.GRAY);
-
-            graph.removeAllSeries();
-            graph.addSeries(seriesAltitudeReal);
-            graph.addSeries(seriesAltitudeAvg);
+            graph.getViewport().setScrollable(true);
+            graph.getViewport().setScalable(true);
 
             graph.getGridLabelRenderer().setLabelFormatter(
                     new DateAsXAxisLabelFormatter(getActivity(),
                             SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
-            graph.getViewport().setScrollable(true);
-            graph.getViewport().setScalable(true);
+
+            seriesAltitudeAvg.setDrawDataPoints(true);
+            seriesAltitudeAvg.setDataPointsRadius(3);
+            seriesAltitudeReal.setColor(Color.GRAY);
+
+            graph.addSeries(seriesAltitudeReal);
+            graph.addSeries(seriesAltitudeAvg);
+
+            graph.setVisibility(View.VISIBLE);
         } else
             graph.setVisibility(View.GONE);
     }
@@ -1752,6 +1759,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
 
         if (data) {
+            graph.removeAllSeries();
+
             graph.getViewport().setXAxisBoundsManual(true);
             graph.getViewport().setMinX(maxTime - DAYS_VIEWPORT * DAY_MS);
             graph.getViewport().setMaxX(maxTime);
@@ -1759,6 +1768,25 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.getViewport().setYAxisBoundsManual(true);
             graph.getViewport().setMinY(0);
             graph.getViewport().setMaxY(maxDuration);
+
+            graph.getViewport().setScrollable(true);
+            graph.getViewport().setScalable(true);
+
+            graph.getGridLabelRenderer().setLabelFormatter(
+                    new DateAsXAxisLabelFormatter(getActivity(),
+                            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)) {
+                        @Override
+                        public String formatLabel(double value, boolean isValueX) {
+                            if (isValueX)
+                                return super.formatLabel(value, isValueX);
+                            else {
+                                int minutes = (int) value % 60;
+                                int hours = (int) value / 60;
+                                return hours + ":" + (minutes < 10 ? "0" : "") + minutes;
+                            }
+                        }
+                    });
+            graph.getGridLabelRenderer().setNumHorizontalLabels(2);
 
             seriesStill.setDrawDataPoints(true);
             seriesStill.setDataPointsRadius(3);
@@ -1788,8 +1816,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             seriesTotal.setDataPointsRadius(3);
             seriesTotal.setColor(Color.BLUE);
 
-            graph.removeAllSeries();
-
             if (showStill)
                 graph.addSeries(seriesStill);
             if (showWalking)
@@ -1805,23 +1831,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             if (showTotal && graphs > 1)
                 graph.addSeries(seriesTotal);
 
-            graph.getGridLabelRenderer().setLabelFormatter(
-                    new DateAsXAxisLabelFormatter(getActivity(),
-                            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)) {
-                        @Override
-                        public String formatLabel(double value, boolean isValueX) {
-                            if (isValueX)
-                                return super.formatLabel(value, isValueX);
-                            else {
-                                int minutes = (int) value % 60;
-                                int hours = (int) value / 60;
-                                return hours + ":" + (minutes < 10 ? "0" : "") + minutes;
-                            }
-                        }
-                    });
-            graph.getGridLabelRenderer().setNumHorizontalLabels(2);
-            graph.getViewport().setScrollable(true);
-            graph.getViewport().setScalable(true);
+            graph.setVisibility(View.VISIBLE);
         } else
             graph.setVisibility(View.GONE);
     }
@@ -2055,6 +2065,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
 
         if (data) {
+            graph.removeAllSeries();
+
             graph.getViewport().setXAxisBoundsManual(true);
             graph.getViewport().setMinX(maxTime - DAYS_VIEWPORT * DAY_MS);
             graph.getViewport().setMaxX(maxTime);
@@ -2063,17 +2075,19 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.getViewport().setMinY(0);
             graph.getViewport().setMaxY(maxSteps);
 
-            seriesStep.setSpacing(10);
-
-            graph.removeAllSeries();
-            graph.addSeries(seriesStep);
+            graph.getViewport().setScrollable(true);
+            graph.getViewport().setScalable(true);
 
             graph.getGridLabelRenderer().setLabelFormatter(
                     new DateAsXAxisLabelFormatter(getActivity(),
                             SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
-            graph.getViewport().setScrollable(true);
-            graph.getViewport().setScalable(true);
+
+            seriesStep.setSpacing(10);
+
+            graph.addSeries(seriesStep);
+
+            graph.setVisibility(View.VISIBLE);
         } else
             graph.setVisibility(View.GONE);
     }
@@ -2088,7 +2102,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Reference controls
         final GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvWeather);
         final Spinner spGraph = (Spinner) viewHistory.findViewById(R.id.spGraph);
-        final TypedArray listGraphValue = getActivity().getResources().obtainTypedArray(R.array.listGraphValue);
+        final TypedArray listGraphValue = getActivity().getResources().obtainTypedArray(R.array.listWeatherValue);
         ImageView ivViewport = (ImageView) viewHistory.findViewById(R.id.ivViewport);
         ImageView ivAdd = (ImageView) viewHistory.findViewById(R.id.ivAdd);
         TextView tvHeaderTemperature = (TextView) viewHistory.findViewById(R.id.tvHeaderTemperature);
@@ -2255,6 +2269,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         long maxTime = 0;
         double minValue = Double.MAX_VALUE;
         double maxValue = 0;
+        double minValue2 = Double.MAX_VALUE;
+        double maxValue2 = 0;
 
         long viewport = prefs.getLong(PREF_LAST_WEATHER_VIEWPORT, DAY_MS);
         final String column = prefs.getString(PREF_LAST_WEATHER_GRAPH, "temperature");
@@ -2269,28 +2285,40 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             maxValue = 100;
         }
 
-        if ("wind_speed".equals(column))
+        if ("wind_speed".equals(column)) {
+            minValue = 0;
             if ("bft".equals(speed_unit))
                 maxValue = 10; // beaufort
             else if ("ms".equals(speed_unit))
                 maxValue = 28.4; // m/s
             else if ("kmh".equals(speed_unit))
                 maxValue = 102; // km/h
+            minValue2 = 0;
+            maxValue2 = 360;
+        }
 
         if ("wind_direction".equals(column)) {
             minValue = 0;
             maxValue = 360;
         }
 
-        if ("rain_1h".equals(column) || "rain_today".equals(column))
+        if ("rain_1h".equals(column) || "rain_today".equals(column)) {
             minValue = 0;
+            minValue2 = 0;
+        }
 
         Cursor cursor = db.getWeather(true);
 
         int colTime = cursor.getColumnIndex("time");
         int colValue = cursor.getColumnIndex(column);
+        int colValue2 = -1;
+        if ("wind_speed".equals(column))
+            colValue2 = cursor.getColumnIndex("wind_direction");
+        else if ("rain_1h".equals(column))
+            colValue2 = cursor.getColumnIndex("rain_today");
 
         LineGraphSeries<DataPoint> seriesValue = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesValue2 = new LineGraphSeries<DataPoint>();
 
         while (cursor.moveToNext())
             if (!cursor.isNull(colValue)) {
@@ -2302,6 +2330,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     maxTime = time;
 
                 double value = cursor.getDouble(colValue);
+                double value2 = (colValue2 >= 0 ? cursor.getDouble(colValue2) : 0);
 
                 if ("temperature".equals(column))
                     if ("f".equals(temperature_unit))
@@ -2318,19 +2347,30 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         value = value * 3600 / 1000;
 
                 if ("rain_1h".equals(column) || "rain_today".equals(column)) {
-                    if ("in".equals(rain_unit))
+                    if ("in".equals(rain_unit)) {
                         value = value / 25.4;
+                        value2 = value2 / 25.4;
+                    }
                 }
 
                 if (value < minValue)
                     minValue = value;
                 if (value > maxValue)
                     maxValue = value;
+                if (value2 < minValue2)
+                    minValue2 = value2;
+                if (value2 > maxValue2)
+                    maxValue2 = value2;
 
                 seriesValue.appendData(new DataPoint(new Date(time), value), true, Integer.MAX_VALUE);
+                if (colValue2 >= 0)
+                    seriesValue2.appendData(new DataPoint(new Date(time), value2), true, Integer.MAX_VALUE);
             }
 
         if (data) {
+            graph.removeAllSeries();
+            graph.getSecondScale().getSeries().clear();
+
             graph.getViewport().setXAxisBoundsManual(true);
             graph.getViewport().setMinX(maxTime - viewport);
             graph.getViewport().setMaxX(maxTime);
@@ -2339,14 +2379,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.getViewport().setMinY(minValue);
             graph.getViewport().setMaxY(maxValue);
 
-            seriesValue.setDrawDataPoints(true);
-            seriesValue.setDataPointsRadius(3);
+            if (colValue2 >= 0) {
+                graph.getSecondScale().setMinY(minValue2);
+                graph.getSecondScale().setMaxY(maxValue2);
+            }
 
-            graph.removeAllSeries();
-            graph.addSeries(seriesValue);
+            graph.getViewport().setScrollable(true);
+            graph.getViewport().setScalable(true);
 
             final DecimalFormat DF = new DecimalFormat("humidity".equals(column) ? "0" : "0.0", new DecimalFormatSymbols(Locale.ROOT));
-
             graph.getGridLabelRenderer().setLabelFormatter(
                     new DateAsXAxisLabelFormatter(getActivity(),
                             SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)) {
@@ -2360,10 +2401,33 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 return DF.format(value);
                         }
                     });
-
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
-            graph.getViewport().setScrollable(true);
-            graph.getViewport().setScalable(true);
+
+            final boolean label2 = (colValue2 >= 0);
+            seriesValue2.setColor(Color.YELLOW);
+            graph.getGridLabelRenderer().setVerticalLabelsSecondScaleColor(Color.YELLOW);
+            graph.getSecondScale().setLabelFormatter(new DefaultLabelFormatter() {
+                @Override
+                public String formatLabel(double value, boolean isValueX) {
+                    if (label2)
+                        if ("wind_speed".equals(column))
+                            return LocationService.getWindDirectionName((float) value, getActivity());
+                        else
+                            return DF.format(value);
+                    else
+                        return "";
+                }
+            });
+
+            seriesValue.setDrawDataPoints(true);
+            seriesValue.setDataPointsRadius(3);
+            seriesValue2.setDrawDataPoints(true);
+            seriesValue2.setDataPointsRadius(3);
+
+            graph.addSeries(seriesValue);
+            if (colValue2 >= 0)
+                graph.getSecondScale().addSeries(seriesValue2);
+
             graph.setVisibility(View.VISIBLE);
         } else
             graph.setVisibility(View.GONE);
