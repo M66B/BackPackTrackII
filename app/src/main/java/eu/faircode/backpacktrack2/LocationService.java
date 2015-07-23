@@ -1148,7 +1148,6 @@ public class LocationService extends IntentService {
     }
 
     public static void stopWeatherUpdates(Context context) {
-        // Cancel repeating alarm
         Intent alarmIntent = new Intent(context, LocationService.class);
         alarmIntent.setAction(LocationService.ACTION_UPDATE_WEATHER);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -1175,6 +1174,15 @@ public class LocationService extends IntentService {
         else
             alarmManager.set(AlarmManager.RTC_WAKEUP, trigger, pi);
         Log.i(TAG, "Start daily job next=" + SimpleDateFormat.getDateTimeInstance().format(trigger));
+    }
+
+    public static void stopDaily(Context context) {
+        Intent alarmIntent = new Intent(context, LocationService.class);
+        alarmIntent.setAction(LocationService.ACTION_DAILY);
+        PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        am.cancel(pi);
+        Log.i(TAG, "Stop daily job");
     }
 
     // Helper methods

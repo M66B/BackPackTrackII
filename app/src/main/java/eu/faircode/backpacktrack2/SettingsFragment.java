@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -67,10 +66,8 @@ import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.BarGraphSeries;
-import com.jjoe64.graphview.series.BaseSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.jjoe64.graphview.series.Series;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -702,6 +699,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         } catch (PackageManager.NameNotFoundException ex) {
             pref_version.setSummary(ex.toString());
         }
+
     }
 
     @Override
@@ -809,9 +807,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         LocationService.startTracking(context);
 
         // Initialize daily alarm
+        LocationService.stopDaily(context);
         LocationService.startDaily(context);
 
         // Initialize weather updates
+        LocationService.stopWeatherUpdates(context);
         LocationService.startWeatherUpdates(context);
     }
 
