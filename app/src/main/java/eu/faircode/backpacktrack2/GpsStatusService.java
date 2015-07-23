@@ -31,7 +31,7 @@ public class GpsStatusService extends Service {
                 }
 
                 // Persist fixed/visible satellites
-                Log.w(TAG, "Satellites fixed/visible=" + fixed + "/" + visible);
+                Log.i(TAG, "Satellites fixed/visible=" + fixed + "/" + visible);
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsStatusService.this);
                 prefs.edit().putInt(SettingsFragment.PREF_SATS_FIXED, fixed).apply();
                 prefs.edit().putInt(SettingsFragment.PREF_SATS_VISIBLE, visible).apply();
@@ -48,7 +48,7 @@ public class GpsStatusService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        Log.w(TAG, "Requesting GPS status updates");
+        Log.i(TAG, "Requesting GPS status updates");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsStatusService.this);
         prefs.edit().remove(SettingsFragment.PREF_SATS_FIXED).apply();
         prefs.edit().remove(SettingsFragment.PREF_SATS_VISIBLE).apply();
@@ -58,7 +58,7 @@ public class GpsStatusService extends Service {
 
     @Override
     public void onDestroy() {
-        Log.w(TAG, "Stopping GPS status updates");
+        Log.i(TAG, "Stopping GPS status updates");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsStatusService.this);
         prefs.edit().remove(SettingsFragment.PREF_SATS_FIXED).apply();
         prefs.edit().remove(SettingsFragment.PREF_SATS_VISIBLE).apply();
