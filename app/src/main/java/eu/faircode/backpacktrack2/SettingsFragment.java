@@ -305,21 +305,27 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private BroadcastReceiver mConnectivityChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i(TAG, "Connectivity changed");
+            boolean mounted = storageMounted();
+            boolean connected = isConnected(SettingsFragment.this.getActivity());
+            Log.i(TAG, "Connectivity changed mounted=" + mounted + " connected=" + connected);
+
             SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
             Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
-            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && storageMounted() && isConnected(SettingsFragment.this.getActivity()));
-            findPreference(PREF_WEATHER_TEST).setEnabled(lastLocation != null && isConnected(getActivity()));
+            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted && connected);
+            findPreference(PREF_WEATHER_TEST).setEnabled(lastLocation != null && connected);
         }
     };
 
     private BroadcastReceiver mExternalStorageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i(TAG, "External storage changed");
-            findPreference(PREF_SHARE_GPX).setEnabled(storageMounted());
-            findPreference(PREF_SHARE_KML).setEnabled(storageMounted());
-            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && storageMounted() && isConnected(SettingsFragment.this.getActivity()));
+            boolean mounted = storageMounted();
+            boolean connected = isConnected(SettingsFragment.this.getActivity());
+            Log.i(TAG, "External storage changed mounted=" + mounted + " connected=" + connected);
+
+            findPreference(PREF_SHARE_GPX).setEnabled(mounted);
+            findPreference(PREF_SHARE_KML).setEnabled(mounted);
+            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted && connected);
         }
     };
 
