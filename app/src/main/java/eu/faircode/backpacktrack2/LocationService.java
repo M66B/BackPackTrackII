@@ -762,28 +762,30 @@ public class LocationService extends IntentService {
     }
 
     private void handleDaily(Intent intent) {
-        long time = new Date().getTime() / (5 * 60 * 1000) * (5 * 60 * 1000);
-        Log.i(TAG, "Daily task at " + SimpleDateFormat.getDateTimeInstance().format(time));
+        try {
+            long time = new Date().getTime() / (5 * 60 * 1000) * (5 * 60 * 1000);
+            Log.i(TAG, "Daily task at " + SimpleDateFormat.getDateTimeInstance().format(time));
 
-        // Reset step counter
-        new DatabaseHelper(this).updateSteps(time, 0).close();
+            // Reset step counter
+            new DatabaseHelper(this).updateSteps(time, 0).close();
 
-        // Finalize last activity
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
-        long lastTime = prefs.getLong(SettingsFragment.PREF_LAST_ACTIVITY_TIME, -1);
-        if (lastTime >= 0) {
-            new DatabaseHelper(this).updateActivity(lastTime, lastActivity, time - lastTime).close();
-            prefs.edit().putLong(SettingsFragment.PREF_LAST_ACTIVITY_TIME, time).apply();
-            new DatabaseHelper(this).updateActivity(time, lastActivity, 0).close();
+            // Finalize last activity
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            int lastActivity = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.STILL);
+            long lastTime = prefs.getLong(SettingsFragment.PREF_LAST_ACTIVITY_TIME, -1);
+            if (lastTime >= 0) {
+                new DatabaseHelper(this).updateActivity(lastTime, lastActivity, time - lastTime).close();
+                prefs.edit().putLong(SettingsFragment.PREF_LAST_ACTIVITY_TIME, time).apply();
+                new DatabaseHelper(this).updateActivity(time, lastActivity, 0).close();
+            }
+
+            // Optimize database
+            new DatabaseHelper(this).vacuum().close();
+        } finally {
+            startDaily(this);
+            updateState(this, "daily alarm");
+            StepCountWidget.updateWidgets(this);
         }
-
-        // Feedback
-        updateState(this, "daily alarm");
-        StepCountWidget.updateWidgets(this);
-
-        // Optimize database
-        new DatabaseHelper(this).vacuum().close();
     }
 
     private void handleWeatherUpdate(Intent intent) throws PackageManager.NameNotFoundException, IOException, JSONException {
@@ -860,6 +862,7 @@ public class LocationService extends IntentService {
                 }
             }
         } finally {
+            startWeatherUpdates(this);
             updateState(this, "weather");
         }
     }
@@ -972,7 +975,8 @@ public class LocationService extends IntentService {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_INTERVAL, SettingsFragment.DEFAULT_INTERVAL));
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + ALARM_DUE_TIME, interval * 1000, pi);
+        // setRepeating is inexact since KitKat
+        am.setRepeating(AlarmManager.RTC_WAKEUP, new Date().getTime() + ALARM_DUE_TIME, interval * 1000, pi);
         Log.i(TAG, "Start repeating alarm frequency=" + interval + "s" + " due=" + ALARM_DUE_TIME + "ms");
     }
 
@@ -1029,7 +1033,10 @@ public class LocationService extends IntentService {
             alarmIntent.setAction(LocationService.ACTION_LOCATION_TIMEOUT);
             PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + timeout * 1000, pi);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                am.setExact(AlarmManager.RTC_WAKEUP, new Date().getTime() + timeout * 1000, pi);
+            else
+                am.set(AlarmManager.RTC_WAKEUP, new Date().getTime() + timeout * 1000, pi);
             Log.i(TAG, "Set timeout=" + timeout + "s");
 
             prefs.edit().putInt(SettingsFragment.PREF_STATE, STATE_ACQUIRING).apply();
@@ -1044,7 +1051,10 @@ public class LocationService extends IntentService {
             alarmIntent.setAction(LocationService.ACTION_LOCATION_CHECK);
             PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            am.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + check * 1000, pi);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                am.setExact(AlarmManager.RTC_WAKEUP, new Date().getTime() + check * 1000, pi);
+            else
+                am.set(AlarmManager.RTC_WAKEUP, new Date().getTime() + check * 1000, pi);
             Log.i(TAG, "Set check=" + check + "s");
         }
 
@@ -1129,8 +1139,12 @@ public class LocationService extends IntentService {
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_INTERVAL, SettingsFragment.DEFAULT_WEATHER_INTERVAL));
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + ALARM_DUE_TIME, interval * 60 * 1000, pi);
-        Log.i(TAG, "Start weather updates frequency=" + interval + "m");
+        long trigger = new Date().getTime() + interval * 60 * 1000;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            am.setExact(AlarmManager.RTC_WAKEUP, trigger, pi);
+        else
+            am.set(AlarmManager.RTC_WAKEUP, trigger, pi);
+        Log.i(TAG, "Start weather updates frequency=" + interval + "m" + " next=" + SimpleDateFormat.getDateTimeInstance().format(trigger));
     }
 
     public static void stopWeatherUpdates(Context context) {
@@ -1141,6 +1155,26 @@ public class LocationService extends IntentService {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
         Log.i(TAG, "Stop weather updates");
+    }
+
+    public static void startDaily(Context context) {
+        Intent alarmIntent = new Intent(context, LocationService.class);
+        alarmIntent.setAction(LocationService.ACTION_DAILY);
+        PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        long trigger = calendar.getTimeInMillis() + 24 * 3600 * 1000;
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, trigger, pi);
+        else
+            alarmManager.set(AlarmManager.RTC_WAKEUP, trigger, pi);
+        Log.i(TAG, "Start daily job next=" + SimpleDateFormat.getDateTimeInstance().format(trigger));
     }
 
     // Helper methods

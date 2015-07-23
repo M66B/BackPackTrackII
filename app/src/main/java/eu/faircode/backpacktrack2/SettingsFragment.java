@@ -806,20 +806,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         LocationService.startTracking(context);
 
         // Initialize daily alarm
-        Intent alarmIntent = new Intent(context, LocationService.class);
-        alarmIntent.setAction(LocationService.ACTION_DAILY);
-        PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        calendar.set(Calendar.HOUR_OF_DAY, 0);
-        calendar.set(Calendar.MINUTE, 0);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
-        Log.i(TAG, "Settings daily task from " + SimpleDateFormat.getDateTimeInstance().format(calendar.getTimeInMillis()));
+        LocationService.startDaily(context);
 
         // Initialize weather updates
         LocationService.startWeatherUpdates(context);
