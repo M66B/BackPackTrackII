@@ -2106,7 +2106,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvWeather);
         final Spinner spGraph = (Spinner) viewHistory.findViewById(R.id.spGraph);
         final TypedArray listGraphValue = getActivity().getResources().obtainTypedArray(R.array.listWeatherValue);
-        ImageView ivViewport = (ImageView) viewHistory.findViewById(R.id.ivViewport);
+        ImageView ivViewDay = (ImageView) viewHistory.findViewById(R.id.ivViewDay);
+        ImageView ivViewWeek = (ImageView) viewHistory.findViewById(R.id.ivViewWeek);
         ImageView ivAdd = (ImageView) viewHistory.findViewById(R.id.ivAdd);
         TextView tvHeaderTemperature = (TextView) viewHistory.findViewById(R.id.tvHeaderTemperature);
         TextView tvHeaderPressure = (TextView) viewHistory.findViewById(R.id.tvHeaderPressure);
@@ -2166,12 +2167,20 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if ("in".equals(rain_unit))
             tvHeaderPrecipitation.setText(R.string.header_inch);
 
-        // Handle viewport change
-        ivViewport.setOnClickListener(new View.OnClickListener() {
+        // Handle view day
+        ivViewDay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                long range = prefs.getLong(PREF_LAST_WEATHER_VIEWPORT, DAY_MS);
-                prefs.edit().putLong(PREF_LAST_WEATHER_VIEWPORT, range == DAY_MS ? DAYS_VIEWPORT * DAY_MS : DAY_MS).apply();
+                prefs.edit().putLong(PREF_LAST_WEATHER_VIEWPORT, DAY_MS).apply();
+                showWeatherGraph(graph);
+            }
+        });
+
+        // Handle view week
+        ivViewWeek.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putLong(PREF_LAST_WEATHER_VIEWPORT, DAYS_VIEWPORT * DAY_MS).apply();
                 showWeatherGraph(graph);
             }
         });

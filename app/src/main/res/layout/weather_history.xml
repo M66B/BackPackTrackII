@@ -29,16 +29,23 @@
             android:layout_height="24dp">
 
             <ImageView
-                android:id="@+id/ivViewport"
+                android:id="@+id/ivViewDay"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_day" />
 
             <ImageView
+                android:id="@+id/ivViewWeek"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="6dp"
+                android:src="@android:drawable/ic_menu_week" />
+
+            <ImageView
                 android:id="@+id/ivAdd"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:layout_marginLeft="12dp"
+                android:layout_marginLeft="6dp"
                 android:src="@android:drawable/ic_menu_add" />
         </LinearLayout>
 
