@@ -308,6 +308,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this;
     }
 
+    public DatabaseHelper updateLocationTime(long id, long time) {
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            cv.put("time", time);
+            if (db.update("location", cv, "ID = ?", new String[]{Long.toString(id)}) != 1)
+                Log.e(TAG, "Update location failed");
+        }
+
+        for (LocationChangedListener listener : mLocationChangedListeners)
+            try {
+                listener.onLocationUpdated();
+            } catch (Throwable ex) {
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
+
+        return this;
+    }
+
     public DatabaseHelper updateLocationAltitude(long id, double altitude) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();

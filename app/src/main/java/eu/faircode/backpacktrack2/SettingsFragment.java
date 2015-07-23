@@ -826,7 +826,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Fill list
         final ListView lv = (ListView) viewEdit.findViewById(R.id.lvEdit);
         Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
-        final WaypointAdapter adapter = new WaypointAdapter(getActivity(), cursor, db);
+        final WaypointAdapter adapter = new WaypointAdapter(getActivity(), cursor, db, getFragmentManager());
         lv.setAdapter(adapter);
 
         // Handle updates

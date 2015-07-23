@@ -1,6 +1,11 @@
 package eu.faircode.backpacktrack2;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,6 +14,7 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,12 +22,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 public class WaypointAdapter extends CursorAdapter {
@@ -30,10 +41,12 @@ public class WaypointAdapter extends CursorAdapter {
     private static final int GEOCODER_RESULTS = 5;
 
     private DatabaseHelper db;
+    private FragmentManager fm;
 
-    public WaypointAdapter(Context context, Cursor cursor, DatabaseHelper db) {
+    public WaypointAdapter(Context context, Cursor cursor, DatabaseHelper db, FragmentManager fm) {
         super(context, cursor, 0);
         this.db = db;
+        this.fm = fm;
     }
 
     @Override
@@ -45,6 +58,7 @@ public class WaypointAdapter extends CursorAdapter {
     public void bindView(final View view, final Context context, final Cursor cursor) {
         // Get values
         final long id = cursor.getLong(cursor.getColumnIndex("ID"));
+        final long time = cursor.getLong(cursor.getColumnIndex("time"));
         final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
         final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
         final String name = cursor.getString(cursor.getColumnIndex("name"));
@@ -54,6 +68,7 @@ public class WaypointAdapter extends CursorAdapter {
         final EditText etName = (EditText) view.findViewById(R.id.etName);
         ImageView ivGeocode = (ImageView) view.findViewById(R.id.ivGeocode);
         ImageView ivSave = (ImageView) view.findViewById(R.id.ivSave);
+        ImageView ivTime = (ImageView) view.findViewById(R.id.ivTime);
         ImageView ivDelete = (ImageView) view.findViewById(R.id.ivDelete);
 
         // Set waypoint name
@@ -175,6 +190,52 @@ public class WaypointAdapter extends CursorAdapter {
                         Toast.makeText(context, context.getString(R.string.msg_updated, newName), Toast.LENGTH_SHORT).show();
                     }
                 }.execute();
+            }
+        });
+
+        // Handle update time
+        ivTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final Calendar cal = GregorianCalendar.getInstance();
+                cal.setTimeInMillis(time);
+                final boolean ampm = android.text.format.DateFormat.is24HourFormat(context);
+
+                new DialogFragment() {
+                    @Override
+                    public Dialog onCreateDialog(Bundle savedInstanceState) {
+                        return new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                                cal.set(year, month, day);
+                                new DialogFragment() {
+                                    @Override
+                                    public Dialog onCreateDialog(Bundle savedInstanceState) {
+                                        return new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+                                            @Override
+                                            public void onTimeSet(TimePicker view, int hour, int minute) {
+                                                cal.set(Calendar.HOUR_OF_DAY, hour);
+                                                cal.set(Calendar.MINUTE, minute);
+
+                                                new AsyncTask<Object, Object, Object>() {
+                                                    protected Object doInBackground(Object... params) {
+                                                        new DatabaseHelper(context).updateLocationTime(id, cal.getTimeInMillis()).close();
+                                                        return null;
+                                                    }
+
+                                                    @Override
+                                                    protected void onPostExecute(Object result) {
+                                                        Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }.execute();
+                                            }
+                                        }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), ampm);
+                                    }
+                                }.show(getFragmentManager(), "timePicker");
+                            }
+                        }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+                    }
+                }.show(fm, "datePicker");
             }
         });
 
