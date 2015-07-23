@@ -2436,12 +2436,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 @Override
                 public String formatLabel(double value, boolean isValueX) {
                     if (label2)
-                        if ("temperature".equals(column))
-                            return Long.toString(Math.round(value)); // humidity
-                        else if ("wind_speed".equals(column))
-                            return LocationService.getWindDirectionName((float) value, getActivity());
+                        if ("temperature".equals(column)) {
+                            long humidity = Math.round(value);
+                            return " " + (humidity >= 100 ? "99" : Long.toString(humidity));
+                        } else if ("wind_speed".equals(column))
+                            return " " + LocationService.getWindDirectionName((float) value, getActivity());
                         else
-                            return DF.format(value); // rain today
+                            return " " + DF.format(value); // rain today
                     else
                         return "";
                 }
