@@ -11,8 +11,22 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 
 public class ActivityDurationAdapter extends CursorAdapter {
+    private int colTime;
+    private int colStill;
+    private int colWalking;
+    private int colRunning;
+    private int colOnbicycle;
+    private int colInvehicle;
+    private int colUnknown;
+
     public ActivityDurationAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
+        colTime = cursor.getColumnIndex("time");
+        colWalking = cursor.getColumnIndex("walking");
+        colRunning = cursor.getColumnIndex("running");
+        colOnbicycle = cursor.getColumnIndex("onbicycle");
+        colInvehicle = cursor.getColumnIndex("invehicle");
+        colUnknown = cursor.getColumnIndex("unknown");
     }
 
     @Override
@@ -23,13 +37,13 @@ public class ActivityDurationAdapter extends CursorAdapter {
     @Override
     public void bindView(final View view, final Context context, final Cursor cursor) {
         // Get values
-        long time = cursor.getLong(cursor.getColumnIndex("time"));
+        long time = cursor.getLong(colTime);
         long still = cursor.getInt(cursor.getColumnIndex("still"));
-        long walking = cursor.getInt(cursor.getColumnIndex("walking"));
-        long running = cursor.getInt(cursor.getColumnIndex("running"));
-        long onbicycle = cursor.getInt(cursor.getColumnIndex("onbicycle"));
-        long invehicle = cursor.getInt(cursor.getColumnIndex("invehicle"));
-        long unknown = cursor.getInt(cursor.getColumnIndex("unknown"));
+        long walking = cursor.getInt(colWalking);
+        long running = cursor.getInt(colRunning);
+        long onbicycle = cursor.getInt(colOnbicycle);
+        long invehicle = cursor.getInt(colInvehicle);
+        long unknown = cursor.getInt(colUnknown);
 
         // Get views
         TextView tvTime = (TextView) view.findViewById(R.id.tvTime);

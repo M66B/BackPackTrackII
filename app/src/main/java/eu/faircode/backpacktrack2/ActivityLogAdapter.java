@@ -11,8 +11,15 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 
 public class ActivityLogAdapter extends CursorAdapter {
+    private int colStart;
+    private int colFinish;
+    private int colActivity;
+
     public ActivityLogAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
+        colStart = cursor.getColumnIndex("start");
+        colFinish = cursor.getColumnIndex("finish");
+        colActivity = cursor.getColumnIndex("activity");
     }
 
     @Override
@@ -23,9 +30,9 @@ public class ActivityLogAdapter extends CursorAdapter {
     @Override
     public void bindView(final View view, final Context context, final Cursor cursor) {
         // Get values
-        long start = cursor.getLong(cursor.getColumnIndex("start"));
-        long finish = cursor.getLong(cursor.getColumnIndex("finish"));
-        int activity = cursor.getInt(cursor.getColumnIndex("activity"));
+        long start = cursor.getLong(colStart);
+        long finish = cursor.getLong(colFinish);
+        int activity = cursor.getInt(colActivity);
 
         // Get views
         TextView tvStart = (TextView) view.findViewById(R.id.tvStart);
