@@ -331,6 +331,10 @@ public class LocationService extends IntentService {
             if (lastTime >= 0)
                 new DatabaseHelper(this).updateActivity(lastTime, lastActivity, time - lastTime).close();
 
+            // Debug
+            if (Util.debugMode(this) && lastActivity != activity.getType())
+                toast(getActivityName(activity.getType(), this), Toast.LENGTH_SHORT, this);
+
             // Feedback
             updateState(this, "new activity");
 
@@ -845,6 +849,10 @@ public class LocationService extends IntentService {
                     found = true;
 
                     new DatabaseHelper(this).insertWeather(weather, lastLocation).close();
+
+                    // Debug
+                    if (Util.debugMode(this))
+                        toast("Weather update", Toast.LENGTH_SHORT, this);
 
                     Log.i(TAG, "Reference pressure " + weather.pressure + "hPa " +
                             weather.station_name + " @" + SimpleDateFormat.getDateTimeInstance().format(weather.time));
