@@ -17,7 +17,7 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="120dp"
+            android:layout_width="80dp"
             android:layout_height="24dp"
             android:layout_marginLeft="6dp">
 
@@ -52,7 +52,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:layout_width="25dp"
+            android:layout_width="15dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_marginLeft="3dp"

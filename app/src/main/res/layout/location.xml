@@ -6,7 +6,7 @@
 
     <TextView
         android:id="@+id/tvTime"
-        android:layout_width="120dp"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="6dp"
@@ -31,14 +31,13 @@
         android:gravity="center_vertical|right"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
-    <TextView
-        android:id="@+id/tvBearing"
-        android:layout_width="25dp"
-        android:layout_height="wrap_content"
+    <ImageView
+        android:id="@+id/ivBearing"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="3dp"
-        android:gravity="center_vertical|right"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:src="@drawable/navigation_60" />
 
     <TextView
         android:id="@+id/tvAccuracy"

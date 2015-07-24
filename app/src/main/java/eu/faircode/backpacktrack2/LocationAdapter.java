@@ -21,11 +21,27 @@ public class LocationAdapter extends CursorAdapter {
     private static final String TAG = "BPT2.LocationAdapter";
 
     private Context mContext;
+    int colTime;
+    int colProvider;
+    int colLatitude;
+    int colLongitude;
+    int colAltitude;
+    int colBearing;
+    int colAccuracy;
+    int colName;
     private Location lastLocation;
 
     public LocationAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
         mContext = context;
+        colTime = cursor.getColumnIndex("time");
+        colProvider = cursor.getColumnIndex("provider");
+        colLatitude = cursor.getColumnIndex("latitude");
+        colLongitude = cursor.getColumnIndex("longitude");
+        colAltitude = cursor.getColumnIndex("altitude");
+        colBearing = cursor.getColumnIndex("bearing");
+        colAccuracy = cursor.getColumnIndex("accuracy");
+        colName = cursor.getColumnIndex("name");
         init();
     }
 
@@ -42,17 +58,17 @@ public class LocationAdapter extends CursorAdapter {
     @Override
     public void bindView(final View view, final Context context, final Cursor cursor) {
         // Get values
-        final long time = cursor.getLong(cursor.getColumnIndex("time"));
-        final String provider = cursor.getString(cursor.getColumnIndex("provider"));
-        final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
-        final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
-        final boolean hasAltitude = !cursor.isNull(cursor.getColumnIndex("altitude"));
-        boolean hasBearing = !cursor.isNull(cursor.getColumnIndex("bearing"));
-        boolean hasAccuracy = !cursor.isNull(cursor.getColumnIndex("accuracy"));
-        double altitude = cursor.getDouble(cursor.getColumnIndex("altitude"));
-        double bearing = cursor.getDouble(cursor.getColumnIndex("bearing"));
-        double accuracy = cursor.getDouble(cursor.getColumnIndex("accuracy"));
-        final String name = cursor.getString(cursor.getColumnIndex("name"));
+        final long time = cursor.getLong(colTime);
+        final String provider = cursor.getString(colProvider);
+        final double latitude = cursor.getDouble(colLatitude);
+        final double longitude = cursor.getDouble(colLongitude);
+        final boolean hasAltitude = !cursor.isNull(colAltitude);
+        boolean hasBearing = !cursor.isNull(colBearing);
+        boolean hasAccuracy = !cursor.isNull(colAccuracy);
+        double altitude = cursor.getDouble(colAltitude);
+        double bearing = cursor.getDouble(colBearing);
+        double accuracy = cursor.getDouble(colAccuracy);
+        final String name = cursor.getString(colName);
 
         // Calculate distance to last location
         Location dest = new Location("");
@@ -64,17 +80,27 @@ public class LocationAdapter extends CursorAdapter {
         TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
         TextView tvProvider = (TextView) view.findViewById(R.id.tvProvider);
         TextView tvAltitude = (TextView) view.findViewById(R.id.tvAltitude);
-        TextView tvBearing = (TextView) view.findViewById(R.id.tvBearing);
+        ImageView ivBearing = (ImageView) view.findViewById(R.id.ivBearing);
         TextView tvAccuracy = (TextView) view.findViewById(R.id.tvAccuracy);
         TextView tvDistance = (TextView) view.findViewById(R.id.tvDistance);
 
         // Set values
         view.setBackgroundColor(context.getResources().getColor(name == null ? android.R.color.transparent : android.R.color.darker_gray));
-        tvTime.setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(time));
+
+        tvTime.setText(
+                new SimpleDateFormat("dd").format(time) + " " +
+                        SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(time));
+
         int resId = context.getResources().getIdentifier("provider_" + provider, "string", context.getPackageName());
         tvProvider.setText(resId == 0 ? "-" : context.getString(resId).substring(0, 1));
         tvAltitude.setText(hasAltitude ? Long.toString(Math.round(altitude)) : "?");
-        tvBearing.setText(hasBearing ? Long.toString(Math.round(bearing)) : "?");
+
+        if (hasBearing) {
+            ivBearing.setRotation((float) bearing);
+            ivBearing.setVisibility(View.VISIBLE);
+        } else
+            ivBearing.setVisibility(View.INVISIBLE);
+
         tvAccuracy.setText(hasAccuracy ? Long.toString(Math.round(accuracy)) : "?");
         if (lastLocation != null && distance >= 1e7)
             tvDistance.setText(Long.toString(Math.round(distance / 1e6)) + "M");
