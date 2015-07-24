@@ -1511,7 +1511,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
 
             seriesAltitudeAvg.setDrawDataPoints(true);
-            seriesAltitudeAvg.setDataPointsRadius(3);
+            seriesAltitudeAvg.setDataPointsRadius(2);
             seriesAltitudeReal.setColor(Color.GRAY);
 
             graph.addSeries(seriesAltitudeReal);
@@ -1814,31 +1814,31 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
 
             seriesStill.setDrawDataPoints(true);
-            seriesStill.setDataPointsRadius(3);
+            seriesStill.setDataPointsRadius(2);
             seriesStill.setColor(Color.WHITE);
 
             seriesWalking.setDrawDataPoints(true);
-            seriesWalking.setDataPointsRadius(3);
+            seriesWalking.setDataPointsRadius(2);
             seriesWalking.setColor(Color.CYAN);
 
             seriesRunning.setDrawDataPoints(true);
-            seriesRunning.setDataPointsRadius(3);
+            seriesRunning.setDataPointsRadius(2);
             seriesRunning.setColor(Color.GREEN);
 
             seriesOnbicyle.setDrawDataPoints(true);
-            seriesOnbicyle.setDataPointsRadius(3);
+            seriesOnbicyle.setDataPointsRadius(2);
             seriesOnbicyle.setColor(Color.YELLOW);
 
             seriesInvehicle.setDrawDataPoints(true);
-            seriesInvehicle.setDataPointsRadius(3);
+            seriesInvehicle.setDataPointsRadius(2);
             seriesInvehicle.setColor(Color.MAGENTA);
 
             seriesUnknown.setDrawDataPoints(true);
-            seriesUnknown.setDataPointsRadius(3);
+            seriesUnknown.setDataPointsRadius(2);
             seriesUnknown.setColor(Color.GRAY);
 
             seriesTotal.setDrawDataPoints(true);
-            seriesTotal.setDataPointsRadius(3);
+            seriesTotal.setDataPointsRadius(2);
             seriesTotal.setColor(Color.BLUE);
 
             if (showStill)
@@ -2472,9 +2472,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             });
 
             seriesValue.setDrawDataPoints(true);
-            seriesValue.setDataPointsRadius(3);
+            seriesValue.setDataPointsRadius(2);
             seriesValue2.setDrawDataPoints(true);
-            seriesValue2.setDataPointsRadius(3);
+            seriesValue2.setDataPointsRadius(2);
 
             graph.addSeries(seriesValue);
             if (colValue2 >= 0)
