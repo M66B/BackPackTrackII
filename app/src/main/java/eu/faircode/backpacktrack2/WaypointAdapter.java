@@ -38,6 +38,12 @@ import java.util.List;
 public class WaypointAdapter extends CursorAdapter {
     private static final String TAG = "BPT2.Settings";
 
+    private int colID;
+    private int colTime;
+    private int colLatitude;
+    private int colLongitude;
+    private int colName;
+
     private static final int GEOCODER_RESULTS = 5;
 
     private DatabaseHelper db;
@@ -47,6 +53,11 @@ public class WaypointAdapter extends CursorAdapter {
         super(context, cursor, 0);
         this.db = db;
         this.fm = fm;
+        colID = cursor.getColumnIndex("ID");
+        colTime = cursor.getColumnIndex("time");
+        colLatitude = cursor.getColumnIndex("latitude");
+        colLongitude = cursor.getColumnIndex("longitude");
+        colName = cursor.getColumnIndex("name");
     }
 
     @Override
@@ -57,11 +68,11 @@ public class WaypointAdapter extends CursorAdapter {
     @Override
     public void bindView(final View view, final Context context, final Cursor cursor) {
         // Get values
-        final long id = cursor.getLong(cursor.getColumnIndex("ID"));
-        final long time = cursor.getLong(cursor.getColumnIndex("time"));
-        final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
-        final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
-        final String name = cursor.getString(cursor.getColumnIndex("name"));
+        final long id = cursor.getLong(colID);
+        final long time = cursor.getLong(colTime);
+        final double latitude = cursor.getDouble(colLatitude);
+        final double longitude = cursor.getDouble(colLongitude);
+        final String name = cursor.getString(colName);
 
         // Get views
         ImageView ivShare = (ImageView) view.findViewById(R.id.ivShare);
