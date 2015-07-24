@@ -1460,39 +1460,36 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, true);
 
         int colTime = cursor.getColumnIndex("time");
-        int colProvider = cursor.getColumnIndex("provider");
         int colAltitude = cursor.getColumnIndex("altitude");
 
         int samples = Integer.parseInt(prefs.getString(PREF_ALTITUDE_AVG, DEFAULT_ALTITUDE_AVG));
         LineGraphSeries<DataPoint> seriesAltitudeReal = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesAltitudeAvg = new LineGraphSeries<DataPoint>();
 
-        while (cursor.moveToNext())
-            if (!cursor.isNull(colAltitude)) {
-                String provider = cursor.getString(colProvider);
-                if (LocationManager.NETWORK_PROVIDER.equals(provider) ||
-                        LocationManager.GPS_PROVIDER.equals(provider)) {
-                    data = true;
+        while (cursor.moveToNext()) {
+            data = true;
 
-                    long time = cursor.getLong(colTime);
+            long time = cursor.getLong(colTime);
 
-                    if (time > maxTime)
-                        maxTime = time;
+            if (time > maxTime)
+                maxTime = time;
 
-                    double alt = cursor.getDouble(colAltitude);
-                    if (alt < minAlt)
-                        minAlt = alt;
-                    if (alt > maxAlt)
-                        maxAlt = alt;
+            double alt = (cursor.isNull(colAltitude) ? Double.NaN : cursor.getDouble(colAltitude));
 
-                    avg = (n * avg + alt) / (n + 1);
-                    if (n < samples)
-                        n++;
+            if (!Double.isNaN(alt)) {
+                if (alt < minAlt)
+                    minAlt = alt;
+                if (alt > maxAlt)
+                    maxAlt = alt;
 
-                    seriesAltitudeReal.appendData(new DataPoint(new Date(time), alt), true, Integer.MAX_VALUE);
-                    seriesAltitudeAvg.appendData(new DataPoint(new Date(time), avg), true, Integer.MAX_VALUE);
-                }
+                avg = (n * avg + alt) / (n + 1);
+                if (n < samples)
+                    n++;
             }
+
+            seriesAltitudeReal.appendData(new DataPoint(new Date(time), alt), true, Integer.MAX_VALUE);
+            seriesAltitudeAvg.appendData(new DataPoint(new Date(time), Double.isNaN(alt) ? Double.NaN : avg), true, Integer.MAX_VALUE);
+        }
 
         if (data) {
             graph.removeAllSeries();
