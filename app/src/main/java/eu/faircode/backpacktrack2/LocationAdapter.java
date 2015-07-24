@@ -78,6 +78,7 @@ public class LocationAdapter extends CursorAdapter {
 
         // Get views
         TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
+        ImageView ivWaypoint = (ImageView) view.findViewById(R.id.ivWaypoint);
         TextView tvProvider = (TextView) view.findViewById(R.id.tvProvider);
         TextView tvAltitude = (TextView) view.findViewById(R.id.tvAltitude);
         ImageView ivBearing = (ImageView) view.findViewById(R.id.ivBearing);
@@ -85,11 +86,10 @@ public class LocationAdapter extends CursorAdapter {
         TextView tvDistance = (TextView) view.findViewById(R.id.tvDistance);
 
         // Set values
-        view.setBackgroundColor(context.getResources().getColor(name == null ? android.R.color.transparent : android.R.color.darker_gray));
-
         tvTime.setText(
                 new SimpleDateFormat("dd").format(time) + " " +
                         SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(time));
+        ivWaypoint.setVisibility(name == null ? View.INVISIBLE : View.VISIBLE);
 
         int resId = context.getResources().getIdentifier("provider_" + provider, "string", context.getPackageName());
         tvProvider.setText(resId == 0 ? "-" : context.getString(resId).substring(0, 1));

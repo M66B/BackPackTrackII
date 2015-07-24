@@ -35,6 +35,12 @@
                 android:src="@android:drawable/ic_menu_week" />
         </LinearLayout>
 
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="3dp" />
+
         <TextView
             android:layout_width="10dp"
             android:layout_height="wrap_content"

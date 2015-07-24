@@ -13,6 +13,14 @@
         android:gravity="center_vertical"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
+    <ImageView
+        android:id="@+id/ivWaypoint"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="3dp"
+        android:src="@android:drawable/ic_menu_myplaces" />
+
     <TextView
         android:id="@+id/tvProvider"
         android:layout_width="10dp"
