@@ -21,14 +21,14 @@ public class LocationAdapter extends CursorAdapter {
     private static final String TAG = "BPT2.LocationAdapter";
 
     private Context mContext;
-    int colTime;
-    int colProvider;
-    int colLatitude;
-    int colLongitude;
-    int colAltitude;
-    int colBearing;
-    int colAccuracy;
-    int colName;
+    private int colTime;
+    private int colProvider;
+    private int colLatitude;
+    private int colLongitude;
+    private int colAltitude;
+    private int colBearing;
+    private int colAccuracy;
+    private int colName;
     private Location lastLocation;
 
     public LocationAdapter(Context context, Cursor cursor) {
