@@ -15,12 +15,16 @@ import java.text.SimpleDateFormat;
 public class StepCountAdapter extends CursorAdapter {
     private int stepsize;
     private int weight;
+    private int colTime;
+    private int colCount;
 
     public StepCountAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         stepsize = Integer.parseInt(prefs.getString(SettingsFragment.PREF_STEP_SIZE, SettingsFragment.DEFAULT_STEP_SIZE));
         weight = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEIGHT, SettingsFragment.DEFAULT_WEIGHT));
+        colTime = cursor.getColumnIndex("time");
+        colCount = cursor.getColumnIndex("count");
     }
 
     @Override
@@ -31,8 +35,8 @@ public class StepCountAdapter extends CursorAdapter {
     @Override
     public void bindView(final View view, final Context context, final Cursor cursor) {
         // Get values
-        long time = cursor.getLong(cursor.getColumnIndex("time"));
-        int count = cursor.getInt(cursor.getColumnIndex("count"));
+        long time = cursor.getLong(colTime);
+        int count = cursor.getInt(colCount);
 
         // Get views
         TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
