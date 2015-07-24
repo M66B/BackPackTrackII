@@ -16,20 +16,35 @@
         android:layout_marginTop="6dp"
         android:orientation="horizontal">
 
-        <TextView
+        <LinearLayout
             android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="6dp" />
+            android:layout_height="24dp"
+            android:layout_marginLeft="6dp">
+
+            <ImageView
+                android:id="@+id/ivViewDay"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@android:drawable/ic_menu_day" />
+
+            <ImageView
+                android:id="@+id/ivViewWeek"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="6dp"
+                android:src="@android:drawable/ic_menu_week" />
+        </LinearLayout>
 
         <TextView
             android:layout_width="10dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
             android:layout_marginLeft="3dp" />
 
         <TextView
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_gravity="bottom"
             android:layout_marginLeft="3dp"
             android:gravity="center_vertical|right"
             android:text="@string/header_altitude"
@@ -39,7 +54,7 @@
         <TextView
             android:layout_width="25dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_gravity="bottom"
             android:layout_marginLeft="3dp"
             android:gravity="center_vertical|right"
             android:text="@string/header_bearing"
@@ -49,7 +64,7 @@
         <TextView
             android:layout_width="35dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_gravity="bottom"
             android:layout_marginLeft="3dp"
             android:gravity="center_vertical|right"
             android:text="@string/header_accuracy"
@@ -59,13 +74,12 @@
         <TextView
             android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_gravity="bottom"
             android:layout_marginLeft="3dp"
             android:gravity="center_vertical|right"
             android:text="@string/header_distance"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
-
     </LinearLayout>
 
     <ListView

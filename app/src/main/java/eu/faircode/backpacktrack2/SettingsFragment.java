@@ -283,6 +283,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_LAST_SHARE_GPX = "pref_last_share_gpx";
     public static final String PREF_LAST_SHARE_KML = "pref_last_share_kml";
     public static final String PREF_LAST_UPLOAD_GPX = "pref_last_gpx_upload";
+    public static final String PREF_LAST_LOCATION_VIEWPORT = "pref_last_location_viewport";
     public static final String PREF_LAST_WEATHER_GRAPH = "pref_last_weather_graph";
     public static final String PREF_LAST_WEATHER_VIEWPORT = "pref_last_weather_viewport";
 
@@ -294,7 +295,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private static final int ACTIVITY_PICKPLACE = 1;
     private static final int GEOCODER_RESULTS = 5;
     private static final long DAY_MS = 24L * 3600L * 1000L;
-    private static final int DAYS_VIEWPORT = 7;
 
     private DatabaseHelper db = null;
     private boolean elevationBusy = false;
@@ -1208,13 +1208,37 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     private void location_history() {
+        final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+
         // Get layout
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View viewHistory = inflater.inflate(R.layout.location_history, null);
 
+        // Reference controls
+        ImageView ivViewDay = (ImageView) viewHistory.findViewById(R.id.ivViewDay);
+        ImageView ivViewWeek = (ImageView) viewHistory.findViewById(R.id.ivViewWeek);
+        final GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvLocation);
+
+        // Handle view day
+        ivViewDay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putLong(PREF_LAST_LOCATION_VIEWPORT, DAY_MS).apply();
+                showAltitudeGraph(graph);
+            }
+        });
+
+        // Handle view week
+        ivViewWeek.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putLong(PREF_LAST_LOCATION_VIEWPORT, 7 * DAY_MS).apply();
+                showAltitudeGraph(graph);
+            }
+        });
+
         // Show altitude graph
-        final GraphView graphView = (GraphView) viewHistory.findViewById(R.id.gvLocation);
-        showAltitudeGraph(graphView);
+        showAltitudeGraph(graph);
 
         // Fill list
         final ListView lv = (ListView) viewHistory.findViewById(R.id.lvLocationHistory);
@@ -1246,7 +1270,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
                         adapter.changeCursor(cursor);
                         adapter.init(); // Possible new last location
-                        showAltitudeGraph(graphView);
+                        showAltitudeGraph(graph);
                     }
                 });
             }
@@ -1432,6 +1456,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         double avg = 0;
         int n = 0;
 
+        long viewport = prefs.getLong(PREF_LAST_LOCATION_VIEWPORT, 7 * DAY_MS);
         Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, true);
 
         int colTime = cursor.getColumnIndex("time");
@@ -1473,7 +1498,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.removeAllSeries();
 
             graph.getViewport().setXAxisBoundsManual(true);
-            graph.getViewport().setMinX(maxTime - DAYS_VIEWPORT * DAY_MS);
+            graph.getViewport().setMinX(maxTime - viewport);
             graph.getViewport().setMaxX(maxTime);
 
             graph.getViewport().setYAxisBoundsManual(true);
@@ -1657,8 +1682,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         long maxTime = 0;
         long maxDuration = 0;
         boolean data = false;
-        SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
+        SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
         boolean showStill = prefs.getBoolean(PREF_GRAPH_STILL, DEFAULT_GRAPH_STILL);
         boolean showWalking = prefs.getBoolean(PREF_GRAPH_WALKING, DEFAULT_GRAPH_WALKING);
         boolean showRunning = prefs.getBoolean(PREF_GRAPH_RUNNING, DEFAULT_GRAPH_RUNNING);
@@ -1765,7 +1790,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.removeAllSeries();
 
             graph.getViewport().setXAxisBoundsManual(true);
-            graph.getViewport().setMinX(maxTime - DAYS_VIEWPORT * DAY_MS);
+            graph.getViewport().setMinX(maxTime - 7 * DAY_MS);
             graph.getViewport().setMaxX(maxTime);
 
             graph.getViewport().setYAxisBoundsManual(true);
@@ -2048,6 +2073,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         int maxSteps = 10000;
 
         Cursor cursor = db.getSteps(true);
+
         int colTime = cursor.getColumnIndex("time");
         int colCount = cursor.getColumnIndex("count");
 
@@ -2071,7 +2097,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.removeAllSeries();
 
             graph.getViewport().setXAxisBoundsManual(true);
-            graph.getViewport().setMinX(maxTime - DAYS_VIEWPORT * DAY_MS);
+            graph.getViewport().setMinX(maxTime - 7 * DAY_MS);
             graph.getViewport().setMaxX(maxTime);
 
             graph.getViewport().setYAxisBoundsManual(true);
@@ -2180,7 +2206,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         ivViewWeek.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                prefs.edit().putLong(PREF_LAST_WEATHER_VIEWPORT, DAYS_VIEWPORT * DAY_MS).apply();
+                prefs.edit().putLong(PREF_LAST_WEATHER_VIEWPORT, 7 * DAY_MS).apply();
                 showWeatherGraph(graph);
             }
         });
