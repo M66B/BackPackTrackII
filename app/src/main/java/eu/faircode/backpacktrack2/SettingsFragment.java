@@ -172,6 +172,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_VERSION = "pref_version";
     public static final String PREF_SUPPORT = "pref_support";
     public static final String PREF_DEBUG = "pref_debug";
+    public static final String PREF_LOGCAT = "pref_logcat";
 
     public static final String PREF_GRAPH_STILL = "pref_graph_still";
     public static final String PREF_GRAPH_WALKING = "pref_graph_walking";
@@ -394,6 +395,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Preference pref_weather_history = findPreference(PREF_WEATHER_HISTORY);
         Preference pref_check = findPreference(PREF_SETTINGS);
         Preference pref_version = findPreference(PREF_VERSION);
+        Preference pref_logcat = findPreference(PREF_LOGCAT);
 
         Preference pref_enabled = findPreference(PREF_ENABLED);
         Preference pref_pressure_enabled = findPreference(PREF_PRESSURE_ENABLED);
@@ -703,6 +705,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref_version.setSummary(ex.toString());
         }
 
+        pref_logcat.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Util.sendLogcat(getActivity());
+                return true;
+            }
+        });
     }
 
     @Override

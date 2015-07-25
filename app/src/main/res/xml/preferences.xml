@@ -504,6 +504,10 @@
             android:key="pref_debug"
             android:title="@string/title_debug" />
         <Preference
+            android:dependency="pref_debug"
+            android:key="pref_logcat"
+            android:title="@string/title_logcat" />
+        <Preference
             android:summary="@string/summary_author"
             android:title="@string/title_author">
             <intent
