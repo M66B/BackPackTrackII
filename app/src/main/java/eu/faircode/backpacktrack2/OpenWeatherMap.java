@@ -43,6 +43,7 @@ public class OpenWeatherMap {
         double humidity = Double.NaN;
         double pressure = Double.NaN;
         double wind_speed = Double.NaN;
+        double wind_gust = Double.NaN;
         double wind_direction = Double.NaN;
         double rain_1h = Double.NaN;
         double rain_today = Double.NaN;
@@ -55,7 +56,8 @@ public class OpenWeatherMap {
                     (Double.isNaN(temperature) ? "-" : DF.format(temperature)) + "°C " +
                     (Double.isNaN(humidity) ? "-" : DF.format(humidity)) + "% " +
                     (Double.isNaN(pressure) ? "-" : DF.format(pressure)) + " HPa " +
-                    (Double.isNaN(wind_speed) ? "-" : DF.format(wind_speed)) + " m/s " +
+                    (Double.isNaN(wind_speed) ? "-" : DF.format(wind_speed)) + "/" +
+                    (Double.isNaN(wind_gust) ? "-" : DF.format(wind_gust)) + " m/s " +
                     (Double.isNaN(wind_direction) ? "-" : DF.format(wind_direction)) + "° " +
                     (Double.isNaN(rain_1h) ? "-" : DF.format(rain_1h)) + "/" +
                     (Double.isNaN(rain_today) ? "-" : DF.format(rain_today)) + " mm";
@@ -239,6 +241,8 @@ public class OpenWeatherMap {
             JSONObject wind = last.getJSONObject("wind");
             if (wind.has("speed"))
                 weather.wind_speed = wind.getDouble("speed");
+            if (wind.has("gust"))
+                weather.wind_gust = wind.getDouble("gust");
             if (wind.has("deg"))
                 weather.wind_direction = wind.getDouble("deg");
         }

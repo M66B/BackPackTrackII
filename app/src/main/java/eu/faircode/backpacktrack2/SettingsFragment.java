@@ -856,7 +856,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
 
             @Override
-            public void onLocationDeleted() {
+            public void onLocationDeleted(long id) {
                 update();
             }
 
@@ -1273,7 +1273,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
 
             @Override
-            public void onLocationDeleted() {
+            public void onLocationDeleted(long id) {
                 update();
             }
 
@@ -1906,7 +1906,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
 
             @Override
-            public void onActivityDeleted() {
+            public void onActivityDeleted(long id) {
                 update();
             }
 
@@ -2247,6 +2247,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 if (cursor == null)
                     return;
 
+                final long weather_id = cursor.getLong(cursor.getColumnIndex("ID"));
                 final long station_id = cursor.getLong(cursor.getColumnIndex("station_id"));
                 int station_type = cursor.getInt(cursor.getColumnIndex("station_type"));
                 String station_name = cursor.getString(cursor.getColumnIndex("station_name"));
@@ -2300,6 +2301,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 prefs.edit().remove(PREF_WEATHER_ID).apply();
                                 return true;
 
+                            case R.id.menu_delete:
+                                db.deleteWeather(weather_id);
+                                return true;
+
                             default:
                                 return false;
                         }
@@ -2311,10 +2316,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     popupMenu.getMenu().findItem(R.id.menu_name).setTitle(name);
                     popupMenu.getMenu().findItem(R.id.menu_name).setVisible(true);
                 }
-                long setid = Long.parseLong(prefs.getString(SettingsFragment.PREF_WEATHER_ID, "-1"));
-                popupMenu.getMenu().findItem(R.id.menu_station_one).setEnabled(setid < 0);
-                popupMenu.getMenu().findItem(R.id.menu_station_all).setEnabled(setid >= 0);
+                long set_station_id = Long.parseLong(prefs.getString(SettingsFragment.PREF_WEATHER_ID, "-1"));
                 popupMenu.getMenu().findItem(R.id.menu_share).setEnabled(station != null);
+                popupMenu.getMenu().findItem(R.id.menu_station_one).setEnabled(set_station_id < 0);
+                popupMenu.getMenu().findItem(R.id.menu_station_all).setEnabled(set_station_id >= 0);
+                popupMenu.getMenu().findItem(R.id.menu_delete).setEnabled(Util.debugMode(getActivity()));
                 popupMenu.show();
             }
         });
@@ -2324,6 +2330,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             @Override
             public void onWeatherAdded(long time, long station_id) {
+                update();
+            }
+
+            @Override
+            public void onWeatherDeleted(long id) {
                 update();
             }
 
@@ -2365,6 +2376,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         double maxValue = 0;
         double minValue2 = Double.MAX_VALUE;
         double maxValue2 = 0;
+        double minValue3 = Double.MAX_VALUE;
+        double maxValue3 = 0;
 
         long viewport = prefs.getLong(PREF_LAST_WEATHER_VIEWPORT, DAY_MS);
         final String column = prefs.getString(PREF_LAST_WEATHER_GRAPH, "temperature");
@@ -2389,9 +2402,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             else if ("kmh".equals(speed_unit))
                 maxValue = 102; // km/h
 
-            // wind direction
             minValue2 = 0;
-            maxValue2 = 360;
+            maxValue2 = maxValue;
+
+            // wind direction
+            minValue3 = 0;
+            maxValue3 = 360;
+
         }
 
         if ("rain_1h".equals(column)) {
@@ -2404,19 +2421,24 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         int colTime = cursor.getColumnIndex("time");
         int colValue = cursor.getColumnIndex(column);
         int colValue2 = -1;
+        int colValue3 = -1;
         if ("temperature".equals(column))
-            colValue2 = cursor.getColumnIndex("humidity");
-        else if ("wind_speed".equals(column))
-            colValue2 = cursor.getColumnIndex("wind_direction");
-        else if ("rain_1h".equals(column))
-            colValue2 = cursor.getColumnIndex("rain_today");
+            colValue3 = cursor.getColumnIndex("humidity");
+        else if ("wind_speed".equals(column)) {
+            colValue2 = cursor.getColumnIndex("wind_gust");
+            colValue3 = cursor.getColumnIndex("wind_direction");
+        } else if ("rain_1h".equals(column))
+            colValue3 = cursor.getColumnIndex("rain_today");
 
         LineGraphSeries<DataPoint> seriesValue = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesValue2 = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesValue3 = new LineGraphSeries<DataPoint>();
 
         boolean first = false;
         while (cursor.moveToNext()) {
-            if (cursor.isNull(colValue) && (colValue2 < 0 ? true : cursor.isNull(colValue2)))
+            if (cursor.isNull(colValue) &&
+                    (colValue2 < 0 ? true : cursor.isNull(colValue2)) &&
+                    (colValue3 < 0 ? true : cursor.isNull(colValue3)))
                 continue;
 
             data = true;
@@ -2428,6 +2450,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             double value = (cursor.isNull(colValue) ? Double.NaN : cursor.getDouble(colValue));
             double value2 = (colValue2 < 0 || cursor.isNull(colValue2) ? Double.NaN : cursor.getDouble(colValue2));
+            double value3 = (colValue3 < 0 || cursor.isNull(colValue3) ? Double.NaN : cursor.getDouble(colValue3));
 
             if ("temperature".equals(column))
                 if (!Double.isNaN(value))
@@ -2443,10 +2466,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             if ("wind_speed".equals(column)) {
                 if (!Double.isNaN(value))
-                    if ("bft".equals(speed_unit))
+                    if ("bft".equals(speed_unit)) {
                         value = Math.pow(10.0, (Math.log10(value / 0.836) / 1.5));
-                    else if ("kmh".equals(speed_unit))
+                        value2 = Math.pow(10.0, (Math.log10(value2 / 0.836) / 1.5));
+                    } else if ("kmh".equals(speed_unit)) {
                         value = value * 3600 / 1000;
+                        value2 = value2 * 3600 / 1000;
+                    }
                 // wind direction
             }
 
@@ -2472,8 +2498,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     maxValue2 = value2;
             }
 
+            if (!Double.isNaN(value3)) {
+                if (value3 < minValue3)
+                    minValue3 = value3;
+                if (value3 > maxValue3)
+                    maxValue3 = value3;
+            }
+
             seriesValue.appendData(new DataPoint(new Date(time), value), true, Integer.MAX_VALUE);
             seriesValue2.appendData(new DataPoint(new Date(time), value2), true, Integer.MAX_VALUE);
+            seriesValue3.appendData(new DataPoint(new Date(time), value3), true, Integer.MAX_VALUE);
         }
 
         if (data) {
@@ -2485,12 +2519,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.getViewport().setMaxX(maxTime);
 
             graph.getViewport().setYAxisBoundsManual(true);
-            graph.getViewport().setMinY(minValue);
-            graph.getViewport().setMaxY(maxValue);
+            graph.getViewport().setMinY(Math.min(minValue, colValue2 < 0 ? minValue : minValue2));
+            graph.getViewport().setMaxY(Math.max(maxValue, colValue2 < 0 ? maxValue : maxValue2));
 
-            if (colValue2 >= 0) {
-                graph.getSecondScale().setMinY(minValue2);
-                graph.getSecondScale().setMaxY(maxValue2);
+            if (colValue3 >= 0) {
+                graph.getSecondScale().setMinY(minValue3);
+                graph.getSecondScale().setMaxY(maxValue3);
             }
 
             graph.getViewport().setScrollable(true);
@@ -2512,13 +2546,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     });
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
 
-            final boolean label2 = (colValue2 >= 0);
-            seriesValue2.setColor(Color.YELLOW);
+            seriesValue2.setColor(Color.RED);
+
+            final boolean label3 = (colValue3 >= 0);
+            seriesValue3.setColor(Color.YELLOW);
             graph.getGridLabelRenderer().setVerticalLabelsSecondScaleColor(Color.YELLOW);
             graph.getSecondScale().setLabelFormatter(new DefaultLabelFormatter() {
                 @Override
                 public String formatLabel(double value, boolean isValueX) {
-                    if (label2)
+                    if (label3)
                         if ("temperature".equals(column)) {
                             long humidity = Math.round(value);
                             return " " + (humidity >= 100 ? "99" : Long.toString(humidity));
@@ -2535,9 +2571,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             seriesValue.setDataPointsRadius(2);
             seriesValue2.setDrawDataPoints(true);
             seriesValue2.setDataPointsRadius(2);
+            seriesValue3.setDrawDataPoints(true);
+            seriesValue3.setDataPointsRadius(2);
 
+            if (colValue3 >= 0)
+                graph.getSecondScale().addSeries(seriesValue3);
             if (colValue2 >= 0)
-                graph.getSecondScale().addSeries(seriesValue2);
+                graph.addSeries(seriesValue2);
             graph.addSeries(seriesValue);
 
             graph.setVisibility(View.VISIBLE);

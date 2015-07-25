@@ -13,4 +13,7 @@
     <item
         android:id="@+id/menu_station_all"
         android:title="@string/menu_station_all" />
+    <item
+        android:id="@+id/menu_delete"
+        android:title="@string/menu_delete" />
 </menu>

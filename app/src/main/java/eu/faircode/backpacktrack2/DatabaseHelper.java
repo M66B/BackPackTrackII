@@ -23,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 13;
+    private static final int DB_VERSION = 14;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
@@ -143,6 +143,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", humidity REAL NULL" +
                 ", pressure REAL NULL" +
                 ", wind_speed REAL NULL" +
+                ", wind_gust REAL NULL" +
                 ", wind_direction REAL NULL" +
                 ", rain_1h REAL NULL" +
                 ", rain_today REAL NULL" +
@@ -220,6 +221,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.execSQL("ALTER TABLE weather ADD COLUMN rain_1h REAL NULL");
                 db.execSQL("ALTER TABLE weather ADD COLUMN rain_today REAL NULL");
             }
+
+            if (oldVersion == 13)
+                db.execSQL("ALTER TABLE weather ADD COLUMN wind_gust REAL NULL");
 
             db.setVersion(DB_VERSION);
 
@@ -355,7 +359,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         for (LocationChangedListener listener : mLocationChangedListeners)
             try {
-                listener.onLocationDeleted();
+                listener.onLocationDeleted(id);
             } catch (Throwable ex) {
                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
@@ -372,7 +376,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         for (LocationChangedListener listener : mLocationChangedListeners)
             try {
-                listener.onLocationDeleted();
+                listener.onLocationDeleted(-1);
             } catch (Throwable ex) {
                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
@@ -427,7 +431,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         for (ActivityTypeChangedListener listener : mActivityTypeChangedListeners)
             try {
-                listener.onActivityDeleted();
+                listener.onActivityDeleted(-1);
             } catch (Throwable ex) {
                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
@@ -711,6 +715,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             else
                 cv.put("wind_speed", weather.wind_speed);
 
+            if (Double.isNaN(weather.wind_gust))
+                cv.putNull("wind_gust");
+            else
+                cv.put("wind_gust", weather.wind_speed);
+
             if (Double.isNaN(weather.wind_direction))
                 cv.putNull("wind_direction");
             else
@@ -742,6 +751,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
 
         return true;
+    }
+
+    public DatabaseHelper deleteWeather(long id) {
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            if (db.delete("weather", "ID = ?", new String[]{Long.toString(id)}) != 1)
+                Log.e(TAG, "Delete weather failed");
+        }
+
+        for (WeatherChangedListener listener : mWeatherChangedListeners)
+            try {
+                listener.onWeatherDeleted(id);
+            } catch (Throwable ex) {
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
+
+        return this;
     }
 
     public Cursor getWeather(boolean asc) {
@@ -829,13 +855,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         void onLocationUpdated();
 
-        void onLocationDeleted();
+        void onLocationDeleted(long id);
     }
 
     public interface ActivityTypeChangedListener {
         void onActivityAdded(long time, int activity, int confidence);
 
-        void onActivityDeleted();
+        void onActivityDeleted(long id);
     }
 
     public interface ActivityDurationChangedListener {
@@ -858,5 +884,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public interface WeatherChangedListener {
         void onWeatherAdded(long time, long station_id);
+
+        void onWeatherDeleted(long id);
     }
 }
