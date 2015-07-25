@@ -40,13 +40,18 @@
     <string name="title_passive_altitude">Höhenveränderung: %s Meter</string>
 
     <string name="title_altitude_settings">Höhe</string>
+    <string name="title_altitude_avg">Gleitender Mittelwert: %s Proben</string>
+
+    <string name="title_correction_header">EGM96 Korrektur</string>
     <string name="title_correction_enabled">Korrektur aktiviert</string>
     <string name="title_correction_egm96">EGM96 Lizenz</string>
 
+    <string name="title_altitude_header">Google Höhe</string>
     <string name="title_altitude_waypoint">Google Höhe für Wegpunkte</string>
     <string name="title_altitude_trackpoint">Google Höhe für Trackpoints</string>
     <string name="title_altitude_google_terms">Powered by Google</string>
 
+    <string name="title_pressure_header">Höhe von Druck</string>
     <string name="title_pressure_enabled">Druck nutzen um Höhe zu ermitteln</string>
     <string name="title_pressure_wait">Druck Mittelungszeit: %s Sekunden</string>
     <string name="title_pressure_offset">Druck Kalibrierung: %s hPa</string>
@@ -55,8 +60,6 @@
     <string name="title_pressure_maxdist">Max Druck Referenzentfernung: %s km</string>
     <string name="title_pressure_accuracy">Use when accuracy/altitude: &lt;%s %%</string>
     <string name="title_pressure_invehicle">Nutze Druckreferenz im Fahrzeug</string>
-
-    <string name="title_altitude_avg">Gleitender Mittelwert: %s Proben</string>
 
     <string name="title_recognition">Aktivitätserkennung</string>
     <string name="title_recognition_enabled">Aktivitätserkennung aktiviert</string>
@@ -138,6 +141,8 @@
     <string name="summary_passive_bearing">Benutze passive Standortabfragen wen sich die Richtung um mehr als die ausgewählte Gradzahl ändert</string>
     <string name="summary_passive_altitude">Benutze passive Standortabfragen wen sich die Höhe um mehr als die ausgewählte Anzahl von Meter ändert</string>
 
+    <string name="summary_altitude_avg">Filtern des Rauschens der GPS-Höhe unter Verwendung eines gleitenden Mittelwerts der ausgewählten Anzahl von Proben</string>
+
     <string name="summary_correction_enabled">Höhenkorrektur mittels EGM96</string>
     <string name="summary_correction_egm96">Copyright &#169; United States Government as represented by the Administrator of the National Aeronautics and Space Administration.\nAll Rights Reserved.\nKlicken für Details (Öffnet im Browser)</string>
 
@@ -151,8 +156,6 @@
     <string name="summary_pressure_maxdist">Nutze den Referenzdruck mit der ausgewählten Anzahl von Kilometer</string>
     <string name="summary_pressure_accuracy">Determine altitude from the pressure when the location accuracy is better than the selected percentage of the location altitude</string>
     <string name="summary_pressure_invehicle">Die Höhe im Fahrzeug durch Druck ermitteln (benötigt Aktivitätserkennung)</string>
-
-    <string name="summary_altitude_avg">Filtern des Rauschens der GPS-Höhe unter Verwendung eines gleitenden Mittelwerts der ausgewählten Anzahl von Proben</string>
 
     <string name="summary_recognition_enabled">Erkennen ob Sie sich bewegen oder stillstehen, und Tracking ausschalten wenn Sie stillstehen</string>
     <string name="summary_recognition_interval">Aktivität jede Anzahl von Sekunden ermitteln</string>
