@@ -2469,8 +2469,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.getViewport().setMinX(maxTime - viewport);
             graph.getViewport().setMaxX(maxTime);
 
-            Log.w(TAG, "min=" + minValue + " max=" + maxValue + " min2=" + minValue2 + " max2=" + maxValue2);
-
             graph.getViewport().setYAxisBoundsManual(true);
             graph.getViewport().setMinY(minValue);
             graph.getViewport().setMaxY(maxValue);
