@@ -31,61 +31,11 @@ public class OpenWeatherMap {
 
     private static final String BASE_URL = "http://api.openweathermap.org/data/2.5";
     private static final int cTimeOutMs = 30 * 1000;
-    private static final DecimalFormat DF = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ROOT));
-
-    // http://bugs.openweathermap.org/projects/api/wiki/Station_Data
-    public static class Weather {
-        public long time;
-        public long station_id;
-        public int station_type;
-        public String station_name;
-        public Location station_location;
-        public double temperature = Double.NaN;
-        public double humidity = Double.NaN;
-        public double pressure = Double.NaN;
-        public double wind_speed = Double.NaN;
-        public double wind_gust = Double.NaN;
-        public double wind_direction = Double.NaN;
-        public double visibility = Double.NaN;
-        public double rain_1h = Double.NaN;
-        public double rain_today = Double.NaN;
-        public String rawData = null;
-
-        @Override
-        public String toString() {
-            return SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT).format(time) + " " +
-                    station_id + " " + station_name + " " +
-                    "" + getStationType(station_type) + " " +
-                    (Double.isNaN(temperature) ? "-" : DF.format(temperature)) + "°C " +
-                    (Double.isNaN(humidity) ? "-" : DF.format(humidity)) + "% " +
-                    (Double.isNaN(pressure) ? "-" : DF.format(pressure)) + " HPa " +
-                    (Double.isNaN(wind_speed) ? "-" : DF.format(wind_speed)) + "/" +
-                    (Double.isNaN(wind_gust) ? "-" : DF.format(wind_gust)) + " m/s " +
-                    (Double.isNaN(wind_direction) ? "-" : DF.format(wind_direction)) + "° " +
-                    (Double.isNaN(visibility) ? "-" : DF.format(visibility)) + "m " +
-                    (Double.isNaN(rain_1h) ? "-" : DF.format(rain_1h)) + "/" +
-                    (Double.isNaN(rain_today) ? "-" : DF.format(rain_today)) + " mm";
-        }
-
-        public static String getStationType(int type) {
-            switch (type) {
-                case 1:
-                    return "Airport";
-                case 2:
-                    return "CWOP";
-                case 3:
-                    return "SYNOP";
-                case 5:
-                    return "DIY";
-                default:
-                    return "?";
-            }
-        }
-    }
 
     public static Weather getWeatherByStation(String apikey, long id, Context context)
             throws IOException, JSONException {
         // http://openweathermap.org/api
+        // http://bugs.openweathermap.org/projects/api/wiki/Station_Data
         boolean nocache = new File(context.getApplicationInfo().dataDir + "/owm_nocache").exists() ||
                 (Util.isDebuggable(context) && Util.debugMode(context));
         URL url = new URL(BASE_URL + "/station" +

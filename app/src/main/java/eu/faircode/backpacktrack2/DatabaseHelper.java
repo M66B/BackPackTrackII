@@ -23,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 15;
+    private static final int DB_VERSION = 16;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
@@ -148,6 +148,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", visibility REAL NULL" +
                 ", rain_1h REAL NULL" +
                 ", rain_today REAL NULL" +
+                ", clouds REAL NULL" +
                 ", created INTEGER NULL" + ");");
         db.execSQL("CREATE INDEX idx_weather_time ON weather(time)");
         db.execSQL("CREATE INDEX idx_weather_station_id ON weather(station_id)");
@@ -248,6 +249,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (oldVersion < 15) {
                 db.execSQL("ALTER TABLE weather ADD COLUMN visibility REAL NULL");
                 oldVersion = 15;
+            }
+
+            if (oldVersion < 16) {
+                db.execSQL("ALTER TABLE weather ADD COLUMN clouds REAL NULL");
+                oldVersion = 16;
             }
 
             db.setVersion(DB_VERSION);
@@ -695,7 +701,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Weather
 
-    public boolean insertWeather(OpenWeatherMap.Weather weather, Location location) {
+    public boolean insertWeather(Weather weather, Location location) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
 
@@ -764,6 +770,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cv.putNull("rain_today");
             else
                 cv.put("rain_today", weather.rain_today);
+
+            if (Double.isNaN(weather.clouds))
+                cv.putNull("clouds");
+            else
+                cv.put("clouds", weather.clouds);
 
             cv.put("created", new Date().getTime());
 

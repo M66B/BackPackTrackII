@@ -79,12 +79,14 @@
 
     <string name="title_weather_settings">Weather</string>
     <string name="title_weather_enabled">Weather updates enabled</string>
+    <string name="title_weather_test">Show weather data</string>
+    <string name="title_weather_fio">Forecast.io</string>
+    <string name="title_weather_owm">OpenWeatherMap</string>
     <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_interval">Weather fetch interval: %s minutes</string>
     <string name="title_weather_stations">Number of weather stations: %s</string>
     <string name="title_weather_maxage">Weather data max. age: %s minutes</string>
     <string name="title_weather_weight">Weather data sort factor: %s</string>
-    <string name="title_weather_test">Show weather data</string>
     <string name="title_weather_id">Use weather station: %s</string>
     <string name="title_weather_airport">Use airport stations</string>
     <string name="title_weather_cwop">Use CWOP stations</string>
@@ -92,7 +94,7 @@
     <string name="title_weather_diy">Use DIY stations</string>
     <string name="title_weather_other">Use other stations</string>
     <string name="title_weather_rain">Use first precipitation data</string>
-    <string name="title_weather_tos">OpenWeatherMap TOS</string>
+    <string name="title_weather_tos">TOS</string>
 
     <string name="title_blog">WordPress weblog</string>
     <string name="title_blogurl">URL: %s</string>
@@ -182,7 +184,7 @@
     <string name="summary_weather_diy">Use data of amateur weather stations</string>
     <string name="summary_weather_other">Use data of other weather station types</string>
     <string name="summary_weather_rain">Use first available precipitation data, ignoring the station type, but honoring the sort order</string>
-    <string name="summary_weather_tos">Tap to read the terms of service of OpenWeatherMap (will start the browser)</string>
+    <string name="summary_weather_tos">Tap to read the terms of service (will start the browser)</string>
 
     <string name="summary_blogurl">WordPress weblog address</string>
     <string name="summary_blogid">WordPress weblog identification\nUse 1 for single site installations</string>

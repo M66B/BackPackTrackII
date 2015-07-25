@@ -805,10 +805,11 @@ public class LocationService extends IntentService {
                 return;
 
             // Get API key
-            String apikey = prefs.getString(SettingsFragment.PREF_WEATHER_APIKEY, null);
-            if (apikey == null) {
+            String apikey_fio = prefs.getString(SettingsFragment.PREF_WEATHER_APIKEY_FIO, null);
+            String apikey_owm = prefs.getString(SettingsFragment.PREF_WEATHER_APIKEY_OWM, null);
+            if (apikey_owm == null) {
                 ApplicationInfo app = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
-                apikey = app.metaData.getString("org.openweathermap.API_KEY", null);
+                apikey_owm = app.metaData.getString("org.openweathermap.API_KEY", null);
             }
 
             // Get settings
@@ -827,20 +828,25 @@ public class LocationService extends IntentService {
                     " id=" + id + " airport=" + airport + " cwop=" + cwop + " synop=" + synop + " diy=" + diy + " other=" + other);
 
             // Fetch weather
-            List<OpenWeatherMap.Weather> listWeather;
+            List<Weather> listWeather = new ArrayList<Weather>();
             if (id < 0)
-                listWeather = OpenWeatherMap.getWeatherByLocation(apikey, lastLocation, stations, maxage, maxdist, weight, this);
+                if (apikey_fio == null)
+                    listWeather = OpenWeatherMap.getWeatherByLocation(apikey_owm, lastLocation, stations, maxage, maxdist, weight, this);
+                else {
+                    Weather w = ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, this);
+                    if (w != null)
+                        listWeather.add(w);
+                }
             else {
-                listWeather = new ArrayList<OpenWeatherMap.Weather>();
-                OpenWeatherMap.Weather w = OpenWeatherMap.getWeatherByStation(apikey, id, this);
+                Weather w = OpenWeatherMap.getWeatherByStation(apikey_owm, id, this);
                 if (w != null)
                     listWeather.add(w);
             }
 
             // Find station with precipitation data
-            OpenWeatherMap.Weather rainy = null;
-            if (firstrain)
-                for (OpenWeatherMap.Weather weather : listWeather) {
+            Weather rainy = null;
+            if (apikey_fio == null && firstrain)
+                for (Weather weather : listWeather) {
                     float distance = weather.station_location.distanceTo(lastLocation);
                     if (distance <= maxdist * 1000) {
                         if (!Double.isNaN(weather.rain_1h) && !Double.isNaN(weather.rain_today)
@@ -853,14 +859,14 @@ public class LocationService extends IntentService {
 
             // Select best weather station
             boolean found = false;
-            for (OpenWeatherMap.Weather weather : listWeather) {
+            for (Weather weather : listWeather) {
                 float distance = weather.station_location.distanceTo(lastLocation);
                 Log.i(TAG, weather.toString() + " " + Math.round(distance) + "m");
 
                 long time = new Date().getTime();
                 if (!found &&
                         weather.time + maxage * 60 * 1000 >= time &&
-                        (id > 0 ||
+                        (id > 0 || apikey_fio != null ||
                                 (weather.station_type == 1 && airport) ||
                                 (weather.station_type == 2 && cwop) ||
                                 (weather.station_type == 3 && synop) ||
@@ -1173,13 +1179,13 @@ public class LocationService extends IntentService {
             return;
         }
 
-        // Set repeating alarm
+        // Set alarm
         Intent alarmIntent = new Intent(context, LocationService.class);
         alarmIntent.setAction(LocationService.ACTION_UPDATE_WEATHER);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_INTERVAL, SettingsFragment.DEFAULT_WEATHER_INTERVAL));
-        long trigger = new Date().getTime() + interval * 60 * 1000;
+        int interval = 60 * 1000 * Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_INTERVAL, SettingsFragment.DEFAULT_WEATHER_INTERVAL));
+        long trigger = new Date().getTime() / interval * interval + interval;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             am.setExact(AlarmManager.RTC_WAKEUP, trigger, pi);
         else

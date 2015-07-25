@@ -79,12 +79,14 @@
 
     <string name="title_weather_settings">Wetter</string>
     <string name="title_weather_enabled">Wetter Aktualisierungen aktiviert</string>
+    <string name="title_weather_test">Zeige Wetter Daten</string>
+    <string name="title_weather_fio">Forecast.io</string>
+    <string name="title_weather_owm">OpenWeatherMap</string>
     <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_interval">Wetter Aktualisierungsintervall: %s Minuten</string>
     <string name="title_weather_stations">Anzahl der Wetterstationen: %s</string>
     <string name="title_weather_maxage">Max. Alter für Wetterdaten: %s Minuten</string>
     <string name="title_weather_weight">Wetterdaten Sortierungsfaktor: %s</string>
-    <string name="title_weather_test">Zeige Wetter Daten</string>
     <string name="title_weather_id">Nutze Wetterstation: %s</string>
     <string name="title_weather_airport">Nutze Flughafenstationen</string>
     <string name="title_weather_cwop">Nutze CWOP Stationen</string>
@@ -92,7 +94,7 @@
     <string name="title_weather_diy">Nutze DIY Stationen</string>
     <string name="title_weather_other">Nutze andere Stationen</string>
     <string name="title_weather_rain">Nutze erste Niederschlagdaten</string>
-    <string name="title_weather_tos">OpenWeatherMap Nutzungsbedingungen</string>
+    <string name="title_weather_tos">Nutzungsbedingungen</string>
 
     <string name="title_blog">WordPress Weblog</string>
     <string name="title_blogurl">URL: %s</string>
@@ -182,7 +184,7 @@
     <string name="summary_weather_diy">Nutze Daten von Amateur-Wetterstation</string>
     <string name="summary_weather_other">Nutze Daten anderen Wetterstationen</string>
     <string name="summary_weather_rain">Nutze erste verfügbare Niederschagdaten, ohne Rücksicht auf Stationtyp, aber mit Rücksicht auf die Sortierreihenfolge</string>
-    <string name="summary_weather_tos">Klicken um Nutzungsbedingungen von OpenWeatherMap (Öffnet im Browser)</string>
+    <string name="summary_weather_tos">Klicken um Nutzungsbedingungen (Öffnet im Browser)</string>
 
     <string name="summary_blogurl">WordPress Weblog Adresse</string>
     <string name="summary_blogid">WordPress Weblog Identifikation\nBenutze 1 für eine Single-Site Installation</string>
