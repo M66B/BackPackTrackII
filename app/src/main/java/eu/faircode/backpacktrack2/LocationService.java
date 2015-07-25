@@ -862,7 +862,7 @@ public class LocationService extends IntentService {
 
                     DatabaseHelper dh = new DatabaseHelper(this);
                     if (dh.insertWeather(weather, lastLocation) && Util.debugMode(this))
-                        Util.toast("Weather update", Toast.LENGTH_SHORT, this);
+                        Util.toast(getString(R.string.title_weather_settings), Toast.LENGTH_SHORT, this);
                     if (rainy != null && Double.isNaN(weather.rain_1h) && Double.isNaN(weather.rain_today)) {
                         rainy.temperature = Double.NaN;
                         rainy.humidity = Double.NaN;
