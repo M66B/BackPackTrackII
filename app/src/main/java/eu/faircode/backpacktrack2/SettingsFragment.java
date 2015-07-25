@@ -599,16 +599,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
                             float altitude = PressureService.getAltitude(lastLocation, getActivity());
 
-                            float delta = SensorManager.getAltitude(ref_pressure, ref_pressure) -
-                                    SensorManager.getAltitude(ref_pressure, ref_pressure + 1f);
-
                             // Show reference/altitude
                             DecimalFormat DF = new DecimalFormat("0.#", new DecimalFormatSymbols(Locale.ROOT));
                             pref_pressure_test.setSummary(
                                     DF.format(ref_pressure) + " hPa " +
                                             SimpleDateFormat.getDateTimeInstance().format(ref_time) + " " +
-                                            (Float.isNaN(altitude) ? "-" : Math.round(altitude)) +
-                                            "m ±" + Math.round(delta) + "m");
+                                            (Float.isNaN(altitude) ? "-" : Math.round(altitude)) + "m");
                             pref_pressure_test.setEnabled(true);
                         }
                     }
