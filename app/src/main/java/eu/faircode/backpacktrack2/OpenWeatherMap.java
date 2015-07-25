@@ -82,6 +82,7 @@ public class OpenWeatherMap {
         // http://openweathermap.org/api
         URL url = new URL(BASE_URL + "/station" +
                 "?APPID=" + apikey +
+                (Util.isDebuggable(context) && Util.debugMode(context) ? "&time=" + new Date().getTime() : "") +
                 "&units=metric" +
                 "&id=" + id);
         Log.d(TAG, "url=" + url);
@@ -123,6 +124,7 @@ public class OpenWeatherMap {
         // http://openweathermap.org/api
         URL url = new URL(BASE_URL + "/station/find" +
                 "?APPID=" + apikey +
+                (Util.isDebuggable(context) && Util.debugMode(context) ? "&time=" + new Date().getTime() : "") +
                 "&units=metric" +
                 "&cnt=" + stations +
                 "&lat=" + String.valueOf(location.getLatitude()) +
