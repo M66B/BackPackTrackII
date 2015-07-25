@@ -262,6 +262,8 @@
     <string name="menu_elevation_loc">Fetch elevation for location</string>
     <string name="menu_elevation_day">Fetch elevations for day</string>
     <string name="menu_delete">Delete</string>
+    <string name="menu_station_one">Use this station</string>
+    <string name="menu_station_all">Use all stations</string>
 
     <string name="still">Still</string>
     <string name="tilting">Tilting</string>

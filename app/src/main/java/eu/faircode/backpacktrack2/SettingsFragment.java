@@ -2247,7 +2247,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 if (cursor == null)
                     return;
 
-                long station_id = cursor.getLong(cursor.getColumnIndex("station_id"));
+                final long station_id = cursor.getLong(cursor.getColumnIndex("station_id"));
                 int station_type = cursor.getInt(cursor.getColumnIndex("station_type"));
                 String station_name = cursor.getString(cursor.getColumnIndex("station_name"));
 
@@ -2291,6 +2291,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                     Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                                 }
                                 return true;
+
+                            case R.id.menu_station_one:
+                                prefs.edit().putString(PREF_WEATHER_ID, Long.toString(station_id)).apply();
+                                return true;
+
+                            case R.id.menu_station_all:
+                                prefs.edit().remove(PREF_WEATHER_ID).apply();
+                                return true;
+
                             default:
                                 return false;
                         }
@@ -2302,6 +2311,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     popupMenu.getMenu().findItem(R.id.menu_name).setTitle(name);
                     popupMenu.getMenu().findItem(R.id.menu_name).setVisible(true);
                 }
+                long setid = Long.parseLong(prefs.getString(SettingsFragment.PREF_WEATHER_ID, "-1"));
+                popupMenu.getMenu().findItem(R.id.menu_station_one).setEnabled(setid < 0);
+                popupMenu.getMenu().findItem(R.id.menu_station_all).setEnabled(setid >= 0);
                 popupMenu.getMenu().findItem(R.id.menu_share).setEnabled(station != null);
                 popupMenu.show();
             }

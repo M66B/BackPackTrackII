@@ -7,4 +7,10 @@
     <item
         android:id="@+id/menu_share"
         android:title="@string/menu_share" />
+    <item
+        android:id="@+id/menu_station_one"
+        android:title="@string/menu_station_one" />
+    <item
+        android:id="@+id/menu_station_all"
+        android:title="@string/menu_station_all" />
 </menu>
