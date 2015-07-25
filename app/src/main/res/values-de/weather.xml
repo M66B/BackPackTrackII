@@ -6,6 +6,7 @@
         <item>Windgeschwindigkeit/richtung</item>
         <item>Niederschlag 1 Stunde/heute</item>
         <item>Sichtweite</item>
+        <item>Bewölkt</item>
     </string-array>
     <!-- do not translate values -->
     <string-array name="listWeatherValue">
@@ -14,5 +15,6 @@
         <item>wind_speed</item>
         <item>rain_1h</item>
         <item>visibility</item>
+        <item>clouds</item>
     </string-array>
 </resources>

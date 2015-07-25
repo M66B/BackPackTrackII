@@ -2405,9 +2405,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             // humidity
             minValue2 = 0;
             maxValue2 = 100;
-        }
-
-        if ("wind_speed".equals(column)) {
+        } else if ("wind_speed".equals(column)) {
             minValue = 0;
             if ("bft".equals(speed_unit))
                 maxValue = 10; // beaufort
@@ -2423,11 +2421,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             minValue3 = 0;
             maxValue3 = 360;
 
-        }
-
-        if ("rain_1h".equals(column)) {
+        } else if ("rain_1h".equals(column)) {
             minValue = 0;
             minValue2 = 0; // rain today
+        } else if ("clouds".equals(column)) {
+            minValue = 0;
+            maxValue = 100;
         }
 
         Cursor cursor = db.getWeather(true);
@@ -2574,7 +2573,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             return " " + (humidity >= 100 ? "99" : Long.toString(humidity));
                         } else if ("wind_speed".equals(column))
                             return " " + LocationService.getWindDirectionName((float) value, getActivity());
-                        else
+                        else if ("clouds".equals(column)) {
+                            long clouds = Math.round(value);
+                            return " " + (clouds >= 100 ? "99" : Long.toString(clouds));
+                        } else
                             return " " + DF.format(value); // rain today
                     else
                         return "";
