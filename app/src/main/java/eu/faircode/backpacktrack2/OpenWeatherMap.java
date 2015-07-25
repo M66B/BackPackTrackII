@@ -39,15 +39,16 @@ public class OpenWeatherMap {
         public int station_type;
         public String station_name;
         public Location station_location;
-        double temperature = Double.NaN;
-        double humidity = Double.NaN;
-        double pressure = Double.NaN;
-        double wind_speed = Double.NaN;
-        double wind_gust = Double.NaN;
-        double wind_direction = Double.NaN;
-        double visibility = Double.NaN;
-        double rain_1h = Double.NaN;
-        double rain_today = Double.NaN;
+        public double temperature = Double.NaN;
+        public double humidity = Double.NaN;
+        public double pressure = Double.NaN;
+        public double wind_speed = Double.NaN;
+        public double wind_gust = Double.NaN;
+        public double wind_direction = Double.NaN;
+        public double visibility = Double.NaN;
+        public double rain_1h = Double.NaN;
+        public double rain_today = Double.NaN;
+        public String rawData = null;
 
         @Override
         public String toString() {
@@ -262,6 +263,8 @@ public class OpenWeatherMap {
             if (rain.has("today"))
                 weather.rain_today = rain.getDouble("today");
         }
+
+        weather.rawData = entry.toString();
 
         return weather;
     }
