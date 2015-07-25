@@ -830,16 +830,15 @@ public class LocationService extends IntentService {
                     listWeather.add(w);
             }
 
-            double rain_1h = Double.NaN;
-            double rain_today = Double.NaN;
+            OpenWeatherMap.Weather rainy = null;
             if (firstrain)
                 for (OpenWeatherMap.Weather weather : listWeather) {
                     float distance = weather.station_location.distanceTo(lastLocation);
                     if (distance <= maxdist * 1000) {
-                        if (!Double.isNaN(weather.rain_1h) && Double.isNaN(rain_1h))
-                            rain_1h = weather.rain_1h;
-                        if (!Double.isNaN(weather.rain_today) && Double.isNaN(rain_today))
-                            rain_today = weather.rain_today;
+                        if (!Double.isNaN(weather.rain_1h) && !Double.isNaN(weather.rain_today)) {
+                            rainy = weather;
+                            break;
+                        }
                     }
                 }
 
@@ -860,17 +859,18 @@ public class LocationService extends IntentService {
                         && !Double.isNaN(weather.pressure)) {
                     found = true;
 
-                    if (firstrain) {
-                        if (Double.isNaN(weather.rain_1h))
-                            weather.rain_1h = rain_1h;
-
-                        if (Double.isNaN(weather.rain_today))
-                            weather.rain_today = rain_today;
-                    }
-
                     DatabaseHelper dh = new DatabaseHelper(this);
                     if (dh.insertWeather(weather, lastLocation) && Util.debugMode(this))
                         Util.toast("Weather update", Toast.LENGTH_SHORT, this);
+                    if (rainy != null &&
+                            (Double.isNaN(weather.rain_1h) || Double.isNaN(weather.rain_today))) {
+                        rainy.temperature = Double.NaN;
+                        rainy.humidity = Double.NaN;
+                        rainy.pressure = Double.NaN;
+                        rainy.wind_speed = Double.NaN;
+                        rainy.wind_direction = Double.NaN;
+                        dh.insertWeather(rainy, lastLocation);
+                    }
                     dh.close();
 
                     Log.i(TAG, "Reference pressure " + weather.pressure + "hPa " +

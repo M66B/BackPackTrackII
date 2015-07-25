@@ -2404,6 +2404,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         boolean first = false;
         while (cursor.moveToNext()) {
+            if (cursor.isNull(colValue) && (colValue2 < 0 ? true : cursor.isNull(colValue2)))
+                continue;
+
             data = true;
 
             long time = cursor.getLong(colTime);
