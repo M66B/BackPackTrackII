@@ -2476,9 +2476,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             seriesValue2.setDrawDataPoints(true);
             seriesValue2.setDataPointsRadius(2);
 
-            graph.addSeries(seriesValue);
             if (colValue2 >= 0)
                 graph.getSecondScale().addSeries(seriesValue2);
+            graph.addSeries(seriesValue);
 
             graph.setVisibility(View.VISIBLE);
         } else
