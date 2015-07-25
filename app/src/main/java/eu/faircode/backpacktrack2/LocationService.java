@@ -1238,9 +1238,13 @@ public class LocationService extends IntentService {
             Log.i(TAG, "New location=" + location + " type=" + locationType);
 
             // Derive altitude from pressure
-            float altitude = PressureService.getAltitude(location, this);
-            if (!Float.isNaN(altitude))
-                location.setAltitude(altitude);
+            int pref_accuracy = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_ACCURACY, SettingsFragment.DEFAULT_PRESSURE_ACCURACY));
+            if (!location.hasAltitude() || !location.hasAccuracy() ||
+                    location.getAltitude() * pref_accuracy / 100 >= location.getAccuracy() * 1.5) {
+                float altitude = PressureService.getAltitude(location, this);
+                if (!Float.isNaN(altitude))
+                    location.setAltitude(altitude);
+            }
 
             // Add elevation data
             if (!location.hasAltitude() && Util.isConnected(this)) {

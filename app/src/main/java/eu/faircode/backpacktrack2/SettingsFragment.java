@@ -125,6 +125,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_PRESSURE_TEST = "pref_pressure_test";
     public static final String PREF_PRESSURE_MAXAGE = "pref_pressure_maxage";
     public static final String PREF_PRESSURE_MAXDIST = "pref_pressure_maxdist";
+    public static final String PREF_PRESSURE_ACCURACY = "pref_pressure_accuracy";
     public static final String PREF_PRESSURE_INVEHICLE = "pref_pressure_invehicle";
 
     public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
@@ -216,6 +217,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_PRESSURE_OFFSET = "0"; // hPa
     public static final String DEFAULT_PRESSURE_MAXAGE = "240"; // minutes
     public static final String DEFAULT_PRESSURE_MAXDIST = "50"; // kilometer
+    public static final String DEFAULT_PRESSURE_ACCURACY = "10"; // percent
     public static final boolean DEFAULT_PRESSURE_INVEHICLE = false;
 
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
@@ -436,6 +438,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_PRESSURE_MAXDIST);
         updateTitle(prefs, PREF_PRESSURE_WAIT);
         updateTitle(prefs, PREF_PRESSURE_OFFSET);
+        updateTitle(prefs, PREF_PRESSURE_ACCURACY);
 
         updateTitle(prefs, PREF_ALTITUDE_AVG);
 
@@ -2551,6 +2554,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref.setTitle(getString(R.string.title_pressure_wait, prefs.getString(key, DEFAULT_PRESSURE_WAIT)));
         else if (PREF_PRESSURE_OFFSET.equals(key))
             pref.setTitle(getString(R.string.title_pressure_offset, prefs.getString(key, DEFAULT_PRESSURE_OFFSET)));
+        else if (PREF_PRESSURE_MAXAGE.equals(key))
+            pref.setTitle(getString(R.string.title_pressure_maxage, prefs.getString(key, DEFAULT_PRESSURE_MAXAGE)));
+        else if (PREF_PRESSURE_MAXDIST.equals(key))
+            pref.setTitle(getString(R.string.title_pressure_maxdist, prefs.getString(key, DEFAULT_PRESSURE_MAXDIST)));
+        else if (PREF_PRESSURE_ACCURACY.equals(key))
+            pref.setTitle(getString(R.string.title_pressure_accuracy, prefs.getString(key, DEFAULT_PRESSURE_ACCURACY)));
 
         else if (PREF_ALTITUDE_AVG.equals(key))
             pref.setTitle(getString(R.string.title_altitude_avg, prefs.getString(key, DEFAULT_ALTITUDE_AVG)));
@@ -2559,10 +2568,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref.setTitle(getString(R.string.title_weather_interval, prefs.getString(key, DEFAULT_WEATHER_INTERVAL)));
         else if (PREF_WEATHER_APIKEY.equals(key))
             pref.setTitle(getString(R.string.title_weather_apikey, prefs.getString(key, getString(R.string.msg_notset))));
-        else if (PREF_PRESSURE_MAXAGE.equals(key))
-            pref.setTitle(getString(R.string.title_pressure_maxage, prefs.getString(key, DEFAULT_PRESSURE_MAXAGE)));
-        else if (PREF_PRESSURE_MAXDIST.equals(key))
-            pref.setTitle(getString(R.string.title_pressure_maxdist, prefs.getString(key, DEFAULT_PRESSURE_MAXDIST)));
         else if (PREF_WEATHER_STATIONS.equals(key))
             pref.setTitle(getString(R.string.title_weather_stations, prefs.getString(key, DEFAULT_WEATHER_STATIONS)));
         else if (PREF_WEATHER_MAXAGE.equals(key))
