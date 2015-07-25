@@ -1199,10 +1199,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 if (!cbDelete.isChecked()) {
-                                    prefs.edit().putString(PREF_LAST_TRACK, tvTrackName.getText().toString()).apply();
-                                    prefs.edit().putBoolean(PREF_LAST_EXTENSIONS, cbExtensions.isChecked()).apply();
-                                    prefs.edit().putLong(PREF_LAST_FROM, from.getTimeInMillis()).apply();
-                                    prefs.edit().putLong(PREF_LAST_TO, to.getTimeInMillis()).apply();
+                                    SharedPreferences.Editor editor = prefs.edit();
+                                    editor.putString(PREF_LAST_TRACK, tvTrackName.getText().toString());
+                                    editor.putBoolean(PREF_LAST_EXTENSIONS, cbExtensions.isChecked());
+                                    editor.putLong(PREF_LAST_FROM, from.getTimeInMillis());
+                                    editor.putLong(PREF_LAST_TO, to.getTimeInMillis());
+                                    editor.apply();
                                 }
                                 intent.putExtra(LocationService.EXTRA_TRACK_NAME, tvTrackName.getText().toString());
                                 intent.putExtra(LocationService.EXTRA_WRITE_EXTENSIONS, cbExtensions.isChecked());

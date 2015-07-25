@@ -324,9 +324,11 @@ public class LocationService extends IntentService {
         // Check confidence
         if (activity.getConfidence() > pref_confidence) {
             // Persist probable activity
-            prefs.edit().putInt(SettingsFragment.PREF_LAST_ACTIVITY, activity.getType()).apply();
-            prefs.edit().putInt(SettingsFragment.PREF_LAST_CONFIDENCE, activity.getConfidence()).apply();
-            prefs.edit().putLong(SettingsFragment.PREF_LAST_ACTIVITY_TIME, time).apply();
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt(SettingsFragment.PREF_LAST_ACTIVITY, activity.getType());
+            editor.putInt(SettingsFragment.PREF_LAST_CONFIDENCE, activity.getConfidence());
+            editor.putLong(SettingsFragment.PREF_LAST_ACTIVITY_TIME, time);
+            editor.apply();
 
             // Update activity duration
             if (lastTime >= 0)
@@ -430,8 +432,10 @@ public class LocationService extends IntentService {
         Location bestLocation = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_BEST_LOCATION, null));
         if (isBetterLocation(bestLocation, location)) {
             Log.i(TAG, "Better location=" + location);
-            prefs.edit().putInt(SettingsFragment.PREF_STATE, STATE_ACQUIRED).apply();
-            prefs.edit().putString(SettingsFragment.PREF_BEST_LOCATION, LocationSerializer.serialize(location)).apply();
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putInt(SettingsFragment.PREF_STATE, STATE_ACQUIRED);
+            editor.putString(SettingsFragment.PREF_BEST_LOCATION, LocationSerializer.serialize(location));
+            editor.apply();
             updateState(this, "better location");
         }
 
@@ -884,11 +888,13 @@ public class LocationService extends IntentService {
                     // Persist reference pressure
                     Log.i(TAG, "Reference pressure " + weather.pressure + "hPa " +
                             weather.station_name + " @" + SimpleDateFormat.getDateTimeInstance().format(weather.time));
-                    prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_LAT, (float) weather.station_location.getLatitude()).apply();
-                    prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_LON, (float) weather.station_location.getLongitude()).apply();
-                    prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_TEMP, (float) weather.temperature).apply();
-                    prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, (float) weather.pressure).apply();
-                    prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, weather.time).apply();
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_LAT, (float) weather.station_location.getLatitude());
+                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_LON, (float) weather.station_location.getLongitude());
+                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_TEMP, (float) weather.temperature);
+                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, (float) weather.pressure);
+                    editor.putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, weather.time);
+                    editor.apply();
                 }
             }
         } finally {
@@ -990,8 +996,10 @@ public class LocationService extends IntentService {
                 ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(gac, pi);
 
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                prefs.edit().remove(SettingsFragment.PREF_LAST_ACTIVITY).apply();
-                prefs.edit().remove(SettingsFragment.PREF_LAST_CONFIDENCE).apply();
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.remove(SettingsFragment.PREF_LAST_ACTIVITY);
+                editor.remove(SettingsFragment.PREF_LAST_CONFIDENCE);
+                editor.apply();
                 Log.i(TAG, "Canceled activity updates");
             }
         }
@@ -1149,9 +1157,11 @@ public class LocationService extends IntentService {
         // Stop pressure service
         context.stopService(new Intent(context, PressureService.class));
 
-        prefs.edit().putInt(SettingsFragment.PREF_STATE, STATE_IDLE).apply();
-        prefs.edit().remove(SettingsFragment.PREF_LOCATION_TYPE).apply();
-        prefs.edit().remove(SettingsFragment.PREF_BEST_LOCATION).apply();
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt(SettingsFragment.PREF_STATE, STATE_IDLE);
+        editor.remove(SettingsFragment.PREF_LOCATION_TYPE);
+        editor.remove(SettingsFragment.PREF_BEST_LOCATION);
+        editor.apply();
         updateState(context, "stop locating");
     }
 

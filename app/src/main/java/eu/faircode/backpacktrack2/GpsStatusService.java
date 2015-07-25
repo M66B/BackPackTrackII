@@ -33,8 +33,10 @@ public class GpsStatusService extends Service {
                 // Persist fixed/visible satellites
                 Log.i(TAG, "Satellites fixed/visible=" + fixed + "/" + visible);
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsStatusService.this);
-                prefs.edit().putInt(SettingsFragment.PREF_SATS_FIXED, fixed).apply();
-                prefs.edit().putInt(SettingsFragment.PREF_SATS_VISIBLE, visible).apply();
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt(SettingsFragment.PREF_SATS_FIXED, fixed);
+                editor.putInt(SettingsFragment.PREF_SATS_VISIBLE, visible);
+                editor.apply();
 
                 // Send state changed intent
                 Intent intent = new Intent(GpsStatusService.this, LocationService.class);
@@ -50,8 +52,10 @@ public class GpsStatusService extends Service {
 
         Log.i(TAG, "Requesting GPS status updates");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsStatusService.this);
-        prefs.edit().remove(SettingsFragment.PREF_SATS_FIXED).apply();
-        prefs.edit().remove(SettingsFragment.PREF_SATS_VISIBLE).apply();
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(SettingsFragment.PREF_SATS_FIXED);
+        editor.remove(SettingsFragment.PREF_SATS_VISIBLE);
+        editor.apply();
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         lm.addGpsStatusListener(mGpsStatusListener);
     }
@@ -60,8 +64,10 @@ public class GpsStatusService extends Service {
     public void onDestroy() {
         Log.i(TAG, "Stopping GPS status updates");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(GpsStatusService.this);
-        prefs.edit().remove(SettingsFragment.PREF_SATS_FIXED).apply();
-        prefs.edit().remove(SettingsFragment.PREF_SATS_VISIBLE).apply();
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(SettingsFragment.PREF_SATS_FIXED);
+        editor.remove(SettingsFragment.PREF_SATS_VISIBLE);
+        editor.apply();
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         lm.removeGpsStatusListener(mGpsStatusListener);
 

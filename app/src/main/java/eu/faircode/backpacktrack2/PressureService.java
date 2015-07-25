@@ -61,8 +61,10 @@ public class PressureService extends Service {
         // Initialize
         count = 0;
         values = 0;
-        prefs.edit().remove(SettingsFragment.PREF_PRESSURE_VALUE).apply();
-        prefs.edit().remove(SettingsFragment.PREF_PRESSURE_TIME).apply();
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove(SettingsFragment.PREF_PRESSURE_VALUE);
+        editor.remove(SettingsFragment.PREF_PRESSURE_TIME);
+        editor.apply();
 
         // Start listening for pressure changes
         SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -91,8 +93,10 @@ public class PressureService extends Service {
                 long time = new Date().getTime();
                 float pressure = (count > 0 ? values / count : 0);
                 Log.i(TAG, "Average pressure " + pressure + "mb");
-                prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_VALUE, pressure).apply();
-                prefs.edit().putLong(SettingsFragment.PREF_PRESSURE_TIME, time).apply();
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putFloat(SettingsFragment.PREF_PRESSURE_VALUE, pressure);
+                editor.putLong(SettingsFragment.PREF_PRESSURE_TIME, time);
+                editor.apply();
 
                 // Send state changed intent
                 Intent intent = new Intent(PressureService.this, LocationService.class);
