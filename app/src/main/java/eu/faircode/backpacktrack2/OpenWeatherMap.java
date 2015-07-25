@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -85,9 +86,11 @@ public class OpenWeatherMap {
     public static Weather getWeatherByStation(String apikey, long id, Context context)
             throws IOException, JSONException {
         // http://openweathermap.org/api
+        boolean nocache = new File(context.getApplicationInfo().dataDir + "/owm_nocache").exists() ||
+                (Util.isDebuggable(context) && Util.debugMode(context));
         URL url = new URL(BASE_URL + "/station" +
                 "?APPID=" + apikey +
-                (Util.isDebuggable(context) && Util.debugMode(context) ? "&time=" + new Date().getTime() : "") +
+                (nocache ? "&time=" + new Date().getTime() : "") +
                 "&units=metric" +
                 "&id=" + id);
         Log.d(TAG, "url=" + url);
@@ -127,9 +130,11 @@ public class OpenWeatherMap {
             String apikey, final Location location, int stations, final int maxage, final int maxdist, final float weight, Context context)
             throws IOException, JSONException {
         // http://openweathermap.org/api
+        boolean nocache = new File(context.getApplicationInfo().dataDir + "/owm_nocache").exists() ||
+                (Util.isDebuggable(context) && Util.debugMode(context));
         URL url = new URL(BASE_URL + "/station/find" +
                 "?APPID=" + apikey +
-                (Util.isDebuggable(context) && Util.debugMode(context) ? "&time=" + new Date().getTime() : "") +
+                (nocache ? "&time=" + new Date().getTime() : "") +
                 "&units=metric" +
                 "&cnt=" + stations +
                 "&lat=" + String.valueOf(location.getLatitude()) +
