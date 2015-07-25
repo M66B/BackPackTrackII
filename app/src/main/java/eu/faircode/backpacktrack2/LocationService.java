@@ -834,10 +834,13 @@ public class LocationService extends IntentService {
             double rain_today = Double.NaN;
             if (firstrain)
                 for (OpenWeatherMap.Weather weather : listWeather) {
-                    if (!Double.isNaN(weather.rain_1h) && Double.isNaN(rain_1h))
-                        rain_1h = weather.rain_1h;
-                    if (!Double.isNaN(weather.rain_today) && Double.isNaN(rain_today))
-                        rain_today = weather.rain_today;
+                    float distance = weather.station_location.distanceTo(lastLocation);
+                    if (distance <= maxdist * 1000) {
+                        if (!Double.isNaN(weather.rain_1h) && Double.isNaN(rain_1h))
+                            rain_1h = weather.rain_1h;
+                        if (!Double.isNaN(weather.rain_today) && Double.isNaN(rain_today))
+                            rain_today = weather.rain_today;
+                    }
                 }
 
             boolean found = false;
