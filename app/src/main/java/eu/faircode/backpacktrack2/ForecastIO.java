@@ -27,12 +27,11 @@ import java.util.Locale;
 import javax.net.ssl.HttpsURLConnection;
 
 public class ForecastIO {
-    private static final String TAG = "BPT2.OpenWeatherMap";
+    private static final String TAG = "BPT2.ForecastIO";
 
     private static final String BASE_URL = "https://api.forecast.io/forecast";
     private static final int cTimeOutMs = 30 * 1000;
     private static final DecimalFormat DF = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ROOT));
-    // https://api.forecast.io/forecast/0bdce475dcc725c4b2e61209547896d1/51,4?exclude=minutely,hourly,daily,alerts,flags&units=si
 
     public static Weather getWeatherByLocation(
             String apikey, final Location location, Context context)
@@ -70,23 +69,6 @@ public class ForecastIO {
 
             // Decode result
             JSONObject jroot = new JSONObject(json.toString());
-            // {"latitude":51,"longitude":4,"timezone":"Europe/Brussels","offset":2,
-            // "currently":{
-            // "time":1437851089,
-            // "summary":"Drizzle",
-            // "icon":"rain",
-            // "precipIntensity":0.2743,
-            // "precipProbability":0.7,
-            // "precipType":"rain",
-            // "temperature":16.28,
-            // "apparentTemperature":16.28,
-            // "dewPoint":10.7,
-            // "humidity":0.7,
-            // "windSpeed":4.53,
-            // "windBearing":278,
-            // "cloudCover":0.02,
-            // "pressure":1015.81,
-            // "ozone":352.87}}
             if (!jroot.has("latitude") || !jroot.has("longitude") || !jroot.has("currently"))
                 return null;
             JSONObject currently = jroot.getJSONObject("currently");
@@ -112,7 +94,7 @@ public class ForecastIO {
             weather.wind_direction = (currently.has("windBearing") ? currently.getDouble("windBearing") : Double.NaN);
             weather.visibility = (currently.has("visibility") ? currently.getDouble("visibility") * 1000 : Double.NaN);
             weather.rain_1h = (currently.has("precipIntensity") ? currently.getDouble("precipIntensity") : Double.NaN);
-            weather.rain_today = Double.NaN;
+            weather.rain_today = (currently.has("precipAccumulation") ? currently.getDouble("precipAccumulation") * 10 : Double.NaN);
             weather.clouds = (currently.has("cloudCover") ? currently.getDouble("cloudCover") * 100 : Double.NaN);
 
             weather.rawData = currently.toString();
