@@ -2547,7 +2547,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     });
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
 
-            seriesValue2.setColor(Color.MAGENTA);
+            seriesValue2.setColor(Color.RED);
 
             final boolean label3 = (colValue3 >= 0);
             seriesValue3.setColor(Color.YELLOW);
