@@ -96,7 +96,7 @@ public class LocationAdapter extends CursorAdapter {
         tvAltitude.setText(hasAltitude ? Long.toString(Math.round(altitude)) : "?");
 
         if (hasBearing) {
-            ivBearing.setRotation((float) bearing);
+            ivBearing.setRotation((float) bearing - 90);
             ivBearing.setVisibility(View.VISIBLE);
         } else
             ivBearing.setVisibility(View.INVISIBLE);

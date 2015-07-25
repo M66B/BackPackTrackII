@@ -44,7 +44,7 @@
         android:layout_height="15dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="3dp"
-        android:src="@drawable/navigation_60" />
+        android:src="@drawable/trending_60" />
 
     <TextView
         android:id="@+id/tvPrecipitation"

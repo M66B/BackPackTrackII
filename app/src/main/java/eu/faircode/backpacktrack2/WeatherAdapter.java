@@ -121,7 +121,7 @@ public class WeatherAdapter extends CursorAdapter {
             ivWindDirection.setVisibility(View.INVISIBLE);
         else {
             float wind_direction = cursor.getFloat(colWindDirection);
-            ivWindDirection.setRotation(wind_direction + 180);
+            ivWindDirection.setRotation(wind_direction - 90 + 180);
             ivWindDirection.setVisibility(View.VISIBLE);
         }
 
