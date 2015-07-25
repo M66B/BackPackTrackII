@@ -26,8 +26,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
 import android.os.PowerManager;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
@@ -222,7 +220,7 @@ public class LocationService extends IntentService {
                 Log.i(TAG, "Unknown action");
         } catch (Throwable ex) {
             Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            toast(ex.toString(), Toast.LENGTH_LONG, this);
+            Util.toast(ex.toString(), Toast.LENGTH_LONG, this);
         } finally {
             if (wakeLock != null)
                 wakeLock.release();
@@ -333,7 +331,7 @@ public class LocationService extends IntentService {
 
             // Debug
             if (Util.debugMode(this) && lastActivity != activity.getType())
-                toast(getActivityName(activity.getType(), this), Toast.LENGTH_SHORT, this);
+                Util.toast(getActivityName(activity.getType(), this), Toast.LENGTH_SHORT, this);
 
             // Feedback
             updateState(this, "new activity");
@@ -551,7 +549,7 @@ public class LocationService extends IntentService {
             // Feedback
             updateState(this, "passive location");
             if (Util.debugMode(this))
-                toast(getString(R.string.title_trackpoint) +
+                Util.toast(getString(R.string.title_trackpoint) +
                         " " + getProviderName(location, this) +
                         " " + Math.round(bchange) +
                         "° / " + Math.round(achange) + "m", Toast.LENGTH_SHORT, this);
@@ -646,7 +644,7 @@ public class LocationService extends IntentService {
             if (name == null)
                 name = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
             new DatabaseHelper(this).insertLocation(location, name, -1, -1, -1).close();
-            toast(getString(R.string.msg_added, name), Toast.LENGTH_LONG, this);
+            Util.toast(getString(R.string.msg_added, name), Toast.LENGTH_LONG, this);
         }
     }
 
@@ -732,7 +730,7 @@ public class LocationService extends IntentService {
 
         // Feedback
         if (ACTION_UPLOAD_GPX.equals(intent.getAction())) {
-            toast(getString(R.string.msg_uploaded, url), Toast.LENGTH_LONG, this);
+            Util.toast(getString(R.string.msg_uploaded, url), Toast.LENGTH_LONG, this);
             Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(500);
         }
@@ -848,11 +846,10 @@ public class LocationService extends IntentService {
                         && !Double.isNaN(weather.pressure)) {
                     found = true;
 
-                    new DatabaseHelper(this).insertWeather(weather, lastLocation).close();
-
-                    // Debug
-                    if (Util.debugMode(this))
-                        toast("Weather update", Toast.LENGTH_SHORT, this);
+                    DatabaseHelper dh = new DatabaseHelper(this);
+                    if (dh.insertWeather(weather, lastLocation) && Util.debugMode(this))
+                        Util.toast("Weather update", Toast.LENGTH_SHORT, this);
+                    dh.close();
 
                     Log.i(TAG, "Reference pressure " + weather.pressure + "hPa " +
                             weather.station_name + " @" + SimpleDateFormat.getDateTimeInstance().format(weather.time));
@@ -1265,11 +1262,11 @@ public class LocationService extends IntentService {
             updateState(this, "handle location");
             if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT) {
                 if (locationType == LOCATION_WAYPOINT)
-                    toast(waypointName, Toast.LENGTH_LONG, this);
+                    Util.toast(waypointName, Toast.LENGTH_LONG, this);
                 Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(locationType == LOCATION_TRACKPOINT ? VIBRATE_SHORT : VIBRATE_LONG);
             } else if (Util.debugMode(this))
-                toast(getString(R.string.title_trackpoint) + " " + getProviderName(location, this), Toast.LENGTH_SHORT, this);
+                Util.toast(getString(R.string.title_trackpoint) + " " + getProviderName(location, this), Toast.LENGTH_SHORT, this);
         } else
             Log.i(TAG, "Filtered location=" + location);
     }
@@ -1646,15 +1643,6 @@ public class LocationService extends IntentService {
             if (dh != null)
                 dh.close();
         }
-    }
-
-    private static void toast(final String text, final int length, final Context context) {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(context, text, length).show();
-            }
-        });
     }
 
     // Serialization

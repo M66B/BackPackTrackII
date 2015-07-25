@@ -666,7 +666,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Weather
 
-    public DatabaseHelper insertWeather(OpenWeatherMap.Weather weather, Location location) {
+    public boolean insertWeather(OpenWeatherMap.Weather weather, Location location) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
 
@@ -675,7 +675,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 c = db.query("weather", new String[]{"ID"}, "time = ? AND station_id = ?",
                         new String[]{Long.toString(weather.time), Long.toString(weather.station_id)}, null, null, null, null);
                 if (c.getCount() != 0)
-                    return this;
+                    return false;
             } finally {
                 if (c != null)
                     c.close();
@@ -741,7 +741,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
-        return this;
+        return true;
     }
 
     public Cursor getWeather(boolean asc) {
