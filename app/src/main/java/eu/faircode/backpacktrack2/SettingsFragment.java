@@ -297,6 +297,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_LAST_FROM = "pref_last_from";
     public static final String PREF_LAST_TO = "pref_last_to";
 
+    // Constants
     private static final int ACTIVITY_PICKPLACE = 1;
     private static final int GEOCODER_RESULTS = 5;
     private static final long DAY_MS = 24L * 3600L * 1000L;

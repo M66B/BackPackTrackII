@@ -830,6 +830,7 @@ public class LocationService extends IntentService {
                     listWeather.add(w);
             }
 
+            // Find station with precipitation data
             OpenWeatherMap.Weather rainy = null;
             if (firstrain)
                 for (OpenWeatherMap.Weather weather : listWeather) {
@@ -843,6 +844,7 @@ public class LocationService extends IntentService {
                     }
                 }
 
+            // Select best weather station
             boolean found = false;
             for (OpenWeatherMap.Weather weather : listWeather) {
                 float distance = weather.station_location.distanceTo(lastLocation);
@@ -860,6 +862,7 @@ public class LocationService extends IntentService {
                         && !Double.isNaN(weather.pressure)) {
                     found = true;
 
+                    // Persist weather
                     DatabaseHelper dh = new DatabaseHelper(this);
                     if (dh.insertWeather(weather, lastLocation) && Util.debugMode(this))
                         Util.toast(getString(R.string.title_weather_settings), Toast.LENGTH_SHORT, this);
@@ -873,6 +876,7 @@ public class LocationService extends IntentService {
                     }
                     dh.close();
 
+                    // Persist reference pressure
                     Log.i(TAG, "Reference pressure " + weather.pressure + "hPa " +
                             weather.station_name + " @" + SimpleDateFormat.getDateTimeInstance().format(weather.time));
                     prefs.edit().putFloat(SettingsFragment.PREF_PRESSURE_REF_LAT, (float) weather.station_location.getLatitude()).apply();
