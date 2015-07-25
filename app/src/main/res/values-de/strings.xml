@@ -10,7 +10,7 @@
     <string name="title_location_history">Positionsverlauf</string>
     <string name="title_activity_history">Aktivitätenverlauf</string>
     <string name="title_step_history">Schrittverlauf</string>
-    <string name="title_weather_history">Weather history</string>
+    <string name="title_weather_history">Wetterhistorie</string>
     <string name="title_loc_settings">Standorteinstellungen</string>
 
     <string name="title_geocode">Geocode-Adresse</string>
@@ -112,7 +112,7 @@
     <string name="title_version">Version</string>
     <string name="title_support">Problem melden</string>
     <string name="title_debug">Debug Modus</string>
-    <string name="title_logcat">Send logcat</string>
+    <string name="title_logcat">Logcat senden</string>
     <string name="title_author">Verfasser</string>
     <string name="title_license">Lizenz</string>
 
