@@ -262,8 +262,8 @@
     <string name="menu_elevation_loc">Höhe für Standort beziehen</string>
     <string name="menu_elevation_day">Höhe für Tag beziehen</string>
     <string name="menu_delete">Löschen</string>
-    <string name="menu_station_one">Use this station</string>
-    <string name="menu_station_all">Use all stations</string>
+    <string name="menu_station_one">Benutze diese Station</string>
+    <string name="menu_station_all">Benutze alle Stationen</string>
 
     <string name="still">Stillstand</string>
     <string name="tilting">Kippen</string>
