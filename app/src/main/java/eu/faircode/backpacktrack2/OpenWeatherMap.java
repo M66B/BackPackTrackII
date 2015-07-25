@@ -61,7 +61,7 @@ public class OpenWeatherMap {
                     (Double.isNaN(rain_today) ? "-" : DF.format(rain_today)) + " mm";
         }
 
-        private static String getStationType(int type) {
+        public static String getStationType(int type) {
             switch (type) {
                 case 1:
                     return "Airport";

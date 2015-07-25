@@ -2244,33 +2244,66 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Cursor cursor = (Cursor) lv.getItemAtPosition(position);
-                if (cursor != null) {
-                    long station_id = cursor.getLong(cursor.getColumnIndex("station_id"));
-                    int station_type = cursor.getInt(cursor.getColumnIndex("station_type"));
-                    String station_name = cursor.getString(cursor.getColumnIndex("station_name"));
+                if (cursor == null)
+                    return;
 
-                    Location station = null;
-                    if (!cursor.isNull(cursor.getColumnIndex("station_latitude")) &&
-                            !cursor.isNull(cursor.getColumnIndex("station_longitude"))) {
-                        station = new Location("station");
-                        station.setLatitude(cursor.getDouble(cursor.getColumnIndex("station_latitude")));
-                        station.setLongitude(cursor.getDouble(cursor.getColumnIndex("station_longitude")));
-                    }
+                long station_id = cursor.getLong(cursor.getColumnIndex("station_id"));
+                int station_type = cursor.getInt(cursor.getColumnIndex("station_type"));
+                String station_name = cursor.getString(cursor.getColumnIndex("station_name"));
 
-                    Location observer = null;
-                    if (!cursor.isNull(cursor.getColumnIndex("latitude")) &&
-                            !cursor.isNull(cursor.getColumnIndex("longitude"))) {
-                        observer = new Location("station");
-                        observer.setLatitude(cursor.getDouble(cursor.getColumnIndex("latitude")));
-                        observer.setLongitude(cursor.getDouble(cursor.getColumnIndex("longitude")));
-                    }
-
-                    float distance = (station == null || observer == null ? Float.NaN : station.distanceTo(observer));
-
-                    Toast.makeText(getActivity(),
-                            station_id + " " + station_name + " " + station_type + " " +
-                                    (Float.isNaN(distance) ? "-" : Math.round(distance / 1000)) + " km", Toast.LENGTH_SHORT).show();
+                Location station = null;
+                if (!cursor.isNull(cursor.getColumnIndex("station_latitude")) &&
+                        !cursor.isNull(cursor.getColumnIndex("station_longitude"))) {
+                    station = new Location("station");
+                    station.setLatitude(cursor.getDouble(cursor.getColumnIndex("station_latitude")));
+                    station.setLongitude(cursor.getDouble(cursor.getColumnIndex("station_longitude")));
                 }
+
+                Location observer = null;
+                if (!cursor.isNull(cursor.getColumnIndex("latitude")) &&
+                        !cursor.isNull(cursor.getColumnIndex("longitude"))) {
+                    observer = new Location("station");
+                    observer.setLatitude(cursor.getDouble(cursor.getColumnIndex("latitude")));
+                    observer.setLongitude(cursor.getDouble(cursor.getColumnIndex("longitude")));
+                }
+
+                float distance = (station == null || observer == null ? Float.NaN : station.distanceTo(observer));
+
+                final double latitude = (station == null ? Double.NaN : station.getLatitude());
+                final double longitude = (station == null ? Double.NaN : station.getLongitude());
+                final String name = station_id + " " + station_name + " " +
+                        OpenWeatherMap.Weather.getStationType(station_type) + " " +
+                        (Float.isNaN(distance) ? "-" : Math.round(distance / 1000)) + " km";
+
+                PopupMenu popupMenu = new PopupMenu(getActivity(), view);
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.menu_share:
+                                try {
+                                    String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude;
+                                    if (name != null)
+                                        uri += "(" + Uri.encode(name) + ")";
+                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
+                                } catch (Throwable ex) {
+                                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                }
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                });
+
+                popupMenu.inflate(R.menu.weather);
+                if (name != null) {
+                    popupMenu.getMenu().findItem(R.id.menu_name).setTitle(name);
+                    popupMenu.getMenu().findItem(R.id.menu_name).setVisible(true);
+                }
+                popupMenu.getMenu().findItem(R.id.menu_share).setEnabled(station != null);
+                popupMenu.show();
             }
         });
 
