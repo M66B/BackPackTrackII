@@ -2481,7 +2481,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     if (!Double.isNaN(value))
                         value = value / 25.4;
                     if (!Double.isNaN(value2))
-                        value2 = value2 / 25.4; // rain today
+                        value3 = value3 / 25.4; // rain today
                 }
 
             if (!Double.isNaN(value)) {

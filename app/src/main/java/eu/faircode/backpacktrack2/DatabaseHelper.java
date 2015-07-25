@@ -743,7 +743,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (Double.isNaN(weather.wind_gust))
                 cv.putNull("wind_gust");
             else
-                cv.put("wind_gust", weather.wind_speed);
+                cv.put("wind_gust", weather.wind_gust);
 
             if (Double.isNaN(weather.wind_direction))
                 cv.putNull("wind_direction");
