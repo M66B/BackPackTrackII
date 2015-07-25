@@ -871,7 +871,9 @@ public class LocationService extends IntentService {
                         rainy.humidity = Double.NaN;
                         rainy.pressure = Double.NaN;
                         rainy.wind_speed = Double.NaN;
+                        rainy.wind_gust = Double.NaN;
                         rainy.wind_direction = Double.NaN;
+                        rainy.visibility = Double.NaN;
                         dh.insertWeather(rainy, lastLocation);
                     }
                     dh.close();
