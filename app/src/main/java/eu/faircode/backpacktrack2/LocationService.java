@@ -59,6 +59,7 @@ import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -315,12 +316,14 @@ public class LocationService extends IntentService {
             return;
         }
 
-        Log.i(TAG, "Activity=" + activity);
+        long time = new Date().getTime();
+        DateFormat DF = SimpleDateFormat.getDateTimeInstance();
+        Log.i(TAG, "Activity=" + activity + " @" + DF.format(time) +
+                " last=" + getActivityName(lastActivity, this) + " @" + DF.format(lastTime));
 
         // Check confidence
         if (activity.getConfidence() > pref_confidence) {
             // Persist probable activity
-            long time = new Date().getTime();
             prefs.edit().putInt(SettingsFragment.PREF_LAST_ACTIVITY, activity.getType()).apply();
             prefs.edit().putInt(SettingsFragment.PREF_LAST_CONFIDENCE, activity.getConfidence()).apply();
             prefs.edit().putLong(SettingsFragment.PREF_LAST_ACTIVITY_TIME, time).apply();
