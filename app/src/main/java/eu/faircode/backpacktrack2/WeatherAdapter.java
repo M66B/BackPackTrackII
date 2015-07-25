@@ -133,9 +133,8 @@ public class WeatherAdapter extends CursorAdapter {
             if ("in".equals(rain_unit)) {
                 rain_1h = rain_1h / 25.4f;
                 tvPrecipitation.setText(DF2.format(rain_1h));
-            } else {
+            } else
                 tvPrecipitation.setText(Integer.toString(Math.round(rain_1h)));
-            }
         }
     }
 }
