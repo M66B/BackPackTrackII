@@ -26,7 +26,7 @@ public class WeatherAdapter extends CursorAdapter {
     private int colRain1h;
     private String temperature_unit;
     private String pressure_unit;
-    private String speed_unit;
+    private String windspeed_unit;
     private String rain_unit;
     private static final DecimalFormat DF = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ROOT));
     private static final DecimalFormat DF2 = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.ROOT));
@@ -43,7 +43,7 @@ public class WeatherAdapter extends CursorAdapter {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         temperature_unit = prefs.getString(SettingsFragment.PREF_TEMPERATURE, SettingsFragment.DEFAULT_TEMPERATURE);
         pressure_unit = prefs.getString(SettingsFragment.PREF_PRESSURE, SettingsFragment.DEFAULT_PRESSURE);
-        speed_unit = prefs.getString(SettingsFragment.PREF_SPEED, SettingsFragment.DEFAULT_SPEED);
+        windspeed_unit = prefs.getString(SettingsFragment.PREF_WINDSPEED, SettingsFragment.DEFAULT_WINDSPEED);
         rain_unit = prefs.getString(SettingsFragment.PREF_PRECIPITATION, SettingsFragment.DEFAULT_PRECIPITATION);
     }
 
@@ -105,12 +105,12 @@ public class WeatherAdapter extends CursorAdapter {
         else {
             float wind_speed = cursor.getFloat(colWindSpeed);
 
-            if ("bft".equals(speed_unit))
+            if ("bft".equals(windspeed_unit))
                 wind_speed = (float) Math.pow(10.0, (Math.log10(wind_speed / 0.836) / 1.5));
-            else if ("kmh".equals(speed_unit))
+            else if ("kmh".equals(windspeed_unit))
                 wind_speed = wind_speed * 3600 / 1000;
 
-            if ("bft".equals(speed_unit))
+            if ("bft".equals(windspeed_unit))
                 tvWindSpeed.setText(Long.toString(Math.round(wind_speed)));
             else
                 tvWindSpeed.setText(DF.format(wind_speed));

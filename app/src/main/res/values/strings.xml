@@ -101,7 +101,7 @@
     <string name="title_units">Units</string>
     <string name="title_temperature">Temperature: %s</string>
     <string name="title_pressure">Pressure: %s</string>
-    <string name="title_speed">Speed: %s</string>
+    <string name="title_windspeed">Wind speed: %s</string>
     <string name="title_precipitation">Precipitation: %s</string>
 
     <string name="title_info">Information</string>

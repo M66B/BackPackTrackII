@@ -101,7 +101,7 @@
     <string name="title_units">Eenheden</string>
     <string name="title_temperature">Temperatuur: %s</string>
     <string name="title_pressure">Druk: %s</string>
-    <string name="title_speed">Snelheid: %s</string>
+    <string name="title_windspeed">Windsnelheid: %s</string>
     <string name="title_precipitation">Neerslag: %s</string>
 
     <string name="title_info">Informatie</string>

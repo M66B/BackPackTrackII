@@ -168,7 +168,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     public static final String PREF_TEMPERATURE = "pref_temperature";
     public static final String PREF_PRESSURE = "pref_pressure";
-    public static final String PREF_SPEED = "pref_speed";
+    public static final String PREF_WINDSPEED = "pref_windspeed";
     public static final String PREF_PRECIPITATION = "pref_precipitation";
 
     public static final String PREF_VERSION = "pref_version";
@@ -251,7 +251,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     public static final String DEFAULT_TEMPERATURE = "c";
     public static final String DEFAULT_PRESSURE = "hpa";
-    public static final String DEFAULT_SPEED = "bft";
+    public static final String DEFAULT_WINDSPEED = "bft";
     public static final String DEFAULT_PRECIPITATION = "mm";
 
     public static final boolean DEFAULT_GRAPH_STILL = false;
@@ -464,7 +464,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         updateTitle(prefs, PREF_TEMPERATURE);
         updateTitle(prefs, PREF_PRESSURE);
-        updateTitle(prefs, PREF_SPEED);
+        updateTitle(prefs, PREF_WINDSPEED);
         updateTitle(prefs, PREF_PRECIPITATION);
 
         updateTitle(prefs, PREF_SUPPORT);
@@ -2189,7 +2189,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             tvHeaderPressure.setText(R.string.header_mmhg);
 
         // Display speed unit
-        String speed_unit = prefs.getString(PREF_SPEED, DEFAULT_SPEED);
+        String speed_unit = prefs.getString(PREF_WINDSPEED, DEFAULT_WINDSPEED);
         if ("bft".equals(speed_unit))
             tvHeaderWindSpeed.setText(R.string.header_beaufort);
         else if ("ms".equals(speed_unit))
@@ -2326,7 +2326,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         String temperature_unit = prefs.getString(PREF_TEMPERATURE, DEFAULT_TEMPERATURE);
         String pressure_unit = prefs.getString(PREF_PRESSURE, DEFAULT_PRESSURE);
-        String speed_unit = prefs.getString(PREF_SPEED, DEFAULT_SPEED);
+        String speed_unit = prefs.getString(PREF_WINDSPEED, DEFAULT_WINDSPEED);
         String rain_unit = prefs.getString(PREF_PRECIPITATION, DEFAULT_PRECIPITATION);
 
         if ("temperature".equals(column)) {
@@ -2617,15 +2617,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             else if ("mmhg".equals(pressure_unit))
                 pressure_unit = getString(R.string.header_mmhg);
             pref.setTitle(getString(R.string.title_pressure, pressure_unit));
-        } else if (PREF_SPEED.equals(key)) {
-            String speed_unit = prefs.getString(key, DEFAULT_SPEED);
-            if ("bft".equals(speed_unit))
-                speed_unit = getString(R.string.header_beaufort);
-            else if ("ms".equals(speed_unit))
-                speed_unit = getString(R.string.header_ms);
-            else if ("kmh".equals(speed_unit))
-                speed_unit = getString(R.string.header_kph);
-            pref.setTitle(getString(R.string.title_speed, speed_unit));
+        } else if (PREF_WINDSPEED.equals(key)) {
+            String windspeed_unit = prefs.getString(key, DEFAULT_WINDSPEED);
+            if ("bft".equals(windspeed_unit))
+                windspeed_unit = getString(R.string.header_beaufort);
+            else if ("ms".equals(windspeed_unit))
+                windspeed_unit = getString(R.string.header_ms);
+            else if ("kmh".equals(windspeed_unit))
+                windspeed_unit = getString(R.string.header_kph);
+            pref.setTitle(getString(R.string.title_windspeed, windspeed_unit));
         } else if (PREF_PRECIPITATION.equals(key)) {
             String rain_unit = prefs.getString(key, DEFAULT_PRECIPITATION);
             if ("mm".equals(rain_unit))

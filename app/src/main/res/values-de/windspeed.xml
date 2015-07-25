@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="listSpeedName">
+    <string-array name="listWindSpeedName">
         <item>Beaufort</item>
         <item>m/s</item>
         <item>km/h</item>
     </string-array>
     <!-- do not translate values -->
-    <string-array name="listSpeedValue">
+    <string-array name="listWindSpeedValue">
         <item>bft</item>
         <item>ms</item>
         <item>kmh</item>

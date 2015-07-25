@@ -464,9 +464,9 @@
                 android:key="pref_temperature" />
             <ListPreference
                 android:defaultValue="bft"
-                android:entries="@array/listSpeedName"
-                android:entryValues="@array/listSpeedValue"
-                android:key="pref_speed" />
+                android:entries="@array/listWindSpeedName"
+                android:entryValues="@array/listWindSpeedValue"
+                android:key="pref_windspeed" />
             <ListPreference
                 android:defaultValue="hpa"
                 android:entries="@array/listPressureName"
