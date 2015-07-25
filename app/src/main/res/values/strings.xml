@@ -87,6 +87,7 @@
     <string name="title_weather_synop">Use SYNOP stations</string>
     <string name="title_weather_diy">Use DIY stations</string>
     <string name="title_weather_other">Use other stations</string>
+    <string name="title_weather_rain">Use first precipitation data</string>
     <string name="title_weather_tos">OpenWeatherMap TOS</string>
 
     <string name="title_blog">WordPress weblog</string>
@@ -175,6 +176,7 @@
     <string name="summary_weather_synop">Use data of Surface Synoptic Observations weather stations</string>
     <string name="summary_weather_diy">Use data of amateur weather stations</string>
     <string name="summary_weather_other">Use data of other weather station types</string>
+    <string name="summary_weather_rain">Use first available precipitation data, ignoring the station type, but honoring the sort order</string>
     <string name="summary_weather_tos">Tap to read the terms of service of OpenWeatherMap (will start the browser)</string>
 
     <string name="summary_blogurl">WordPress weblog address</string>

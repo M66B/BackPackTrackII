@@ -815,6 +815,7 @@ public class LocationService extends IntentService {
             boolean synop = prefs.getBoolean(SettingsFragment.PREF_WEATHER_SYNOP, SettingsFragment.DEFAULT_WEATHER_SYNOP);
             boolean diy = prefs.getBoolean(SettingsFragment.PREF_WEATHER_DIY, SettingsFragment.DEFAULT_WEATHER_DIY);
             boolean other = prefs.getBoolean(SettingsFragment.PREF_WEATHER_OTHER, SettingsFragment.DEFAULT_WEATHER_OTHER);
+            boolean firstrain = prefs.getBoolean(SettingsFragment.PREF_WEATHER_RAIN, SettingsFragment.DEFAULT_WEATHER_RAIN);
             Log.i(TAG, "stations=" + stations + " maxage=" + maxage + " maxdist=" + maxdist + " weight=" + weight +
                     " id=" + id + " airport=" + airport + " cwop=" + cwop + " synop=" + synop + " diy=" + diy + " other=" + other);
 
@@ -828,6 +829,16 @@ public class LocationService extends IntentService {
                 if (w != null)
                     listWeather.add(w);
             }
+
+            double rain_1h = Double.NaN;
+            double rain_today = Double.NaN;
+            if (firstrain)
+                for (OpenWeatherMap.Weather weather : listWeather) {
+                    if (!Double.isNaN(weather.rain_1h) && Double.isNaN(rain_1h))
+                        rain_1h = weather.rain_1h;
+                    if (!Double.isNaN(weather.rain_today) && Double.isNaN(rain_today))
+                        rain_today = weather.rain_today;
+                }
 
             boolean found = false;
             for (OpenWeatherMap.Weather weather : listWeather) {
@@ -845,6 +856,14 @@ public class LocationService extends IntentService {
                                 ((weather.station_type < 1 || weather.station_type > 5 || weather.station_type == 4) && other))
                         && !Double.isNaN(weather.pressure)) {
                     found = true;
+
+                    if (firstrain) {
+                        if (Double.isNaN(weather.rain_1h))
+                            weather.rain_1h = rain_1h;
+
+                        if (Double.isNaN(weather.rain_today))
+                            weather.rain_today = rain_today;
+                    }
 
                     DatabaseHelper dh = new DatabaseHelper(this);
                     if (dh.insertWeather(weather, lastLocation) && Util.debugMode(this))

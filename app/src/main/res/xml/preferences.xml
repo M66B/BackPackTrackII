@@ -409,6 +409,12 @@
                 android:key="pref_weather_other"
                 android:summary="@string/summary_weather_other"
                 android:title="@string/title_weather_other" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="pref_weather_enabled"
+                android:key="pref_weather_rain"
+                android:summary="@string/summary_weather_rain"
+                android:title="@string/title_weather_rain" />
             <Preference
                 android:dependency="pref_weather_enabled"
                 android:summary="@string/summary_weather_tos"

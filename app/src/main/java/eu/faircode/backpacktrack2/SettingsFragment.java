@@ -142,6 +142,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_WEATHER_SYNOP = "pref_weather_synop";
     public static final String PREF_WEATHER_DIY = "pref_weather_diy";
     public static final String PREF_WEATHER_OTHER = "pref_weather_other";
+    public static final String PREF_WEATHER_RAIN = "pref_weather_rain";
 
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
     public static final String PREF_RECOGNITION_INTERVAL_STILL = "pref_recognition_interval_still";
@@ -229,6 +230,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final boolean DEFAULT_WEATHER_SYNOP = false;
     public static final boolean DEFAULT_WEATHER_DIY = false;
     public static final boolean DEFAULT_WEATHER_OTHER = false;
+    public static final boolean DEFAULT_WEATHER_RAIN = true;
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
     public static final String DEFAULT_RECOGNITION_INTERVAL_STILL = "60"; // seconds
