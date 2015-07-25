@@ -356,7 +356,7 @@
                 android:key="pref_weather_test"
                 android:summary="@string/summary_weather_test"
                 android:title="@string/title_weather_test" />
-            <PreferenceCategory android:title="@string/title_weather_owm">
+            <PreferenceCategory android:title="@string/title_weather_fio">
                 <EditTextPreference
                     android:dependency="pref_weather_enabled"
                     android:key="pref_weather_apikey_fio" />
