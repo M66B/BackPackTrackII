@@ -45,6 +45,7 @@ public class OpenWeatherMap {
         double wind_speed = Double.NaN;
         double wind_gust = Double.NaN;
         double wind_direction = Double.NaN;
+        double visibility = Double.NaN;
         double rain_1h = Double.NaN;
         double rain_today = Double.NaN;
 
@@ -59,6 +60,7 @@ public class OpenWeatherMap {
                     (Double.isNaN(wind_speed) ? "-" : DF.format(wind_speed)) + "/" +
                     (Double.isNaN(wind_gust) ? "-" : DF.format(wind_gust)) + " m/s " +
                     (Double.isNaN(wind_direction) ? "-" : DF.format(wind_direction)) + "° " +
+                    (Double.isNaN(visibility) ? "-" : DF.format(visibility)) + "m " +
                     (Double.isNaN(rain_1h) ? "-" : DF.format(rain_1h)) + "/" +
                     (Double.isNaN(rain_today) ? "-" : DF.format(rain_today)) + " mm";
         }
@@ -245,6 +247,12 @@ public class OpenWeatherMap {
                 weather.wind_gust = wind.getDouble("gust");
             if (wind.has("deg"))
                 weather.wind_direction = wind.getDouble("deg");
+        }
+
+        if (last.has("visibility")) {
+            JSONObject visibility = last.getJSONObject("visibility");
+            if (visibility.has("distance"))
+                weather.visibility = visibility.getDouble("distance");
         }
 
         if (last.has("rain")) {

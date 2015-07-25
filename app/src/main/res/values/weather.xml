@@ -5,6 +5,7 @@
         <item>Atmospheric pressure</item>
         <item>Wind speed/direction</item>
         <item>Precipitation 1 hour/today</item>
+        <item>Visibility</item>
     </string-array>
     <!-- do not translate values -->
     <string-array name="listWeatherValue">
@@ -12,5 +13,6 @@
         <item>pressure</item>
         <item>wind_speed</item>
         <item>rain_1h</item>
+        <item>visibility</item>
     </string-array>
 </resources>

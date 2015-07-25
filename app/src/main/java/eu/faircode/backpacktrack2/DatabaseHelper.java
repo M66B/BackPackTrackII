@@ -23,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 14;
+    private static final int DB_VERSION = 15;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
@@ -145,6 +145,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", wind_speed REAL NULL" +
                 ", wind_gust REAL NULL" +
                 ", wind_direction REAL NULL" +
+                ", visibility REAL NULL" +
                 ", rain_1h REAL NULL" +
                 ", rain_today REAL NULL" +
                 ", created INTEGER NULL" + ");");
@@ -158,25 +159,34 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         db.beginTransaction();
         try {
-            if (oldVersion < 2)
+            if (oldVersion < 2) {
                 createTableActivityType(db);
+                oldVersion = 2;
+            }
 
-            if (oldVersion < 3)
+            if (oldVersion < 3) {
                 createTableStep(db);
+                oldVersion = 3;
+            }
 
-            if (oldVersion == 3) {
+            if (oldVersion < 4) {
                 db.execSQL("ALTER TABLE location ADD COLUMN activity_type INTEGER NULL");
                 db.execSQL("ALTER TABLE location ADD COLUMN activity_confidence INTEGER NULL");
                 db.execSQL("ALTER TABLE location ADD COLUMN stepcount INTEGER NULL");
+                oldVersion = 4;
             }
 
-            if (oldVersion == 4)
+            if (oldVersion < 5) {
                 db.execSQL("UPDATE step SET time = time - " + TimeZone.getDefault().getOffset(new Date().getTime()));
+                oldVersion = 5;
+            }
 
-            if (oldVersion < 7)
+            if (oldVersion < 7) {
                 createTableActivityDuration(db);
+                oldVersion = 7;
+            }
 
-            if (oldVersion == 7) {
+            if (oldVersion < 8) {
                 db.execSQL("ALTER TABLE activity RENAME TO activitytype");
                 // Index activity_time not renamed
                 db.execSQL("ALTER TABLE activityduration RENAME TO activityduration_orig");
@@ -186,15 +196,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         "INSERT INTO activityduration (time, still, walking, running, onbicycle, invehicle, unknown)" +
                                 " SELECT time, still, onfoot, running, onbicycle, invehicle, unknown FROM activityduration_orig");
                 db.execSQL("DROP TABLE activityduration_orig");
+                oldVersion = 8;
             }
 
-            if (oldVersion < 9)
+            if (oldVersion < 9) {
                 createTableActivityLog(db);
+                oldVersion = 9;
+            }
 
-            if (oldVersion < 10)
+            if (oldVersion < 10) {
                 createTableWeather(db);
+                oldVersion = 10;
+            }
 
-            if (oldVersion == 10) {
+            if (oldVersion < 11) {
                 db.execSQL("ALTER TABLE weather ADD COLUMN station_latitude REAL NULL");
                 db.execSQL("ALTER TABLE weather ADD COLUMN station_longitude REAL NULL");
                 //db.execSQL("ALTER TABLE weather DROP COLUMN distance");
@@ -202,9 +217,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.execSQL("UPDATE weather SET station_longitude = longitude");
                 db.execSQL("UPDATE weather SET latitude = NULL");
                 db.execSQL("UPDATE weather SET longitude = NULL");
+                oldVersion = 11;
             }
 
-            if (oldVersion == 11) {
+            if (oldVersion < 12) {
                 db.execSQL("ALTER TABLE weather RENAME TO weather_orig");
                 db.execSQL("DROP INDEX idx_weather_time");
                 db.execSQL("DROP INDEX idx_weather_station_id");
@@ -215,15 +231,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                                 " SELECT time, station_id, station_type, station_name, station_latitude, station_longitude" +
                                 ", latitude, longitude, temperature, humidity, pressure, wind_speed, wind_direction, created FROM weather_orig");
                 db.execSQL("DROP TABLE weather_orig");
+                oldVersion = 12;
             }
 
-            if (oldVersion == 12) {
+            if (oldVersion < 13) {
                 db.execSQL("ALTER TABLE weather ADD COLUMN rain_1h REAL NULL");
                 db.execSQL("ALTER TABLE weather ADD COLUMN rain_today REAL NULL");
+                oldVersion = 13;
             }
 
-            if (oldVersion == 13)
+            if (oldVersion < 14) {
                 db.execSQL("ALTER TABLE weather ADD COLUMN wind_gust REAL NULL");
+                oldVersion = 14;
+            }
+
+            if (oldVersion < 15) {
+                db.execSQL("ALTER TABLE weather ADD COLUMN visibility REAL NULL");
+                oldVersion = 15;
+            }
 
             db.setVersion(DB_VERSION);
 
@@ -724,6 +749,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cv.putNull("wind_direction");
             else
                 cv.put("wind_direction", weather.wind_direction);
+
+            if (Double.isNaN(weather.visibility))
+                cv.putNull("visibility");
+            else
+                cv.put("visibility", weather.visibility);
 
             if (Double.isNaN(weather.rain_1h))
                 cv.putNull("rain_1h");
