@@ -43,6 +43,8 @@ public class Weather {
     public double rain_1h = Double.NaN;
     public double rain_today = Double.NaN;
     public double clouds = Double.NaN;
+    public String icon = null;
+    public String summary = null;
     public String rawData = null;
 
     private static final DecimalFormat DF = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ROOT));
@@ -62,7 +64,8 @@ public class Weather {
                 (Double.isNaN(visibility) ? "-" : DF.format(visibility)) + "m " +
                 (Double.isNaN(rain_1h) ? "-" : DF.format(rain_1h)) + "/" +
                 (Double.isNaN(rain_today) ? "-" : DF.format(rain_today)) + " mm " +
-                (Double.isNaN(clouds) ? "-" : DF.format(clouds)) + "% ";
+                (Double.isNaN(clouds) ? "-" : DF.format(clouds)) + "% " +
+                icon + " " + summary;
     }
 
     public static String getStationType(int type) {

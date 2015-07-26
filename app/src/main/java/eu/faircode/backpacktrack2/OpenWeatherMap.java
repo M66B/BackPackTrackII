@@ -220,6 +220,8 @@ public class OpenWeatherMap {
                 weather.rain_today = rain.getDouble("today");
         }
 
+        weather.icon = null;
+        weather.summary = null;
         weather.rawData = entry.toString();
 
         return weather;
