@@ -351,6 +351,18 @@
                 android:defaultValue="true"
                 android:key="pref_weather_enabled"
                 android:title="@string/title_weather_enabled" />
+            <ListPreference
+                android:defaultValue="owm"
+                android:dependency="pref_weather_enabled"
+                android:entries="@array/listAPIName"
+                android:entryValues="@array/listAPIValue"
+                android:key="pref_weather_api" />
+            <EditTextPreference
+                android:defaultValue="30"
+                android:dependency="pref_weather_enabled"
+                android:inputType="number"
+                android:key="pref_weather_interval"
+                android:summary="@string/summary_weather_interval" />
             <Preference
                 android:dependency="pref_weather_enabled"
                 android:key="pref_weather_test"
@@ -373,12 +385,6 @@
                 <EditTextPreference
                     android:dependency="pref_weather_enabled"
                     android:key="pref_weather_apikey" />
-                <EditTextPreference
-                    android:defaultValue="60"
-                    android:dependency="pref_weather_enabled"
-                    android:inputType="number"
-                    android:key="pref_weather_interval"
-                    android:summary="@string/summary_weather_interval" />
                 <EditTextPreference
                     android:defaultValue="10"
                     android:dependency="pref_weather_enabled"

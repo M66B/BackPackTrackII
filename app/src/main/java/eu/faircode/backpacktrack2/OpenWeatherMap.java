@@ -176,6 +176,7 @@ public class OpenWeatherMap {
         long time = new Date().getTime();
         Weather weather = new Weather();
         weather.time = last.getLong("dt") * 1000;
+        weather.provider = "owm";
 
         weather.station_id = station.getLong("id");
         weather.station_type = (station.has("type") ? station.getInt("type") : -1);

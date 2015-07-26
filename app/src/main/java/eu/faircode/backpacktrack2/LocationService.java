@@ -791,7 +791,7 @@ public class LocationService extends IntentService {
         }
     }
 
-    private void handleWeatherUpdate(Intent intent) throws PackageManager.NameNotFoundException, IOException, JSONException {
+    private void handleWeatherUpdate(Intent intent) throws Throwable {
         // Get weather
         try {
             // Check connectivity
@@ -805,6 +805,7 @@ public class LocationService extends IntentService {
                 return;
 
             // Get API key
+            String api = prefs.getString(SettingsFragment.PREF_WEATHER_API, SettingsFragment.DEFAULT_WEATHER_API);
             String apikey_fio = prefs.getString(SettingsFragment.PREF_WEATHER_APIKEY_FIO, null);
             String apikey_owm = prefs.getString(SettingsFragment.PREF_WEATHER_APIKEY_OWM, null);
             if (apikey_owm == null) {
@@ -829,29 +830,35 @@ public class LocationService extends IntentService {
 
             // Fetch weather
             List<Weather> listWeather = new ArrayList<Weather>();
-            if (id < 0)
-                if (apikey_fio == null)
+            if ("fio".equals(api)) {
+                // Forecast.io
+                Weather w = ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, this);
+                if (w != null)
+                    listWeather.add(w);
+            } else if ("owm".equals(api)) {
+                // OpenWeatherMap
+                if (id < 0)
                     listWeather = OpenWeatherMap.getWeatherByLocation(apikey_owm, lastLocation, stations, maxage, maxdist, weight, this);
                 else {
-                    Weather w = ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, this);
+                    Weather w = OpenWeatherMap.getWeatherByStation(apikey_owm, id, this);
                     if (w != null)
                         listWeather.add(w);
                 }
-            else {
-                Weather w = OpenWeatherMap.getWeatherByStation(apikey_owm, id, this);
-                if (w != null)
-                    listWeather.add(w);
-            }
+            } else
+                throw new Throwable("Unknown weather API");
+
+            long time = new Date().getTime();
 
             // Find station with precipitation data
             Weather rainy = null;
-            if (apikey_fio == null && firstrain)
+            if (firstrain && "owm".equals(api))
                 for (Weather weather : listWeather) {
                     float distance = weather.station_location.distanceTo(lastLocation);
-                    if (distance <= maxdist * 1000) {
+                    if (weather.time + maxage * 60 * 1000 >= time && distance <= maxdist * 1000) {
                         if (!Double.isNaN(weather.rain_1h) && !Double.isNaN(weather.rain_today)
                                 && (weather.rain_1h > 0 || weather.rain_today > 0)) {
                             rainy = weather;
+                            Log.i(TAG, "Rainy " + rainy);
                             break;
                         }
                     }
@@ -863,10 +870,9 @@ public class LocationService extends IntentService {
                 float distance = weather.station_location.distanceTo(lastLocation);
                 Log.i(TAG, weather.toString() + " " + Math.round(distance) + "m");
 
-                long time = new Date().getTime();
                 if (!found &&
                         weather.time + maxage * 60 * 1000 >= time &&
-                        (id > 0 || apikey_fio != null ||
+                        ("fio".equals(api) || id > 0 ||
                                 (weather.station_type == 1 && airport) ||
                                 (weather.station_type == 2 && cwop) ||
                                 (weather.station_type == 3 && synop) ||

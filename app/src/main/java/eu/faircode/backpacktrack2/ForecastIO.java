@@ -77,6 +77,7 @@ public class ForecastIO {
 
             Weather weather = new Weather();
             weather.time = currently.getLong("time") * 1000;
+            weather.provider = "fio";
             weather.station_id = -1;
             weather.station_type = -1;
             weather.station_name = "-";

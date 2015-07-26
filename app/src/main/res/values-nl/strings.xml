@@ -79,11 +79,12 @@
 
     <string name="title_weather_settings">Weer</string>
     <string name="title_weather_enabled">Weer bijwerken aan</string>
+    <string name="title_weather_api">Weer provider: %s</string>
+    <string name="title_weather_interval">Weer ververs interval: %s minuten</string>
     <string name="title_weather_test">Show weather data</string>
     <string name="title_weather_fio">Forecast.io</string>
     <string name="title_weather_owm">OpenWeatherMap</string>
     <string name="title_weather_apikey">API key: %s</string>
-    <string name="title_weather_interval">Weer ververs interval: %s minuten</string>
     <string name="title_weather_stations">Aantal weerstations: %s</string>
     <string name="title_weather_maxage">Weergegevens max. leeftijd: %s minuten</string>
     <string name="title_weather_weight">Weergegevems sorteer factor: %s</string>
@@ -173,10 +174,10 @@
     <string name="summary_weight">Your weight in kilograms to calculate the number of calories burned</string>
 
     <string name="summary_weather_interval">Fetch weather data every selected number of minutes</string>
+    <string name="summary_weather_test">Tap to display raw weather data</string>
     <string name="summary_weather_stations">Fetch data for the selected number of weather stations</string>
     <string name="summary_weather_maxage">Display weather data for maximum the selected number of minutes</string>
     <string name="summary_weather_weight">0=sorteer op afstand\n&#8734;=sorteer op leeftijd</string>
-    <string name="summary_weather_test">Tap to display raw weather data</string>
     <string name="summary_weather_id">Use specific weather station designated by ID</string>
     <string name="summary_weather_airport">Use data of airport weather stations</string>
     <string name="summary_weather_cwop">Use data of Citizen Weather Observer Program weather stations</string>

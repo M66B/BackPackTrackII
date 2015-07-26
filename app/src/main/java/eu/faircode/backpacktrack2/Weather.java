@@ -28,6 +28,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class Weather {
     public long time = -1;
+    public String provider = null;
     public long station_id = -1;
     public int station_type = -1;
     public String station_name = null;
@@ -49,6 +50,7 @@ public class Weather {
     @Override
     public String toString() {
         return SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT).format(time) + " " +
+                provider + " " +
                 station_id + " " + station_name + " " +
                 "" + getStationType(station_type) + " " +
                 (Double.isNaN(temperature) ? "-" : DF.format(temperature)) + "°C " +

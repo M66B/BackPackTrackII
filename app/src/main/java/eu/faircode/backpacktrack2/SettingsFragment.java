@@ -131,6 +131,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
 
     public static final String PREF_WEATHER_ENABLED = "pref_weather_enabled";
+    public static final String PREF_WEATHER_API = "pref_weather_api";
     public static final String PREF_WEATHER_TEST = "pref_weather_test";
     public static final String PREF_WEATHER_APIKEY_FIO = "pref_weather_apikey_fio";
     public static final String PREF_WEATHER_APIKEY_OWM = "pref_weather_apikey";
@@ -224,7 +225,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
 
     public static final boolean DEFAULT_WEATHER_ENABLED = true;
-    public static final String DEFAULT_WEATHER_INTERVAL = "60"; // minutes
+    public static final String DEFAULT_WEATHER_API = "owm";
+    public static final String DEFAULT_WEATHER_INTERVAL = "30"; // minutes
     public static final String DEFAULT_WEATHER_STATIONS = "10"; // count
     public static final String DEFAULT_WEATHER_MAXAGE = "120"; // minutes
     public static final String DEFAULT_WEATHER_WEIGHT = "0.2";
@@ -444,6 +446,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         updateTitle(prefs, PREF_ALTITUDE_AVG);
 
+        updateTitle(prefs, PREF_WEATHER_API);
         updateTitle(prefs, PREF_WEATHER_INTERVAL);
         updateTitle(prefs, PREF_WEATHER_APIKEY_FIO);
         updateTitle(prefs, PREF_WEATHER_APIKEY_OWM);
@@ -628,6 +631,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     protected Object doInBackground(Object... objects) {
                         try {
                             // Get API key
+                            String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
                             String apikey_fio = prefs.getString(PREF_WEATHER_APIKEY_FIO, null);
                             String apikey_owm = prefs.getString(PREF_WEATHER_APIKEY_OWM, null);
                             if (apikey_owm == null) {
@@ -635,18 +639,21 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 apikey_owm = app.metaData.getString("org.openweathermap.API_KEY", null);
                             }
 
-                            if (apikey_fio == null) {
-                                int stations = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_STATIONS, SettingsFragment.DEFAULT_WEATHER_STATIONS));
-                                int maxage = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXAGE, SettingsFragment.DEFAULT_PRESSURE_MAXAGE));
-                                int maxdist = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXDIST, SettingsFragment.DEFAULT_PRESSURE_MAXDIST));
-                                float weight = Float.parseFloat(prefs.getString(SettingsFragment.PREF_WEATHER_WEIGHT, SettingsFragment.DEFAULT_WEATHER_WEIGHT));
-                                return OpenWeatherMap.getWeatherByLocation(apikey_owm, lastLocation, stations, maxage, maxdist, weight, getActivity());
-                            } else {
+                            // Weather provider
+                            if ("fio".equals(api)) {
+                                // Forecast.io
                                 List<Weather> listWeather = new ArrayList<Weather>();
                                 Weather w = ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, getActivity());
                                 if (w != null)
                                     listWeather.add(w);
                                 return listWeather;
+                            } else {
+                                // OpenWeatherMap
+                                int stations = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_STATIONS, SettingsFragment.DEFAULT_WEATHER_STATIONS));
+                                int maxage = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXAGE, SettingsFragment.DEFAULT_PRESSURE_MAXAGE));
+                                int maxdist = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXDIST, SettingsFragment.DEFAULT_PRESSURE_MAXDIST));
+                                float weight = Float.parseFloat(prefs.getString(SettingsFragment.PREF_WEATHER_WEIGHT, SettingsFragment.DEFAULT_WEATHER_WEIGHT));
+                                return OpenWeatherMap.getWeatherByLocation(apikey_owm, lastLocation, stations, maxage, maxdist, weight, getActivity());
                             }
                         } catch (Throwable ex) {
                             return ex;
@@ -2258,6 +2265,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     return;
 
                 final long weather_id = cursor.getLong(cursor.getColumnIndex("ID"));
+                String provider = cursor.getString(cursor.getColumnIndex("provider"));
                 final long station_id = cursor.getLong(cursor.getColumnIndex("station_id"));
                 int station_type = cursor.getInt(cursor.getColumnIndex("station_type"));
                 String station_name = cursor.getString(cursor.getColumnIndex("station_name"));
@@ -2282,9 +2290,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                 final double latitude = (station == null ? Double.NaN : station.getLatitude());
                 final double longitude = (station == null ? Double.NaN : station.getLongitude());
-                final String name = station_id + " " + station_name + " " +
+                final String name = ("fio".equals(provider))
+                        ? getString(R.string.title_weather_fio)
+                        : (station_id + " " + station_name + " " +
                         Weather.getStationType(station_type) + " " +
-                        (Float.isNaN(distance) ? "-" : Math.round(distance / 1000)) + " km";
+                        (Float.isNaN(distance) ? "-" : Math.round(distance / 1000)) + " km");
 
                 PopupMenu popupMenu = new PopupMenu(getActivity(), view);
 
@@ -2399,8 +2409,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         if ("temperature".equals(column)) {
             // humidity
-            minValue2 = 0;
-            maxValue2 = 100;
+            minValue3 = 0;
+            maxValue3 = 100;
         } else if ("wind_speed".equals(column)) {
             minValue = 0;
             if ("bft".equals(speed_unit))
@@ -2423,6 +2433,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         } else if ("clouds".equals(column)) {
             minValue = 0;
             maxValue = 100;
+        } else if ("visibility".equals(column)) {
+            minValue = 0;
+            maxValue = 10000;
         }
 
         Cursor cursor = db.getWeather(true);
@@ -2549,6 +2562,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 return super.formatLabel(value, isValueX);
                             else if ("wind_direction".equals(column))
                                 return LocationService.getWindDirectionName((float) value, getActivity());
+                            else if ("clouds".equals(column))
+                                return Long.toString(Math.round(value));
+                            else if ("visibility".equals(column))
+                                return DF.format(value / 1000);
                             else
                                 return DF.format(value);
                         }
@@ -2569,10 +2586,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             return " " + (humidity >= 100 ? "99" : Long.toString(humidity));
                         } else if ("wind_speed".equals(column))
                             return " " + LocationService.getWindDirectionName((float) value, getActivity());
-                        else if ("clouds".equals(column)) {
-                            long clouds = Math.round(value);
-                            return " " + (clouds >= 100 ? "99" : Long.toString(clouds));
-                        } else
+                        else
                             return " " + DF.format(value); // rain today
                     else
                         return "";
@@ -2662,7 +2676,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if (PREF_ALTITUDE_AVG.equals(key))
             pref.setTitle(getString(R.string.title_altitude_avg, prefs.getString(key, DEFAULT_ALTITUDE_AVG)));
 
-        else if (PREF_WEATHER_INTERVAL.equals(key))
+        else if (PREF_WEATHER_API.equals(key)) {
+            String weather_api = prefs.getString(key, DEFAULT_WEATHER_API);
+            if ("owm".equals(weather_api))
+                weather_api = getString(R.string.title_weather_owm);
+            else if ("fio".equals(weather_api))
+                weather_api = getString(R.string.title_weather_fio);
+            pref.setTitle(getString(R.string.title_weather_api, weather_api));
+        } else if (PREF_WEATHER_INTERVAL.equals(key))
             pref.setTitle(getString(R.string.title_weather_interval, prefs.getString(key, DEFAULT_WEATHER_INTERVAL)));
         else if (PREF_WEATHER_APIKEY_FIO.equals(key) || PREF_WEATHER_APIKEY_OWM.equals(key))
             pref.setTitle(getString(R.string.title_weather_apikey, prefs.getString(key, getString(R.string.msg_notset))));

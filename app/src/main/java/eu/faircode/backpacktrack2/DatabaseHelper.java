@@ -23,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 16;
+    private static final int DB_VERSION = 17;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
@@ -132,6 +132,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE weather (" +
                 " ID INTEGER PRIMARY KEY AUTOINCREMENT" +
                 ", time INTEGER NOT NULL" +
+                ", provider TEXT NULL" +
                 ", station_id INTEGER NOT NULL" +
                 ", station_type INTEGER NOT NULL" +
                 ", station_name TEXT NULL" +
@@ -254,6 +255,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (oldVersion < 16) {
                 db.execSQL("ALTER TABLE weather ADD COLUMN clouds REAL NULL");
                 oldVersion = 16;
+            }
+
+            if (oldVersion < 17) {
+                db.execSQL("ALTER TABLE weather ADD COLUMN provider TEXT NULL");
+                db.execSQL("UPDATE weather SET provider = 'owm' WHERE station_id >= 0");
+                db.execSQL("UPDATE weather SET provider = 'fio' WHERE station_id < 0");
+                oldVersion = 17;
             }
 
             db.setVersion(DB_VERSION);
@@ -718,6 +726,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             ContentValues cv = new ContentValues();
             cv.put("time", weather.time);
+            cv.put("provider", weather.provider);
             cv.put("station_id", weather.station_id);
             cv.put("station_type", weather.station_type);
             cv.put("station_name", weather.station_name);
