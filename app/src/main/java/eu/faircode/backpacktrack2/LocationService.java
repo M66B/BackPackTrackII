@@ -60,12 +60,15 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import de.timroes.axmlrpc.XMLRPCClient;
@@ -127,6 +130,8 @@ public class LocationService extends IntentService {
 
     private static final int ALARM_DUE_TIME = 5 * 1000; // milliseconds
 
+    private static final int NOTIFICATION_LOCATION = 0;
+    private static final int NOTIFICATION_WEATHER = 1;
     private static int mEGM96Pointer = -1;
     private static int mEGM96Offset;
 
@@ -833,8 +838,10 @@ public class LocationService extends IntentService {
             if ("fio".equals(api)) {
                 // Forecast.io
                 Weather w = ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, this);
-                if (w != null)
+                if (w != null) {
                     listWeather.add(w);
+                    showWeatherNotification(w, this);
+                }
             } else if ("owm".equals(api)) {
                 // OpenWeatherMap
                 if (id < 0)
@@ -1519,7 +1526,7 @@ public class LocationService extends IntentService {
         notificationBuilder.setOngoing(true);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            notificationBuilder.setCategory(Notification.CATEGORY_SERVICE);
+            notificationBuilder.setCategory(Notification.CATEGORY_STATUS);
             notificationBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
 
@@ -1573,7 +1580,52 @@ public class LocationService extends IntentService {
         }
 
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        nm.notify(0, notificationBuilder.build());
+        nm.notify(NOTIFICATION_LOCATION, notificationBuilder.build());
+    }
+
+    private static void cancelNotification(Context context) {
+        NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        nm.cancel(NOTIFICATION_LOCATION);
+    }
+
+    public static void showWeatherNotification(Weather weather, Context context) {
+        Notification.Builder notificationBuilder = new Notification.Builder(context);
+        int resId = (weather.icon == null ? -1 : context.getResources().getIdentifier(weather.icon.replace("-", "-"), "drawable", context.getPackageName()));
+        Log.i(TAG, "icon=" + weather.icon + " res=" + resId);
+        if (resId > 0) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), resId).copy(Bitmap.Config.ARGB_8888, true);
+                notificationBuilder.setLargeIcon(largeIcon);
+                notificationBuilder.setSmallIcon(resId);
+            } else
+                notificationBuilder.setSmallIcon(resId);
+        }
+        notificationBuilder.setContentTitle(weather.summary);
+
+        double temperature = weather.temperature;
+        if (!Double.isNaN(temperature)) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            String temperature_unit = prefs.getString(SettingsFragment.PREF_TEMPERATURE, SettingsFragment.DEFAULT_TEMPERATURE);
+            if ("f".equals(temperature_unit))
+                temperature = temperature * 9 / 5 + 32;
+            final DecimalFormat DF = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.ROOT));
+            notificationBuilder.setContentText(DF.format(temperature) + "°" + temperature_unit.toUpperCase());
+        }
+        notificationBuilder.setUsesChronometer(true);
+        notificationBuilder.setWhen(System.currentTimeMillis());
+        notificationBuilder.setAutoCancel(false);
+        notificationBuilder.setOngoing(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            notificationBuilder.setCategory(Notification.CATEGORY_STATUS);
+            notificationBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        }
+        NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        nm.notify(NOTIFICATION_WEATHER, notificationBuilder.build());
+    }
+
+    public static void removeWeatherIcon(Context context) {
+        NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        nm.cancel(NOTIFICATION_WEATHER);
     }
 
     public static String getActivityName(int activityType, Context context) {
@@ -1614,11 +1666,6 @@ public class LocationService extends IntentService {
         String provider = (location == null ? context.getString(R.string.undefined) : location.getProvider());
         int resId = context.getResources().getIdentifier("provider_" + provider, "string", context.getPackageName());
         return (resId == 0 ? provider : context.getString(resId));
-    }
-
-    private static void cancelNotification(Context context) {
-        NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        nm.cancel(0);
     }
 
     private static String writeFile(boolean gpx, String trackName, boolean extensions, long from, long to, Context context) throws IOException {

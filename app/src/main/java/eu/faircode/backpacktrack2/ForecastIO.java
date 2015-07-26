@@ -40,7 +40,8 @@ public class ForecastIO {
         URL url = new URL(BASE_URL + "/" + apikey + "/" +
                 String.valueOf(location.getLatitude()) + "," +
                 String.valueOf(location.getLongitude()) +
-                "?exclude=minutely,hourly,daily,alerts,flags&units=si");
+                "?exclude=minutely,hourly,daily,alerts,flags&units=si" +
+                "&lang=" + Locale.getDefault().getLanguage());
 
         Log.i(TAG, "url=" + url);
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
