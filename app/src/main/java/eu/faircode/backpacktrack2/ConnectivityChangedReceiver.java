@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import java.util.Date;
+
 public class ConnectivityChangedReceiver extends BroadcastReceiver {
     private static final String TAG = "BPT2.Connectivity";
 
@@ -15,9 +17,16 @@ public class ConnectivityChangedReceiver extends BroadcastReceiver {
         Log.i(TAG, "Received " + intent);
 
         if (Util.isConnected(context)) {
-            Intent intentWeather = new Intent(context, LocationService.class);
-            intentWeather.setAction(LocationService.EXPORTED_ACTION_UPDATE_WEATHER);
-            context.startService(intentWeather);
+            long time = new Date().getTime();
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            long ref_time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
+            int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_INTERVAL, SettingsFragment.DEFAULT_WEATHER_INTERVAL));
+
+            if (ref_time + interval * 60 * 1000 < time) {
+                Intent intentWeather = new Intent(context, LocationService.class);
+                intentWeather.setAction(LocationService.EXPORTED_ACTION_UPDATE_WEATHER);
+                context.startService(intentWeather);
+            }
         }
     }
 }
