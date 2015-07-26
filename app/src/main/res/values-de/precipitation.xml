@@ -2,7 +2,7 @@
 <resources>
     <string-array name="listPrecipitationName">
         <item>mm</item>
-        <item>inch</item>
+        <item>Zoll</item>
     </string-array>
     <!-- do not translate values -->
     <string-array name="listPrecipitationValue">
