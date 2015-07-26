@@ -225,6 +225,11 @@ When fetching Google Elevation data, your location (latitude/longitude) will be 
 When fetching weather data, your location (latitude/longitude) will be sent insecurely to api.openweathermap.org.
 Note, if a station ID is enter in 'Settings - Weather - Use weather station' your actaul location will not be sent, except when manually selecting the 'Show weather data' option.
 
+<a name="FAQ12"></a>
+**(12) How can I use forecast.io weather info?**
+
+In order to use forecast.io weather info you will need to register for developerer account [here](https://developer.forecast.io/), then you need to enter the API key into the weather settings.
+
 Android permissions
 -------------------
 
