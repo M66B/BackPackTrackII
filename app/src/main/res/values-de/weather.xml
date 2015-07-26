@@ -5,7 +5,7 @@
         <item>Luftdruck</item>
         <item>Windgeschwindigkeit/richtung</item>
         <item>Niederschlag 1 Stunde/heute</item>
-        <item>Bewölkt</item>
+        <item>Wolken</item>
         <item>Sichtweite</item>
     </string-array>
     <!-- do not translate values -->
