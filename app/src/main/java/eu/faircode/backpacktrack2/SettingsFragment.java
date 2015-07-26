@@ -2576,6 +2576,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 return DF.format(value);
                         }
                     });
+            graph.getGridLabelRenderer().setVerticalLabelsColor(seriesValue.getColor());
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
 
             seriesValue2.setColor(Color.RED);
