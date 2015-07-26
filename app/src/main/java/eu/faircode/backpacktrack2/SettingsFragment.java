@@ -2429,7 +2429,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         } else if ("rain_1h".equals(column)) {
             minValue = 0;
-            minValue2 = 0; // rain today
+            minValue3 = 0; // rain today
         } else if ("clouds".equals(column)) {
             minValue = 0;
             maxValue = 100;
