@@ -228,7 +228,8 @@ Note, if a station ID is enter in 'Settings - Weather - Use weather station' you
 <a name="FAQ12"></a>
 **(12) How can I use forecast.io weather info?**
 
-In order to use forecast.io weather info you will need to register for developerer account [here](https://developer.forecast.io/), then you need to enter the API key into the weather settings.
+In order to use Forecast.io weather information you will need to register for a developer account [here](https://developer.forecast.io/)
+and to enter the Forecast.io API key into the weather settings. Without API key you will get 'Forbidden'.
 
 Android permissions
 -------------------
