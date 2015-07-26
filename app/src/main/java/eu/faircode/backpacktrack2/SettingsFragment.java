@@ -603,10 +603,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             float altitude = PressureService.getAltitude(lastLocation, getActivity());
 
                             // Show reference/altitude
-                            DecimalFormat DF = new DecimalFormat("0.#", new DecimalFormatSymbols(Locale.ROOT));
+                            DecimalFormat DF = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.ROOT));
                             pref_pressure_test.setSummary(
                                     DF.format(ref_pressure) + " hPa " +
-                                            SimpleDateFormat.getDateTimeInstance().format(ref_time) + " " +
+                                            SimpleDateFormat.getDateTimeInstance().format(ref_time) + ": " +
                                             (Float.isNaN(altitude) ? "-" : Math.round(altitude)) + "m");
                             pref_pressure_test.setEnabled(true);
                         }

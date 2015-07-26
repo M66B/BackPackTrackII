@@ -15,8 +15,8 @@
 
     <ImageView
         android:id="@+id/ivWaypoint"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="3dp"
         android:src="@android:drawable/ic_menu_myplaces" />
@@ -41,11 +41,11 @@
 
     <ImageView
         android:id="@+id/ivBearing"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="3dp"
-        android:src="@drawable/navigation_60" />
+        android:src="@drawable/trending_60" />
 
     <TextView
         android:id="@+id/tvAccuracy"
