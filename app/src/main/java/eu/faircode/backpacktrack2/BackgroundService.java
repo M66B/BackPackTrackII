@@ -1735,6 +1735,15 @@ public class BackgroundService extends IntentService {
                 sb.append(context.getString(R.string.header_inch));
         }
 
+        // Clouds
+        double clouds = weather.clouds;
+        if (!Double.isNaN(clouds)) {
+            if (sb.length() > 0)
+                sb.append(" ");
+            sb.append(Math.round(clouds));
+            sb.append(("%"));
+        }
+
         notificationBuilder.setContentText(sb.toString());
 
         // Build main intent
