@@ -131,10 +131,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     public static final String PREF_WEATHER_ENABLED = "pref_weather_enabled";
     public static final String PREF_WEATHER_API = "pref_weather_api";
+    public static final String PREF_WEATHER_INTERVAL = "pref_weather_interval";
     public static final String PREF_WEATHER_TEST = "pref_weather_test";
     public static final String PREF_WEATHER_APIKEY_FIO = "pref_weather_apikey_fio";
+    public static final String PREF_WEATHER_NOTIFICATION = "pref_weather_notification";
+    public static final String PREF_WEATHER_GUARD = "pref_weather_guard";
     public static final String PREF_WEATHER_APIKEY_OWM = "pref_weather_apikey";
-    public static final String PREF_WEATHER_INTERVAL = "pref_weather_interval";
     public static final String PREF_WEATHER_STATIONS = "pref_weather_stations";
     public static final String PREF_WEATHER_MAXAGE = "pref_weather_maxage";
     public static final String PREF_WEATHER_WEIGHT = "pref_weather_weight";
@@ -226,6 +228,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final boolean DEFAULT_WEATHER_ENABLED = true;
     public static final String DEFAULT_WEATHER_API = "owm";
     public static final String DEFAULT_WEATHER_INTERVAL = "30"; // minutes
+    public static final boolean DEFAULT_WEATHER_NOTIFICATION = true;
+    public static final String DEFAULT_WEATHER_GUARD = "60"; // minutes
     public static final String DEFAULT_WEATHER_STATIONS = "10"; // count
     public static final String DEFAULT_WEATHER_MAXAGE = "120"; // minutes
     public static final String DEFAULT_WEATHER_WEIGHT = "0.2";
@@ -448,6 +452,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_WEATHER_API);
         updateTitle(prefs, PREF_WEATHER_INTERVAL);
         updateTitle(prefs, PREF_WEATHER_APIKEY_FIO);
+        updateTitle(prefs, PREF_WEATHER_GUARD);
         updateTitle(prefs, PREF_WEATHER_APIKEY_OWM);
         updateTitle(prefs, PREF_WEATHER_STATIONS);
         updateTitle(prefs, PREF_WEATHER_MAXAGE);
@@ -761,13 +766,17 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Follow extern change (Tasker)
         if (PREF_ENABLED.equals(key))
-            ((CheckBoxPreference) pref).setChecked(prefs.getBoolean(PREF_ENABLED, DEFAULT_ENABLED));
+            ((CheckBoxPreference) pref).setChecked(prefs.getBoolean(key, DEFAULT_ENABLED));
 
-        // Reset activity
-        if (PREF_RECOGNITION_ENABLED.equals(key))
+            // Reset activity
+        else if (PREF_RECOGNITION_ENABLED.equals(key))
             prefs.edit().remove(PREF_LAST_ACTIVITY).apply();
 
-        if (PREF_WEATHER_MAXAGE.equals(key) ||
+        else if (PREF_WEATHER_NOTIFICATION.equals(key)) {
+            if (!prefs.getBoolean(key, DEFAULT_WEATHER_NOTIFICATION))
+                BackgroundService.removeWeatherIcon(getActivity());
+
+        } else if (PREF_WEATHER_MAXAGE.equals(key) ||
                 PREF_TEMPERATURE.equals(key)) {
             Intent intent = new Intent(getActivity(), BackgroundService.class);
             intent.setAction(BackgroundService.ACTION_STATE_CHANGED);
@@ -775,7 +784,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
 
         // Update blog URL
-        if (PREF_BLOGURL.equals(key)) {
+        else if (PREF_BLOGURL.equals(key)) {
             String blogurl = prefs.getString(key, null);
             if (blogurl != null) {
                 if (!blogurl.startsWith("http://") && !blogurl.startsWith("https://"))
@@ -2693,6 +2702,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref.setTitle(getString(R.string.title_weather_interval, prefs.getString(key, DEFAULT_WEATHER_INTERVAL)));
         else if (PREF_WEATHER_APIKEY_FIO.equals(key) || PREF_WEATHER_APIKEY_OWM.equals(key))
             pref.setTitle(getString(R.string.title_weather_apikey, prefs.getString(key, getString(R.string.msg_notset))));
+        else if (PREF_WEATHER_GUARD.equals(key))
+            pref.setTitle(getString(R.string.title_weather_guard, prefs.getString(key, DEFAULT_WEATHER_GUARD)));
         else if (PREF_WEATHER_STATIONS.equals(key))
             pref.setTitle(getString(R.string.title_weather_stations, prefs.getString(key, DEFAULT_WEATHER_STATIONS)));
         else if (PREF_WEATHER_MAXAGE.equals(key))

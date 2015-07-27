@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="listPressureName">
-        <item>hPa</item>
+        <item>hPa/mbar</item>
         <item>mmHg</item>
     </string-array>
     <!-- do not translate values -->

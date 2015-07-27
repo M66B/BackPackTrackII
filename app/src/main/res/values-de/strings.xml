@@ -82,6 +82,8 @@
     <string name="title_weather_api">Wetter Provider: %s</string>
     <string name="title_weather_interval">Wetter Aktualisierungsintervall: %s Minuten</string>
     <string name="title_weather_test">Zeige Wetter Daten</string>
+    <string name="title_weather_notification">Show weather notification</string>
+    <string name="title_weather_guard">Weather notification valid: %s minutes</string>
     <string name="title_weather_fio">Forecast.io</string>
     <string name="title_weather_owm">OpenWeatherMap</string>
     <string name="title_weather_apikey">API key: %s</string>

@@ -82,6 +82,8 @@
     <string name="title_weather_api">Weather provider: %s</string>
     <string name="title_weather_interval">Weather fetch interval: %s minutes</string>
     <string name="title_weather_test">Show weather data</string>
+    <string name="title_weather_notification">Show weather notification</string>
+    <string name="title_weather_guard">Weather notification valid: %s minutes</string>
     <string name="title_weather_fio">Forecast.io</string>
     <string name="title_weather_owm">OpenWeatherMap</string>
     <string name="title_weather_apikey">API key: %s</string>

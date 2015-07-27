@@ -79,7 +79,8 @@ public class BackgroundService extends IntentService {
     // Actions
     public static final String ACTION_ALARM = "Alarm";
     public static final String ACTION_DAILY = "Daily";
-    public static final String ACTION_UPDATE_WEATHER = "Weather";
+    public static final String ACTION_UPDATE_WEATHER = "WeatherUpdate";
+    public static final String ACTION_GUARD_WEATHER = "WeatherGuard";
     public static final String ACTION_ACTIVITY = "Activity";
     public static final String ACTION_LOCATION_FINE = "LocationFine";
     public static final String ACTION_LOCATION_COARSE = "LocationCoarse";
@@ -221,6 +222,9 @@ public class BackgroundService extends IntentService {
                     EXPORTED_ACTION_UPDATE_WEATHER.equals(intent.getAction()))
                 handleWeatherUpdate(intent);
 
+            else if (ACTION_GUARD_WEATHER.equals(intent.getAction()))
+                handleWeatherGuard(intent);
+
             else
                 Log.i(TAG, "Unknown action");
         } catch (Throwable ex) {
@@ -343,7 +347,7 @@ public class BackgroundService extends IntentService {
                 Util.toast(getActivityName(activity.getType(), this), Toast.LENGTH_SHORT, this);
 
             // Feedback
-            updateState(this, "new activity");
+            notifyState(this, "new activity");
 
             // Get parameters
             int act = activity.getType();
@@ -440,7 +444,7 @@ public class BackgroundService extends IntentService {
             editor.putInt(SettingsFragment.PREF_STATE, STATE_ACQUIRED);
             editor.putString(SettingsFragment.PREF_BEST_LOCATION, LocationSerializer.serialize(location));
             editor.apply();
-            updateState(this, "better location");
+            notifyState(this, "better location");
         }
 
         // Check altitude
@@ -558,7 +562,7 @@ public class BackgroundService extends IntentService {
             }
 
             // Feedback
-            updateState(this, "passive location");
+            notifyState(this, "passive location");
             if (Util.debugMode(this))
                 Util.toast(getString(R.string.title_trackpoint) +
                         " " + getProviderName(location, this) +
@@ -589,7 +593,7 @@ public class BackgroundService extends IntentService {
     }
 
     private void handleStateChanged(Intent intent) {
-        updateState(this, "state changed");
+        notifyState(this, "state changed");
     }
 
     private void handleLocationTimeout(Intent intent) {
@@ -790,7 +794,7 @@ public class BackgroundService extends IntentService {
             new DatabaseHelper(this).vacuum().close();
         } finally {
             startDaily(this);
-            updateState(this, "daily alarm");
+            notifyState(this, "daily alarm");
             StepCountWidget.updateWidgets(this);
         }
     }
@@ -818,6 +822,7 @@ public class BackgroundService extends IntentService {
             }
 
             // Get settings
+            boolean notification = prefs.getBoolean(SettingsFragment.PREF_WEATHER_NOTIFICATION, SettingsFragment.DEFAULT_WEATHER_NOTIFICATION);
             int stations = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_STATIONS, SettingsFragment.DEFAULT_WEATHER_STATIONS));
             int maxage = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXAGE, SettingsFragment.DEFAULT_PRESSURE_MAXAGE));
             int maxdist = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXDIST, SettingsFragment.DEFAULT_PRESSURE_MAXDIST));
@@ -839,7 +844,8 @@ public class BackgroundService extends IntentService {
                 Weather w = ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, this);
                 if (w != null) {
                     listWeather.add(w);
-                    showWeatherNotification(w, this);
+                    if (notification)
+                        showWeatherNotification(w, this);
                 }
             } else if ("owm".equals(api)) {
                 // OpenWeatherMap
@@ -917,8 +923,12 @@ public class BackgroundService extends IntentService {
             }
         } finally {
             startWeatherUpdates(this);
-            updateState(this, "weather");
+            notifyState(this, "weather");
         }
+    }
+
+    private void handleWeatherGuard(Intent intent) {
+        removeWeatherIcon(this);
     }
 
     // Start/stop methods
@@ -933,7 +943,7 @@ public class BackgroundService extends IntentService {
             return;
         }
 
-        updateState(context, "start tracking");
+        notifyState(context, "start tracking");
 
         // Start activity recognition / repeating alarm
         boolean recognition = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_ENABLED, SettingsFragment.DEFAULT_RECOGNITION_ENABLED);
@@ -1096,7 +1106,7 @@ public class BackgroundService extends IntentService {
             Log.i(TAG, "Set timeout=" + timeout + "s");
 
             prefs.edit().putInt(SettingsFragment.PREF_STATE, STATE_ACQUIRING).apply();
-            updateState(context, "start locating");
+            notifyState(context, "start locating");
         } else
             Log.i(TAG, "No location providers");
 
@@ -1180,7 +1190,7 @@ public class BackgroundService extends IntentService {
         editor.remove(SettingsFragment.PREF_LOCATION_TYPE);
         editor.remove(SettingsFragment.PREF_BEST_LOCATION);
         editor.apply();
-        updateState(context, "stop locating");
+        notifyState(context, "stop locating");
     }
 
     public static void startWeatherUpdates(Context context) {
@@ -1212,6 +1222,20 @@ public class BackgroundService extends IntentService {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
         Log.i(TAG, "Stop weather updates");
+    }
+
+    public static void startWeatherGuard(Context context) {
+        // Set alarm
+        Intent alarmIntent = new Intent(context, BackgroundService.class);
+        alarmIntent.setAction(BackgroundService.ACTION_GUARD_WEATHER);
+        PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        am.cancel(pi);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_GUARD, SettingsFragment.DEFAULT_WEATHER_GUARD));
+        long trigger = new Date().getTime() + 60 * 1000 * interval;
+        am.set(AlarmManager.RTC_WAKEUP, trigger, pi);
+        Log.i(TAG, "Set weather guard interval=" + interval + "m" + " trigger=" + SimpleDateFormat.getDateTimeInstance().format(trigger));
     }
 
     public static void startDaily(Context context) {
@@ -1322,7 +1346,7 @@ public class BackgroundService extends IntentService {
             }
 
             // Feedback
-            updateState(this, "handle location");
+            notifyState(this, "handle location");
             if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT) {
                 if (locationType == LOCATION_WAYPOINT)
                     Util.toast(waypointName, Toast.LENGTH_LONG, this);
@@ -1403,7 +1427,7 @@ public class BackgroundService extends IntentService {
         return listline;
     }
 
-    private static void updateState(Context context, String reason) {
+    private static void notifyState(Context context, String reason) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         // Check if tracking enabled
@@ -1589,28 +1613,106 @@ public class BackgroundService extends IntentService {
 
     public static void showWeatherNotification(Weather weather, Context context) {
         Notification.Builder notificationBuilder = new Notification.Builder(context);
-        int resId = (weather.icon == null ? -1 : context.getResources().getIdentifier(weather.icon.replace("-", "_git co"), "drawable", context.getPackageName()));
-        Log.i(TAG, "icon=" + weather.icon + " res=" + resId);
+        int resId = (weather.icon == null ? -1 : context.getResources().getIdentifier(weather.icon.replace("-", "_"), "drawable", context.getPackageName()));
         if (resId > 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), resId).copy(Bitmap.Config.ARGB_8888, true);
                 notificationBuilder.setLargeIcon(largeIcon);
-                notificationBuilder.setSmallIcon(resId);
+                notificationBuilder.setSmallIcon(getWindDirectionIcon((float) weather.wind_direction, context));
             } else
                 notificationBuilder.setSmallIcon(resId);
         } else
             notificationBuilder.setSmallIcon(android.R.drawable.ic_menu_help);
         notificationBuilder.setContentTitle(weather.summary);
 
+        StringBuilder sb = new StringBuilder();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        DecimalFormat DF1 = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ROOT));
+        DecimalFormat DF2 = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.ROOT));
+
+        // Temperature
         double temperature = weather.temperature;
         if (!Double.isNaN(temperature)) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             String temperature_unit = prefs.getString(SettingsFragment.PREF_TEMPERATURE, SettingsFragment.DEFAULT_TEMPERATURE);
             if ("f".equals(temperature_unit))
                 temperature = temperature * 9 / 5 + 32;
-            final DecimalFormat DF = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.ROOT));
-            notificationBuilder.setContentText(DF.format(temperature) + "°" + temperature_unit.toUpperCase());
+
+            sb.append(DF1.format(temperature));
+            if ("c".equals(temperature_unit))
+                sb.append(context.getString(R.string.header_celcius));
+            else if ("f".equals(temperature_unit))
+                sb.append(context.getString(R.string.header_fahrenheit));
         }
+
+        // Humidity
+        double humidity = weather.humidity;
+        if (!Double.isNaN(humidity)) {
+            if (sb.length() > 0)
+                sb.append(" ");
+            sb.append(DF1.format(humidity));
+            sb.append(("%"));
+        }
+
+        // Pressure
+        double pressure = weather.pressure;
+        if (!Double.isNaN(pressure)) {
+            String pressure_unit = prefs.getString(SettingsFragment.PREF_PRESSURE, SettingsFragment.DEFAULT_PRESSURE);
+            if ("mmhg".equals(pressure_unit))
+                pressure = pressure / 1.33322368f;
+
+            if (sb.length() > 0)
+                sb.append(" ");
+            if ("hpa".equals(pressure_unit))
+                sb.append(DF1.format(pressure));
+            else
+                sb.append(DF2.format(pressure));
+            sb.append(" ");
+            if ("hpa".equals(pressure_unit))
+                sb.append(context.getString(R.string.header_hpa));
+            else if ("mmhg".equals(pressure_unit))
+                sb.append(context.getString(R.string.header_mmhg));
+        }
+
+        // Wind speed
+        double wind_speed = weather.wind_speed;
+        if (!Double.isNaN(wind_speed)) {
+            String windspeed_unit = prefs.getString(SettingsFragment.PREF_WINDSPEED, SettingsFragment.DEFAULT_WINDSPEED);
+            if ("bft".equals(windspeed_unit))
+                wind_speed = (float) Math.pow(10.0, (Math.log10(wind_speed / 0.836) / 1.5));
+            else if ("kmh".equals(windspeed_unit))
+                wind_speed = wind_speed * 3600 / 1000;
+
+            if (sb.length() > 0)
+                sb.append(" ");
+            sb.append(DF1.format(wind_speed));
+            sb.append(" ");
+            if ("bft".equals(windspeed_unit))
+                sb.append(context.getString(R.string.header_beaufort));
+            else if ("ms".equals(windspeed_unit))
+                sb.append(context.getString(R.string.header_ms));
+            else if ("kmh".equals(windspeed_unit))
+                sb.append(context.getString(R.string.header_kph));
+        }
+
+        // Rain 1h
+        double rain_1h = weather.rain_1h;
+        if (!Double.isNaN(rain_1h)) {
+            String rain_unit = prefs.getString(SettingsFragment.PREF_PRECIPITATION, SettingsFragment.DEFAULT_PRECIPITATION);
+            if ("in".equals(rain_unit))
+                rain_1h = rain_1h / 25.4f;
+
+            if (sb.length() > 0)
+                sb.append(" ");
+            sb.append(DF1.format(rain_1h));
+            sb.append(" ");
+            if ("mm".equals(rain_unit))
+                sb.append(context.getString(R.string.header_mm));
+            else if ("in".equals(rain_unit))
+                sb.append(context.getString(R.string.header_inch));
+        }
+
+        notificationBuilder.setContentText(sb.toString());
+
         notificationBuilder.setUsesChronometer(true);
         notificationBuilder.setWhen(System.currentTimeMillis());
         notificationBuilder.setAutoCancel(false);
@@ -1621,6 +1723,8 @@ public class BackgroundService extends IntentService {
         }
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         nm.notify(NOTIFICATION_WEATHER, notificationBuilder.build());
+
+        startWeatherGuard(context);
     }
 
     public static void removeWeatherIcon(Context context) {
@@ -1660,6 +1764,13 @@ public class BackgroundService extends IntentService {
         b = (b % 360) / 30 * 30;
         int resId = context.getResources().getIdentifier("direction_" + b, "string", context.getPackageName());
         return (resId == 0 ? "?" : context.getString(resId));
+    }
+
+    private static int getWindDirectionIcon(float bearing, Context context) {
+        int b = Math.round(bearing) + 15;
+        b = (b % 360) / 30 * 30;
+        int resId = context.getResources().getIdentifier("direction_" + b, "drawable", context.getPackageName());
+        return (resId > 0 ? resId : android.R.drawable.ic_menu_help);
     }
 
     private static String getProviderName(Location location, Context context) {
