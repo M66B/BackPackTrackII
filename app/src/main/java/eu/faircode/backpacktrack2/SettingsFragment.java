@@ -2410,6 +2410,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         long viewport = prefs.getLong(PREF_LAST_WEATHER_VIEWPORT, DAY_MS);
         final String column = prefs.getString(PREF_LAST_WEATHER_GRAPH, "temperature");
 
+        String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
         String temperature_unit = prefs.getString(PREF_TEMPERATURE, DEFAULT_TEMPERATURE);
         String pressure_unit = prefs.getString(PREF_PRESSURE, DEFAULT_PRESSURE);
         String speed_unit = prefs.getString(PREF_WINDSPEED, DEFAULT_WINDSPEED);
@@ -2458,7 +2459,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             colValue2 = cursor.getColumnIndex("wind_gust");
             colValue3 = cursor.getColumnIndex("wind_direction");
         } else if ("rain_1h".equals(column))
-            colValue3 = cursor.getColumnIndex("rain_today");
+            if ("owm".equals(api))
+                colValue3 = cursor.getColumnIndex("rain_today");
 
         LineGraphSeries<DataPoint> seriesValue = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesValue2 = new LineGraphSeries<DataPoint>();
@@ -2509,7 +2511,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 if ("in".equals(rain_unit)) {
                     if (!Double.isNaN(value))
                         value = value / 25.4;
-                    if (!Double.isNaN(value2))
+                    if (!Double.isNaN(value3))
                         value3 = value3 / 25.4; // rain today
                 }
 
@@ -2584,7 +2586,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 return DF.format(value);
                         }
                     });
-            graph.getGridLabelRenderer().setVerticalLabelsColor(seriesValue.getColor());
+            if (colValue3 >= 0)
+                graph.getGridLabelRenderer().setVerticalLabelsColor(seriesValue.getColor());
+            else
+                graph.getGridLabelRenderer().setVerticalLabelsColor(Color.WHITE);
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
 
             seriesValue2.setColor(Color.RED);

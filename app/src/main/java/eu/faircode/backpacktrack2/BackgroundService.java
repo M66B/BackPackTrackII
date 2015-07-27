@@ -1776,7 +1776,7 @@ public class BackgroundService extends IntentService {
     }
 
     private static int getWindDirectionIcon(float bearing, Context context) {
-        int b = Math.round(bearing) + 15;
+        int b = Math.round(bearing) + 15 + 180;
         b = (b % 360) / 30 * 30;
         int resId = context.getResources().getIdentifier("direction_" + b, "drawable", context.getPackageName());
         return (resId > 0 ? resId : android.R.drawable.ic_menu_help);
