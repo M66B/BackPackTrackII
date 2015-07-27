@@ -121,7 +121,7 @@ public class GPXFileWriter {
             ext.addContent(new Element("accuracy", bpt2).addContent(DF.format(c.getDouble(colAccuracy))));
 
         if (!c.isNull(colActivityType))
-            ext.addContent(new Element("activity_type", bpt2).addContent(LocationService.getActivityName(c.getInt(colActivityType), context)));
+            ext.addContent(new Element("activity_type", bpt2).addContent(BackgroundService.getActivityName(c.getInt(colActivityType), context)));
         if (!c.isNull(colActivityConfidence))
             ext.addContent(new Element("activity_confidence", bpt2).addContent(Integer.toString(c.getInt(colActivityConfidence))));
 

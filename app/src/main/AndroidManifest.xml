@@ -106,7 +106,7 @@
         </receiver>
 
         <service
-            android:name=".LocationService"
+            android:name=".BackgroundService"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

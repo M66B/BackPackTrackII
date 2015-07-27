@@ -41,7 +41,7 @@ public class ActivityTypeAdapter extends CursorAdapter {
 
         // Set values
         tvTime.setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(time));
-        tvActivity.setText(LocationService.getActivityName(activity, context));
+        tvActivity.setText(BackgroundService.getActivityName(activity, context));
         tvConfidence.setText(confidence + "%");
     }
 }

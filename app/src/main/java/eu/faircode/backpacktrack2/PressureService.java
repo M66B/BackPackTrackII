@@ -99,8 +99,8 @@ public class PressureService extends Service {
                 editor.apply();
 
                 // Send state changed intent
-                Intent intent = new Intent(PressureService.this, LocationService.class);
-                intent.setAction(LocationService.ACTION_STATE_CHANGED);
+                Intent intent = new Intent(PressureService.this, BackgroundService.class);
+                intent.setAction(BackgroundService.ACTION_STATE_CHANGED);
                 startService(intent);
             }
         }).start();

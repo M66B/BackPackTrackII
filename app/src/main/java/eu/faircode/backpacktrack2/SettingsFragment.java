@@ -19,7 +19,6 @@ import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -316,7 +315,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             Log.i(TAG, "Connectivity changed mounted=" + mounted + " connected=" + connected);
 
             SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
-            Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+            Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
             findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted && connected);
             findPreference(PREF_WEATHER_TEST).setEnabled(lastLocation != null && connected);
         }
@@ -345,9 +344,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Shared geo point
         Uri data = getActivity().getIntent().getData();
         if (data != null && "geo".equals(data.getScheme())) {
-            Intent geopointIntent = new Intent(getActivity(), LocationService.class);
-            geopointIntent.setAction(LocationService.ACTION_GEOPOINT);
-            geopointIntent.putExtra(LocationService.EXTRA_GEOURI, data);
+            Intent geopointIntent = new Intent(getActivity(), BackgroundService.class);
+            geopointIntent.setAction(BackgroundService.ACTION_GEOPOINT);
+            geopointIntent.putExtra(BackgroundService.EXTRA_GEOURI, data);
             getActivity().startService(geopointIntent);
         }
     }
@@ -489,8 +488,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         pref_share_gpx.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Intent intent = new Intent(getActivity(), LocationService.class);
-                intent.setAction(LocationService.ACTION_SHARE_GPX);
+                Intent intent = new Intent(getActivity(), BackgroundService.class);
+                intent.setAction(BackgroundService.ACTION_SHARE_GPX);
                 export(intent, R.string.title_share_gpx);
                 return true;
             }
@@ -501,8 +500,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         pref_share_kml.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Intent intent = new Intent(getActivity(), LocationService.class);
-                intent.setAction(LocationService.ACTION_SHARE_KML);
+                Intent intent = new Intent(getActivity(), BackgroundService.class);
+                intent.setAction(BackgroundService.ACTION_SHARE_KML);
                 export(intent, R.string.title_share_kml);
                 return true;
             }
@@ -513,8 +512,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         pref_upload_gpx.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                Intent intent = new Intent(getActivity(), LocationService.class);
-                intent.setAction(LocationService.ACTION_UPLOAD_GPX);
+                Intent intent = new Intent(getActivity(), BackgroundService.class);
+                intent.setAction(BackgroundService.ACTION_UPLOAD_GPX);
                 export(intent, R.string.title_upload_gpx);
                 return true;
             }
@@ -581,7 +580,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         final float ref_pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, 0);
         final long ref_time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
-        Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+        Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
 
         // Handle pressure reading test
         pref_pressure_test.setEnabled(ref_pressure != 0 && ref_time != 0 && lastLocation != null);
@@ -599,7 +598,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 
                             // Get altitude
-                            Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+                            Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
                             float altitude = PressureService.getAltitude(lastLocation, getActivity());
 
                             // Show reference/altitude
@@ -625,7 +624,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 pref_weather_test.setSummary(null);
 
                 new AsyncTask<Object, Object, Object>() {
-                    Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+                    Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
 
                     @Override
                     protected Object doInBackground(Object... objects) {
@@ -770,8 +769,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         if (PREF_WEATHER_MAXAGE.equals(key) ||
                 PREF_TEMPERATURE.equals(key)) {
-            Intent intent = new Intent(getActivity(), LocationService.class);
-            intent.setAction(LocationService.ACTION_STATE_CHANGED);
+            Intent intent = new Intent(getActivity(), BackgroundService.class);
+            intent.setAction(BackgroundService.ACTION_STATE_CHANGED);
             getActivity().startService(intent);
         }
 
@@ -811,16 +810,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 @Override
                 public void run() {
                     synchronized (getActivity().getApplicationContext()) {
-                        LocationService.stopTracking(getActivity());
-                        LocationService.startTracking(getActivity());
+                        BackgroundService.stopTracking(getActivity());
+                        BackgroundService.startTracking(getActivity());
                     }
                 }
             }).start();
 
         if (PREF_WEATHER_ENABLED.equals(key) ||
                 PREF_WEATHER_INTERVAL.equals(key)) {
-            LocationService.stopWeatherUpdates(getActivity());
-            LocationService.startWeatherUpdates(getActivity());
+            BackgroundService.stopWeatherUpdates(getActivity());
+            BackgroundService.startWeatherUpdates(getActivity());
         }
     }
 
@@ -835,16 +834,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         StepCountWidget.updateWidgets(context);
 
         // Initialize tracking
-        LocationService.stopTracking(context);
-        LocationService.startTracking(context);
+        BackgroundService.stopTracking(context);
+        BackgroundService.startTracking(context);
 
         // Initialize daily alarm
-        LocationService.stopDaily(context);
-        LocationService.startDaily(context);
+        BackgroundService.stopDaily(context);
+        BackgroundService.startDaily(context);
 
         // Initialize weather updates
-        LocationService.stopWeatherUpdates(context);
-        LocationService.startWeatherUpdates(context);
+        BackgroundService.stopWeatherUpdates(context);
+        BackgroundService.startWeatherUpdates(context);
     }
 
     private void edit_waypoints() {
@@ -1091,7 +1090,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final boolean ampm = android.text.format.DateFormat.is24HourFormat(getActivity());
 
         // Set last track name/extensions
-        tvTrackName.setText(prefs.getString(PREF_LAST_TRACK, LocationService.DEFAULT_TRACK_NAME));
+        tvTrackName.setText(prefs.getString(PREF_LAST_TRACK, BackgroundService.DEFAULT_TRACK_NAME));
         cbExtensions.setChecked(prefs.getBoolean(PREF_LAST_EXTENSIONS, false));
 
         // Get default from
@@ -1220,11 +1219,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                     editor.putLong(PREF_LAST_TO, to.getTimeInMillis());
                                     editor.apply();
                                 }
-                                intent.putExtra(LocationService.EXTRA_TRACK_NAME, tvTrackName.getText().toString());
-                                intent.putExtra(LocationService.EXTRA_WRITE_EXTENSIONS, cbExtensions.isChecked());
-                                intent.putExtra(LocationService.EXTRA_DELETE_DATA, cbDelete.isChecked());
-                                intent.putExtra(LocationService.EXTRA_TIME_FROM, from.getTimeInMillis());
-                                intent.putExtra(LocationService.EXTRA_TIME_TO, to.getTimeInMillis());
+                                intent.putExtra(BackgroundService.EXTRA_TRACK_NAME, tvTrackName.getText().toString());
+                                intent.putExtra(BackgroundService.EXTRA_WRITE_EXTENSIONS, cbExtensions.isChecked());
+                                intent.putExtra(BackgroundService.EXTRA_DELETE_DATA, cbDelete.isChecked());
+                                intent.putExtra(BackgroundService.EXTRA_TIME_FROM, from.getTimeInMillis());
+                                intent.putExtra(BackgroundService.EXTRA_TIME_TO, to.getTimeInMillis());
                                 getActivity().startService(intent);
                             }
                         })
@@ -1352,7 +1351,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                     @Override
                                     public void run() {
                                         // Get altitudes for range
-                                        LocationService.getAltitude(time, time, getActivity());
+                                        BackgroundService.getAltitude(time, time, getActivity());
 
                                         synchronized (getActivity()) {
                                             elevationBusy = false;
@@ -1396,7 +1395,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                         to.set(Calendar.MILLISECOND, 999);
 
                                         // Get altitudes for range
-                                        LocationService.getAltitude(from.getTimeInMillis(), to.getTimeInMillis(), getActivity());
+                                        BackgroundService.getAltitude(from.getTimeInMillis(), to.getTimeInMillis(), getActivity());
 
                                         synchronized (getActivity()) {
                                             elevationBusy = false;
@@ -2243,8 +2242,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         ivAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), LocationService.class);
-                intent.setAction(LocationService.EXPORTED_ACTION_UPDATE_WEATHER);
+                Intent intent = new Intent(getActivity(), BackgroundService.class);
+                intent.setAction(BackgroundService.EXPORTED_ACTION_UPDATE_WEATHER);
                 getActivity().startService(intent);
                 Toast.makeText(getActivity(), R.string.msg_requesting, Toast.LENGTH_SHORT).show();
             }
@@ -2567,7 +2566,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             if (isValueX)
                                 return super.formatLabel(value, isValueX);
                             else if ("wind_direction".equals(column))
-                                return LocationService.getWindDirectionName((float) value, getActivity());
+                                return BackgroundService.getWindDirectionName((float) value, getActivity());
                             else if ("clouds".equals(column))
                                 return Long.toString(Math.round(value));
                             else if ("visibility".equals(column))
@@ -2592,7 +2591,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             long humidity = Math.round(value);
                             return " " + (humidity >= 100 ? "99" : Long.toString(humidity));
                         } else if ("wind_speed".equals(column))
-                            return " " + LocationService.getWindDirectionName((float) value, getActivity());
+                            return " " + BackgroundService.getWindDirectionName((float) value, getActivity());
                         else
                             return " " + DF.format(value); // rain today
                     else

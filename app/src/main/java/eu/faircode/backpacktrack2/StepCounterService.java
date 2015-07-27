@@ -46,8 +46,8 @@ public class StepCounterService extends Service {
                     StepCountWidget.updateWidgets(StepCounterService.this);
 
                     // Send state changed intent
-                    Intent intent = new Intent(StepCounterService.this, LocationService.class);
-                    intent.setAction(LocationService.ACTION_STATE_CHANGED);
+                    Intent intent = new Intent(StepCounterService.this, BackgroundService.class);
+                    intent.setAction(BackgroundService.ACTION_STATE_CHANGED);
                     startService(intent);
                 }
             }

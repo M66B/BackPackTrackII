@@ -262,7 +262,7 @@ public class KMLFileWriter {
             Element data = new Element("Data", NS);
             data.setAttribute(new Attribute("name", "activity_type"));
             Element value = new Element("value", NS);
-            value.addContent(LocationService.getActivityName(c.getInt(colActivityType), context));
+            value.addContent(BackgroundService.getActivityName(c.getInt(colActivityType), context));
             data.addContent(value);
             extendedData.addContent(data);
         }

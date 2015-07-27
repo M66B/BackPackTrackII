@@ -42,6 +42,6 @@ public class ActivityLogAdapter extends CursorAdapter {
         // Set values
         tvStart.setText(SimpleDateFormat.getTimeInstance(SimpleDateFormat.MEDIUM).format(start));
         tvFinish.setText(SimpleDateFormat.getTimeInstance(SimpleDateFormat.MEDIUM).format(finish));
-        tvActivity.setText(LocationService.getActivityName(activity, context));
+        tvActivity.setText(BackgroundService.getActivityName(activity, context));
     }
 }

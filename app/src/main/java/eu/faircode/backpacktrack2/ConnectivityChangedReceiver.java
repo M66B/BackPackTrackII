@@ -23,8 +23,8 @@ public class ConnectivityChangedReceiver extends BroadcastReceiver {
             int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_INTERVAL, SettingsFragment.DEFAULT_WEATHER_INTERVAL));
 
             if (ref_time + interval * 60 * 1000 < time) {
-                Intent intentWeather = new Intent(context, LocationService.class);
-                intentWeather.setAction(LocationService.EXPORTED_ACTION_UPDATE_WEATHER);
+                Intent intentWeather = new Intent(context, BackgroundService.class);
+                intentWeather.setAction(BackgroundService.EXPORTED_ACTION_UPDATE_WEATHER);
                 context.startService(intentWeather);
             }
         }

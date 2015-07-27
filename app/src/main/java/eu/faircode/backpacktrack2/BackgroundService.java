@@ -48,7 +48,6 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import org.joda.time.DateTime;
-import org.json.JSONException;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -74,7 +73,7 @@ import java.util.Map;
 import de.timroes.axmlrpc.XMLRPCClient;
 import de.timroes.axmlrpc.XMLRPCException;
 
-public class LocationService extends IntentService {
+public class BackgroundService extends IntentService {
     private static final String TAG = "BPT2.Service";
 
     // Actions
@@ -135,7 +134,7 @@ public class LocationService extends IntentService {
     private static int mEGM96Pointer = -1;
     private static int mEGM96Offset;
 
-    public LocationService() {
+    public BackgroundService() {
         super(TAG);
     }
 
@@ -579,8 +578,8 @@ public class LocationService extends IntentService {
         // Check if there is any chance for a GPS fix
         if (fixed < checksat) {
             // Cancel fine location updates
-            Intent locationIntent = new Intent(this, LocationService.class);
-            locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
+            Intent locationIntent = new Intent(this, BackgroundService.class);
+            locationIntent.setAction(BackgroundService.ACTION_LOCATION_FINE);
             PendingIntent pi = PendingIntent.getService(this, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
             lm.removeUpdates(pi);
@@ -805,7 +804,7 @@ public class LocationService extends IntentService {
 
             // Get last location
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            Location lastLocation = LocationService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+            Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
             if (lastLocation == null)
                 return;
 
@@ -951,8 +950,8 @@ public class LocationService extends IntentService {
         // Request passive location updates
         boolean passive = prefs.getBoolean(SettingsFragment.PREF_PASSIVE_ENABLED, SettingsFragment.DEFAULT_PASSIVE_ENABLED);
         if (passive) {
-            Intent locationIntent = new Intent(context, LocationService.class);
-            locationIntent.setAction(LocationService.ACTION_LOCATION_PASSIVE);
+            Intent locationIntent = new Intent(context, BackgroundService.class);
+            locationIntent.setAction(BackgroundService.ACTION_LOCATION_PASSIVE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
             int minTime = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PASSIVE_MINTIME, SettingsFragment.DEFAULT_PASSIVE_MINTIME));
@@ -973,8 +972,8 @@ public class LocationService extends IntentService {
         stopActivityRecognition(context);
 
         // Cancel passive location updates
-        Intent locationIntent = new Intent(context, LocationService.class);
-        locationIntent.setAction(LocationService.ACTION_LOCATION_PASSIVE);
+        Intent locationIntent = new Intent(context, BackgroundService.class);
+        locationIntent.setAction(BackgroundService.ACTION_LOCATION_PASSIVE);
         PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         lm.removeUpdates(pi);
@@ -988,8 +987,8 @@ public class LocationService extends IntentService {
             GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
             if (gac.blockingConnect().isSuccess()) {
                 Log.i(TAG, "GoogleApiClient connected");
-                Intent activityIntent = new Intent(context, LocationService.class);
-                activityIntent.setAction(LocationService.ACTION_ACTIVITY);
+                Intent activityIntent = new Intent(context, BackgroundService.class);
+                activityIntent.setAction(BackgroundService.ACTION_ACTIVITY);
                 PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -1009,8 +1008,8 @@ public class LocationService extends IntentService {
             GoogleApiClient gac = new GoogleApiClient.Builder(context).addApi(ActivityRecognition.API).build();
             if (gac.blockingConnect().isSuccess()) {
                 Log.i(TAG, "GoogleApiClient connected");
-                Intent activityIntent = new Intent(context, LocationService.class);
-                activityIntent.setAction(LocationService.ACTION_ACTIVITY);
+                Intent activityIntent = new Intent(context, BackgroundService.class);
+                activityIntent.setAction(BackgroundService.ACTION_ACTIVITY);
                 PendingIntent pi = PendingIntent.getService(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(gac, pi);
 
@@ -1026,8 +1025,8 @@ public class LocationService extends IntentService {
 
     private static void startPeriodicLocating(Context context) {
         // Set repeating alarm
-        Intent alarmIntent = new Intent(context, LocationService.class);
-        alarmIntent.setAction(LocationService.ACTION_ALARM);
+        Intent alarmIntent = new Intent(context, BackgroundService.class);
+        alarmIntent.setAction(BackgroundService.ACTION_ALARM);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -1039,8 +1038,8 @@ public class LocationService extends IntentService {
 
     private static void stopPeriodicLocating(Context context) {
         // Cancel repeating alarm
-        Intent alarmIntent = new Intent(context, LocationService.class);
-        alarmIntent.setAction(LocationService.ACTION_ALARM);
+        Intent alarmIntent = new Intent(context, BackgroundService.class);
+        alarmIntent.setAction(BackgroundService.ACTION_ALARM);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
@@ -1066,8 +1065,8 @@ public class LocationService extends IntentService {
 
         // Request coarse location
         if (network && lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-            Intent locationIntent = new Intent(context, LocationService.class);
-            locationIntent.setAction(LocationService.ACTION_LOCATION_COARSE);
+            Intent locationIntent = new Intent(context, BackgroundService.class);
+            locationIntent.setAction(BackgroundService.ACTION_LOCATION_COARSE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             lm.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, minTime * 1000, minDist, pi);
             Log.i(TAG, "Requested network location updates");
@@ -1075,8 +1074,8 @@ public class LocationService extends IntentService {
 
         // Request fine location
         if (gps && lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            Intent locationIntent = new Intent(context, LocationService.class);
-            locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
+            Intent locationIntent = new Intent(context, BackgroundService.class);
+            locationIntent.setAction(BackgroundService.ACTION_LOCATION_FINE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime * 1000, minDist, pi);
             context.startService(new Intent(context, GpsStatusService.class));
@@ -1086,8 +1085,8 @@ public class LocationService extends IntentService {
         // Initiate location timeout
         if ((network && lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) || (gps && lm.isProviderEnabled(LocationManager.GPS_PROVIDER))) {
             int timeout = Integer.parseInt(prefs.getString(SettingsFragment.PREF_TIMEOUT, SettingsFragment.DEFAULT_TIMEOUT));
-            Intent alarmIntent = new Intent(context, LocationService.class);
-            alarmIntent.setAction(LocationService.ACTION_LOCATION_TIMEOUT);
+            Intent alarmIntent = new Intent(context, BackgroundService.class);
+            alarmIntent.setAction(BackgroundService.ACTION_LOCATION_TIMEOUT);
             PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
@@ -1104,8 +1103,8 @@ public class LocationService extends IntentService {
         // Initiate satellite check
         if (gps && lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             int check = Integer.parseInt(prefs.getString(SettingsFragment.PREF_CHECK_TIME, SettingsFragment.DEFAULT_CHECK_TIME));
-            Intent alarmIntent = new Intent(context, LocationService.class);
-            alarmIntent.setAction(LocationService.ACTION_LOCATION_CHECK);
+            Intent alarmIntent = new Intent(context, BackgroundService.class);
+            alarmIntent.setAction(BackgroundService.ACTION_LOCATION_CHECK);
             PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
@@ -1140,16 +1139,16 @@ public class LocationService extends IntentService {
 
         // Cancel coarse location updates
         {
-            Intent locationIntent = new Intent(context, LocationService.class);
-            locationIntent.setAction(LocationService.ACTION_LOCATION_COARSE);
+            Intent locationIntent = new Intent(context, BackgroundService.class);
+            locationIntent.setAction(BackgroundService.ACTION_LOCATION_COARSE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             lm.removeUpdates(pi);
         }
 
         // Cancel fine location updates
         {
-            Intent locationIntent = new Intent(context, LocationService.class);
-            locationIntent.setAction(LocationService.ACTION_LOCATION_FINE);
+            Intent locationIntent = new Intent(context, BackgroundService.class);
+            locationIntent.setAction(BackgroundService.ACTION_LOCATION_FINE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             lm.removeUpdates(pi);
             context.stopService(new Intent(context, GpsStatusService.class));
@@ -1157,8 +1156,8 @@ public class LocationService extends IntentService {
 
         // Cancel check
         {
-            Intent alarmIntent = new Intent(context, LocationService.class);
-            alarmIntent.setAction(LocationService.ACTION_LOCATION_CHECK);
+            Intent alarmIntent = new Intent(context, BackgroundService.class);
+            alarmIntent.setAction(BackgroundService.ACTION_LOCATION_CHECK);
             PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             am.cancel(pi);
@@ -1166,8 +1165,8 @@ public class LocationService extends IntentService {
 
         // Cancel timeout
         {
-            Intent alarmIntent = new Intent(context, LocationService.class);
-            alarmIntent.setAction(LocationService.ACTION_LOCATION_TIMEOUT);
+            Intent alarmIntent = new Intent(context, BackgroundService.class);
+            alarmIntent.setAction(BackgroundService.ACTION_LOCATION_TIMEOUT);
             PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             am.cancel(pi);
@@ -1193,8 +1192,8 @@ public class LocationService extends IntentService {
         }
 
         // Set alarm
-        Intent alarmIntent = new Intent(context, LocationService.class);
-        alarmIntent.setAction(LocationService.ACTION_UPDATE_WEATHER);
+        Intent alarmIntent = new Intent(context, BackgroundService.class);
+        alarmIntent.setAction(BackgroundService.ACTION_UPDATE_WEATHER);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         int interval = 60 * 1000 * Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_INTERVAL, SettingsFragment.DEFAULT_WEATHER_INTERVAL));
@@ -1207,8 +1206,8 @@ public class LocationService extends IntentService {
     }
 
     public static void stopWeatherUpdates(Context context) {
-        Intent alarmIntent = new Intent(context, LocationService.class);
-        alarmIntent.setAction(LocationService.ACTION_UPDATE_WEATHER);
+        Intent alarmIntent = new Intent(context, BackgroundService.class);
+        alarmIntent.setAction(BackgroundService.ACTION_UPDATE_WEATHER);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
@@ -1216,8 +1215,8 @@ public class LocationService extends IntentService {
     }
 
     public static void startDaily(Context context) {
-        Intent alarmIntent = new Intent(context, LocationService.class);
-        alarmIntent.setAction(LocationService.ACTION_DAILY);
+        Intent alarmIntent = new Intent(context, BackgroundService.class);
+        alarmIntent.setAction(BackgroundService.ACTION_DAILY);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Calendar calendar = Calendar.getInstance();
@@ -1236,8 +1235,8 @@ public class LocationService extends IntentService {
     }
 
     public static void stopDaily(Context context) {
-        Intent alarmIntent = new Intent(context, LocationService.class);
-        alarmIntent.setAction(LocationService.ACTION_DAILY);
+        Intent alarmIntent = new Intent(context, BackgroundService.class);
+        alarmIntent.setAction(BackgroundService.ACTION_DAILY);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
@@ -1532,13 +1531,13 @@ public class LocationService extends IntentService {
 
         if (state == STATE_IDLE) {
             // Build trackpoint intent
-            Intent riTrackpoint = new Intent(context, LocationService.class);
-            riTrackpoint.setAction(LocationService.ACTION_TRACKPOINT);
+            Intent riTrackpoint = new Intent(context, BackgroundService.class);
+            riTrackpoint.setAction(BackgroundService.ACTION_TRACKPOINT);
             PendingIntent piTrackpoint = PendingIntent.getService(context, 2, riTrackpoint, PendingIntent.FLAG_UPDATE_CURRENT);
 
             // Build waypoint intent
-            Intent riWaypoint = new Intent(context, LocationService.class);
-            riWaypoint.setAction(LocationService.ACTION_WAYPOINT);
+            Intent riWaypoint = new Intent(context, BackgroundService.class);
+            riWaypoint.setAction(BackgroundService.ACTION_WAYPOINT);
             PendingIntent piWaypoint = PendingIntent.getService(context, 3, riWaypoint, PendingIntent.FLAG_UPDATE_CURRENT);
 
             // Add actions
@@ -1557,13 +1556,13 @@ public class LocationService extends IntentService {
                 notificationBuilder.setProgress(visible, fixed, false);
 
             // Build stop intent
-            Intent riStop = new Intent(context, LocationService.class);
-            riStop.setAction(LocationService.ACTION_STOP_LOCATING);
+            Intent riStop = new Intent(context, BackgroundService.class);
+            riStop.setAction(BackgroundService.ACTION_STOP_LOCATING);
             PendingIntent piStop = PendingIntent.getService(context, 4, riStop, PendingIntent.FLAG_UPDATE_CURRENT);
 
             // Build accept intent
-            Intent riAccept = new Intent(context, LocationService.class);
-            riAccept.setAction(LocationService.ACTION_LOCATION_TIMEOUT);
+            Intent riAccept = new Intent(context, BackgroundService.class);
+            riAccept.setAction(BackgroundService.ACTION_LOCATION_TIMEOUT);
             PendingIntent piAccept = PendingIntent.getService(context, 5, riAccept, PendingIntent.FLAG_UPDATE_CURRENT);
 
             // Add cancel action

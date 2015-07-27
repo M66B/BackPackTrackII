@@ -15,8 +15,8 @@ public class ProvidersChangedReceiver extends BroadcastReceiver {
             @Override
             public void run() {
                 synchronized (context.getApplicationContext()) {
-                    LocationService.stopTracking(context);
-                    LocationService.startTracking(context);
+                    BackgroundService.stopTracking(context);
+                    BackgroundService.startTracking(context);
                 }
             }
         }).start();
