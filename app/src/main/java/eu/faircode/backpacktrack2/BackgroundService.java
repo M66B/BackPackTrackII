@@ -1661,7 +1661,7 @@ public class BackgroundService extends IntentService {
             if ("f".equals(temperature_unit))
                 temperature = temperature * 9 / 5 + 32;
 
-            sb.append(DF1.format(temperature));
+            sb.append(Math.round(temperature));
             if ("c".equals(temperature_unit))
                 sb.append(context.getString(R.string.header_celcius));
             else if ("f".equals(temperature_unit))
@@ -1673,7 +1673,7 @@ public class BackgroundService extends IntentService {
         if (!Double.isNaN(humidity)) {
             if (sb.length() > 0)
                 sb.append(" ");
-            sb.append(DF1.format(humidity));
+            sb.append(Math.round(humidity));
             sb.append(("%"));
         }
 
@@ -1686,10 +1686,7 @@ public class BackgroundService extends IntentService {
 
             if (sb.length() > 0)
                 sb.append(" ");
-            if ("hpa".equals(pressure_unit))
-                sb.append(DF1.format(pressure));
-            else
-                sb.append(DF2.format(pressure));
+            sb.append(Math.round(pressure));
             sb.append(" ");
             if ("hpa".equals(pressure_unit))
                 sb.append(context.getString(R.string.header_hpa));
@@ -1708,7 +1705,7 @@ public class BackgroundService extends IntentService {
 
             if (sb.length() > 0)
                 sb.append(" ");
-            sb.append(DF1.format(wind_speed));
+            sb.append(Math.round(wind_speed));
             sb.append(" ");
             if ("bft".equals(windspeed_unit))
                 sb.append(context.getString(R.string.header_beaufort));
@@ -1727,7 +1724,10 @@ public class BackgroundService extends IntentService {
 
             if (sb.length() > 0)
                 sb.append(" ");
-            sb.append(DF1.format(rain_1h));
+            if ("in".equals(rain_unit))
+                sb.append(DF2.format(rain_1h));
+            else
+                sb.append(DF1.format(rain_1h));
             sb.append(" ");
             if ("mm".equals(rain_unit))
                 sb.append(context.getString(R.string.header_mm));
