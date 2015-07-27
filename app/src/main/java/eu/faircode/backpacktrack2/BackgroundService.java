@@ -1589,7 +1589,7 @@ public class BackgroundService extends IntentService {
 
     public static void showWeatherNotification(Weather weather, Context context) {
         Notification.Builder notificationBuilder = new Notification.Builder(context);
-        int resId = (weather.icon == null ? -1 : context.getResources().getIdentifier(weather.icon.replace("-", "_"), "drawable", context.getPackageName()));
+        int resId = (weather.icon == null ? -1 : context.getResources().getIdentifier(weather.icon.replace("-", "_git co"), "drawable", context.getPackageName()));
         Log.i(TAG, "icon=" + weather.icon + " res=" + resId);
         if (resId > 0) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
