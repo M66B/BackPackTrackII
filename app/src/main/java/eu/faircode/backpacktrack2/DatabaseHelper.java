@@ -23,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 17;
+    private static final int DB_VERSION = 18;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
@@ -150,6 +150,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", rain_1h REAL NULL" +
                 ", rain_today REAL NULL" +
                 ", clouds REAL NULL" +
+                ", icon TEXT NULL" +
+                ", summary TEXT NULL" +
                 ", created INTEGER NULL" + ");");
         db.execSQL("CREATE INDEX idx_weather_time ON weather(time)");
         db.execSQL("CREATE INDEX idx_weather_station_id ON weather(station_id)");
@@ -262,6 +264,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.execSQL("UPDATE weather SET provider = 'owm' WHERE station_id >= 0");
                 db.execSQL("UPDATE weather SET provider = 'fio' WHERE station_id < 0");
                 oldVersion = 17;
+            }
+
+            if (oldVersion < 18) {
+                db.execSQL("ALTER TABLE weather ADD COLUMN icon TEXT NULL");
+                db.execSQL("ALTER TABLE weather ADD COLUMN summary TEXT NULL");
+                oldVersion = 18;
             }
 
             db.setVersion(DB_VERSION);
@@ -784,6 +792,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cv.putNull("clouds");
             else
                 cv.put("clouds", weather.clouds);
+
+            if (weather.icon == null)
+                cv.putNull("icon");
+            else
+                cv.put("icon", weather.icon);
+
+            if (weather.summary == null)
+                cv.putNull("summary");
+            else
+                cv.put("summary", weather.summary);
 
             cv.put("created", new Date().getTime());
 
