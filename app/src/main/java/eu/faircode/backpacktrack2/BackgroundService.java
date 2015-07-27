@@ -1484,11 +1484,11 @@ public class BackgroundService extends IntentService {
         //    text += " " + reason;
 
         // Build main intent
-        Intent riSettings = new Intent(context, SettingsActivity.class);
-        riSettings.setAction(Intent.ACTION_MAIN);
-        riSettings.addCategory(Intent.CATEGORY_LAUNCHER);
-        riSettings.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent piSettings = PendingIntent.getActivity(context, 1, riSettings, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent riMain = new Intent(context, SettingsActivity.class);
+        riMain.setAction(Intent.ACTION_MAIN);
+        riMain.addCategory(Intent.CATEGORY_LAUNCHER);
+        riMain.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent piMain = PendingIntent.getActivity(context, 1, riMain, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Build notification
         Notification.Builder notificationBuilder = new Notification.Builder(context);
@@ -1542,7 +1542,7 @@ public class BackgroundService extends IntentService {
 
         notificationBuilder.setContentTitle(title);
         notificationBuilder.setContentText(text);
-        notificationBuilder.setContentIntent(piSettings);
+        notificationBuilder.setContentIntent(piMain);
         notificationBuilder.setUsesChronometer(lastLocation != null);
         notificationBuilder.setWhen(lastLocation == null ? System.currentTimeMillis() : lastLocation.getTime());
         notificationBuilder.setAutoCancel(false);
@@ -1712,6 +1712,15 @@ public class BackgroundService extends IntentService {
         }
 
         notificationBuilder.setContentText(sb.toString());
+
+        // Build main intent
+        Intent riMain = new Intent(context, SettingsActivity.class);
+        riMain.setAction(Intent.ACTION_MAIN);
+        riMain.addCategory(Intent.CATEGORY_LAUNCHER);
+        riMain.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent piMain = PendingIntent.getActivity(context, 1, riMain, PendingIntent.FLAG_UPDATE_CURRENT);
+        notificationBuilder.setContentIntent(piMain);
+
 
         notificationBuilder.setUsesChronometer(true);
         notificationBuilder.setWhen(System.currentTimeMillis());
