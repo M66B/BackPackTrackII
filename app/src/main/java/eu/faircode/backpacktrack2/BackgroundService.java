@@ -1415,7 +1415,7 @@ public class BackgroundService extends IntentService {
         List<String> listline = new ArrayList<>();
         if (location != null && Geocoder.isPresent())
             try {
-                Geocoder geocoder = new Geocoder(context);
+                Geocoder geocoder = new Geocoder(context, Locale.getDefault());
                 List<Address> listPlace = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                 if (listPlace != null && listPlace.size() > 0) {
                     for (int l = 0; l < listPlace.get(0).getMaxAddressLineIndex(); l++)
@@ -1623,7 +1623,31 @@ public class BackgroundService extends IntentService {
                 notificationBuilder.setSmallIcon(resId);
         } else
             notificationBuilder.setSmallIcon(android.R.drawable.ic_menu_help);
-        notificationBuilder.setContentTitle(weather.summary);
+
+        String summary = "";
+        if (weather.summary != null)
+            summary += weather.summary;
+        if (weather.station_location != null && Geocoder.isPresent()) {
+            // Reverse geocode station location
+            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+            try {
+                List<Address> listAddress = geocoder.getFromLocation(
+                        weather.station_location.getLatitude(), weather.station_location.getLongitude(), 1);
+                if (listAddress.size() > 0) {
+                    int count = listAddress.get(0).getMaxAddressLineIndex();
+                    if (count > 0) {
+                        String place = listAddress.get(0).getAddressLine(count - 1);
+                        if (summary.length() > 0)
+                            summary += ", ";
+                        summary += place;
+                    }
+                }
+            } catch (IOException ex) {
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
+        }
+
+        notificationBuilder.setContentTitle(summary);
 
         StringBuilder sb = new StringBuilder();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -1723,7 +1747,7 @@ public class BackgroundService extends IntentService {
 
 
         notificationBuilder.setUsesChronometer(true);
-        notificationBuilder.setWhen(System.currentTimeMillis());
+        notificationBuilder.setWhen(weather.time);
         notificationBuilder.setAutoCancel(false);
         notificationBuilder.setOngoing(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

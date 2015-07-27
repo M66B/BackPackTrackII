@@ -972,7 +972,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         new AsyncTask<Object, Object, List<Address>>() {
             protected List<Address> doInBackground(Object... params) {
                 try {
-                    Geocoder geocoder = new Geocoder(getActivity());
+                    Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
                     return geocoder.getFromLocationName(name, GEOCODER_RESULTS);
                 } catch (IOException ex) {
                     Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
@@ -1462,6 +1462,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     popupMenu.getMenu().findItem(R.id.menu_name).setTitle(name);
                     popupMenu.getMenu().findItem(R.id.menu_name).setVisible(true);
                 }
+                popupMenu.getMenu().findItem(R.id.menu_time).setTitle(SimpleDateFormat.getDateTimeInstance().format(time));
                 popupMenu.getMenu().findItem(R.id.menu_elevation_loc).setEnabled(Util.isConnected(getActivity()));
                 popupMenu.getMenu().findItem(R.id.menu_elevation_day).setEnabled(Util.isConnected(getActivity()));
                 popupMenu.show();
@@ -2272,6 +2273,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 if (cursor == null)
                     return;
 
+                long time = cursor.getLong(cursor.getColumnIndex("time"));
                 final long weather_id = cursor.getLong(cursor.getColumnIndex("ID"));
                 String provider = cursor.getString(cursor.getColumnIndex("provider"));
                 final long station_id = cursor.getLong(cursor.getColumnIndex("station_id"));
@@ -2344,6 +2346,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     popupMenu.getMenu().findItem(R.id.menu_name).setTitle(name);
                     popupMenu.getMenu().findItem(R.id.menu_name).setVisible(true);
                 }
+                popupMenu.getMenu().findItem(R.id.menu_time).setTitle(SimpleDateFormat.getDateTimeInstance().format(time));
                 long set_station_id = Long.parseLong(prefs.getString(SettingsFragment.PREF_WEATHER_ID, "-1"));
                 popupMenu.getMenu().findItem(R.id.menu_share).setEnabled(station != null);
                 popupMenu.getMenu().findItem(R.id.menu_station_one).setEnabled(set_station_id < 0);

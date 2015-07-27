@@ -34,6 +34,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 
 public class WaypointAdapter extends CursorAdapter {
     private static final String TAG = "BPT2.Settings";
@@ -127,7 +128,7 @@ public class WaypointAdapter extends CursorAdapter {
                     new AsyncTask<Object, Object, List<Address>>() {
                         protected List<Address> doInBackground(Object... params) {
                             try {
-                                Geocoder geocoder = new Geocoder(context);
+                                Geocoder geocoder = new Geocoder(context, Locale.getDefault());
                                 return geocoder.getFromLocation(latitude, longitude, GEOCODER_RESULTS);
                             } catch (IOException ex) {
                                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
