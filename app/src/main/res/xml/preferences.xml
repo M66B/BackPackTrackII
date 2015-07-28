@@ -374,12 +374,12 @@
                     android:key="pref_weather_apikey_fio" />
                 <CheckBoxPreference
                     android:defaultValue="true"
-                    android:dependency="pref_weather_enabled"
+                    android:dependency="pref_weather_apikey_fio"
                     android:key="pref_weather_notification"
                     android:title="@string/title_weather_notification" />
                 <EditTextPreference
                     android:defaultValue="60"
-                    android:dependency="pref_weather_enabled"
+                    android:dependency="pref_weather_apikey_fio"
                     android:inputType="number"
                     android:key="pref_weather_guard" />
                 <Preference
