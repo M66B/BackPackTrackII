@@ -327,11 +327,12 @@ public class BackgroundService extends IntentService {
         long time = new Date().getTime();
         DateFormat DF = SimpleDateFormat.getDateTimeInstance();
         Log.i(TAG, "Activity=" + activity + " @" + DF.format(time) +
-                " last=" + getActivityName(lastActivity, this) + " @" + DF.format(lastTime));
+                " last=" + getActivityName(lastActivity, this) + " @" + DF.format(lastTime) + " threshold=" + pref_confidence + "%");
 
         // Check confidence
         if (activity.getConfidence() > pref_confidence) {
             // Persist probable activity
+            Log.i(TAG, "New activity=" + activity);
             SharedPreferences.Editor editor = prefs.edit();
             editor.putInt(SettingsFragment.PREF_LAST_ACTIVITY, activity.getType());
             editor.putInt(SettingsFragment.PREF_LAST_CONFIDENCE, activity.getConfidence());
@@ -360,6 +361,7 @@ public class BackgroundService extends IntentService {
 
             // Stop/start repeating alarm
             if (lastStill != still) {
+                Log.i(TAG, "Last still=" + lastStill + " still=" + still);
                 // Restart activity recognition if needed
                 int intervalStill = Integer.parseInt(prefs.getString(SettingsFragment.PREF_RECOGNITION_INTERVAL_STILL, SettingsFragment.DEFAULT_RECOGNITION_INTERVAL_STILL));
                 int intervalMoving = Integer.parseInt(prefs.getString(SettingsFragment.PREF_RECOGNITION_INTERVAL_MOVING, SettingsFragment.DEFAULT_RECOGNITION_INTERVAL_MOVING));
