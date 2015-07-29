@@ -372,6 +372,13 @@
                 <EditTextPreference
                     android:dependency="pref_weather_enabled"
                     android:key="pref_weather_apikey_fio" />
+                <Preference
+                    android:dependency="pref_weather_enabled"
+                    android:title="@string/title_weather_register">
+                    <intent
+                        android:action="android.intent.action.VIEW"
+                        android:data="https://developer.forecast.io/register" />
+                </Preference>
                 <CheckBoxPreference
                     android:defaultValue="true"
                     android:dependency="pref_weather_apikey_fio"

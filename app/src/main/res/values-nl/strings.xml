@@ -85,6 +85,7 @@
     <string name="title_weather_notification">Toon weer notificatie</string>
     <string name="title_weather_guard">Weernotificatie geldig: %s minuten</string>
     <string name="title_weather_fio">Forecast.io</string>
+    <string name="title_weather_register">Registeren</string>
     <string name="title_weather_owm">OpenWeatherMap</string>
     <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_stations">Aantal weerstations: %s</string>

@@ -85,6 +85,7 @@
     <string name="title_weather_notification">Zeige Wetterbenachrichtigung</string>
     <string name="title_weather_guard">Wetterbenachrichtigung Gültigkeit: %s Minuten</string>
     <string name="title_weather_fio">Forecast.io</string>
+    <string name="title_weather_register">Registrieren</string>
     <string name="title_weather_owm">OpenWeatherMap</string>
     <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_stations">Anzahl der Wetterstationen: %s</string>

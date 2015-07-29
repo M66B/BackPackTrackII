@@ -97,10 +97,26 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/lvWeatherHistory"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="3dp" />
+        android:layout_height="match_parent"
+        android:layout_marginTop="3dp">
 
+        <TextView
+            android:id="@+id/tvPoweredBy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="3dp"
+            android:text="@string/title_weather_poweredby"
+            android:textSize="6pt" />
+
+        <ListView
+            android:id="@+id/lvWeatherHistory"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/tvPoweredBy"
+            android:layout_alignParentTop="true" />
+    </RelativeLayout>
 </LinearLayout>

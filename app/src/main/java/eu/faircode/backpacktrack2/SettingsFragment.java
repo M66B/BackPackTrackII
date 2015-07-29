@@ -34,6 +34,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -2176,6 +2177,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         TextView tvHeaderPressure = (TextView) viewHistory.findViewById(R.id.tvHeaderPressure);
         TextView tvHeaderWindSpeed = (TextView) viewHistory.findViewById(R.id.tvHeaderWindSpeed);
         TextView tvHeaderPrecipitation = (TextView) viewHistory.findViewById(R.id.tvHeaderPrecipitation);
+        TextView tvPoweredBy = (TextView) viewHistory.findViewById(R.id.tvPoweredBy);
 
         // Select graph
         spGraph.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -2355,6 +2357,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 popupMenu.show();
             }
         });
+
+        // Powered by
+        String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
+        if ("fio".equals(api)) {
+            tvPoweredBy.setVisibility(View.VISIBLE);
+            tvPoweredBy.setMovementMethod(LinkMovementMethod.getInstance());
+        } else
+            tvPoweredBy.setVisibility(View.GONE);
 
         // Live updates
         final DatabaseHelper.WeatherChangedListener listener = new DatabaseHelper.WeatherChangedListener() {
