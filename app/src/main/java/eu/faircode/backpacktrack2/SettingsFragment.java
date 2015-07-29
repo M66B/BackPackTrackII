@@ -2281,6 +2281,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 final long station_id = cursor.getLong(cursor.getColumnIndex("station_id"));
                 int station_type = cursor.getInt(cursor.getColumnIndex("station_type"));
                 String station_name = cursor.getString(cursor.getColumnIndex("station_name"));
+                final String summary = cursor.getString(cursor.getColumnIndex("summary"));
 
                 Location station = null;
                 if (!cursor.isNull(cursor.getColumnIndex("station_latitude")) &&
@@ -2349,6 +2350,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     popupMenu.getMenu().findItem(R.id.menu_name).setVisible(true);
                 }
                 popupMenu.getMenu().findItem(R.id.menu_time).setTitle(SimpleDateFormat.getDateTimeInstance().format(time));
+                popupMenu.getMenu().findItem(R.id.menu_summary).setTitle(summary);
                 long set_station_id = Long.parseLong(prefs.getString(SettingsFragment.PREF_WEATHER_ID, "-1"));
                 popupMenu.getMenu().findItem(R.id.menu_share).setEnabled(station != null);
                 popupMenu.getMenu().findItem(R.id.menu_station_one).setEnabled(set_station_id < 0);
