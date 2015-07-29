@@ -23,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 18;
+    private static final int DB_VERSION = 19;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
@@ -149,6 +149,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", visibility REAL NULL" +
                 ", rain_1h REAL NULL" +
                 ", rain_today REAL NULL" +
+                ", rain_probability REAL NULL" +
                 ", clouds REAL NULL" +
                 ", icon TEXT NULL" +
                 ", summary TEXT NULL" +
@@ -270,6 +271,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.execSQL("ALTER TABLE weather ADD COLUMN icon TEXT NULL");
                 db.execSQL("ALTER TABLE weather ADD COLUMN summary TEXT NULL");
                 oldVersion = 18;
+            }
+
+            if (oldVersion < 19) {
+                db.execSQL("ALTER TABLE weather ADD COLUMN rain_probability REAL NULL");
+                oldVersion = 19;
             }
 
             db.setVersion(DB_VERSION);
@@ -787,6 +793,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cv.putNull("rain_today");
             else
                 cv.put("rain_today", weather.rain_today);
+
+            if (Double.isNaN(weather.rain_probability))
+                cv.putNull("rain_probability");
+            else
+                cv.put("rain_probability", weather.rain_probability);
 
             if (Double.isNaN(weather.clouds))
                 cv.putNull("clouds");

@@ -97,6 +97,7 @@ public class ForecastIO {
             weather.visibility = (currently.has("visibility") ? currently.getDouble("visibility") * 1000 : Double.NaN);
             weather.rain_1h = (currently.has("precipIntensity") ? currently.getDouble("precipIntensity") : Double.NaN);
             weather.rain_today = (currently.has("precipAccumulation") ? currently.getDouble("precipAccumulation") * 10 : Double.NaN);
+            weather.rain_probability = (currently.has("precipProbability") ? currently.getDouble("precipProbability") * 100 : Double.NaN);
             weather.clouds = (currently.has("cloudCover") ? currently.getDouble("cloudCover") * 100 : Double.NaN);
             weather.icon = (currently.has("icon") ? currently.getString("icon") : null);
             // clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night

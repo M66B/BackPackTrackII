@@ -42,6 +42,7 @@ public class Weather {
     public double visibility = Double.NaN;
     public double rain_1h = Double.NaN;
     public double rain_today = Double.NaN;
+    public double rain_probability = Double.NaN;
     public double clouds = Double.NaN;
     public String icon = null;
     public String summary = null;
@@ -64,6 +65,7 @@ public class Weather {
                 (Double.isNaN(visibility) ? "-" : DF.format(visibility)) + "m " +
                 (Double.isNaN(rain_1h) ? "-" : DF.format(rain_1h)) + "/" +
                 (Double.isNaN(rain_today) ? "-" : DF.format(rain_today)) + " mm " +
+                (Double.isNaN(rain_probability) ? "-" : DF.format(rain_probability)) + "% " +
                 (Double.isNaN(clouds) ? "-" : DF.format(clouds)) + "% " +
                 icon + " " + summary;
     }

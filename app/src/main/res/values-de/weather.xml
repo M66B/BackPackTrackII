@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="listWeatherName">
-        <item>Lufttemperatur/feuchtigkeit</item>
+        <item>Temperatur/feuchtigkeit</item>
         <item>Luftdruck</item>
-        <item>Windgeschwindigkeit/richtung</item>
-        <item>Niederschlag 1 Stunde/heute</item>
+        <item>Wind</item>
+        <item>Niederschlag</item>
         <item>Wolken</item>
         <item>Sichtweite</item>
     </string-array>

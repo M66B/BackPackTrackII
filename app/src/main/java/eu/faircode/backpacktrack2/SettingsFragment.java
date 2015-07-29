@@ -2425,7 +2425,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         long viewport = prefs.getLong(PREF_LAST_WEATHER_VIEWPORT, DAY_MS);
         final String column = prefs.getString(PREF_LAST_WEATHER_GRAPH, "temperature");
 
-        String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
+        final String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
         String temperature_unit = prefs.getString(PREF_TEMPERATURE, DEFAULT_TEMPERATURE);
         String pressure_unit = prefs.getString(PREF_PRESSURE, DEFAULT_PRESSURE);
         String speed_unit = prefs.getString(PREF_WINDSPEED, DEFAULT_WINDSPEED);
@@ -2454,6 +2454,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         } else if ("rain_1h".equals(column)) {
             minValue = 0;
             minValue3 = 0; // rain today
+            if ("fio".equals(api))
+                maxValue3 = 100;
         } else if ("clouds".equals(column)) {
             minValue = 0;
             maxValue = 100;
@@ -2474,7 +2476,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             colValue2 = cursor.getColumnIndex("wind_gust");
             colValue3 = cursor.getColumnIndex("wind_direction");
         } else if ("rain_1h".equals(column))
-            if ("owm".equals(api))
+            if ("fio".equals(api))
+                colValue3 = cursor.getColumnIndex("rain_probability");
+            else
                 colValue3 = cursor.getColumnIndex("rain_today");
 
         LineGraphSeries<DataPoint> seriesValue = new LineGraphSeries<DataPoint>();
@@ -2621,7 +2625,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             return " " + (humidity >= 100 ? "99" : Long.toString(humidity));
                         } else if ("wind_speed".equals(column))
                             return " " + BackgroundService.getWindDirectionName((float) value, getActivity());
-                        else
+                        else if ("fio".equals(api)) {
+                            long rain_probability = Math.round(value);
+                            return " " + (rain_probability >= 100 ? "99" : Long.toString(rain_probability));
+                        } else
                             return " " + DF.format(value); // rain today
                     else
                         return "";
