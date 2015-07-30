@@ -1208,8 +1208,9 @@ public class BackgroundService extends IntentService {
         alarmIntent.setAction(BackgroundService.ACTION_UPDATE_WEATHER);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        int interval = 60 * 1000 * Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_INTERVAL, SettingsFragment.DEFAULT_WEATHER_INTERVAL));
-        long trigger = new Date().getTime() / interval * interval + interval;
+        int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_INTERVAL, SettingsFragment.DEFAULT_WEATHER_INTERVAL));
+        int ms = 60 * 1000 * interval;
+        long trigger = new Date().getTime() / ms * ms + ms;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             am.setExact(AlarmManager.RTC_WAKEUP, trigger, pi);
         else
