@@ -2457,8 +2457,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 popupMenu.getMenu().findItem(R.id.menu_summary).setTitle(summary);
                 long set_station_id = Long.parseLong(prefs.getString(SettingsFragment.PREF_WEATHER_ID, "-1"));
                 popupMenu.getMenu().findItem(R.id.menu_share).setEnabled(station != null);
-                popupMenu.getMenu().findItem(R.id.menu_station_one).setEnabled(set_station_id < 0);
-                popupMenu.getMenu().findItem(R.id.menu_station_all).setEnabled(set_station_id >= 0);
+                popupMenu.getMenu().findItem(R.id.menu_station_one).setEnabled(set_station_id < 0 && "owm".equals(provider));
+                popupMenu.getMenu().findItem(R.id.menu_station_all).setEnabled(set_station_id >= 0 && "owm".equals(provider));
                 popupMenu.getMenu().findItem(R.id.menu_delete).setEnabled(Util.debugMode(getActivity()));
                 popupMenu.show();
             }
