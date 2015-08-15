@@ -266,6 +266,7 @@
     <string name="provider_gps">GPS</string>
     <string name="provider_network">Netzwerk</string>
 
+    <string name="menu_details">Details</string>
     <string name="menu_share">Teilen</string>
     <string name="menu_elevation_loc">Höhe für Standort beziehen</string>
     <string name="menu_elevation_day">Höhe für Tag beziehen</string>

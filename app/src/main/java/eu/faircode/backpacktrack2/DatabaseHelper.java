@@ -630,6 +630,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this;
     }
 
+    public DatabaseHelper deleteActivity(long id) {
+        // This will not delete the activity log
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            if (db.delete("activityduration", "ID = ?", new String[]{Long.toString(id)}) != 1)
+                Log.e(TAG, "Delete activity duration failed");
+        }
+
+        for (ActivityDurationChangedListener listener : mActivityDurationChangedListeners)
+            try {
+                listener.onActivityDeleted(id);
+            } catch (Throwable ex) {
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
+
+        return this;
+    }
+
     public Cursor getActivityDurations(long from, long to, boolean asc) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT *, ID AS _id FROM activityduration";
@@ -696,6 +714,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this;
     }
 
+    public DatabaseHelper deleteStep(long id) {
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            if (db.delete("step", "ID = ?", new String[]{Long.toString(id)}) != 1)
+                Log.e(TAG, "Delete step failed");
+        }
+
+        for (StepCountChangedListener listener : mStepCountChangedListeners)
+            try {
+                listener.onStepDeleted(id);
+            } catch (Throwable ex) {
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
+
+        return this;
+    }
+
     public Cursor getSteps(boolean asc) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT *, ID AS _id FROM step";
@@ -719,23 +754,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (c != null)
                 c.close();
         }
-    }
-
-    public DatabaseHelper deleteStep(long id) {
-        synchronized (mContext.getApplicationContext()) {
-            SQLiteDatabase db = this.getWritableDatabase();
-            if (db.delete("step", "ID = ?", new String[]{Long.toString(id)}) != 1)
-                Log.e(TAG, "Delete step failed");
-        }
-
-        for (StepCountChangedListener listener : mStepCountChangedListeners)
-            try {
-                listener.onStepDeleted(id);
-            } catch (Throwable ex) {
-                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            }
-
-        return this;
     }
 
     // Weather
@@ -976,6 +994,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         void onActivityAdded(long day);
 
         void onActivityUpdated(long day, int activity, long duration);
+
+        void onActivityDeleted(long id);
     }
 
     public interface ActivityLogChangedListener {

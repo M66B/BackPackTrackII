@@ -1705,6 +1705,43 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final ActivityDurationAdapter adapter = new ActivityDurationAdapter(getActivity(), cursor);
         lv.setAdapter(adapter);
 
+        // Handle list item click
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Cursor cursor = (Cursor) lv.getItemAtPosition(position);
+                if (cursor == null)
+                    return;
+
+                final long activity_id = cursor.getLong(cursor.getColumnIndex("ID"));
+                final long time = cursor.getLong(cursor.getColumnIndex("time"));
+
+                PopupMenu popupMenu = new PopupMenu(getActivity(), view);
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.menu_details:
+                                activity_log(time, time + 24 * 3600 * 1000L);
+                                return true;
+
+                            case R.id.menu_delete:
+                                db.deleteActivity(activity_id);
+                                return true;
+
+                            default:
+                                return false;
+                        }
+                    }
+                });
+
+                popupMenu.inflate(R.menu.activity);
+                popupMenu.getMenu().findItem(R.id.menu_delete).setEnabled(Util.debugMode(getActivity()));
+                popupMenu.show();
+            }
+        });
+
         // Live updates
         final DatabaseHelper.ActivityDurationChangedListener listener = new DatabaseHelper.ActivityDurationChangedListener() {
             @Override
@@ -1714,6 +1751,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             @Override
             public void onActivityUpdated(long day, int activity, long duration) {
+                update();
+            }
+
+            public void onActivityDeleted(long id) {
                 update();
             }
 
@@ -1729,18 +1770,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         };
         DatabaseHelper.addActivityDurationChangedListener(listener);
-
-        // Handle list item click
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Cursor cursor = (Cursor) lv.getItemAtPosition(position);
-                if (cursor != null) {
-                    long time = cursor.getLong(cursor.getColumnIndex("time"));
-                    activity_log(time, time + 24 * 3600 * 1000L);
-                }
-            }
-        });
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
