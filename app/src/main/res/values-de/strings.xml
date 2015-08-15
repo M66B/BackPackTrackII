@@ -40,6 +40,7 @@
     <string name="title_passive_altitude">Höhenveränderung: %s Meter</string>
 
     <string name="title_altitude_settings">Höhe</string>
+    <string name="title_altitude_history">Graph history: %s days</string>
     <string name="title_altitude_avg">Gleitender Mittelwert: %s Proben</string>
 
     <string name="title_correction_header">EGM96 Korrektur</string>
@@ -147,6 +148,7 @@
     <string name="summary_passive_bearing">Benutze passive Standortabfragen wen sich die Richtung um mehr als die ausgewählte Gradzahl ändert</string>
     <string name="summary_passive_altitude">Benutze passive Standortabfragen wen sich die Höhe um mehr als die ausgewählte Anzahl von Meter ändert</string>
 
+    <string name="summary_altitude_history">Show the altitude graph for locations of the selected number of days</string>
     <string name="summary_altitude_avg">Filtern des Rauschens der GPS-Höhe unter Verwendung eines gleitenden Mittelwerts der ausgewählten Anzahl von Proben</string>
 
     <string name="summary_correction_enabled">Höhenkorrektur mittels EGM96</string>

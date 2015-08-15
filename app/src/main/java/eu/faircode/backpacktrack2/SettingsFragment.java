@@ -128,6 +128,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_PRESSURE_ACCURACY = "pref_pressure_accuracy";
     public static final String PREF_PRESSURE_INVEHICLE = "pref_pressure_invehicle";
 
+    public static final String PREF_ALTITUDE_HISTORY = "pref_altitude_history";
     public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
 
     public static final String PREF_WEATHER_ENABLED = "pref_weather_enabled";
@@ -224,6 +225,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_PRESSURE_ACCURACY = "10"; // percent
     public static final boolean DEFAULT_PRESSURE_INVEHICLE = false;
 
+    public static final String DEFAULT_ALTITUDE_HISTORY = "30"; // days
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
 
     public static final boolean DEFAULT_WEATHER_ENABLED = true;
@@ -448,6 +450,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_PRESSURE_OFFSET);
         updateTitle(prefs, PREF_PRESSURE_ACCURACY);
 
+        updateTitle(prefs, PREF_ALTITUDE_HISTORY);
         updateTitle(prefs, PREF_ALTITUDE_AVG);
 
         updateTitle(prefs, PREF_WEATHER_API);
@@ -1499,8 +1502,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         double avg = 0;
         int n = 0;
 
+        long now = new Date().getTime();
+        int history = Integer.parseInt(prefs.getString(PREF_ALTITUDE_HISTORY, DEFAULT_ALTITUDE_HISTORY));
         long viewport = prefs.getLong(PREF_LAST_LOCATION_VIEWPORT, 7 * DAY_MS);
-        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, true);
+        Cursor cursor = db.getLocations(now - history * DAY_MS, now, true, true, true);
 
         int colTime = cursor.getColumnIndex("time");
         int colAltitude = cursor.getColumnIndex("altitude");
@@ -2715,6 +2720,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if (PREF_PRESSURE_ACCURACY.equals(key))
             pref.setTitle(getString(R.string.title_pressure_accuracy, prefs.getString(key, DEFAULT_PRESSURE_ACCURACY)));
 
+        else if (PREF_ALTITUDE_HISTORY.equals(key))
+            pref.setTitle(getString(R.string.title_altitude_history, prefs.getString(key, DEFAULT_ALTITUDE_HISTORY)));
         else if (PREF_ALTITUDE_AVG.equals(key))
             pref.setTitle(getString(R.string.title_altitude_avg, prefs.getString(key, DEFAULT_ALTITUDE_AVG)));
 

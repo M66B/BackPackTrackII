@@ -179,6 +179,11 @@
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_altitude_settings">
             <EditTextPreference
+                android:defaultValue="30"
+                android:inputType="number"
+                android:key="pref_altitude_history"
+                android:summary="@string/summary_altitude_history" />
+            <EditTextPreference
                 android:defaultValue="5"
                 android:inputType="number"
                 android:key="pref_altitude_avg"

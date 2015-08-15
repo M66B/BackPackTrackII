@@ -40,6 +40,7 @@
     <string name="title_passive_altitude">Hoogteverandering: %s meter</string>
 
     <string name="title_altitude_settings">Hoogte</string>
+    <string name="title_altitude_history">Grafiek geschiedenis: %s dagen</string>
     <string name="title_altitude_avg">Voortschrijdend gemiddelde: %s monsters</string>
 
     <string name="title_correction_header">EGM96 correctie</string>
@@ -147,6 +148,7 @@
     <string name="summary_passive_bearing">Use passive location updates when bearing changes for more than the selected number of degrees</string>
     <string name="summary_passive_altitude">Use passive location updates when altitude changes for more than the selected number of meters</string>
 
+    <string name="summary_altitude_history">Show the altitude graph for locations of the selected number of days</string>
     <string name="summary_altitude_avg">Filter the noise of the GPS altitude using a moving average with the selected number of samples</string>
 
     <string name="summary_correction_enabled">GPS altitude correction using EGM96</string>
