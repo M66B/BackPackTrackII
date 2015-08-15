@@ -721,6 +721,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    public DatabaseHelper deleteStep(long id) {
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            if (db.delete("step", "ID = ?", new String[]{Long.toString(id)}) != 1)
+                Log.e(TAG, "Delete step failed");
+        }
+
+        for (StepCountChangedListener listener : mStepCountChangedListeners)
+            try {
+                listener.onStepDeleted(id);
+            } catch (Throwable ex) {
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
+
+        return this;
+    }
+
     // Weather
 
     public boolean insertWeather(Weather weather, Location location) {
@@ -971,6 +988,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         void onStepCountAdded(long time, int count);
 
         void onStepCountUpdated(long time, int count);
+
+        void onStepDeleted(long id);
     }
 
     public interface WeatherChangedListener {

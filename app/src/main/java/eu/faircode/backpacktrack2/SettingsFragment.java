@@ -2105,6 +2105,38 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final StepCountAdapter adapter = new StepCountAdapter(getActivity(), cursor);
         lv.setAdapter(adapter);
 
+        // Handle list item click
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Cursor cursor = (Cursor) lv.getItemAtPosition(position);
+                if (cursor == null)
+                    return;
+
+                final long step_id = cursor.getLong(cursor.getColumnIndex("ID"));
+
+                PopupMenu popupMenu = new PopupMenu(getActivity(), view);
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()) {
+                            case R.id.menu_delete:
+                                db.deleteStep(step_id);
+                                return true;
+
+                            default:
+                                return false;
+                        }
+                    }
+                });
+
+                popupMenu.inflate(R.menu.step);
+                popupMenu.getMenu().findItem(R.id.menu_delete).setEnabled(Util.debugMode(getActivity()));
+                popupMenu.show();
+            }
+        });
+
         // Live updates
         final DatabaseHelper.StepCountChangedListener listener = new DatabaseHelper.StepCountChangedListener() {
             @Override
@@ -2114,6 +2146,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             @Override
             public void onStepCountUpdated(long time, int count) {
+                update();
+            }
+
+            public void onStepDeleted(long id) {
                 update();
             }
 
