@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.Geocoder;
+import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -178,4 +179,13 @@ public class Util {
         return builder;
     }
 
+    public static double distance(Location lastLocation, Location location) {
+        if (lastLocation.hasAltitude() && location.hasAltitude())
+            // Pythagoras
+            return Math.sqrt(
+                    Math.pow(lastLocation.distanceTo(location), 2) +
+                            Math.pow(Math.abs(lastLocation.getAltitude() - location.getAltitude()), 2));
+        else
+            return lastLocation.distanceTo(location);
+    }
 }

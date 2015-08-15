@@ -515,7 +515,7 @@ public class BackgroundService extends IntentService {
 
         // Filter nearby passive locations
         int pref_nearby = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PASSIVE_NEARBY, SettingsFragment.DEFAULT_PASSIVE_NEARBY));
-        if (lastLocation.distanceTo(location) < pref_nearby &&
+        if (Util.distance(lastLocation, location) < pref_nearby &&
                 (lastLocation.hasAccuracy() ? lastLocation.getAccuracy() : Float.MAX_VALUE) <=
                         (location.hasAccuracy() ? location.getAccuracy() : Float.MAX_VALUE)) {
             Log.i(TAG, "Filtering nearby passive location=" + location);
@@ -1298,7 +1298,7 @@ public class BackgroundService extends IntentService {
         int pref_nearby = Integer.parseInt(prefs.getString(SettingsFragment.PREF_NEARBY, SettingsFragment.DEFAULT_NEARBY));
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
         if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT ||
-                lastLocation == null || lastLocation.distanceTo(location) >= pref_nearby ||
+                lastLocation == null || Util.distance(lastLocation, location) >= pref_nearby ||
                 (lastLocation.hasAccuracy() ? lastLocation.getAccuracy() : Float.MAX_VALUE) >
                         (location.hasAccuracy() ? location.getAccuracy() : Float.MAX_VALUE)) {
             // New location
