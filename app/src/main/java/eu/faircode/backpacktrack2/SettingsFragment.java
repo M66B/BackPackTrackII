@@ -2591,11 +2591,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         boolean first = false;
         while (cursor.moveToNext()) {
-            if (cursor.isNull(colValue) &&
-                    (colValue2 < 0 ? true : cursor.isNull(colValue2)) &&
-                    (colValue3 < 0 ? true : cursor.isNull(colValue3)))
-                continue;
-
             data = true;
 
             long time = cursor.getLong(colTime);
@@ -2665,19 +2660,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
 
         if (data) {
-            long time = new Date().getTime();
-            if (time > maxTime) {
-                seriesValue.appendData(new DataPoint(new Date(time), Double.NaN), true, Integer.MAX_VALUE);
-                seriesValue2.appendData(new DataPoint(new Date(time), Double.NaN), true, Integer.MAX_VALUE);
-                seriesValue3.appendData(new DataPoint(new Date(time), Double.NaN), true, Integer.MAX_VALUE);
-            }
-
             graph.removeAllSeries();
             graph.getSecondScale().getSeries().clear();
 
             graph.getViewport().setXAxisBoundsManual(true);
-            graph.getViewport().setMinX(time - viewport);
-            graph.getViewport().setMaxX(time);
+            graph.getViewport().setMinX(maxTime - viewport);
+            graph.getViewport().setMaxX(maxTime);
 
             graph.getViewport().setYAxisBoundsManual(true);
             graph.getViewport().setMinY(Math.min(minValue, colValue2 < 0 ? minValue : minValue2));
