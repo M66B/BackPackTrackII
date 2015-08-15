@@ -1847,7 +1847,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             graph.getGridLabelRenderer().setLabelFormatter(
                     new DateAsXAxisLabelFormatter(getActivity(),
-                            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)) {
+                            SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)) {
                         @Override
                         public String formatLabel(double value, boolean isValueX) {
                             if (isValueX)
@@ -1859,7 +1859,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             }
                         }
                     });
-            graph.getGridLabelRenderer().setNumHorizontalLabels(2);
+            graph.getGridLabelRenderer().setNumHorizontalLabels(3);
 
             seriesStill.setDrawDataPoints(true);
             seriesStill.setDataPointsRadius(2);
@@ -2154,8 +2154,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             graph.getGridLabelRenderer().setLabelFormatter(
                     new DateAsXAxisLabelFormatter(getActivity(),
-                            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
-            graph.getGridLabelRenderer().setNumHorizontalLabels(2);
+                            SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT)));
+            graph.getGridLabelRenderer().setNumHorizontalLabels(3);
 
             graph.addSeries(seriesStep);
 
