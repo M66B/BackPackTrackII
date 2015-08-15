@@ -350,7 +350,7 @@ public class BackgroundService extends IntentService {
                 Util.toast(getActivityName(activity.getType(), this), Toast.LENGTH_SHORT, this);
 
             // Feedback
-            notifyState(this, "new activity");
+            showState(this, "new activity");
 
             // Get parameters
             int act = activity.getType();
@@ -448,7 +448,7 @@ public class BackgroundService extends IntentService {
             editor.putInt(SettingsFragment.PREF_STATE, STATE_ACQUIRED);
             editor.putString(SettingsFragment.PREF_BEST_LOCATION, LocationSerializer.serialize(location));
             editor.apply();
-            notifyState(this, "better location");
+            showState(this, "better location");
         }
 
         // Check altitude
@@ -566,7 +566,7 @@ public class BackgroundService extends IntentService {
             }
 
             // Feedback
-            notifyState(this, "passive location");
+            showState(this, "passive location");
             if (Util.debugMode(this))
                 Util.toast(getString(R.string.title_trackpoint) +
                         " " + getProviderName(location, this) +
@@ -597,7 +597,7 @@ public class BackgroundService extends IntentService {
     }
 
     private void handleStateChanged(Intent intent) {
-        notifyState(this, "state changed");
+        showState(this, "state changed");
     }
 
     private void handleLocationTimeout(Intent intent) {
@@ -798,7 +798,7 @@ public class BackgroundService extends IntentService {
             new DatabaseHelper(this).vacuum().close();
         } finally {
             startDaily(this);
-            notifyState(this, "daily alarm");
+            showState(this, "daily alarm");
             StepCountWidget.updateWidgets(this);
         }
     }
@@ -927,7 +927,7 @@ public class BackgroundService extends IntentService {
             }
         } finally {
             startWeatherUpdates(this);
-            notifyState(this, "weather");
+            showState(this, "weather");
         }
     }
 
@@ -947,7 +947,7 @@ public class BackgroundService extends IntentService {
             return;
         }
 
-        notifyState(context, "start tracking");
+        showState(context, "start tracking");
 
         // Start activity recognition / repeating alarm
         boolean recognition = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_ENABLED, SettingsFragment.DEFAULT_RECOGNITION_ENABLED);
@@ -980,7 +980,7 @@ public class BackgroundService extends IntentService {
 
         stopPeriodicLocating(context);
         stopLocating(context);
-        cancelNotification(context);
+        removeState(context);
 
         // Cancel activity updates
         stopActivityRecognition(context);
@@ -1110,7 +1110,7 @@ public class BackgroundService extends IntentService {
             Log.i(TAG, "Set timeout=" + timeout + "s");
 
             prefs.edit().putInt(SettingsFragment.PREF_STATE, STATE_ACQUIRING).apply();
-            notifyState(context, "start locating");
+            showState(context, "start locating");
         } else
             Log.i(TAG, "No location providers");
 
@@ -1194,7 +1194,7 @@ public class BackgroundService extends IntentService {
         editor.remove(SettingsFragment.PREF_LOCATION_TYPE);
         editor.remove(SettingsFragment.PREF_BEST_LOCATION);
         editor.apply();
-        notifyState(context, "stop locating");
+        showState(context, "stop locating");
     }
 
     public static void startWeatherUpdates(Context context) {
@@ -1355,7 +1355,7 @@ public class BackgroundService extends IntentService {
             }
 
             // Feedback
-            notifyState(this, "handle location");
+            showState(this, "handle location");
             if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT) {
                 if (locationType == LOCATION_WAYPOINT)
                     Util.toast(waypointName, Toast.LENGTH_LONG, this);
@@ -1436,7 +1436,7 @@ public class BackgroundService extends IntentService {
         return listline;
     }
 
-    private static void notifyState(Context context, String reason) {
+    private static void showState(Context context, String reason) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         // Check if tracking enabled
@@ -1615,7 +1615,7 @@ public class BackgroundService extends IntentService {
         nm.notify(NOTIFICATION_LOCATION, notificationBuilder.build());
     }
 
-    private static void cancelNotification(Context context) {
+    private static void removeState(Context context) {
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         nm.cancel(NOTIFICATION_LOCATION);
     }
@@ -1681,7 +1681,7 @@ public class BackgroundService extends IntentService {
         double humidity = weather.humidity;
         if (!Double.isNaN(humidity)) {
             if (sb.length() > 0)
-                sb.append(" ");
+                sb.append("/");
             sb.append(Math.round(humidity));
             sb.append(("%"));
         }
@@ -1742,6 +1742,13 @@ public class BackgroundService extends IntentService {
                 sb.append(context.getString(R.string.header_mm));
             else if ("in".equals(rain_unit))
                 sb.append(context.getString(R.string.header_inch));
+
+            double rain_probability = weather.rain_probability;
+            if (!Double.isNaN(rain_probability)) {
+                sb.append("/");
+                sb.append(Math.round(rain_probability));
+                sb.append(("%"));
+            }
         }
 
         // Clouds
