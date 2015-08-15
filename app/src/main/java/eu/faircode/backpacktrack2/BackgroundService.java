@@ -48,6 +48,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import org.joda.time.DateTime;
+import org.json.JSONException;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -229,7 +230,8 @@ public class BackgroundService extends IntentService {
                 Log.i(TAG, "Unknown action");
         } catch (Throwable ex) {
             Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            Util.toast(ex.toString(), Toast.LENGTH_LONG, this);
+            if (!ACTION_UPDATE_WEATHER.equals(intent.getAction()))
+                Util.toast(ex.toString(), Toast.LENGTH_LONG, this);
         } finally {
             if (wakeLock != null)
                 wakeLock.release();
@@ -753,7 +755,7 @@ public class BackgroundService extends IntentService {
         }
     }
 
-    private void handleGetAltitude(Intent intent) {
+    private void handleGetAltitude(Intent intent) throws IOException, JSONException {
         Calendar cfrom = Calendar.getInstance();
         cfrom.add(Calendar.DAY_OF_YEAR, -1); // yesterday
         cfrom.set(Calendar.HOUR_OF_DAY, 0);
@@ -1314,14 +1316,18 @@ public class BackgroundService extends IntentService {
             }
 
             // Add elevation data
-            if (!location.hasAltitude() && Util.isConnected(this)) {
-                if (locationType == LOCATION_WAYPOINT) {
-                    if (prefs.getBoolean(SettingsFragment.PREF_ALTITUDE_WAYPOINT, SettingsFragment.DEFAULT_ALTITUDE_WAYPOINT))
-                        GoogleElevationApi.getElevation(location, this);
-                } else {
-                    if (prefs.getBoolean(SettingsFragment.PREF_ALTITUDE_TRACKPOINT, SettingsFragment.DEFAULT_ALTITUDE_TRACKPOINT))
-                        GoogleElevationApi.getElevation(location, this);
+            try {
+                if (!location.hasAltitude() && Util.isConnected(this)) {
+                    if (locationType == LOCATION_WAYPOINT) {
+                        if (prefs.getBoolean(SettingsFragment.PREF_ALTITUDE_WAYPOINT, SettingsFragment.DEFAULT_ALTITUDE_WAYPOINT))
+                            GoogleElevationApi.getElevation(location, this);
+                    } else {
+                        if (prefs.getBoolean(SettingsFragment.PREF_ALTITUDE_TRACKPOINT, SettingsFragment.DEFAULT_ALTITUDE_TRACKPOINT))
+                            GoogleElevationApi.getElevation(location, this);
+                    }
                 }
+            } catch (Throwable ex) {
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
             // Get waypoint name
@@ -1854,7 +1860,7 @@ public class BackgroundService extends IntentService {
         return fileName;
     }
 
-    public static void getAltitude(long from, long to, Context context) {
+    public static void getAltitude(long from, long to, Context context) throws IOException, JSONException {
         Log.i(TAG, "Get altitude" +
                 " from=" + SimpleDateFormat.getDateTimeInstance().format(new Date(from)) +
                 " to=" + SimpleDateFormat.getDateTimeInstance().format(new Date(to)));
@@ -1883,19 +1889,17 @@ public class BackgroundService extends IntentService {
                 location.setLatitude(latitude);
                 location.setLongitude(longitude);
                 location.setTime(time);
-                if (GoogleElevationApi.getElevation(location, context)) {
-                    if (first)
-                        first = false;
-                    else
-                        try {
-                            // Max. 5 requests/second
-                            Thread.sleep(200);
-                        } catch (InterruptedException ignored) {
-                        }
-                    Log.i(TAG, "New altitude for location=" + location);
-                    dh.updateLocationAltitude(id, location.getAltitude());
-                } else
-                    break;
+                GoogleElevationApi.getElevation(location, context);
+                if (first)
+                    first = false;
+                else
+                    try {
+                        // Max. 5 requests/second
+                        Thread.sleep(200);
+                    } catch (InterruptedException ignored) {
+                    }
+                Log.i(TAG, "New altitude for location=" + location);
+                dh.updateLocationAltitude(id, location.getAltitude());
             }
         } finally {
             if (cursor != null)

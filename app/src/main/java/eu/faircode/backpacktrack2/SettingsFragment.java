@@ -1015,7 +1015,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                     if (!location.hasAltitude() && Util.isConnected(getActivity())) {
                                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
                                         if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
-                                            GoogleElevationApi.getElevation(location, getActivity());
+                                            try {
+                                                GoogleElevationApi.getElevation(location, getActivity());
+                                            } catch (Throwable ex) {
+                                                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                            }
                                     }
 
                                     // Persist location
@@ -1063,7 +1067,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     if (!location.hasAltitude() && Util.isConnected(getActivity())) {
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
                         if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
-                            GoogleElevationApi.getElevation(location, getActivity());
+                            try {
+                                GoogleElevationApi.getElevation(location, getActivity());
+                            } catch (Throwable ex) {
+                                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                            }
                     }
 
                     // Persist location
@@ -1366,18 +1374,27 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                     @Override
                                     public void run() {
                                         // Get altitudes for range
-                                        BackgroundService.getAltitude(time, time, getActivity());
-
-                                        synchronized (getActivity()) {
-                                            elevationBusy = false;
-                                        }
-
-                                        getActivity().runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Toast.makeText(getActivity(), getString(R.string.msg_updated, getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
+                                        try {
+                                            BackgroundService.getAltitude(time, time, getActivity());
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Toast.makeText(getActivity(), getString(R.string.msg_updated, getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        } catch (final Throwable ex) {
+                                            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Toast.makeText(getActivity(), ex.toString(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        } finally {
+                                            synchronized (getActivity()) {
+                                                elevationBusy = false;
                                             }
-                                        });
+                                        }
                                     }
                                 }).start();
                                 return true;
@@ -1410,18 +1427,27 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                         to.set(Calendar.MILLISECOND, 999);
 
                                         // Get altitudes for range
-                                        BackgroundService.getAltitude(from.getTimeInMillis(), to.getTimeInMillis(), getActivity());
-
-                                        synchronized (getActivity()) {
-                                            elevationBusy = false;
-                                        }
-
-                                        getActivity().runOnUiThread(new Runnable() {
-                                            @Override
-                                            public void run() {
-                                                Toast.makeText(getActivity(), getString(R.string.msg_updated, getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
+                                        try {
+                                            BackgroundService.getAltitude(from.getTimeInMillis(), to.getTimeInMillis(), getActivity());
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Toast.makeText(getActivity(), getString(R.string.msg_updated, getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        } catch (final Throwable ex) {
+                                            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                            getActivity().runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    Toast.makeText(getActivity(), ex.toString(), Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                        } finally {
+                                            synchronized (getActivity()) {
+                                                elevationBusy = false;
                                             }
-                                        });
+                                        }
                                     }
                                 }).start();
                                 return true;

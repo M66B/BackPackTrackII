@@ -5,6 +5,7 @@ import android.location.Location;
 import android.util.Log;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -18,57 +19,51 @@ public class GoogleElevationApi {
     private static final String TAG = "BPT2.GoogleElevation";
     public static final int cTimeOutMs = 30 * 1000;
 
-    public static boolean getElevation(Location location, Context context) {
+    public static void getElevation(Location location, Context context) throws IOException, JSONException {
+        // https://developers.google.com/maps/documentation/elevation/
+        URL url = new URL("https://maps.googleapis.com/maps/api/elevation/json?locations=" +
+                String.valueOf(location.getLatitude()) + "," +
+                String.valueOf(location.getLongitude()));
+        Log.d(TAG, "url=" + url);
+        HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+        urlConnection.setConnectTimeout(cTimeOutMs);
+        urlConnection.setReadTimeout(cTimeOutMs);
+        urlConnection.setRequestProperty("Accept", "application/json");
+
+        // Set request type
+        urlConnection.setRequestMethod("GET");
+        urlConnection.setDoOutput(false);
+        urlConnection.setDoInput(true);
+
         try {
-            // https://developers.google.com/maps/documentation/elevation/
-            URL url = new URL("https://maps.googleapis.com/maps/api/elevation/json?locations=" +
-                    String.valueOf(location.getLatitude()) + "," +
-                    String.valueOf(location.getLongitude()));
-            Log.d(TAG, "url=" + url);
-            HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
-            urlConnection.setConnectTimeout(cTimeOutMs);
-            urlConnection.setReadTimeout(cTimeOutMs);
-            urlConnection.setRequestProperty("Accept", "application/json");
+            // Check for errors
+            int code = urlConnection.getResponseCode();
+            if (code != HttpsURLConnection.HTTP_OK)
+                throw new IOException("HTTP error " + urlConnection.getResponseCode());
 
-            // Set request type
-            urlConnection.setRequestMethod("GET");
-            urlConnection.setDoOutput(false);
-            urlConnection.setDoInput(true);
+            // Get response
+            BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+            StringBuilder json = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null)
+                json.append(line);
+            Log.d(TAG, json.toString());
 
-            try {
-                // Check for errors
-                int code = urlConnection.getResponseCode();
-                if (code != HttpsURLConnection.HTTP_OK)
-                    throw new IOException("HTTP error " + urlConnection.getResponseCode());
-
-                // Get response
-                BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                StringBuilder json = new StringBuilder();
-                String line;
-                while ((line = br.readLine()) != null)
-                    json.append(line);
-                Log.d(TAG, json.toString());
-
-                // Decode result
-                JSONObject jroot = new JSONObject(json.toString());
-                String status = jroot.getString("status");
-                if ("OK".equals(status)) {
-                    JSONArray results = jroot.getJSONArray("results");
-                    if (results.length() > 0) {
-                        double elevation = results.getJSONObject(0).getDouble("elevation");
-                        location.setAltitude(elevation);
-                        Log.i(TAG, "Elevation " + location);
-                        return true;
-                    } else
-                        throw new IOException("JSON no results");
+            // Decode result
+            JSONObject jroot = new JSONObject(json.toString());
+            String status = jroot.getString("status");
+            if ("OK".equals(status)) {
+                JSONArray results = jroot.getJSONArray("results");
+                if (results.length() > 0) {
+                    double elevation = results.getJSONObject(0).getDouble("elevation");
+                    location.setAltitude(elevation);
+                    Log.i(TAG, "Elevation " + location);
                 } else
-                    throw new IOException("JSON status " + status);
-            } finally {
-                urlConnection.disconnect();
-            }
-        } catch (Throwable ex) {
-            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            return false;
+                    throw new IOException("JSON no results");
+            } else
+                throw new IOException("JSON status " + status);
+        } finally {
+            urlConnection.disconnect();
         }
     }
 }
