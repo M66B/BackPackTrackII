@@ -496,7 +496,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             public boolean onPreferenceClick(Preference preference) {
                 Intent intent = new Intent(getActivity(), BackgroundService.class);
                 intent.setAction(BackgroundService.ACTION_SHARE_GPX);
-                export(intent, R.string.title_share_gpx);
+                export(intent, R.string.title_share_gpx, R.drawable.send_60);
                 return true;
             }
         });
@@ -508,7 +508,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             public boolean onPreferenceClick(Preference preference) {
                 Intent intent = new Intent(getActivity(), BackgroundService.class);
                 intent.setAction(BackgroundService.ACTION_SHARE_KML);
-                export(intent, R.string.title_share_kml);
+                export(intent, R.string.title_share_kml, R.drawable.language_60);
                 return true;
             }
         });
@@ -520,7 +520,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             public boolean onPreferenceClick(Preference preference) {
                 Intent intent = new Intent(getActivity(), BackgroundService.class);
                 intent.setAction(BackgroundService.ACTION_UPLOAD_GPX);
-                export(intent, R.string.title_upload_gpx);
+                export(intent, R.string.title_upload_gpx, R.drawable.backup_60);
                 return true;
             }
         });
@@ -953,6 +953,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
         alertDialogBuilder.setTitle(R.string.title_edit);
+        alertDialogBuilder.setIcon(R.drawable.create_60);
         alertDialogBuilder.setView(viewEdit);
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -1077,7 +1078,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void export(final Intent intent, int resTitle) {
+    private void export(final Intent intent, int resTitle, int resIcon) {
         final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
         // Get layout
@@ -1216,6 +1217,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
         alertDialogBuilder.setTitle(resTitle);
+        alertDialogBuilder.setIcon(resIcon);
         alertDialogBuilder.setView(view);
         alertDialogBuilder
                 .setPositiveButton(android.R.string.ok,
