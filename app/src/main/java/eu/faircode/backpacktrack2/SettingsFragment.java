@@ -1471,6 +1471,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 popupMenu.getMenu().findItem(R.id.menu_time).setTitle(SimpleDateFormat.getDateTimeInstance().format(time));
                 popupMenu.getMenu().findItem(R.id.menu_elevation_loc).setEnabled(Util.isConnected(getActivity()));
                 popupMenu.getMenu().findItem(R.id.menu_elevation_day).setEnabled(Util.isConnected(getActivity()));
+                popupMenu.getMenu().findItem(R.id.menu_delete).setEnabled(Util.debugMode(getActivity()));
                 popupMenu.show();
             }
         });
