@@ -744,10 +744,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cv.put("station_id", weather.station_id);
             cv.put("station_type", weather.station_type);
             cv.put("station_name", weather.station_name);
-            cv.put("station_latitude", weather.station_location.getLatitude());
-            cv.put("station_longitude", weather.station_location.getLongitude());
-            cv.put("latitude", location.getLatitude());
-            cv.put("longitude", location.getLongitude());
+
+            if (weather.station_location == null) {
+                cv.putNull("station_latitude");
+                cv.putNull("station_longitude");
+            } else {
+                cv.put("station_latitude", weather.station_location.getLatitude());
+                cv.put("station_longitude", weather.station_location.getLongitude());
+            }
+
+            if (location == null) {
+                cv.putNull("latitude");
+                cv.putNull("longitude");
+            } else {
+                cv.put("latitude", location.getLatitude());
+                cv.put("longitude", location.getLongitude());
+            }
 
             if (Double.isNaN(weather.temperature))
                 cv.putNull("temperature");

@@ -680,10 +680,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                                 sb.append(weather.toString());
 
-                                float distance = weather.station_location.distanceTo(lastLocation);
-                                sb.append(" ");
-                                sb.append(Integer.toString(Math.round(distance / 1000)));
-                                sb.append(" km");
+                                if (weather.station_location != null) {
+                                    float distance = weather.station_location.distanceTo(lastLocation);
+                                    sb.append(" ");
+                                    sb.append(Integer.toString(Math.round(distance / 1000)));
+                                    sb.append(" km");
+                                }
                             }
 
                             pref_weather_test.setSummary(sb.toString());

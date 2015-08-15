@@ -230,8 +230,7 @@ public class BackgroundService extends IntentService {
                 Log.i(TAG, "Unknown action");
         } catch (Throwable ex) {
             Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            if (!ACTION_UPDATE_WEATHER.equals(intent.getAction()))
-                Util.toast(ex.toString(), Toast.LENGTH_LONG, this);
+            Util.toast(ex.toString(), Toast.LENGTH_LONG, this);
         } finally {
             if (wakeLock != null)
                 wakeLock.release();
@@ -806,15 +805,15 @@ public class BackgroundService extends IntentService {
     private void handleWeatherUpdate(Intent intent) throws Throwable {
         // Get weather
         try {
-            // Check connectivity
-            if (!Util.isConnected(this))
-                return;
-
             // Get last location
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
             Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
             if (lastLocation == null)
                 return;
+
+            // Check connectivity
+            if (!Util.isConnected(this))
+                throw new Throwable("No connectivity");
 
             // Get API key
             String api = prefs.getString(SettingsFragment.PREF_WEATHER_API, SettingsFragment.DEFAULT_WEATHER_API);
@@ -925,6 +924,20 @@ public class BackgroundService extends IntentService {
                     editor.apply();
                 }
             }
+        } catch (Throwable ex) {
+            if (EXPORTED_ACTION_UPDATE_WEATHER.equals(intent.getAction()))
+                throw ex;
+
+            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+
+            // Insert no weather
+            DatabaseHelper dh = new DatabaseHelper(this);
+            Weather weather = new Weather();
+            weather.time = new Date().getTime();
+            if (dh.insertWeather(weather, null) && Util.debugMode(this))
+                Util.toast(getString(R.string.title_weather_settings), Toast.LENGTH_SHORT, this);
+            dh.close();
+
         } finally {
             startWeatherUpdates(this);
             showState(this, "weather");
