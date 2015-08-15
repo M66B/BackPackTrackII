@@ -125,59 +125,64 @@ public class WaypointAdapter extends CursorAdapter {
                 public void onClick(View view) {
                     Toast.makeText(context, context.getString(R.string.msg_rgeocoding), Toast.LENGTH_SHORT).show();
 
-                    new AsyncTask<Object, Object, List<Address>>() {
-                        protected List<Address> doInBackground(Object... params) {
+                    new AsyncTask<Object, Object, Object>() {
+                        protected Object doInBackground(Object... params) {
                             try {
                                 Geocoder geocoder = new Geocoder(context, Locale.getDefault());
                                 return geocoder.getFromLocation(latitude, longitude, GEOCODER_RESULTS);
                             } catch (IOException ex) {
                                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                                return null;
+                                return ex;
                             }
                         }
 
                         @Override
-                        protected void onPostExecute(final List<Address> listAddress) {
-                            // Get address lines
-                            if (listAddress != null && listAddress.size() > 0) {
-                                final List<CharSequence> listAddressLine = new ArrayList<>();
-                                for (Address address : listAddress)
-                                    if (address.hasLatitude() && address.hasLongitude()) {
-                                        List<String> listLine = new ArrayList<>();
-                                        for (int l = 0; l < address.getMaxAddressLineIndex(); l++)
-                                            listLine.add(address.getAddressLine(l));
-                                        listAddressLine.add(TextUtils.join(", ", listLine));
-                                    }
+                        protected void onPostExecute(final Object result) {
+                            if (result instanceof Throwable)
+                                Toast.makeText(context, ((Throwable) result).toString(), Toast.LENGTH_SHORT).show();
+                            else {
+                                List<Address> listAddress = (List<Address>) result;
+                                // Get address lines
+                                if (listAddress != null && listAddress.size() > 0) {
+                                    final List<CharSequence> listAddressLine = new ArrayList<>();
+                                    for (Address address : listAddress)
+                                        if (address.hasLatitude() && address.hasLongitude()) {
+                                            List<String> listLine = new ArrayList<>();
+                                            for (int l = 0; l < address.getMaxAddressLineIndex(); l++)
+                                                listLine.add(address.getAddressLine(l));
+                                            listAddressLine.add(TextUtils.join(", ", listLine));
+                                        }
 
-                                // Show address selector
-                                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                                alertDialogBuilder.setTitle(context.getString(R.string.title_rgeocode));
-                                alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int item) {
-                                        final String geocodedName = (String) listAddressLine.get(item);
+                                    // Show address selector
+                                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                                    alertDialogBuilder.setTitle(context.getString(R.string.title_rgeocode));
+                                    alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int item) {
+                                            final String geocodedName = (String) listAddressLine.get(item);
 
-                                        new AsyncTask<Object, Object, Object>() {
-                                            protected Object doInBackground(Object... params) {
-                                                new DatabaseHelper(context).updateLocationName(id, geocodedName).close();
-                                                return null;
-                                            }
+                                            new AsyncTask<Object, Object, Object>() {
+                                                protected Object doInBackground(Object... params) {
+                                                    new DatabaseHelper(context).updateLocationName(id, geocodedName).close();
+                                                    return null;
+                                                }
 
-                                            @Override
-                                            protected void onPostExecute(Object result) {
-                                                Toast.makeText(context, context.getString(R.string.msg_updated, geocodedName), Toast.LENGTH_SHORT).show();
-                                            }
-                                        }.execute();
-                                    }
-                                });
-                                alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        // Do nothing
-                                    }
-                                });
-                                alertDialogBuilder.show();
-                            } else
-                                Toast.makeText(context, context.getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
+                                                @Override
+                                                protected void onPostExecute(Object result) {
+                                                    Toast.makeText(context, context.getString(R.string.msg_updated, geocodedName), Toast.LENGTH_SHORT).show();
+                                                }
+                                            }.execute();
+                                        }
+                                    });
+                                    alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // Do nothing
+                                        }
+                                    });
+                                    alertDialogBuilder.show();
+                                } else
+                                    Toast.makeText(context, context.getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
+                            }
                         }
                     }.execute();
                 }

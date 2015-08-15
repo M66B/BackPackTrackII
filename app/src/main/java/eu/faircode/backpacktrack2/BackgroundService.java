@@ -1333,7 +1333,13 @@ public class BackgroundService extends IntentService {
             // Get waypoint name
             String waypointName = null;
             if (locationType == LOCATION_WAYPOINT) {
-                List<String> listAddress = reverseGeocode(location, this);
+                List<String> listAddress;
+                try {
+                    listAddress = reverseGeocode(location, this);
+                } catch (IOException ex) {
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    listAddress = new ArrayList<String>();
+                }
                 if (listAddress == null || listAddress.size() == 0)
                     waypointName = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
                 else
@@ -1420,19 +1426,16 @@ public class BackgroundService extends IntentService {
         }
     }
 
-    private static List<String> reverseGeocode(Location location, Context context) {
+    private static List<String> reverseGeocode(Location location, Context context) throws IOException {
         List<String> listline = new ArrayList<>();
-        if (location != null && Geocoder.isPresent())
-            try {
-                Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-                List<Address> listPlace = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-                if (listPlace != null && listPlace.size() > 0) {
-                    for (int l = 0; l < listPlace.get(0).getMaxAddressLineIndex(); l++)
-                        listline.add(listPlace.get(0).getAddressLine(l));
-                }
-            } catch (IOException ex) {
-                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+        if (location != null && Geocoder.isPresent()) {
+            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+            List<Address> listPlace = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+            if (listPlace != null && listPlace.size() > 0) {
+                for (int l = 0; l < listPlace.get(0).getMaxAddressLineIndex(); l++)
+                    listline.add(listPlace.get(0).getAddressLine(l));
             }
+        }
         return listline;
     }
 

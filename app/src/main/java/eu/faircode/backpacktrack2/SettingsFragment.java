@@ -974,75 +974,80 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Geocode name
         Toast.makeText(getActivity(), getString(R.string.msg_geocoding, name), Toast.LENGTH_SHORT).show();
 
-        new AsyncTask<Object, Object, List<Address>>() {
-            protected List<Address> doInBackground(Object... params) {
+        new AsyncTask<Object, Object, Object>() {
+            protected Object doInBackground(Object... params) {
                 try {
                     Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
                     return geocoder.getFromLocationName(name, GEOCODER_RESULTS);
                 } catch (IOException ex) {
                     Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                    return null;
+                    return ex;
                 }
             }
 
-            protected void onPostExecute(final List<Address> listAddress) {
-                // Get address lines
-                if (listAddress != null && listAddress.size() > 0) {
-                    final List<CharSequence> listAddressLine = new ArrayList<>();
-                    for (Address address : listAddress)
-                        if (address.hasLatitude() && address.hasLongitude()) {
-                            List<String> listLine = new ArrayList<>();
-                            for (int l = 0; l < address.getMaxAddressLineIndex(); l++)
-                                listLine.add(address.getAddressLine(l));
-                            listAddressLine.add(TextUtils.join(", ", listLine));
-                        }
+            protected void onPostExecute(final Object result) {
+                if (result instanceof Throwable)
+                    Toast.makeText(getActivity(), ((Throwable) result).toString(), Toast.LENGTH_SHORT).show();
+                else {
+                    final List<Address> listAddress = (List<Address>) result;
+                    // Get address lines
+                    if (listAddress != null && listAddress.size() > 0) {
+                        final List<CharSequence> listAddressLine = new ArrayList<>();
+                        for (Address address : listAddress)
+                            if (address.hasLatitude() && address.hasLongitude()) {
+                                List<String> listLine = new ArrayList<>();
+                                for (int l = 0; l < address.getMaxAddressLineIndex(); l++)
+                                    listLine.add(address.getAddressLine(l));
+                                listAddressLine.add(TextUtils.join(", ", listLine));
+                            }
 
-                    // Show address selector
-                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-                    alertDialogBuilder.setTitle(getString(R.string.title_geocode));
-                    alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int item) {
-                            // Build location
-                            final String geocodedName = (String) listAddressLine.get(item);
-                            final Location location = new Location("geocoder");
-                            location.setLatitude(listAddress.get(item).getLatitude());
-                            location.setLongitude(listAddress.get(item).getLongitude());
-                            location.setTime(System.currentTimeMillis());
+                        // Show address selector
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                        alertDialogBuilder.setTitle(getString(R.string.title_geocode));
+                        alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int item) {
+                                // Build location
+                                final String geocodedName = (String) listAddressLine.get(item);
+                                final Location location = new Location("geocoder");
+                                location.setLatitude(listAddress.get(item).getLatitude());
+                                location.setLongitude(listAddress.get(item).getLongitude());
+                                location.setTime(System.currentTimeMillis());
 
-                            new AsyncTask<Object, Object, Object>() {
-                                protected Object doInBackground(Object... params) {
-                                    // Add elevation data
-                                    if (!location.hasAltitude() && Util.isConnected(getActivity())) {
-                                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                                        if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
-                                            try {
-                                                GoogleElevationApi.getElevation(location, getActivity());
-                                            } catch (Throwable ex) {
-                                                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                                            }
+                                new AsyncTask<Object, Object, Object>() {
+                                    protected Object doInBackground(Object... params) {
+                                        // Add elevation data
+                                        if (!location.hasAltitude() && Util.isConnected(getActivity())) {
+                                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                                            if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
+                                                try {
+                                                    GoogleElevationApi.getElevation(location, getActivity());
+                                                } catch (Throwable ex) {
+                                                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                                }
+                                        }
+
+                                        // Persist location
+                                        new DatabaseHelper(getActivity()).insertLocation(location, geocodedName, -1, -1, -1).close();
+                                        return null;
                                     }
 
-                                    // Persist location
-                                    new DatabaseHelper(getActivity()).insertLocation(location, geocodedName, -1, -1, -1).close();
-                                    return null;
-                                }
-
-                                @Override
-                                protected void onPostExecute(Object result) {
-                                    Toast.makeText(getActivity(), getString(R.string.msg_added, geocodedName), Toast.LENGTH_SHORT).show();
-                                }
-                            }.execute();
-                        }
-                    });
-                    alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            // Do nothing
-                        }
-                    });
-                    alertDialogBuilder.show();
-                } else
-                    Toast.makeText(getActivity(), getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
+                                    @Override
+                                    protected void onPostExecute(Object result) {
+                                        Toast.makeText(getActivity(), getString(R.string.msg_added, geocodedName), Toast.LENGTH_SHORT).show();
+                                    }
+                                }.execute();
+                            }
+                        });
+                        alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Do nothing
+                            }
+                        });
+                        alertDialogBuilder.show();
+                    } else
+                        Toast.makeText(getActivity(), getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
+                }
             }
         }.execute();
     }
