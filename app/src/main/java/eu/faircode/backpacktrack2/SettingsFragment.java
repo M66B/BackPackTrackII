@@ -2115,7 +2115,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         int colTime = cursor.getColumnIndex("time");
         int colCount = cursor.getColumnIndex("count");
 
-        BarGraphSeries<DataPoint> seriesStep = new BarGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesStep = new LineGraphSeries<DataPoint>();
 
         while (cursor.moveToNext()) {
             data = true;
@@ -2149,8 +2149,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     new DateAsXAxisLabelFormatter(getActivity(),
                             SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
-
-            seriesStep.setSpacing(10);
 
             graph.addSeries(seriesStep);
 
