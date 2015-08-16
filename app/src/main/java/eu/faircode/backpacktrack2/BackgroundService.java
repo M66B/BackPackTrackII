@@ -1538,10 +1538,8 @@ public class BackgroundService extends IntentService {
         // Build notification
         Notification.Builder notificationBuilder = new Notification.Builder(context);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.backpacker_grey).copy(Bitmap.Config.ARGB_8888, true);
-            notificationBuilder.setLargeIcon(largeIcon);
-        }
+        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.backpacker_grey).copy(Bitmap.Config.ARGB_8888, true);
+        notificationBuilder.setLargeIcon(largeIcon);
 
         if (activityType == DetectedActivity.STILL)
             notificationBuilder.setSmallIcon(R.drawable.pause);
@@ -1634,12 +1632,9 @@ public class BackgroundService extends IntentService {
         Notification.Builder notificationBuilder = new Notification.Builder(context);
         int resId = (weather.icon == null ? -1 : context.getResources().getIdentifier(weather.icon.replace("-", "_"), "drawable", context.getPackageName()));
         if (resId > 0) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), resId).copy(Bitmap.Config.ARGB_8888, true);
-                notificationBuilder.setLargeIcon(largeIcon);
-                notificationBuilder.setSmallIcon(getTemperatureIcon((float) weather.temperature, context));
-            } else
-                notificationBuilder.setSmallIcon(resId);
+            Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), resId).copy(Bitmap.Config.ARGB_8888, true);
+            notificationBuilder.setLargeIcon(largeIcon);
+            notificationBuilder.setSmallIcon(getTemperatureIcon((float) weather.temperature, context));
         } else
             notificationBuilder.setSmallIcon(android.R.drawable.ic_menu_help);
 
