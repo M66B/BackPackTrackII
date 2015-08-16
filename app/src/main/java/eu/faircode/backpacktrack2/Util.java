@@ -15,6 +15,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
@@ -30,6 +31,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Set;
 
 public class Util {
     private static final String TAG = "BPT2.Util";
@@ -187,5 +189,16 @@ public class Util {
                             Math.pow(Math.abs(lastLocation.getAltitude() - location.getAltitude()), 2));
         else
             return lastLocation.distanceTo(location);
+    }
+
+    public static void logExtras(Intent intent) {
+        Bundle extras = intent.getExtras();
+        if (extras != null) {
+            Set<String> keys = extras.keySet();
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String key : keys)
+                stringBuilder.append(key).append("=").append(extras.get(key)).append("\r\n");
+            Log.d(TAG, stringBuilder.toString());
+        }
     }
 }
