@@ -5,12 +5,25 @@
     android:orientation="vertical"
     android:padding="12dp">
 
-    <Spinner
-        android:id="@+id/spGraph"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:entries="@array/listWeatherName"
-        android:entryValues="@array/listWeatherValue" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Spinner
+            android:id="@+id/spGraph"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:entries="@array/listWeatherName"
+            android:entryValues="@array/listWeatherValue" />
+
+        <ImageView
+            android:id="@+id/ivAdd"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentRight="true"
+            android:src="@android:drawable/ic_menu_add" />
+    </RelativeLayout>
 
     <com.jjoe64.graphview.GraphView
         android:id="@+id/gvWeather"
@@ -40,13 +53,6 @@
                 android:layout_height="24dp"
                 android:layout_marginLeft="6dp"
                 android:src="@android:drawable/ic_menu_week" />
-
-            <ImageView
-                android:id="@+id/ivAdd"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginLeft="6dp"
-                android:src="@android:drawable/ic_menu_add" />
         </LinearLayout>
 
         <TextView
