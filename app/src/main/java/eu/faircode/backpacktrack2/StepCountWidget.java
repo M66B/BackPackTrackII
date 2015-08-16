@@ -18,15 +18,13 @@ public class StepCountWidget extends AppWidgetProvider {
             dh = new DatabaseHelper(context);
             int count = dh.getSteps(new Date().getTime());
 
-            Intent riSettings = new Intent(context, SettingsActivity.class);
-            riSettings.setAction(Intent.ACTION_MAIN);
-            riSettings.addCategory(Intent.CATEGORY_LAUNCHER);
-            riSettings.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            PendingIntent piSettings = PendingIntent.getActivity(context, 1, riSettings, PendingIntent.FLAG_UPDATE_CURRENT);
+            Intent riMain = new Intent(context, SettingsActivity.class);
+            riMain.putExtra(SettingsFragment.EXTRA_ACTION, SettingsFragment.ACTION_STEPS);
+            PendingIntent piMain = PendingIntent.getActivity(context, 3, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
 
             for (int id : appWidgetIds) {
                 RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.step_widget);
-                views.setOnClickPendingIntent(R.id.llCount, piSettings);
+                views.setOnClickPendingIntent(R.id.llCount, piMain);
                 views.setTextViewText(R.id.tvCount, Integer.toString(count));
                 appWidgetManager.updateAppWidget(id, views);
             }
@@ -38,7 +36,7 @@ public class StepCountWidget extends AppWidgetProvider {
 
     public static void updateWidgets(Context context) {
         Intent intent = new Intent(context, StepCountWidget.class);
-        intent.setAction("android.appwidget.action.APPWIDGET_UPDATE");
+        intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
         int ids[] = AppWidgetManager.getInstance(context).getAppWidgetIds(new ComponentName(context, StepCountWidget.class));
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
         context.sendBroadcast(intent);

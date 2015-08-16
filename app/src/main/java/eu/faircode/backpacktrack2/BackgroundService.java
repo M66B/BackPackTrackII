@@ -1538,10 +1538,7 @@ public class BackgroundService extends IntentService {
 
         // Build main intent
         Intent riMain = new Intent(context, SettingsActivity.class);
-        riMain.setAction(Intent.ACTION_MAIN);
-        riMain.addCategory(Intent.CATEGORY_LAUNCHER);
-        riMain.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent piMain = PendingIntent.getActivity(context, 1, riMain, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent piMain = PendingIntent.getActivity(context, 1, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
 
         // Build notification
         Notification.Builder notificationBuilder = new Notification.Builder(context);
@@ -1808,13 +1805,9 @@ public class BackgroundService extends IntentService {
 
         // Build main intent
         Intent riMain = new Intent(context, SettingsActivity.class);
-        riMain.setAction(Intent.ACTION_MAIN);
-        riMain.addCategory(Intent.CATEGORY_LAUNCHER);
-        riMain.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent piMain = PendingIntent.getActivity(context, 1, riMain, PendingIntent.FLAG_UPDATE_CURRENT);
+        riMain.putExtra(SettingsFragment.EXTRA_ACTION, SettingsFragment.ACTION_WEATHER);
+        PendingIntent piMain = PendingIntent.getActivity(context, 2, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
         notificationBuilder.setContentIntent(piMain);
-
-
         notificationBuilder.setUsesChronometer(true);
         notificationBuilder.setWhen(weather.time);
         notificationBuilder.setAutoCancel(false);

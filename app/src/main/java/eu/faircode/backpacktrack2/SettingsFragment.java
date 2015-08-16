@@ -80,7 +80,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
-    private static final String TAG = "BPT2.Settings";
+    private static final String TAG = "BPT2.Fragment";
 
     // Preference names
     public static final String PREF_EDIT = "pref_edit";
@@ -308,12 +308,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_LAST_TO = "pref_last_to";
 
     // Constants
+    public static final String EXTRA_ACTION = "Action";
+    public static final String ACTION_STEPS = "Steps";
+    public static final String ACTION_WEATHER = "Weather";
     private static final int ACTIVITY_PICKPLACE = 1;
     private static final int GEOCODER_RESULTS = 5;
     private static final long DAY_MS = 24L * 3600L * 1000L;
 
     private DatabaseHelper db = null;
     private boolean elevationBusy = false;
+    private List<AlertDialog> dialogs = new ArrayList<AlertDialog>();
 
     private BroadcastReceiver mConnectivityChangeReceiver = new BroadcastReceiver() {
         @Override
@@ -357,11 +361,24 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             geopointIntent.putExtra(BackgroundService.EXTRA_GEOURI, data);
             getActivity().startService(geopointIntent);
         }
+
+        Bundle extras = getActivity().getIntent().getExtras();
+        if (extras != null && extras.containsKey(EXTRA_ACTION)) {
+            String action = extras.getString(EXTRA_ACTION);
+            if (ACTION_STEPS.equals(action))
+                step_history();
+            else if (ACTION_WEATHER.equals(action))
+                weather_history();
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        for (AlertDialog dialog : dialogs)
+            if (dialog.isShowing())
+                dialog.dismiss();
 
         if (db != null)
             db.close();
@@ -931,6 +948,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             });
                     AlertDialog alertDialog = alertDialogBuilder.create();
                     alertDialog.show();
+                    dialogs.add(alertDialog);
                 }
             });
         else
@@ -969,6 +987,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
         alertDialog.show();
+        dialogs.add(alertDialog);
         // Fix keyboard input
         alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
     }
@@ -1050,7 +1069,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 // Do nothing
                             }
                         });
-                        alertDialogBuilder.show();
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.show();
+                        dialogs.add(alertDialog);
                     } else
                         Toast.makeText(getActivity(), getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
                 }
@@ -1272,6 +1293,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
+        dialogs.add(alertDialog);
     }
 
     private void location_history() {
@@ -1496,6 +1518,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                         });
                                 AlertDialog alertDialog = alertDialogBuilder.create();
                                 alertDialog.show();
+                                dialogs.add(alertDialog);
                                 return true;
 
                             default:
@@ -1530,6 +1553,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
         alertDialog.show();
+        dialogs.add(alertDialog);
         // Fix keyboard input
         alertDialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
     }
@@ -1799,6 +1823,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
         alertDialog.show();
+        dialogs.add(alertDialog);
     }
 
     private void showActivityGraph(GraphView graph) {
@@ -2062,6 +2087,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         });
                 AlertDialog alertDialog = alertDialogBuilder.create();
                 alertDialog.show();
+                dialogs.add(alertDialog);
             }
         });
 
@@ -2078,6 +2104,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
         alertDialog.show();
+        dialogs.add(alertDialog);
     }
 
     private void activity_log(final long from, final long to) {
@@ -2132,6 +2159,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
         alertDialog.show();
+        dialogs.add(alertDialog);
     }
 
     private void step_history() {
@@ -2224,6 +2252,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
         alertDialog.show();
+        dialogs.add(alertDialog);
     }
 
     private void showStepGraph(GraphView graph) {
@@ -2527,6 +2556,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
         alertDialog.show();
+        dialogs.add(alertDialog);
     }
 
     private void showWeatherGraph(GraphView graph) {
