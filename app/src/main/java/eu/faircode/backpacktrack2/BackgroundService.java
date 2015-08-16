@@ -1530,6 +1530,7 @@ public class BackgroundService extends IntentService {
 
         // Build main intent
         Intent riMain = new Intent(context, SettingsActivity.class);
+        riMain.putExtra(SettingsFragment.EXTRA_ACTION, SettingsFragment.ACTION_LOCATION);
         PendingIntent piMain = PendingIntent.getActivity(context, 1, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
 
         // Build notification

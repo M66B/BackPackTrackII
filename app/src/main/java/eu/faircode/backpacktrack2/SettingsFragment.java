@@ -309,6 +309,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     // Constants
     public static final String EXTRA_ACTION = "Action";
+    public static final String ACTION_LOCATION = "Location";
     public static final String ACTION_STEPS = "Steps";
     public static final String ACTION_WEATHER = "Weather";
     private static final int ACTIVITY_PICKPLACE = 1;
