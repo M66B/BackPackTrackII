@@ -34,6 +34,8 @@ public class Weather {
     public String station_name = null;
     public Location station_location = null;
     public double temperature = Double.NaN;
+    public double temperature_min = Double.NaN;
+    public double temperature_max = Double.NaN;
     public double humidity = Double.NaN;
     public double pressure = Double.NaN;
     public double wind_speed = Double.NaN;

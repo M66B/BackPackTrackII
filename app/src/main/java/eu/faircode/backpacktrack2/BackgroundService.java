@@ -862,12 +862,9 @@ public class BackgroundService extends IntentService {
             List<Weather> listWeather = new ArrayList<Weather>();
             if ("fio".equals(api)) {
                 // Forecast.io
-                Weather w = ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, this);
-                if (w != null) {
-                    listWeather.add(w);
-                    if (notification)
-                        showWeatherNotification(w, this);
-                }
+                listWeather = ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, ForecastIO.TYPE_CURRENT, this);
+                if (notification && listWeather.size() > 0)
+                    showWeatherNotification(listWeather.get(0), this);
             } else if ("owm".equals(api)) {
                 // OpenWeatherMap
                 if (id < 0)

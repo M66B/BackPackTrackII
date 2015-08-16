@@ -34,14 +34,28 @@ public class ForecastIO {
     private static final int cTimeOutMs = 30 * 1000;
     private static final DecimalFormat DF = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ROOT));
 
-    public static Weather getWeatherByLocation(
-            String apikey, final Location location, Context context)
+    public static final int TYPE_CURRENT = 1;
+    public static final int TYPE_HOURLY = 2;
+    public static final int TYPE_DAILY = 3;
+
+    public static List<Weather> getWeatherByLocation(
+            String apikey, final Location location, int type, Context context)
             throws IOException, JSONException {
         // https:developer.forecast.io/docs/v2
+        List<Weather> result = new ArrayList<Weather>();
+
+        String exclude = "currently,minutely,hourly,daily,alerts,flags";
+        if (type == TYPE_CURRENT)
+            exclude = exclude.replace("currently,", "");
+        else if (type == TYPE_HOURLY)
+            exclude = exclude.replace("hourly,", "");
+        else if (type == TYPE_DAILY)
+            exclude = exclude.replace("daily,", "");
         URL url = new URL(BASE_URL + "/" + apikey + "/" +
                 String.valueOf(location.getLatitude()) + "," +
                 String.valueOf(location.getLongitude()) +
-                "?exclude=minutely,hourly,daily,alerts,flags&units=si" +
+                "?exclude=" + exclude +
+                "&units=si" +
                 "&lang=" + Locale.getDefault().getLanguage());
 
         Log.i(TAG, "url=" + url);
@@ -71,22 +85,45 @@ public class ForecastIO {
 
             // Decode result
             JSONObject jroot = new JSONObject(json.toString());
-            if (!jroot.has("latitude") || !jroot.has("longitude") || !jroot.has("currently"))
-                return null;
-            JSONObject currently = jroot.getJSONObject("currently");
-            if (!currently.has("time"))
-                return null;
+            if (!jroot.has("latitude") || !jroot.has("longitude"))
+                return result;
 
-            return decodeWeather(jroot, currently);
+            if (type == TYPE_CURRENT) {
+                if (jroot.has("currently")) {
+                    JSONObject current = jroot.getJSONObject("currently");
+                    if (current.has("time"))
+                        result.add(decodeWeather(jroot, current));
+                }
+            } else if (type == TYPE_HOURLY) {
+                if (jroot.has("hourly")) {
+                    JSONArray hourly = jroot.getJSONArray("hourly");
+                    for (int i = 0; i < hourly.length(); i++) {
+                        JSONObject hour = hourly.getJSONObject(i);
+                        if (hour.has("time"))
+                            result.add(decodeWeather(jroot, hour));
+                    }
+                }
+            } else if (type == TYPE_DAILY) {
+                if (jroot.has("daily")) {
+                    JSONArray daily = jroot.getJSONArray("daily");
+                    for (int i = 0; i < daily.length(); i++) {
+                        JSONObject day = daily.getJSONObject(i);
+                        if (day.has("time"))
+                            result.add(decodeWeather(jroot, day));
+                    }
+                }
+            }
+
+            return result;
         } finally {
             urlConnection.disconnect();
         }
     }
 
     @NonNull
-    private static Weather decodeWeather(JSONObject jroot, JSONObject currently) throws JSONException {
+    private static Weather decodeWeather(JSONObject jroot, JSONObject data) throws JSONException {
         Weather weather = new Weather();
-        weather.time = currently.getLong("time") * 1000;
+        weather.time = data.getLong("time") * 1000;
         weather.provider = "fio";
         weather.station_id = -1;
         weather.station_type = -1;
@@ -97,21 +134,23 @@ public class ForecastIO {
         station_location.setLongitude(jroot.getDouble("longitude"));
         weather.station_location = station_location;
 
-        weather.temperature = (currently.has("temperature") ? currently.getDouble("temperature") : Double.NaN);
-        weather.humidity = (currently.has("humidity") ? currently.getDouble("humidity") * 100 : Double.NaN);
-        weather.pressure = (currently.has("pressure") ? currently.getDouble("pressure") : Double.NaN);
-        weather.wind_speed = (currently.has("windSpeed") ? currently.getDouble("windSpeed") : Double.NaN);
+        weather.temperature = (data.has("temperature") ? data.getDouble("temperature") : Double.NaN);
+        weather.temperature_min = (data.has("temperatureMin") ? data.getDouble("temperatureMin") : Double.NaN);
+        weather.temperature_max = (data.has("temperatureMax") ? data.getDouble("temperatureMax") : Double.NaN);
+        weather.humidity = (data.has("humidity") ? data.getDouble("humidity") * 100 : Double.NaN);
+        weather.pressure = (data.has("pressure") ? data.getDouble("pressure") : Double.NaN);
+        weather.wind_speed = (data.has("windSpeed") ? data.getDouble("windSpeed") : Double.NaN);
         weather.wind_gust = Double.NaN;
-        weather.wind_direction = (currently.has("windBearing") ? currently.getDouble("windBearing") : Double.NaN);
-        weather.visibility = (currently.has("visibility") ? currently.getDouble("visibility") * 1000 : Double.NaN);
-        weather.rain_1h = (currently.has("precipIntensity") ? currently.getDouble("precipIntensity") : Double.NaN);
-        weather.rain_today = (currently.has("precipAccumulation") ? currently.getDouble("precipAccumulation") * 10 : Double.NaN);
-        weather.rain_probability = (currently.has("precipProbability") ? currently.getDouble("precipProbability") * 100 : Double.NaN);
-        weather.clouds = (currently.has("cloudCover") ? currently.getDouble("cloudCover") * 100 : Double.NaN);
-        weather.icon = (currently.has("icon") ? currently.getString("icon") : null);
+        weather.wind_direction = (data.has("windBearing") ? data.getDouble("windBearing") : Double.NaN);
+        weather.visibility = (data.has("visibility") ? data.getDouble("visibility") * 1000 : Double.NaN);
+        weather.rain_1h = (data.has("precipIntensity") ? data.getDouble("precipIntensity") : Double.NaN);
+        weather.rain_today = (data.has("precipAccumulation") ? data.getDouble("precipAccumulation") * 10 : Double.NaN);
+        weather.rain_probability = (data.has("precipProbability") ? data.getDouble("precipProbability") * 100 : Double.NaN);
+        weather.clouds = (data.has("cloudCover") ? data.getDouble("cloudCover") * 100 : Double.NaN);
+        weather.icon = (data.has("icon") ? data.getString("icon") : null);
         // clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night
-        weather.summary = (currently.has("summary") ? currently.getString("summary") : null);
-        weather.rawData = currently.toString();
+        weather.summary = (data.has("summary") ? data.getString("summary") : null);
+        weather.rawData = data.toString();
 
         return weather;
     }

@@ -668,11 +668,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             // Weather provider
                             if ("fio".equals(api)) {
                                 // Forecast.io
-                                List<Weather> listWeather = new ArrayList<Weather>();
-                                Weather w = ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, getActivity());
-                                if (w != null)
-                                    listWeather.add(w);
-                                return listWeather;
+                                return ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, ForecastIO.TYPE_CURRENT, getActivity());
                             } else {
                                 // OpenWeatherMap
                                 int stations = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_STATIONS, SettingsFragment.DEFAULT_WEATHER_STATIONS));
