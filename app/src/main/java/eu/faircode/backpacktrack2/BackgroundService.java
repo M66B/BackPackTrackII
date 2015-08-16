@@ -13,11 +13,6 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -1545,32 +1540,6 @@ public class BackgroundService extends IntentService {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.backpacker_grey).copy(Bitmap.Config.ARGB_8888, true);
-
-            // Show temperature
-            float ref_temp = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_TEMP, Float.NaN);
-            long ref_time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
-            int maxage = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_MAXAGE, SettingsFragment.DEFAULT_WEATHER_MAXAGE));
-            String unit = prefs.getString(SettingsFragment.PREF_TEMPERATURE, SettingsFragment.DEFAULT_TEMPERATURE);
-            if (!Float.isNaN(ref_temp) && ref_time + maxage * 60 * 1000 > new Date().getTime()) {
-                if ("f".equals(unit))
-                    ref_temp = ref_temp * 9 / 5 + 32;
-
-                int size = largeIcon.getWidth() / 4;
-                String label = Integer.toString(Math.round(ref_temp));
-
-                Paint paint = new Paint();
-                paint.setStyle(Paint.Style.FILL);
-                paint.setColor(Color.GRAY);
-                paint.setTextSize(size);
-                paint.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-
-                Rect bounds = new Rect();
-                paint.getTextBounds(label, 0, label.length(), bounds);
-
-                Canvas canvas = new Canvas(largeIcon);
-                canvas.drawText(label, 0, bounds.height(), paint);
-            }
-
             notificationBuilder.setLargeIcon(largeIcon);
         }
 
