@@ -126,6 +126,11 @@ public class BackgroundService extends IntentService {
     private static final int LOCATION_WAYPOINT = 2;
     private static final int LOCATION_PERIODIC = 3;
 
+    public final static int ALTITUDE_NONE = 0;
+    public final static int ALTITUDE_GPS = 1;
+    public final static int ALTITUDE_PRESSURE = 2;
+    public final static int ALTITUDE_LOOKUP = 3;
+
     private static final int VIBRATE_SHORT = 250; // milliseconds
     private static final int VIBRATE_LONG = 500; // milliseconds
 
@@ -555,10 +560,11 @@ public class BackgroundService extends IntentService {
             DatabaseHelper dh = null;
             try {
                 dh = new DatabaseHelper(this);
+                int altitude_type = (location.hasAltitude() ? ALTITUDE_GPS : ALTITUDE_NONE);
                 int activity_type = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN);
                 int activity_confidence = prefs.getInt(SettingsFragment.PREF_LAST_CONFIDENCE, -1);
                 int stepcount = dh.getSteps(location.getTime());
-                dh.insertLocation(location, null, activity_type, activity_confidence, stepcount).close();
+                dh.insertLocation(location, altitude_type, null, activity_type, activity_confidence, stepcount).close();
             } finally {
                 if (dh != null)
                     dh.close();
@@ -661,7 +667,7 @@ public class BackgroundService extends IntentService {
             location.setLongitude(lon);
             if (name == null)
                 name = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
-            new DatabaseHelper(this).insertLocation(location, name, -1, -1, -1).close();
+            new DatabaseHelper(this).insertLocation(location, ALTITUDE_NONE, name, -1, -1, -1).close();
             Util.toast(getString(R.string.msg_added, name), Toast.LENGTH_LONG, this);
         }
     }
@@ -1329,14 +1335,19 @@ public class BackgroundService extends IntentService {
             }
 
             // Add elevation data
+            int altitude_type = (location.hasAltitude() ? ALTITUDE_GPS : ALTITUDE_NONE);
             try {
                 if (!location.hasAltitude() && Util.isConnected(this)) {
                     if (locationType == LOCATION_WAYPOINT) {
-                        if (prefs.getBoolean(SettingsFragment.PREF_ALTITUDE_WAYPOINT, SettingsFragment.DEFAULT_ALTITUDE_WAYPOINT))
+                        if (prefs.getBoolean(SettingsFragment.PREF_ALTITUDE_WAYPOINT, SettingsFragment.DEFAULT_ALTITUDE_WAYPOINT)) {
                             GoogleElevationApi.getElevation(location, this);
+                            altitude_type = ALTITUDE_LOOKUP;
+                        }
                     } else {
-                        if (prefs.getBoolean(SettingsFragment.PREF_ALTITUDE_TRACKPOINT, SettingsFragment.DEFAULT_ALTITUDE_TRACKPOINT))
+                        if (prefs.getBoolean(SettingsFragment.PREF_ALTITUDE_TRACKPOINT, SettingsFragment.DEFAULT_ALTITUDE_TRACKPOINT)) {
                             GoogleElevationApi.getElevation(location, this);
+                            altitude_type = ALTITUDE_LOOKUP;
+                        }
                     }
                 }
             } catch (Throwable ex) {
@@ -1367,7 +1378,7 @@ public class BackgroundService extends IntentService {
                 int activity_type = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN);
                 int activity_confidence = prefs.getInt(SettingsFragment.PREF_LAST_CONFIDENCE, -1);
                 int stepcount = dh.getSteps(location.getTime());
-                dh.insertLocation(location, waypointName, activity_type, activity_confidence, stepcount).close();
+                dh.insertLocation(location, altitude_type, waypointName, activity_type, activity_confidence, stepcount).close();
             } finally {
                 if (dh != null)
                     dh.close();
@@ -1900,6 +1911,7 @@ public class BackgroundService extends IntentService {
             int colProvider = cursor.getColumnIndex("provider");
             int colLatitude = cursor.getColumnIndex("latitude");
             int colLongitude = cursor.getColumnIndex("longitude");
+            int colAltitudeType = cursor.getColumnIndex("altitude_type");
 
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(colID);
@@ -1907,22 +1919,25 @@ public class BackgroundService extends IntentService {
                 final String provider = cursor.getString(colProvider);
                 double latitude = cursor.getDouble(colLatitude);
                 double longitude = cursor.getDouble(colLongitude);
+                int altitude_type = (cursor.isNull(colAltitudeType) ? ALTITUDE_NONE : cursor.getInt(colAltitudeType));
 
-                Location location = new Location(provider);
-                location.setLatitude(latitude);
-                location.setLongitude(longitude);
-                location.setTime(time);
-                GoogleElevationApi.getElevation(location, context);
-                if (first)
-                    first = false;
-                else
-                    try {
-                        // Max. 5 requests/second
-                        Thread.sleep(200);
-                    } catch (InterruptedException ignored) {
-                    }
-                Log.i(TAG, "New altitude for location=" + location);
-                dh.updateLocationAltitude(id, location.getAltitude());
+                if (altitude_type != ALTITUDE_LOOKUP) {
+                    Location location = new Location(provider);
+                    location.setLatitude(latitude);
+                    location.setLongitude(longitude);
+                    location.setTime(time);
+                    GoogleElevationApi.getElevation(location, context);
+                    if (first)
+                        first = false;
+                    else
+                        try {
+                            // Max. 5 requests/second
+                            Thread.sleep(200);
+                        } catch (InterruptedException ignored) {
+                        }
+                    Log.i(TAG, "New altitude for location=" + location);
+                    dh.updateLocationAltitude(id, location.getAltitude(), ALTITUDE_LOOKUP);
+                }
             }
         } finally {
             if (cursor != null)

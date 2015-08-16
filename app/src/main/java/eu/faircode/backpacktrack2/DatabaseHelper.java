@@ -23,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 19;
+    private static final int DB_VERSION = 20;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
@@ -72,6 +72,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", latitude REAL NOT NULL" +
                 ", longitude REAL NOT NULL" +
                 ", altitude REAL NULL" +
+                ", altitude_type INTEGER NULL" +
                 ", speed REAL NULL" +
                 ", bearing REAL NULL" +
                 ", accuracy REAL NULL" +
@@ -278,6 +279,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 oldVersion = 19;
             }
 
+            if (oldVersion < 20) {
+                db.execSQL("ALTER TABLE location ADD COLUMN altitude_type INTEGER NULL");
+                oldVersion = 20;
+            }
+
             db.setVersion(DB_VERSION);
 
             db.setTransactionSuccessful();
@@ -290,7 +296,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Location
 
-    public DatabaseHelper insertLocation(Location location, String name, int activity_type, int activity_confidence, int stepcount) {
+    public DatabaseHelper insertLocation(Location location, int altitude_type, String name, int activity_type, int activity_confidence, int stepcount) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
 
@@ -304,6 +310,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cv.put("altitude", location.getAltitude());
             else
                 cv.putNull("altitude");
+
+            cv.put("altitude_type", altitude_type);
 
             if (location.hasSpeed())
                 cv.put("speed", location.getSpeed());
@@ -384,11 +392,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this;
     }
 
-    public DatabaseHelper updateLocationAltitude(long id, double altitude) {
+    public DatabaseHelper updateLocationAltitude(long id, double altitude, int altitude_type) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues cv = new ContentValues();
             cv.put("altitude", altitude);
+            cv.put("altitude_type", altitude_type);
             if (db.update("location", cv, "ID = ?", new String[]{Long.toString(id)}) != 1)
                 Log.e(TAG, "Update location altitude failed");
         }

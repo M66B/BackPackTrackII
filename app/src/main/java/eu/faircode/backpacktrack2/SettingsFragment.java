@@ -1018,19 +1018,22 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                                 new AsyncTask<Object, Object, Object>() {
                                     protected Object doInBackground(Object... params) {
+                                        int altitude_type = (location.hasAltitude() ? BackgroundService.ALTITUDE_GPS : BackgroundService.ALTITUDE_NONE);
+
                                         // Add elevation data
                                         if (!location.hasAltitude() && Util.isConnected(getActivity())) {
                                             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
                                             if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
                                                 try {
                                                     GoogleElevationApi.getElevation(location, getActivity());
+                                                    altitude_type = BackgroundService.ALTITUDE_LOOKUP;
                                                 } catch (Throwable ex) {
                                                     Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                                                 }
                                         }
 
                                         // Persist location
-                                        new DatabaseHelper(getActivity()).insertLocation(location, geocodedName, -1, -1, -1).close();
+                                        new DatabaseHelper(getActivity()).insertLocation(location, altitude_type, geocodedName, -1, -1, -1).close();
                                         return null;
                                     }
 
@@ -1071,19 +1074,22 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             new AsyncTask<Object, Object, Object>() {
                 protected Object doInBackground(Object... params) {
+                    int altitude_type = (location.hasAltitude() ? BackgroundService.ALTITUDE_GPS : BackgroundService.ALTITUDE_NONE);
+
                     // Add elevation data
                     if (!location.hasAltitude() && Util.isConnected(getActivity())) {
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
                         if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
                             try {
                                 GoogleElevationApi.getElevation(location, getActivity());
+                                altitude_type = BackgroundService.ALTITUDE_LOOKUP;
                             } catch (Throwable ex) {
                                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                             }
                     }
 
                     // Persist location
-                    new DatabaseHelper(getActivity()).insertLocation(location, name.toString(), -1, -1, -1).close();
+                    new DatabaseHelper(getActivity()).insertLocation(location, altitude_type, name.toString(), -1, -1, -1).close();
                     return null;
                 }
 
