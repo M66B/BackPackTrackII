@@ -1638,7 +1638,6 @@ public class BackgroundService extends IntentService {
                 Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), resId).copy(Bitmap.Config.ARGB_8888, true);
                 notificationBuilder.setLargeIcon(largeIcon);
                 notificationBuilder.setSmallIcon(getTemperatureIcon((float) weather.temperature, context));
-                //notificationBuilder.setSmallIcon(getWindDirectionIcon((float) weather.wind_direction, context));
             } else
                 notificationBuilder.setSmallIcon(resId);
         } else
@@ -1835,13 +1834,6 @@ public class BackgroundService extends IntentService {
         b = (b % 360) / 30 * 30;
         int resId = context.getResources().getIdentifier("direction_" + b, "string", context.getPackageName());
         return (resId > 0 ? context.getString(resId) : "?");
-    }
-
-    private static int getWindDirectionIcon(float bearing, Context context) {
-        int b = Math.round(bearing) + 15 + 180;
-        b = (b % 360) / 30 * 30;
-        int resId = context.getResources().getIdentifier("direction_" + b, "drawable", context.getPackageName());
-        return (resId > 0 ? resId : android.R.drawable.ic_menu_help);
     }
 
     private static String getProviderName(Location location, Context context) {
