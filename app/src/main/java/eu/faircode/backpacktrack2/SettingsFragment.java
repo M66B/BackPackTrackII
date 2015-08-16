@@ -77,6 +77,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "BPT2.Settings";
@@ -1736,7 +1737,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     }
                 });
 
+                float zone = (time % (24 * 3600 * 1000L)) / (float) (3600 * 1000);
+                zone = (zone <= 12 ? 0 : 24) - zone;
+                DateFormat SDF = SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT);
+                DecimalFormat ZF = new DecimalFormat("+0.#;-0.#", new DecimalFormatSymbols(Locale.ROOT));
+                SDF.setTimeZone(TimeZone.getTimeZone("UTC"));
+
                 popupMenu.inflate(R.menu.activity);
+                popupMenu.getMenu().findItem(R.id.menu_time).setTitle(SDF.format(time + 12 * 3600 * 1000L) + ZF.format(zone));
                 popupMenu.getMenu().findItem(R.id.menu_delete).setEnabled(Util.debugMode(getActivity()));
                 popupMenu.show();
             }
