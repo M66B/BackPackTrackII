@@ -665,9 +665,26 @@ public class BackgroundService extends IntentService {
             location.setTime(System.currentTimeMillis());
             location.setLatitude(lat);
             location.setLongitude(lon);
+
+            // Add elevation data
+            int altitude_type = ALTITUDE_NONE;
+            try {
+                if (Util.isConnected(this)) {
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+                    if (prefs.getBoolean(SettingsFragment.PREF_ALTITUDE_WAYPOINT, SettingsFragment.DEFAULT_ALTITUDE_WAYPOINT)) {
+                        GoogleElevationApi.getElevation(location, this);
+                        altitude_type = ALTITUDE_LOOKUP;
+                    }
+                }
+            } catch (Throwable ex) {
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
+
+
             if (name == null)
                 name = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
-            new DatabaseHelper(this).insertLocation(location, ALTITUDE_NONE, name, -1, -1, -1).close();
+
+            new DatabaseHelper(this).insertLocation(location, altitude_type, name, -1, -1, -1).close();
             Util.toast(getString(R.string.msg_added, name), Toast.LENGTH_LONG, this);
         }
     }

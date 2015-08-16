@@ -1355,6 +1355,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 final long time = cursor.getLong(cursor.getColumnIndex("time"));
                 final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
                 final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
+                int altitude_type = cursor.getInt(cursor.getColumnIndex("altitude_type"));
                 final String name = cursor.getString(cursor.getColumnIndex("name"));
 
                 PopupMenu popupMenu = new PopupMenu(getActivity(), view);
@@ -1509,7 +1510,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     popupMenu.getMenu().findItem(R.id.menu_name).setVisible(true);
                 }
                 popupMenu.getMenu().findItem(R.id.menu_time).setTitle(SimpleDateFormat.getDateTimeInstance().format(time));
-                popupMenu.getMenu().findItem(R.id.menu_elevation_loc).setEnabled(Util.isConnected(getActivity()));
+                popupMenu.getMenu().findItem(R.id.menu_elevation_loc).setEnabled(Util.isConnected(getActivity()) && altitude_type != BackgroundService.ALTITUDE_LOOKUP);
                 popupMenu.getMenu().findItem(R.id.menu_elevation_day).setEnabled(Util.isConnected(getActivity()));
                 popupMenu.getMenu().findItem(R.id.menu_delete).setEnabled(Util.debugMode(getActivity()));
                 popupMenu.show();
