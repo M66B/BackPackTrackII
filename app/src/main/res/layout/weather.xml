@@ -6,7 +6,7 @@
 
     <TextView
         android:id="@+id/tvTime"
-        android:layout_width="80dp"
+        android:layout_width="55dp"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -53,4 +53,10 @@
         android:gravity="right"
         android:textAppearance="?android:attr/textAppearanceSmall" />
 
+    <TextView
+        android:id="@+id/tvPrecipitationProbability"
+        android:layout_width="25dp"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 </LinearLayout>

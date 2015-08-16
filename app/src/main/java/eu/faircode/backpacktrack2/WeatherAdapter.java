@@ -11,6 +11,7 @@ import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -24,12 +25,14 @@ public class WeatherAdapter extends CursorAdapter {
     private int colWindSpeed;
     private int colWindDirection;
     private int colRain1h;
+    private int colRainProbability;
     private String temperature_unit;
     private String pressure_unit;
     private String windspeed_unit;
     private String rain_unit;
     private static final DecimalFormat DF = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ROOT));
     private static final DecimalFormat DF2 = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.ROOT));
+    private static final DateFormat SDF = new SimpleDateFormat("dd HH:mm");
 
     public WeatherAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
@@ -40,6 +43,7 @@ public class WeatherAdapter extends CursorAdapter {
         colWindSpeed = cursor.getColumnIndex("wind_speed");
         colWindDirection = cursor.getColumnIndex("wind_direction");
         colRain1h = cursor.getColumnIndex("rain_1h");
+        colRainProbability = cursor.getColumnIndex("rain_probability");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         temperature_unit = prefs.getString(SettingsFragment.PREF_TEMPERATURE, SettingsFragment.DEFAULT_TEMPERATURE);
         pressure_unit = prefs.getString(SettingsFragment.PREF_PRESSURE, SettingsFragment.DEFAULT_PRESSURE);
@@ -62,12 +66,11 @@ public class WeatherAdapter extends CursorAdapter {
         TextView tvWindSpeed = (TextView) view.findViewById(R.id.tvWindSpeed);
         ImageView ivWindDirection = (ImageView) view.findViewById(R.id.ivWindDirection);
         TextView tvPrecipitation = (TextView) view.findViewById(R.id.tvPrecipitation);
+        TextView tvPrecipitationProbability = (TextView) view.findViewById(R.id.tvPrecipitationProbability);
 
         // Time
         long time = cursor.getLong(colTime);
-        tvTime.setText(
-                new SimpleDateFormat("dd").format(time) + " " +
-                        SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT).format(time));
+        tvTime.setText(SDF.format(time));
 
         // Temperature
         if (cursor.isNull(colTemperature))
@@ -139,6 +142,16 @@ public class WeatherAdapter extends CursorAdapter {
                 else
                     tvPrecipitation.setText(Integer.toString(Math.round(rain_1h)));
             }
+        }
+
+        // Precipitation probability
+        if (cursor.isNull(colRainProbability))
+            tvPrecipitationProbability.setText("");
+        else {
+            int probability = Math.round(cursor.getFloat(colRainProbability));
+            if (probability > 99)
+                probability = 99;
+            tvPrecipitationProbability.setText(Long.toString(probability));
         }
     }
 }
