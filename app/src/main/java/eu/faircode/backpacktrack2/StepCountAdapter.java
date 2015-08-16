@@ -10,13 +10,20 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class StepCountAdapter extends CursorAdapter {
     private int stepsize;
     private int weight;
     private int colTime;
     private int colCount;
+    private static final DateFormat SDF = SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT);
+    private static final DecimalFormat ZF = new DecimalFormat("+0.#;-0.#", new DecimalFormatSymbols(Locale.ROOT));
 
     public StepCountAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
@@ -25,6 +32,7 @@ public class StepCountAdapter extends CursorAdapter {
         weight = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEIGHT, SettingsFragment.DEFAULT_WEIGHT));
         colTime = cursor.getColumnIndex("time");
         colCount = cursor.getColumnIndex("count");
+        SDF.setTimeZone(TimeZone.getTimeZone("UTC"));
     }
 
     @Override
@@ -50,7 +58,9 @@ public class StepCountAdapter extends CursorAdapter {
         // http://www.runnersworld.com/weight-loss/how-many-calories-are-you-really-burning
 
         // Set values
-        tvTime.setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT).format(time));
+        float zone = (time % (24 * 3600 * 1000L)) / (float) (3600 * 1000);
+        zone = (zone <= 12 ? 0 : 24) - zone;
+        tvTime.setText(SDF.format(time + 12 * 3600 * 1000L) + ZF.format(zone));
         tvCount.setText(Long.toString(count));
         tvDistance.setText(Long.toString(Math.round(distance)));
         tvCalories.setText(Long.toString(Math.round(calories)));
