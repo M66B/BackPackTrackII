@@ -45,6 +45,11 @@
             android:summary="@string/summary_weather_history"
             android:title="@string/title_weather_history" />
         <Preference
+            android:icon="@drawable/trending_up_60"
+            android:key="pref_weather_forecast"
+            android:summary="@string/summary_weather_forecast"
+            android:title="@string/title_weather_forecast" />
+        <Preference
             android:icon="@drawable/gpsfixed_60"
             android:key="pref_settings"
             android:summary="@string/summary_loc_settings"

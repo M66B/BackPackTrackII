@@ -96,20 +96,26 @@ public class ForecastIO {
                 }
             } else if (type == TYPE_HOURLY) {
                 if (jroot.has("hourly")) {
-                    JSONArray hourly = jroot.getJSONArray("hourly");
-                    for (int i = 0; i < hourly.length(); i++) {
-                        JSONObject hour = hourly.getJSONObject(i);
-                        if (hour.has("time"))
-                            result.add(decodeWeather(jroot, hour));
+                    JSONObject hourly = jroot.getJSONObject("hourly");
+                    if (hourly.has("data")) {
+                        JSONArray data = hourly.getJSONArray("data");
+                        for (int i = 0; i < data.length(); i++) {
+                            JSONObject hour = data.getJSONObject(i);
+                            if (hour.has("time"))
+                                result.add(decodeWeather(jroot, hour));
+                        }
                     }
                 }
             } else if (type == TYPE_DAILY) {
                 if (jroot.has("daily")) {
-                    JSONArray daily = jroot.getJSONArray("daily");
-                    for (int i = 0; i < daily.length(); i++) {
-                        JSONObject day = daily.getJSONObject(i);
-                        if (day.has("time"))
-                            result.add(decodeWeather(jroot, day));
+                    JSONObject daily = jroot.getJSONObject("daily");
+                    if (daily.has("data")) {
+                        JSONArray data = daily.getJSONArray("data");
+                        for (int i = 0; i < data.length(); i++) {
+                            JSONObject day = data.getJSONObject(i);
+                            if (day.has("time"))
+                                result.add(decodeWeather(jroot, day));
+                        }
                     }
                 }
             }

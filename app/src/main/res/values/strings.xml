@@ -11,6 +11,7 @@
     <string name="title_activity_history">Activity history</string>
     <string name="title_step_history">Walk history</string>
     <string name="title_weather_history">Weather history</string>
+    <string name="title_weather_forecast">Weather forecast</string>
     <string name="title_loc_settings">Location settings</string>
 
     <string name="title_geocode">Geocode address</string>
@@ -132,6 +133,7 @@
     <string name="summary_activity_history">Show the activity history to verify everything works</string>
     <string name="summary_step_history">Show the daily number of steps taken, distance walked and calories burned</string>
     <string name="summary_weather_history">Show local weather history</string>
+    <string name="summary_weather_forecast">Show local weather forecast</string>
     <string name="summary_loc_settings">Tap to open the Android location settings</string>
 
     <string name="summary_interval">Try to acquire a new location every selected number of seconds</string>

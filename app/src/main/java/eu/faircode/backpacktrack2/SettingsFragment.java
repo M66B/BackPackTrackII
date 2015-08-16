@@ -91,6 +91,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_ACTIVITY_HISTORY = "pref_activity_history";
     public static final String PREF_STEP_HISTORY = "pref_step_history";
     public static final String PREF_WEATHER_HISTORY = "pref_weather_history";
+    public static final String PREF_WEATHER_FORECAST = "pref_weather_forecast";
     public static final String PREF_SETTINGS = "pref_settings";
 
     public static final String PREF_ENABLED = "pref_enabled";
@@ -328,7 +329,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             Log.i(TAG, "Connectivity changed mounted=" + mounted + " connected=" + connected);
 
             SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+            String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
             Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+            findPreference(PREF_WEATHER_FORECAST).setEnabled("fio".equals(api) && Util.isConnected(getActivity()));
             findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted && connected);
             findPreference(PREF_WEATHER_TEST).setEnabled(lastLocation != null && connected);
         }
@@ -426,6 +429,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Preference pref_activity_history = findPreference(PREF_ACTIVITY_HISTORY);
         Preference pref_step_history = findPreference(PREF_STEP_HISTORY);
         Preference pref_weather_history = findPreference(PREF_WEATHER_HISTORY);
+        Preference pref_weather_forecast = findPreference(PREF_WEATHER_FORECAST);
         Preference pref_check = findPreference(PREF_SETTINGS);
         Preference pref_version = findPreference(PREF_VERSION);
         Preference pref_logcat = findPreference(PREF_LOGCAT);
@@ -596,6 +600,17 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
+        // Handle weather forecast
+        String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
+        pref_weather_forecast.setEnabled("fio".equals(api) && Util.isConnected(getActivity()));
+        pref_weather_forecast.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                weather_forecast();
+                return true;
+            }
+        });
+
         // Handle location settings
         Intent locationSettingsIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         if (getActivity().getPackageManager().queryIntentActivities(locationSettingsIntent, 0).size() > 0)
@@ -679,6 +694,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 return OpenWeatherMap.getWeatherByLocation(apikey_owm, lastLocation, stations, maxage, maxdist, weight, getActivity());
                             }
                         } catch (Throwable ex) {
+                            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                             return ex;
                         }
                     }
@@ -793,7 +809,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if (PREF_RECOGNITION_ENABLED.equals(key))
             prefs.edit().remove(PREF_LAST_ACTIVITY).apply();
 
-        else if (PREF_WEATHER_NOTIFICATION.equals(key)) {
+        else if (PREF_WEATHER_API.equals(key)) {
+            findPreference(PREF_WEATHER_FORECAST).setEnabled("fio".equals(prefs.getString(key, DEFAULT_WEATHER_API)) && Util.isConnected(getActivity()));
+
+        } else if (PREF_WEATHER_NOTIFICATION.equals(key)) {
             if (!prefs.getBoolean(key, DEFAULT_WEATHER_NOTIFICATION))
                 BackgroundService.removeWeatherIcon(getActivity());
 
@@ -2785,6 +2804,59 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.setVisibility(View.VISIBLE);
         } else
             graph.setVisibility(View.GONE);
+    }
+
+    private void weather_forecast() {
+        final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+
+        // Get layout
+        LayoutInflater inflater = LayoutInflater.from(getActivity());
+        View viewForecast = inflater.inflate(R.layout.weather_forecast, null);
+
+        // Fill list
+        final ListView lv = (ListView) viewForecast.findViewById(R.id.lvWeatherForecast);
+
+        new AsyncTask<Object, Object, Object>() {
+            Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+
+            @Override
+            protected Object doInBackground(Object... objects) {
+                try {
+                    // Get API key
+                    String apikey_fio = prefs.getString(PREF_WEATHER_APIKEY_FIO, null);
+                    return ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, ForecastIO.TYPE_HOURLY, getActivity());
+                } catch (Throwable ex) {
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    return ex;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Object result) {
+                if (result instanceof Throwable)
+                    Toast.makeText(getActivity(), ((Throwable) result).toString(), Toast.LENGTH_LONG).show();
+                else if (result instanceof List) {
+                    ForecastAdapter adapter = new ForecastAdapter(getActivity(), (List<Weather>) result);
+                    lv.setAdapter(adapter);
+                }
+            }
+        }.execute();
+
+        // Handle list item click
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+            }
+        });
+
+        // Show layout
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+        alertDialogBuilder.setTitle(R.string.title_weather_forecast);
+        alertDialogBuilder.setIcon(R.drawable.trending_up_60);
+        alertDialogBuilder.setView(viewForecast);
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+        dialogs.add(alertDialog);
     }
 
     private void updateTitle(SharedPreferences prefs, String key) {
