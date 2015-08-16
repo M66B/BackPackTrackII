@@ -1668,7 +1668,8 @@ public class BackgroundService extends IntentService {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), resId).copy(Bitmap.Config.ARGB_8888, true);
                 notificationBuilder.setLargeIcon(largeIcon);
-                notificationBuilder.setSmallIcon(getWindDirectionIcon((float) weather.wind_direction, context));
+                notificationBuilder.setSmallIcon(getTemperatureIcon((float) weather.temperature, context));
+                //notificationBuilder.setSmallIcon(getWindDirectionIcon((float) weather.wind_direction, context));
             } else
                 notificationBuilder.setSmallIcon(resId);
         } else
@@ -1854,11 +1855,17 @@ public class BackgroundService extends IntentService {
         }
     }
 
+    private static int getTemperatureIcon(float degrees, Context context) {
+        int b = Math.round(degrees);
+        int resId = context.getResources().getIdentifier("degrees_" + (degrees < 0 ? "m" : "p") + b, "drawable", context.getPackageName());
+        return (resId > 0 ? resId : android.R.drawable.ic_menu_help);
+    }
+
     public static String getWindDirectionName(float bearing, Context context) {
         int b = Math.round(bearing) + 15;
         b = (b % 360) / 30 * 30;
         int resId = context.getResources().getIdentifier("direction_" + b, "string", context.getPackageName());
-        return (resId == 0 ? "?" : context.getString(resId));
+        return (resId > 0 ? context.getString(resId) : "?");
     }
 
     private static int getWindDirectionIcon(float bearing, Context context) {
