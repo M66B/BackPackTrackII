@@ -374,7 +374,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             if (ACTION_STEPS.equals(action))
                 step_history();
             else if (ACTION_WEATHER.equals(action))
-                weather_history();
+                weather_forecast();
         }
     }
 
@@ -2821,15 +2821,19 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     private class updateForecast extends AsyncTask<Object, Object, Object> {
         private int type;
+        private Context context;
         private ProgressBar progress;
         private ListView list;
-        private SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
-        private Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+        private SharedPreferences prefs;
+        private Location lastLocation;
 
         public updateForecast(int type, View view) {
             this.type = type;
+            this.context = view.getContext();
             this.progress = (ProgressBar) view.findViewById(R.id.pbWeatherForecast);
             this.list = (ListView) view.findViewById(R.id.lvWeatherForecast);
+            this.prefs = getPreferenceScreen().getSharedPreferences();
+            this.lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
         }
 
         @Override
@@ -2842,7 +2846,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         protected Object doInBackground(Object... params) {
             try {
                 String apikey_fio = prefs.getString(PREF_WEATHER_APIKEY_FIO, null);
-                return ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, type, getActivity());
+                return ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, type, context);
             } catch (Throwable ex) {
                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                 return ex;
@@ -2853,9 +2857,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         protected void onPostExecute(Object result) {
             progress.setVisibility(View.GONE);
             if (result instanceof Throwable)
-                Toast.makeText(getActivity(), ((Throwable) result).toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, ((Throwable) result).toString(), Toast.LENGTH_LONG).show();
             else if (result instanceof List) {
-                ForecastAdapter adapter = new ForecastAdapter(getActivity(), (List<Weather>) result, type);
+                ForecastAdapter adapter = new ForecastAdapter(context, (List<Weather>) result, type);
                 list.setAdapter(adapter);
                 list.setVisibility(View.VISIBLE);
             }
