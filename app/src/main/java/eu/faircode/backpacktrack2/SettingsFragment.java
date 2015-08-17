@@ -49,6 +49,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -302,6 +303,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_LAST_LOCATION_VIEWPORT = "pref_last_location_viewport";
     public static final String PREF_LAST_WEATHER_GRAPH = "pref_last_weather_graph";
     public static final String PREF_LAST_WEATHER_VIEWPORT = "pref_last_weather_viewport";
+    public static final String PREF_LAST_FORECAST_TYPE = "pref_last_forecast_type";
 
     public static final String PREF_LAST_TRACK = "pref_last_track";
     public static final String PREF_LAST_EXTENSIONS = "pref_last_extensions";
@@ -667,7 +669,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 pref_weather_test.setSummary(null);
 
                 new AsyncTask<Object, Object, Object>() {
-                    Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+                    private Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
 
                     @Override
                     protected Object doInBackground(Object... objects) {
@@ -2380,7 +2382,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if ("mmhg".equals(pressure_unit))
             tvHeaderPressure.setText(R.string.header_mmhg);
 
-        // Display speed unit
+        // Display wind speed unit
         String speed_unit = prefs.getString(PREF_WINDSPEED, DEFAULT_WINDSPEED);
         if ("bft".equals(speed_unit))
             tvHeaderWindSpeed.setText(R.string.header_beaufort);
@@ -2806,48 +2808,117 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.setVisibility(View.GONE);
     }
 
+    private class updateForecast extends AsyncTask<Object, Object, Object> {
+        private int type;
+        private ProgressBar progress;
+        private ListView list;
+        private SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+        private Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+
+        public updateForecast(int type, View view) {
+            this.type = type;
+            this.progress = (ProgressBar) view.findViewById(R.id.pbWeatherForecast);
+            this.list = (ListView) view.findViewById(R.id.lvWeatherForecast);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            progress.setVisibility(View.VISIBLE);
+            list.setVisibility(View.GONE);
+        }
+
+        @Override
+        protected Object doInBackground(Object... params) {
+            try {
+                String apikey_fio = prefs.getString(PREF_WEATHER_APIKEY_FIO, null);
+                return ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, type, getActivity());
+            } catch (Throwable ex) {
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                return ex;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Object result) {
+            progress.setVisibility(View.GONE);
+            if (result instanceof Throwable)
+                Toast.makeText(getActivity(), ((Throwable) result).toString(), Toast.LENGTH_LONG).show();
+            else if (result instanceof List) {
+                ForecastAdapter adapter = new ForecastAdapter(getActivity(), (List<Weather>) result, type);
+                list.setAdapter(adapter);
+                list.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
     private void weather_forecast() {
         final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
         // Get layout
         LayoutInflater inflater = LayoutInflater.from(getActivity());
-        View viewForecast = inflater.inflate(R.layout.weather_forecast, null);
+        final View viewForecast = inflater.inflate(R.layout.weather_forecast, null);
 
-        // Fill list
+        // Reference controls
+        ImageView ivViewDay = (ImageView) viewForecast.findViewById(R.id.ivViewDay);
+        ImageView ivViewWeek = (ImageView) viewForecast.findViewById(R.id.ivViewWeek);
+        TextView tvHeaderTemperature = (TextView) viewForecast.findViewById(R.id.tvHeaderTemperature);
+        TextView tvHeaderPrecipitation = (TextView) viewForecast.findViewById(R.id.tvHeaderPrecipitation);
+        TextView tvHeaderWindSpeed = (TextView) viewForecast.findViewById(R.id.tvHeaderWindSpeed);
         final ListView lv = (ListView) viewForecast.findViewById(R.id.lvWeatherForecast);
 
-        new AsyncTask<Object, Object, Object>() {
-            Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
-
+        // Handle view hourly
+        ivViewDay.setOnClickListener(new View.OnClickListener() {
             @Override
-            protected Object doInBackground(Object... objects) {
-                try {
-                    // Get API key
-                    String apikey_fio = prefs.getString(PREF_WEATHER_APIKEY_FIO, null);
-                    return ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, ForecastIO.TYPE_HOURLY, getActivity());
-                } catch (Throwable ex) {
-                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                    return ex;
-                }
+            public void onClick(View view) {
+                prefs.edit().putInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_HOURLY).apply();
+                new updateForecast(ForecastIO.TYPE_HOURLY, viewForecast).execute();
             }
+        });
 
+        // Handle view daily
+        ivViewWeek.setOnClickListener(new View.OnClickListener() {
             @Override
-            protected void onPostExecute(Object result) {
-                if (result instanceof Throwable)
-                    Toast.makeText(getActivity(), ((Throwable) result).toString(), Toast.LENGTH_LONG).show();
-                else if (result instanceof List) {
-                    ForecastAdapter adapter = new ForecastAdapter(getActivity(), (List<Weather>) result);
-                    lv.setAdapter(adapter);
-                }
+            public void onClick(View view) {
+                prefs.edit().putInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_DAILY).apply();
+                new updateForecast(ForecastIO.TYPE_DAILY, viewForecast).execute();
             }
-        }.execute();
+        });
+
+        // Display temperature unit
+        String temperature_unit = prefs.getString(PREF_TEMPERATURE, DEFAULT_TEMPERATURE);
+        if ("c".equals(temperature_unit))
+            tvHeaderTemperature.setText(R.string.header_celcius);
+        else if ("f".equals(temperature_unit))
+            tvHeaderTemperature.setText(R.string.header_fahrenheit);
+
+        // Display precipitation unit
+        String rain_unit = prefs.getString(PREF_PRECIPITATION, DEFAULT_PRECIPITATION);
+        if ("mm".equals(rain_unit))
+            tvHeaderPrecipitation.setText(R.string.header_mm);
+        else if ("in".equals(rain_unit))
+            tvHeaderPrecipitation.setText(R.string.header_inch);
+
+        // Display wind speed unit
+        String speed_unit = prefs.getString(PREF_WINDSPEED, DEFAULT_WINDSPEED);
+        if ("bft".equals(speed_unit))
+            tvHeaderWindSpeed.setText(R.string.header_beaufort);
+        else if ("ms".equals(speed_unit))
+            tvHeaderWindSpeed.setText(R.string.header_ms);
+        else if ("kmh".equals(speed_unit))
+            tvHeaderWindSpeed.setText(R.string.header_kph);
 
         // Handle list item click
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Weather weather = (Weather) lv.getItemAtPosition(position);
+                Toast.makeText(getActivity(), weather.summary, Toast.LENGTH_SHORT).show();
             }
         });
+
+        // Fill list
+        int type = prefs.getInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_DAILY);
+        new updateForecast(type, viewForecast).execute();
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());

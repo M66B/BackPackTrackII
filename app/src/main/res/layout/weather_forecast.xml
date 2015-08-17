@@ -12,7 +12,7 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="55dp"
+            android:layout_width="84dp"
             android:layout_height="24dp">
 
             <ImageView
@@ -39,22 +39,11 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tvHeaderHumidity"
-            android:layout_width="25dp"
+            android:id="@+id/tvHeaderPrecipitation"
+            android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:gravity="right"
-            android:text="@string/header_percent"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvHeaderPressure"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:gravity="right"
-            android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
 
         <TextView
@@ -63,26 +52,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:gravity="right"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvHeaderPrecipitation"
-            android:layout_width="30dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:layout_marginLeft="18dp"
-            android:gravity="right"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvHeaderPrecipitationProbability"
-            android:layout_width="25dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:gravity="right"
-            android:text="@string/header_percent"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
     </LinearLayout>
@@ -108,5 +77,16 @@
             android:layout_height="wrap_content"
             android:layout_above="@id/tvPoweredBy"
             android:layout_alignParentTop="true" />
+
+        <ProgressBar
+            android:id="@+id/pbWeatherForecast"
+            style="@android:style/Widget.ProgressBar.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/tvPoweredBy"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="6dip"
+            android:visibility="gone" />
     </RelativeLayout>
 </LinearLayout>
