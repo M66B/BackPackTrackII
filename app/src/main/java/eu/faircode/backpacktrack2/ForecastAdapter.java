@@ -56,6 +56,8 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
         TextView tvPrecipitationProbability = (TextView) convertView.findViewById(R.id.tvPrecipitationProbability);
         TextView tvWindSpeed = (TextView) convertView.findViewById(R.id.tvWindSpeed);
         ImageView ivWindDirection = (ImageView) convertView.findViewById(R.id.ivWindDirection);
+        TextView tvHumidity = (TextView) convertView.findViewById(R.id.tvHumidity);
+        TextView tvPressure = (TextView) convertView.findViewById(R.id.tvPressure);
 
         // Time
         tvDate.setText(SDFD.format(weather.time));
@@ -67,8 +69,8 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
         int resId = (weather.icon == null ? -1 : getContext().getResources().getIdentifier(weather.icon.replace("-", "_"), "drawable", getContext().getPackageName()));
         ivWeather.setImageResource(resId > 0 ? resId : android.R.drawable.ic_menu_help);
 
+        // Temperature
         if (type == ForecastIO.TYPE_HOURLY) {
-            // Temperature
             if (Double.isNaN(weather.temperature))
                 tvTemperatureMin.setText("");
             else {
@@ -77,9 +79,8 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
                     temperature = temperature * 9 / 5 + 32;
                 tvTemperatureMin.setText(DF.format(temperature));
             }
-            tvTemperatureMax.setVisibility(View.INVISIBLE);
+            tvTemperatureMax.setVisibility(View.GONE);
         } else {
-            // Temperature min
             if (Double.isNaN(weather.temperature_min))
                 tvTemperatureMin.setText("");
             else {
@@ -89,7 +90,6 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
                 tvTemperatureMin.setText(DF.format(temperature));
             }
 
-            // Temperature max
             if (Double.isNaN(weather.temperature_max))
                 tvTemperatureMax.setText("");
             else {
@@ -153,6 +153,26 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
             float wind_direction = (float) weather.wind_direction;
             ivWindDirection.setRotation(wind_direction - 90 + 180);
             ivWindDirection.setVisibility(View.VISIBLE);
+        }
+
+        // Humidity
+        if (Double.isNaN(weather.humidity))
+            tvHumidity.setText("");
+        else {
+            long humidity = Math.round(weather.humidity);
+            if (humidity > 99)
+                humidity = 99;
+            tvHumidity.setText(humidity + "%");
+        }
+
+        // Pressure
+        if (Double.isNaN(weather.pressure))
+            tvPressure.setText("");
+        else {
+            double pressure = weather.pressure;
+            if ("mmhg".equals(pressure_unit))
+                pressure = pressure / 1.33322368f;
+            tvPressure.setText(DF.format(pressure));
         }
 
         return convertView;

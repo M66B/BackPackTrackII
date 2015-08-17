@@ -2864,6 +2864,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         TextView tvHeaderTemperature = (TextView) viewForecast.findViewById(R.id.tvHeaderTemperature);
         TextView tvHeaderPrecipitation = (TextView) viewForecast.findViewById(R.id.tvHeaderPrecipitation);
         TextView tvHeaderWindSpeed = (TextView) viewForecast.findViewById(R.id.tvHeaderWindSpeed);
+        TextView tvHeaderPressure = (TextView) viewForecast.findViewById(R.id.tvHeaderPressure);
         final ListView lv = (ListView) viewForecast.findViewById(R.id.lvWeatherForecast);
 
         // Handle view hourly
@@ -2906,6 +2907,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             tvHeaderWindSpeed.setText(R.string.header_ms);
         else if ("kmh".equals(speed_unit))
             tvHeaderWindSpeed.setText(R.string.header_kph);
+
+        // Display pressure unit
+        String pressure_unit = prefs.getString(PREF_PRESSURE, DEFAULT_PRESSURE);
+        if ("hpa".equals(pressure_unit))
+            tvHeaderPressure.setText(R.string.header_hpa);
+        else if ("mmhg".equals(pressure_unit))
+            tvHeaderPressure.setText(R.string.header_mmhg);
 
         // Handle list item click
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
