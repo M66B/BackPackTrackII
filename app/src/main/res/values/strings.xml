@@ -266,6 +266,8 @@
     <string name="msg_rgeocoding">Reverse geocoding &#8230;</string>
     <string name="msg_requesting">Requesting &#8230;</string>
 
+    <string name="msg_permissions">One or more required permissions missing</string>
+
     <string name="provider_gps">GPS</string>
     <string name="provider_network">Network</string>
 

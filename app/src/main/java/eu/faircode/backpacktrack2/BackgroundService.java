@@ -1,5 +1,6 @@
 package eu.faircode.backpacktrack2;
 
+import android.Manifest;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
@@ -965,7 +966,7 @@ public class BackgroundService extends IntentService {
 
     // Start/stop methods
 
-    public static void startTracking(final Context context) {
+    public static void startTracking(final Context context) throws SecurityException {
         Log.i(TAG, "Start tracking");
 
         // Check if enabled
@@ -1088,7 +1089,7 @@ public class BackgroundService extends IntentService {
         Log.i(TAG, "Stop repeating alarm");
     }
 
-    public static void startLocating(Context context) {
+    public static void startLocating(Context context) throws SecurityException {
         Log.i(TAG, "Start locating");
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

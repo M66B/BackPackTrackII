@@ -265,6 +265,8 @@
     <string name="msg_rgeocoding">Umgewandelte Geocoding &#8230;</string>
     <string name="msg_requesting">Abfragen &#8230;</string>
 
+    <string name="msg_permissions">Eine oder mehrere benötigte Berechtigungen fehlen</string>
+
     <string name="provider_gps">GPS</string>
     <string name="provider_network">Netzwerk</string>
 
