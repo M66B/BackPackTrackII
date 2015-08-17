@@ -902,43 +902,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final LayoutInflater inflater = LayoutInflater.from(getActivity());
         View viewEdit = inflater.inflate(R.layout.waypoint_editor, null);
 
-        // Fill list
+        // Reference controls
+        ImageView ivAdd = (ImageView) viewEdit.findViewById(R.id.ivAdd);
+        ImageView ivPlace = (ImageView) viewEdit.findViewById(R.id.ivPlace);
         final ListView lv = (ListView) viewEdit.findViewById(R.id.lvEdit);
-        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
-        final WaypointAdapter adapter = new WaypointAdapter(getActivity(), cursor, db, getFragmentManager());
-        lv.setAdapter(adapter);
-
-        // Handle updates
-        final DatabaseHelper.LocationChangedListener listener = new DatabaseHelper.LocationChangedListener() {
-            @Override
-            public void onLocationAdded(Location location) {
-                update();
-            }
-
-            @Override
-            public void onLocationUpdated() {
-                update();
-            }
-
-            @Override
-            public void onLocationDeleted(long id) {
-                update();
-            }
-
-            private void update() {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
-                        adapter.changeCursor(cursor);
-                    }
-                });
-            }
-        };
-        DatabaseHelper.addLocationChangedListener(listener);
 
         // Handle add waypoint
-        ImageView ivAdd = (ImageView) viewEdit.findViewById(R.id.ivAdd);
         if (Geocoder.isPresent())
             ivAdd.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -973,7 +942,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             ivAdd.setVisibility(View.GONE);
 
         // Handle add place
-        ImageView ivPlace = (ImageView) viewEdit.findViewById(R.id.ivPlace);
         if (Util.hasPlayServices(getActivity()))
             ivPlace.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -991,6 +959,40 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             });
         else
             ivPlace.setVisibility(View.GONE);
+
+        // Fill list
+        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
+        final WaypointAdapter adapter = new WaypointAdapter(getActivity(), cursor, db, getFragmentManager());
+        lv.setAdapter(adapter);
+
+        // Handle updates
+        final DatabaseHelper.LocationChangedListener listener = new DatabaseHelper.LocationChangedListener() {
+            @Override
+            public void onLocationAdded(Location location) {
+                update();
+            }
+
+            @Override
+            public void onLocationUpdated() {
+                update();
+            }
+
+            @Override
+            public void onLocationDeleted(long id) {
+                update();
+            }
+
+            private void update() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
+                        adapter.changeCursor(cursor);
+                    }
+                });
+            }
+        };
+        DatabaseHelper.addLocationChangedListener(listener);
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
@@ -1322,9 +1324,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         View viewHistory = inflater.inflate(R.layout.location_history, null);
 
         // Reference controls
+        final GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvLocation);
         ImageView ivViewDay = (ImageView) viewHistory.findViewById(R.id.ivViewDay);
         ImageView ivViewWeek = (ImageView) viewHistory.findViewById(R.id.ivViewWeek);
-        final GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvLocation);
+        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvLocationHistory);
 
         // Handle view day
         ivViewDay.setOnClickListener(new View.OnClickListener() {
@@ -1343,46 +1346,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 showAltitudeGraph(graph);
             }
         });
-
-        // Show altitude graph
-        showAltitudeGraph(graph);
-
-        // Fill list
-        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvLocationHistory);
-        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
-        final LocationAdapter adapter = new LocationAdapter(getActivity(), cursor);
-        lv.setAdapter(adapter);
-
-        // Live updates
-        final DatabaseHelper.LocationChangedListener listener = new DatabaseHelper.LocationChangedListener() {
-            @Override
-            public void onLocationAdded(Location location) {
-                update();
-            }
-
-            @Override
-            public void onLocationUpdated() {
-                update();
-            }
-
-            @Override
-            public void onLocationDeleted(long id) {
-                update();
-            }
-
-            private void update() {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
-                        adapter.changeCursor(cursor);
-                        adapter.init(); // Possible new last location
-                        showAltitudeGraph(graph);
-                    }
-                });
-            }
-        };
-        DatabaseHelper.addLocationChangedListener(listener);
 
         // Handle list item click
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -1558,6 +1521,45 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
+        // Show altitude graph
+        showAltitudeGraph(graph);
+
+        // Fill list
+        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
+        final LocationAdapter adapter = new LocationAdapter(getActivity(), cursor);
+        lv.setAdapter(adapter);
+
+        // Live updates
+        final DatabaseHelper.LocationChangedListener listener = new DatabaseHelper.LocationChangedListener() {
+            @Override
+            public void onLocationAdded(Location location) {
+                update();
+            }
+
+            @Override
+            public void onLocationUpdated() {
+                update();
+            }
+
+            @Override
+            public void onLocationDeleted(long id) {
+                update();
+            }
+
+            private void update() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
+                        adapter.changeCursor(cursor);
+                        adapter.init(); // Possible new last location
+                        showAltitudeGraph(graph);
+                    }
+                });
+            }
+        };
+        DatabaseHelper.addLocationChangedListener(listener);
+
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
         alertDialogBuilder.setTitle(R.string.title_location_history);
@@ -1661,12 +1663,19 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View viewHistory = inflater.inflate(R.layout.activity_history, null);
 
-        // Show activity graph
+        // Reference controls
         final GraphView graphView = (GraphView) viewHistory.findViewById(R.id.gvActivity);
-        showActivityGraph(graphView);
+        ImageView ivList = (ImageView) viewHistory.findViewById(R.id.ivList);
+        ImageView ivStill = (ImageView) viewHistory.findViewById(R.id.ivStill);
+        ImageView ivWalking = (ImageView) viewHistory.findViewById(R.id.ivWalking);
+        ImageView ivRunning = (ImageView) viewHistory.findViewById(R.id.ivRunning);
+        ImageView ivOnbicyle = (ImageView) viewHistory.findViewById(R.id.ivOnbicyle);
+        ImageView ivInvehicle = (ImageView) viewHistory.findViewById(R.id.ivInvehicle);
+        ImageView ivUnknown = (ImageView) viewHistory.findViewById(R.id.ivUnknown);
+        ImageView ivTotal = (ImageView) viewHistory.findViewById(R.id.ivTotal);
+        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityDuration);
 
         // Handle view list
-        ImageView ivList = (ImageView) viewHistory.findViewById(R.id.ivList);
         if (Util.debugMode(getActivity()))
             ivList.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -1677,14 +1686,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else
             ivList.setVisibility(View.INVISIBLE);
 
-        ImageView ivStill = (ImageView) viewHistory.findViewById(R.id.ivStill);
-        ImageView ivWalking = (ImageView) viewHistory.findViewById(R.id.ivWalking);
-        ImageView ivRunning = (ImageView) viewHistory.findViewById(R.id.ivRunning);
-        ImageView ivOnbicyle = (ImageView) viewHistory.findViewById(R.id.ivOnbicyle);
-        ImageView ivInvehicle = (ImageView) viewHistory.findViewById(R.id.ivInvehicle);
-        ImageView ivUnknown = (ImageView) viewHistory.findViewById(R.id.ivUnknown);
-        ImageView ivTotal = (ImageView) viewHistory.findViewById(R.id.ivTotal);
-
+        // Set icon colors
         ivStill.setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
         ivWalking.setColorFilter(Color.CYAN, PorterDuff.Mode.SRC_ATOP);
         ivRunning.setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
@@ -1749,12 +1751,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
-        // Fill list
-        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityDuration);
-        Cursor cursor = db.getActivityDurations(0, Long.MAX_VALUE, false);
-        final ActivityDurationAdapter adapter = new ActivityDurationAdapter(getActivity(), cursor);
-        lv.setAdapter(adapter);
-
         // Handle list item click
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -1798,6 +1794,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 popupMenu.show();
             }
         });
+
+        // Show activity graph
+        showActivityGraph(graphView);
+
+        // Fill list
+        Cursor cursor = db.getActivityDurations(0, Long.MAX_VALUE, false);
+        final ActivityDurationAdapter adapter = new ActivityDurationAdapter(getActivity(), cursor);
+        lv.setAdapter(adapter);
 
         // Live updates
         final DatabaseHelper.ActivityDurationChangedListener listener = new DatabaseHelper.ActivityDurationChangedListener() {
@@ -2035,10 +2039,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View viewHistory = inflater.inflate(R.layout.activity_list, null);
 
+        // Reference controls
+        CheckBox cbHistoryEnabled = (CheckBox) viewHistory.findViewById(R.id.cbHistoryEnabled);
+        ImageView ivDelete = (ImageView) viewHistory.findViewById(R.id.ivDelete);
+        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityHistory);
+
         // Set/handle history enabled
         final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
         boolean enabled = prefs.getBoolean(PREF_RECOGNITION_HISTORY, DEFAULT_RECOGNITION_HISTORY);
-        CheckBox cbHistoryEnabled = (CheckBox) viewHistory.findViewById(R.id.cbHistoryEnabled);
         cbHistoryEnabled.setChecked(enabled);
         cbHistoryEnabled.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -2047,39 +2055,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
-        // Fill list
-        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityHistory);
-        Cursor cursor = db.getActivityTypes(0, Long.MAX_VALUE);
-        final ActivityTypeAdapter adapter = new ActivityTypeAdapter(getActivity(), cursor);
-        lv.setAdapter(adapter);
-
-        // Live updates
-        final DatabaseHelper.ActivityTypeChangedListener listener = new DatabaseHelper.ActivityTypeChangedListener() {
-            @Override
-            public void onActivityAdded(long time, int activity, int confidence) {
-                update();
-            }
-
-            @Override
-            public void onActivityDeleted(long id) {
-                update();
-            }
-
-            private void update() {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Cursor cursor = db.getActivityTypes(0, Long.MAX_VALUE);
-                        adapter.changeCursor(cursor);
-                        lv.setAdapter(adapter);
-                    }
-                });
-            }
-        };
-        DatabaseHelper.addActivityTypeChangedListener(listener);
-
         // Handle delete
-        ImageView ivDelete = (ImageView) viewHistory.findViewById(R.id.ivDelete);
         ivDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -2109,6 +2085,36 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
+        // Fill list
+        Cursor cursor = db.getActivityTypes(0, Long.MAX_VALUE);
+        final ActivityTypeAdapter adapter = new ActivityTypeAdapter(getActivity(), cursor);
+        lv.setAdapter(adapter);
+
+        // Live updates
+        final DatabaseHelper.ActivityTypeChangedListener listener = new DatabaseHelper.ActivityTypeChangedListener() {
+            @Override
+            public void onActivityAdded(long time, int activity, int confidence) {
+                update();
+            }
+
+            @Override
+            public void onActivityDeleted(long id) {
+                update();
+            }
+
+            private void update() {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Cursor cursor = db.getActivityTypes(0, Long.MAX_VALUE);
+                        adapter.changeCursor(cursor);
+                        lv.setAdapter(adapter);
+                    }
+                });
+            }
+        };
+        DatabaseHelper.addActivityTypeChangedListener(listener);
+
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
         alertDialogBuilder.setTitle(R.string.title_activity_history);
@@ -2130,11 +2136,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View viewHistory = inflater.inflate(R.layout.activity_log, null);
 
+        // Reference controls
         TextView tvDate = (TextView) viewHistory.findViewById(R.id.tvDate);
+        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityLog);
+
+        // Show date
         tvDate.setText(SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM).format(from));
 
         // Fill list
-        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvActivityLog);
         Cursor cursor = db.getActivityLog(from, to, false);
         final ActivityLogAdapter adapter = new ActivityLogAdapter(getActivity(), cursor);
         lv.setAdapter(adapter);
@@ -2185,15 +2194,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View viewHistory = inflater.inflate(R.layout.step_history, null);
 
-        // Show steps bar graph
+        // Reference controls
         final GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvStep);
-        showStepGraph(graph);
-
-        // Fill list
         final ListView lv = (ListView) viewHistory.findViewById(R.id.lvStepHistory);
-        Cursor cursor = db.getSteps(false);
-        final StepCountAdapter adapter = new StepCountAdapter(getActivity(), cursor);
-        lv.setAdapter(adapter);
 
         // Handle list item click
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -2226,6 +2229,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 popupMenu.show();
             }
         });
+
+        // Show steps bar graph
+        showStepGraph(graph);
+
+        // Fill list
+        Cursor cursor = db.getSteps(false);
+        final StepCountAdapter adapter = new StepCountAdapter(getActivity(), cursor);
+        lv.setAdapter(adapter);
 
         // Live updates
         final DatabaseHelper.StepCountChangedListener listener = new DatabaseHelper.StepCountChangedListener() {
@@ -2335,17 +2346,18 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Reference controls
         final GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvWeather);
         final Spinner spGraph = (Spinner) viewHistory.findViewById(R.id.spGraph);
-        final TypedArray listGraphValue = getActivity().getResources().obtainTypedArray(R.array.listWeatherValue);
+        ImageView ivAdd = (ImageView) viewHistory.findViewById(R.id.ivAdd);
         ImageView ivViewDay = (ImageView) viewHistory.findViewById(R.id.ivViewDay);
         ImageView ivViewWeek = (ImageView) viewHistory.findViewById(R.id.ivViewWeek);
-        ImageView ivAdd = (ImageView) viewHistory.findViewById(R.id.ivAdd);
         TextView tvHeaderTemperature = (TextView) viewHistory.findViewById(R.id.tvHeaderTemperature);
         TextView tvHeaderPrecipitation = (TextView) viewHistory.findViewById(R.id.tvHeaderPrecipitation);
         TextView tvHeaderWindSpeed = (TextView) viewHistory.findViewById(R.id.tvHeaderWindSpeed);
         TextView tvHeaderPressure = (TextView) viewHistory.findViewById(R.id.tvHeaderPressure);
+        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvWeatherHistory);
         TextView tvPoweredBy = (TextView) viewHistory.findViewById(R.id.tvPoweredBy);
 
         // Select graph
+        final TypedArray listGraphValue = getActivity().getResources().obtainTypedArray(R.array.listWeatherValue);
         spGraph.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
@@ -2367,6 +2379,35 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 spGraph.setSelection(p);
                 break;
             }
+
+        // Handle update request
+        ivAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), BackgroundService.class);
+                intent.setAction(BackgroundService.EXPORTED_ACTION_UPDATE_WEATHER);
+                getActivity().startService(intent);
+                Toast.makeText(getActivity(), R.string.msg_requesting, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Handle view day
+        ivViewDay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putLong(PREF_LAST_WEATHER_VIEWPORT, DAY_MS).apply();
+                showWeatherGraph(graph);
+            }
+        });
+
+        // Handle view week
+        ivViewWeek.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                prefs.edit().putLong(PREF_LAST_WEATHER_VIEWPORT, 7 * DAY_MS).apply();
+                showWeatherGraph(graph);
+            }
+        });
 
         // Display temperature unit
         String temperature_unit = prefs.getString(PREF_TEMPERATURE, DEFAULT_TEMPERATURE);
@@ -2397,41 +2438,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             tvHeaderPressure.setText(R.string.header_hpa);
         else if ("mmhg".equals(pressure_unit))
             tvHeaderPressure.setText(R.string.header_mmhg);
-
-        // Handle view day
-        ivViewDay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                prefs.edit().putLong(PREF_LAST_WEATHER_VIEWPORT, DAY_MS).apply();
-                showWeatherGraph(graph);
-            }
-        });
-
-        // Handle view week
-        ivViewWeek.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                prefs.edit().putLong(PREF_LAST_WEATHER_VIEWPORT, 7 * DAY_MS).apply();
-                showWeatherGraph(graph);
-            }
-        });
-
-        // Handle update request
-        ivAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getActivity(), BackgroundService.class);
-                intent.setAction(BackgroundService.EXPORTED_ACTION_UPDATE_WEATHER);
-                getActivity().startService(intent);
-                Toast.makeText(getActivity(), R.string.msg_requesting, Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // Fill list
-        final ListView lv = (ListView) viewHistory.findViewById(R.id.lvWeatherHistory);
-        Cursor cursor = db.getWeather(false);
-        final WeatherAdapter adapter = new WeatherAdapter(getActivity(), cursor);
-        lv.setAdapter(adapter);
 
         // Handle list item click
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -2526,13 +2532,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
-        // Powered by
-        String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
-        if ("fio".equals(api)) {
-            tvPoweredBy.setVisibility(View.VISIBLE);
-            tvPoweredBy.setMovementMethod(LinkMovementMethod.getInstance());
-        } else
-            tvPoweredBy.setVisibility(View.GONE);
+        // Fill list
+        Cursor cursor = db.getWeather(false);
+        final WeatherAdapter adapter = new WeatherAdapter(getActivity(), cursor);
+        lv.setAdapter(adapter);
 
         // Live updates
         final DatabaseHelper.WeatherChangedListener listener = new DatabaseHelper.WeatherChangedListener() {
@@ -2560,6 +2563,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         };
         DatabaseHelper.addWeatherChangedListener(listener);
+
+        // Powered by
+        String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
+        if ("fio".equals(api)) {
+            tvPoweredBy.setVisibility(View.VISIBLE);
+            tvPoweredBy.setMovementMethod(LinkMovementMethod.getInstance());
+        } else
+            tvPoweredBy.setVisibility(View.GONE);
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
