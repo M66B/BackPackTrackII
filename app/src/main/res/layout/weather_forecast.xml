@@ -50,7 +50,7 @@
 
         <TextView
             android:id="@+id/tvHeaderPrecipitation"
-            android:layout_width="30dp"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:gravity="right"
