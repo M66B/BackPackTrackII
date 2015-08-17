@@ -374,7 +374,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             if (ACTION_STEPS.equals(action))
                 step_history();
             else if (ACTION_WEATHER.equals(action))
-                weather_forecast();
+                weather_history();
         }
     }
 
