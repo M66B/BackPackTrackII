@@ -53,6 +53,7 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
         TextView tvTemperatureMin = (TextView) convertView.findViewById(R.id.tvTemperatureMin);
         TextView tvTemperatureMax = (TextView) convertView.findViewById(R.id.tvTemperatureMax);
         TextView tvHumidity = (TextView) convertView.findViewById(R.id.tvHumidity);
+        TextView tvClouds = (TextView) convertView.findViewById(R.id.tvClouds);
         TextView tvPrecipitation = (TextView) convertView.findViewById(R.id.tvPrecipitation);
         TextView tvPrecipitationProbability = (TextView) convertView.findViewById(R.id.tvPrecipitationProbability);
         TextView tvWindSpeed = (TextView) convertView.findViewById(R.id.tvWindSpeed);
@@ -109,6 +110,16 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
             if (humidity > 99)
                 humidity = 99;
             tvHumidity.setText(Long.toString(humidity));
+        }
+
+        // Clouds
+        if (Double.isNaN(weather.clouds))
+            tvClouds.setText("");
+        else {
+            long clouds = Math.round(weather.clouds);
+            if (clouds > 99)
+                clouds = 99;
+            tvClouds.setText(Long.toString(clouds));
         }
 
         // Precipitation
