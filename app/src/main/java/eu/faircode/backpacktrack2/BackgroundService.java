@@ -1689,44 +1689,6 @@ public class BackgroundService extends IntentService {
             sb.append(("%"));
         }
 
-        // Pressure
-        double pressure = weather.pressure;
-        if (!Double.isNaN(pressure)) {
-            String pressure_unit = prefs.getString(SettingsFragment.PREF_PRESSURE, SettingsFragment.DEFAULT_PRESSURE);
-            if ("mmhg".equals(pressure_unit))
-                pressure = pressure / 1.33322368f;
-
-            if (sb.length() > 0)
-                sb.append(" ");
-            sb.append(Math.round(pressure));
-            sb.append(" ");
-            if ("hpa".equals(pressure_unit))
-                sb.append(context.getString(R.string.header_hpa));
-            else if ("mmhg".equals(pressure_unit))
-                sb.append(context.getString(R.string.header_mmhg));
-        }
-
-        // Wind speed
-        double wind_speed = weather.wind_speed;
-        if (!Double.isNaN(wind_speed)) {
-            String windspeed_unit = prefs.getString(SettingsFragment.PREF_WINDSPEED, SettingsFragment.DEFAULT_WINDSPEED);
-            if ("bft".equals(windspeed_unit))
-                wind_speed = (float) Math.pow(10.0, (Math.log10(wind_speed / 0.836) / 1.5));
-            else if ("kmh".equals(windspeed_unit))
-                wind_speed = wind_speed * 3600 / 1000;
-
-            if (sb.length() > 0)
-                sb.append(" ");
-            sb.append(Math.round(wind_speed));
-            sb.append(" ");
-            if ("bft".equals(windspeed_unit))
-                sb.append(context.getString(R.string.header_beaufort));
-            else if ("ms".equals(windspeed_unit))
-                sb.append(context.getString(R.string.header_ms));
-            else if ("kmh".equals(windspeed_unit))
-                sb.append(context.getString(R.string.header_kph));
-        }
-
         // Rain 1h
         double rain_1h = weather.rain_1h;
         if (!Double.isNaN(rain_1h)) {
@@ -1761,6 +1723,51 @@ public class BackgroundService extends IntentService {
                 sb.append(" ");
             sb.append(Math.round(clouds));
             sb.append(("%"));
+        }
+
+        // Wind speed
+        double wind_speed = weather.wind_speed;
+        if (!Double.isNaN(wind_speed)) {
+            String windspeed_unit = prefs.getString(SettingsFragment.PREF_WINDSPEED, SettingsFragment.DEFAULT_WINDSPEED);
+            if ("bft".equals(windspeed_unit))
+                wind_speed = (float) Math.pow(10.0, (Math.log10(wind_speed / 0.836) / 1.5));
+            else if ("kmh".equals(windspeed_unit))
+                wind_speed = wind_speed * 3600 / 1000;
+
+            if (sb.length() > 0)
+                sb.append(" ");
+            sb.append(Math.round(wind_speed));
+            sb.append(" ");
+            if ("bft".equals(windspeed_unit))
+                sb.append(context.getString(R.string.header_beaufort));
+            else if ("ms".equals(windspeed_unit))
+                sb.append(context.getString(R.string.header_ms));
+            else if ("kmh".equals(windspeed_unit))
+                sb.append(context.getString(R.string.header_kph));
+        }
+
+        // Wind direction
+        if (!Double.isInfinite(weather.wind_direction)) {
+            if (sb.length() > 0)
+                sb.append(" ");
+            sb.append(getWindDirectionName((float) weather.wind_direction, context));
+        }
+
+        // Pressure
+        double pressure = weather.pressure;
+        if (!Double.isNaN(pressure)) {
+            String pressure_unit = prefs.getString(SettingsFragment.PREF_PRESSURE, SettingsFragment.DEFAULT_PRESSURE);
+            if ("mmhg".equals(pressure_unit))
+                pressure = pressure / 1.33322368f;
+
+            if (sb.length() > 0)
+                sb.append(" ");
+            sb.append(Math.round(pressure));
+            sb.append(" ");
+            if ("hpa".equals(pressure_unit))
+                sb.append(context.getString(R.string.header_hpa));
+            else if ("mmhg".equals(pressure_unit))
+                sb.append(context.getString(R.string.header_mmhg));
         }
 
         notificationBuilder.setContentText(sb.toString());
