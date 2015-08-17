@@ -460,6 +460,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.rawQuery(query, new String[]{Long.toString(from), Long.toString(to)});
     }
 
+    public Cursor getWaypoints() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT ID AS _id, latitude, longitude, name FROM location WHERE NOT name IS NULL ORDER BY name", new String[0]);
+    }
+
     // Activity
 
     public DatabaseHelper insertActivityType(long time, int activity, int confidence) {

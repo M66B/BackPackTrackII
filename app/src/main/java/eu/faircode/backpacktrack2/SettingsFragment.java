@@ -50,6 +50,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -63,7 +64,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
-import com.jjoe64.graphview.series.BarGraphSeries;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
@@ -304,6 +304,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_LAST_WEATHER_GRAPH = "pref_last_weather_graph";
     public static final String PREF_LAST_WEATHER_VIEWPORT = "pref_last_weather_viewport";
     public static final String PREF_LAST_FORECAST_TYPE = "pref_last_forecast_type";
+    public static final String PREF_LAST_FORECAST_WAYPOINT = "pref_last_forecast_waypoint";
 
     public static final String PREF_LAST_TRACK = "pref_last_track";
     public static final String PREF_LAST_EXTENSIONS = "pref_last_extensions";
@@ -2344,8 +2345,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         View viewHistory = inflater.inflate(R.layout.weather_history, null);
 
         // Reference controls
-        final GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvWeather);
         final Spinner spGraph = (Spinner) viewHistory.findViewById(R.id.spGraph);
+        final GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvWeather);
         ImageView ivAdd = (ImageView) viewHistory.findViewById(R.id.ivAdd);
         ImageView ivViewDay = (ImageView) viewHistory.findViewById(R.id.ivViewDay);
         ImageView ivViewWeek = (ImageView) viewHistory.findViewById(R.id.ivViewWeek);
@@ -2825,15 +2826,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         private ProgressBar progress;
         private ListView list;
         private SharedPreferences prefs;
-        private Location lastLocation;
+        private Location location;
 
-        public updateForecast(int type, View view) {
+        public updateForecast(int type, Location location, View view) {
             this.type = type;
             this.context = view.getContext();
             this.progress = (ProgressBar) view.findViewById(R.id.pbWeatherForecast);
             this.list = (ListView) view.findViewById(R.id.lvWeatherForecast);
             this.prefs = getPreferenceScreen().getSharedPreferences();
-            this.lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+            this.location = location;
         }
 
         @Override
@@ -2846,7 +2847,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         protected Object doInBackground(Object... params) {
             try {
                 String apikey_fio = prefs.getString(PREF_WEATHER_APIKEY_FIO, null);
-                return ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, type, context);
+                return ForecastIO.getWeatherByLocation(apikey_fio, location, type, context);
             } catch (Throwable ex) {
                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                 return ex;
@@ -2868,12 +2869,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     private void weather_forecast() {
         final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+        final Location location = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
 
         // Get layout
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         final View viewForecast = inflater.inflate(R.layout.weather_forecast, null);
 
         // Reference controls
+        final Spinner spWaypoint = (Spinner) viewForecast.findViewById(R.id.spWaypoint);
         ImageView ivViewDay = (ImageView) viewForecast.findViewById(R.id.ivViewDay);
         ImageView ivViewWeek = (ImageView) viewForecast.findViewById(R.id.ivViewWeek);
         TextView tvHeaderTemperature = (TextView) viewForecast.findViewById(R.id.tvHeaderTemperature);
@@ -2882,12 +2885,49 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         TextView tvHeaderPressure = (TextView) viewForecast.findViewById(R.id.tvHeaderPressure);
         final ListView lv = (ListView) viewForecast.findViewById(R.id.lvWeatherForecast);
 
+        // Create waypoint adapter
+        DatabaseHelper dh = new DatabaseHelper(getActivity());
+        final SimpleCursorAdapter adapter = new SimpleCursorAdapter(
+                getActivity(),
+                android.R.layout.simple_spinner_item,
+                db.getWaypoints(),
+                new String[]{"name"},
+                new int[]{android.R.id.text1},
+                0);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spWaypoint.setAdapter(adapter);
+        dh.close();
+
+        spWaypoint.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                Cursor cursor = (Cursor) adapter.getItem(position);
+                prefs.edit().putLong(PREF_LAST_FORECAST_WAYPOINT, cursor.getLong(cursor.getColumnIndex("_id"))).apply();
+                location.setLatitude(cursor.getDouble(cursor.getColumnIndex("latitude")));
+                location.setLongitude(cursor.getDouble(cursor.getColumnIndex("longitude")));
+
+                int type = prefs.getInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_DAILY);
+                new updateForecast(type, location, viewForecast).execute();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+                prefs.edit().putLong(PREF_LAST_FORECAST_WAYPOINT, -1).apply();
+                location.setLatitude(lastLocation.getLatitude());
+                location.setLongitude(lastLocation.getLongitude());
+
+                int type = prefs.getInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_DAILY);
+                new updateForecast(type, location, viewForecast).execute();
+            }
+        });
+
         // Handle view hourly
         ivViewDay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 prefs.edit().putInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_HOURLY).apply();
-                new updateForecast(ForecastIO.TYPE_HOURLY, viewForecast).execute();
+                new updateForecast(ForecastIO.TYPE_HOURLY, location, viewForecast).execute();
             }
         });
 
@@ -2896,7 +2936,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             @Override
             public void onClick(View view) {
                 prefs.edit().putInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_DAILY).apply();
-                new updateForecast(ForecastIO.TYPE_DAILY, viewForecast).execute();
+                new updateForecast(ForecastIO.TYPE_DAILY, location, viewForecast).execute();
             }
         });
 
@@ -2939,9 +2979,20 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
-        // Fill list
-        int type = prefs.getInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_DAILY);
-        new updateForecast(type, viewForecast).execute();
+        // Fill waypoint list
+        spWaypoint.setAdapter(adapter);
+
+        // Select last waypoint
+        int spinnerCount = spWaypoint.getCount();
+        long rowid = prefs.getLong(PREF_LAST_FORECAST_WAYPOINT, -1);
+        for (int i = 0; i < spinnerCount; i++) {
+            Cursor value = (Cursor) spWaypoint.getItemAtPosition(i);
+            long id = value.getLong(value.getColumnIndex("_id"));
+            if (id == rowid) {
+                spWaypoint.setSelection(i);
+                break;
+            }
+        }
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
