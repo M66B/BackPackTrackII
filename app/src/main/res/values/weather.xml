@@ -2,18 +2,18 @@
 <resources>
     <string-array name="listWeatherName">
         <item>Temperature/humidity</item>
-        <item>Pressure</item>
-        <item>Wind</item>
         <item>Precipitation</item>
+        <item>Wind</item>
+        <item>Pressure</item>
         <item>Clouds</item>
         <item>Visibility</item>
     </string-array>
     <!-- do not translate values -->
     <string-array name="listWeatherValue">
         <item>temperature</item>
-        <item>pressure</item>
-        <item>wind_speed</item>
         <item>rain_1h</item>
+        <item>wind_speed</item>
+        <item>pressure</item>
         <item>clouds</item>
         <item>visibility</item>
     </string-array>

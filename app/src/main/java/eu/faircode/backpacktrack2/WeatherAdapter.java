@@ -62,11 +62,11 @@ public class WeatherAdapter extends CursorAdapter {
         TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
         TextView tvTemperature = (TextView) view.findViewById(R.id.tvTemperature);
         TextView tvHumidity = (TextView) view.findViewById(R.id.tvHumidity);
-        TextView tvPressure = (TextView) view.findViewById(R.id.tvPressure);
-        TextView tvWindSpeed = (TextView) view.findViewById(R.id.tvWindSpeed);
-        ImageView ivWindDirection = (ImageView) view.findViewById(R.id.ivWindDirection);
         TextView tvPrecipitation = (TextView) view.findViewById(R.id.tvPrecipitation);
         TextView tvPrecipitationProbability = (TextView) view.findViewById(R.id.tvPrecipitationProbability);
+        TextView tvWindSpeed = (TextView) view.findViewById(R.id.tvWindSpeed);
+        ImageView ivWindDirection = (ImageView) view.findViewById(R.id.ivWindDirection);
+        TextView tvPressure = (TextView) view.findViewById(R.id.tvPressure);
 
         // Time
         long time = cursor.getLong(colTime);
@@ -92,14 +92,30 @@ public class WeatherAdapter extends CursorAdapter {
             tvHumidity.setText(Long.toString(humidity));
         }
 
-        // Pressure
-        if (cursor.isNull(colPressure))
-            tvPressure.setText("");
+        // Precipitation
+        if (cursor.isNull(colRain1h))
+            tvPrecipitation.setText("");
         else {
-            float pressure = cursor.getFloat(colPressure);
-            if ("mmhg".equals(pressure_unit))
-                pressure = pressure / 1.33322368f;
-            tvPressure.setText(DF.format(pressure));
+            float rain_1h = cursor.getFloat(colRain1h);
+            if ("in".equals(rain_unit)) {
+                rain_1h = rain_1h / 25.4f;
+                tvPrecipitation.setText(DF2.format(rain_1h));
+            } else {
+                if (rain_1h < 10)
+                    tvPrecipitation.setText(DF.format(rain_1h));
+                else
+                    tvPrecipitation.setText(Integer.toString(Math.round(rain_1h)));
+            }
+        }
+
+        // Precipitation probability
+        if (cursor.isNull(colRainProbability))
+            tvPrecipitationProbability.setText("");
+        else {
+            int probability = Math.round(cursor.getFloat(colRainProbability));
+            if (probability > 99)
+                probability = 99;
+            tvPrecipitationProbability.setText(Long.toString(probability));
         }
 
         // Wind speed
@@ -128,30 +144,14 @@ public class WeatherAdapter extends CursorAdapter {
             ivWindDirection.setVisibility(View.VISIBLE);
         }
 
-        // Precipitation
-        if (cursor.isNull(colRain1h))
-            tvPrecipitation.setText("");
+        // Pressure
+        if (cursor.isNull(colPressure))
+            tvPressure.setText("");
         else {
-            float rain_1h = cursor.getFloat(colRain1h);
-            if ("in".equals(rain_unit)) {
-                rain_1h = rain_1h / 25.4f;
-                tvPrecipitation.setText(DF2.format(rain_1h));
-            } else {
-                if (rain_1h < 10)
-                    tvPrecipitation.setText(DF.format(rain_1h));
-                else
-                    tvPrecipitation.setText(Integer.toString(Math.round(rain_1h)));
-            }
-        }
-
-        // Precipitation probability
-        if (cursor.isNull(colRainProbability))
-            tvPrecipitationProbability.setText("");
-        else {
-            int probability = Math.round(cursor.getFloat(colRainProbability));
-            if (probability > 99)
-                probability = 99;
-            tvPrecipitationProbability.setText(Long.toString(probability));
+            float pressure = cursor.getFloat(colPressure);
+            if ("mmhg".equals(pressure_unit))
+                pressure = pressure / 1.33322368f;
+            tvPressure.setText(DF.format(pressure));
         }
     }
 }

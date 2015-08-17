@@ -2340,9 +2340,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         ImageView ivViewWeek = (ImageView) viewHistory.findViewById(R.id.ivViewWeek);
         ImageView ivAdd = (ImageView) viewHistory.findViewById(R.id.ivAdd);
         TextView tvHeaderTemperature = (TextView) viewHistory.findViewById(R.id.tvHeaderTemperature);
-        TextView tvHeaderPressure = (TextView) viewHistory.findViewById(R.id.tvHeaderPressure);
-        TextView tvHeaderWindSpeed = (TextView) viewHistory.findViewById(R.id.tvHeaderWindSpeed);
         TextView tvHeaderPrecipitation = (TextView) viewHistory.findViewById(R.id.tvHeaderPrecipitation);
+        TextView tvHeaderWindSpeed = (TextView) viewHistory.findViewById(R.id.tvHeaderWindSpeed);
+        TextView tvHeaderPressure = (TextView) viewHistory.findViewById(R.id.tvHeaderPressure);
         TextView tvPoweredBy = (TextView) viewHistory.findViewById(R.id.tvPoweredBy);
 
         // Select graph
@@ -2375,12 +2375,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if ("f".equals(temperature_unit))
             tvHeaderTemperature.setText(R.string.header_fahrenheit);
 
-        // Display pressure unit
-        String pressure_unit = prefs.getString(PREF_PRESSURE, DEFAULT_PRESSURE);
-        if ("hpa".equals(pressure_unit))
-            tvHeaderPressure.setText(R.string.header_hpa);
-        else if ("mmhg".equals(pressure_unit))
-            tvHeaderPressure.setText(R.string.header_mmhg);
+        // Display precipitation unit
+        String rain_unit = prefs.getString(PREF_PRECIPITATION, DEFAULT_PRECIPITATION);
+        if ("mm".equals(rain_unit))
+            tvHeaderPrecipitation.setText(R.string.header_mm);
+        else if ("in".equals(rain_unit))
+            tvHeaderPrecipitation.setText(R.string.header_inch);
 
         // Display wind speed unit
         String speed_unit = prefs.getString(PREF_WINDSPEED, DEFAULT_WINDSPEED);
@@ -2391,12 +2391,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if ("kmh".equals(speed_unit))
             tvHeaderWindSpeed.setText(R.string.header_kph);
 
-        // Display precipitation unit
-        String rain_unit = prefs.getString(PREF_PRECIPITATION, DEFAULT_PRECIPITATION);
-        if ("mm".equals(rain_unit))
-            tvHeaderPrecipitation.setText(R.string.header_mm);
-        else if ("in".equals(rain_unit))
-            tvHeaderPrecipitation.setText(R.string.header_inch);
+        // Display pressure unit
+        String pressure_unit = prefs.getString(PREF_PRESSURE, DEFAULT_PRESSURE);
+        if ("hpa".equals(pressure_unit))
+            tvHeaderPressure.setText(R.string.header_hpa);
+        else if ("mmhg".equals(pressure_unit))
+            tvHeaderPressure.setText(R.string.header_mmhg);
 
         // Handle view day
         ivViewDay.setOnClickListener(new View.OnClickListener() {

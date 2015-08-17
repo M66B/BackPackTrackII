@@ -39,6 +39,16 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/tvHeaderHumidity"
+            android:layout_width="25dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="right"
+            android:text="@string/header_percent"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/tvHeaderPrecipitation"
             android:layout_width="30dp"
             android:layout_height="wrap_content"
@@ -52,16 +62,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:gravity="right"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/tvHeaderHumidity"
-            android:layout_width="25dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:gravity="right"
-            android:text="@string/header_percent"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textStyle="bold" />
 

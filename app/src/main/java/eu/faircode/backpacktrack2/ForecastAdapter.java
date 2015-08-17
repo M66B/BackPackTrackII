@@ -52,11 +52,11 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
         ImageView ivWeather = (ImageView) convertView.findViewById(R.id.ivWeather);
         TextView tvTemperatureMin = (TextView) convertView.findViewById(R.id.tvTemperatureMin);
         TextView tvTemperatureMax = (TextView) convertView.findViewById(R.id.tvTemperatureMax);
+        TextView tvHumidity = (TextView) convertView.findViewById(R.id.tvHumidity);
         TextView tvPrecipitation = (TextView) convertView.findViewById(R.id.tvPrecipitation);
         TextView tvPrecipitationProbability = (TextView) convertView.findViewById(R.id.tvPrecipitationProbability);
         TextView tvWindSpeed = (TextView) convertView.findViewById(R.id.tvWindSpeed);
         ImageView ivWindDirection = (ImageView) convertView.findViewById(R.id.ivWindDirection);
-        TextView tvHumidity = (TextView) convertView.findViewById(R.id.tvHumidity);
         TextView tvPressure = (TextView) convertView.findViewById(R.id.tvPressure);
 
         // Time
@@ -99,6 +99,16 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
                 tvTemperatureMax.setText(DF.format(temperature));
             }
             tvTemperatureMax.setVisibility(View.VISIBLE);
+        }
+
+        // Humidity
+        if (Double.isNaN(weather.humidity))
+            tvHumidity.setText("");
+        else {
+            long humidity = Math.round(weather.humidity);
+            if (humidity > 99)
+                humidity = 99;
+            tvHumidity.setText(Long.toString(humidity));
         }
 
         // Precipitation
@@ -153,16 +163,6 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
             float wind_direction = (float) weather.wind_direction;
             ivWindDirection.setRotation(wind_direction - 90 + 180);
             ivWindDirection.setVisibility(View.VISIBLE);
-        }
-
-        // Humidity
-        if (Double.isNaN(weather.humidity))
-            tvHumidity.setText("");
-        else {
-            long humidity = Math.round(weather.humidity);
-            if (humidity > 99)
-                humidity = 99;
-            tvHumidity.setText(Long.toString(humidity));
         }
 
         // Pressure

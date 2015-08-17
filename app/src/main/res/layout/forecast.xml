@@ -51,6 +51,14 @@
             android:textAppearance="?android:attr/textAppearanceSmall" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tvHumidity"
+        android:layout_width="25dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:gravity="right"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
     <LinearLayout
         android:layout_width="30dp"
         android:layout_height="wrap_content"
@@ -92,14 +100,6 @@
             android:layout_gravity="center_horizontal|right"
             android:src="@drawable/trending_60" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/tvHumidity"
-        android:layout_width="25dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:gravity="right"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <TextView
         android:id="@+id/tvPressure"
