@@ -162,7 +162,7 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
             long humidity = Math.round(weather.humidity);
             if (humidity > 99)
                 humidity = 99;
-            tvHumidity.setText(humidity + "%");
+            tvHumidity.setText(Long.toString(humidity));
         }
 
         // Pressure

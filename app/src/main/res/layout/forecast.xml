@@ -93,23 +93,20 @@
             android:src="@drawable/trending_60" />
     </LinearLayout>
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/tvHumidity"
+        android:layout_width="25dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:gravity="right"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/tvPressure"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_gravity="center_vertical"
+        android:gravity="right"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <TextView
-            android:id="@+id/tvPressure"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="right"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        <TextView
-            android:id="@+id/tvHumidity"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="right"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-    </LinearLayout>
 </LinearLayout>

@@ -56,6 +56,16 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/tvHeaderHumidity"
+            android:layout_width="25dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="right"
+            android:text="@string/header_percent"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textStyle="bold" />
+
+        <TextView
             android:id="@+id/tvHeaderPressure"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
