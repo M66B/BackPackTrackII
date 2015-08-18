@@ -2,6 +2,7 @@ package eu.faircode.backpacktrack2;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -63,6 +64,8 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
         tvTime.setText(SDFT.format(weather.time));
         tvDate.setVisibility(type == ForecastIO.TYPE_HOURLY && DateUtils.isToday(weather.time) ? View.GONE : View.VISIBLE);
         tvTime.setVisibility(type == ForecastIO.TYPE_HOURLY ? View.VISIBLE : View.GONE);
+        tvDate.setTypeface(null, type == ForecastIO.TYPE_HOURLY ? Typeface.NORMAL : Typeface.BOLD);
+        tvTime.setTypeface(null, type == ForecastIO.TYPE_HOURLY ? Typeface.BOLD : Typeface.NORMAL);
 
         // Icon
         int resId = (weather.icon == null ? -1 : getContext().getResources().getIdentifier(weather.icon.replace("-", "_"), "drawable", getContext().getPackageName()));
