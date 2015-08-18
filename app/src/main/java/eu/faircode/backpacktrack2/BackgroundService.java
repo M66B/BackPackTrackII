@@ -1285,7 +1285,9 @@ public class BackgroundService extends IntentService {
         long trigger = calendar.getTimeInMillis() + 24 * 3600 * 1000;
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pi);
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, trigger, pi);
         else
             alarmManager.set(AlarmManager.RTC_WAKEUP, trigger, pi);
