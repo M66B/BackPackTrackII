@@ -429,11 +429,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this;
     }
 
-    public DatabaseHelper deleteLocations(long from, long to) {
+    public DatabaseHelper deleteTrackpoints(long from, long to) {
         synchronized (mContext.getApplicationContext()) {
             Log.i(TAG, "Delete from=" + from + " to=" + to);
             SQLiteDatabase db = this.getWritableDatabase();
-            db.delete("location", "time >= ? AND time <= ?", new String[]{Long.toString(from), Long.toString(to)});
+            int rows = db.delete("location", "time >= ? AND time <= ? AND name IS NULL", new String[]{Long.toString(from), Long.toString(to)});
+            Log.i(TAG, rows+ " trackpoints deleted");
         }
 
         for (LocationChangedListener listener : mLocationChangedListeners)

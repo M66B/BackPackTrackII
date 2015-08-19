@@ -1,6 +1,5 @@
 package eu.faircode.backpacktrack2;
 
-import android.Manifest;
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.Notification;
@@ -704,7 +703,7 @@ public class BackgroundService extends IntentService {
 
         // Delete data on request
         if (delete)
-            new DatabaseHelper(this).deleteLocations(from, to).close();
+            new DatabaseHelper(this).deleteTrackpoints(from, to).close();
 
         // View file
         if (ACTION_SHARE_GPX.equals(intent.getAction()) || ACTION_SHARE_KML.equals(intent.getAction())) {
@@ -763,7 +762,7 @@ public class BackgroundService extends IntentService {
 
         // Delete data on request
         if (delete)
-            new DatabaseHelper(this).deleteLocations(from, to).close();
+            new DatabaseHelper(this).deleteTrackpoints(from, to).close();
 
         // Feedback
         if (ACTION_UPLOAD_GPX.equals(intent.getAction())) {
