@@ -1195,7 +1195,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         to.setTime(new Date(prefs.getLong(PREF_LAST_TO, defaultTo.getTimeInMillis())));
 
         // Show range
-        final DateFormat dateFormat = SimpleDateFormat.getDateInstance(SimpleDateFormat.MEDIUM);
+        final DateFormat dateFormat = SimpleDateFormat.getDateInstance(SimpleDateFormat.SHORT);
         final DateFormat timeFormat = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT);
 
         tvDateFrom.setText(dateFormat.format(from.getTime()));
