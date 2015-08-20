@@ -293,8 +293,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_PRESSURE_REF_TEMP = "pref_pressure_ref_temp";
     public static final String PREF_PRESSURE_REF_TIME = "pref_pressure_ref_time";
 
-    public static final String PREF_FORECAST_DATA = "pref_forecast_data";
     public static final String PREF_FORECAST_TIME = "pref_forecast_time";
+    public static final String PREF_FORECAST_LATITUDE = "pref_forecast_latitude";
+    public static final String PREF_FORECAST_LONGITUDE = "pref_forecast_longitude";
+    public static final String PREF_FORECAST_DATA = "pref_forecast_data";
 
     // Remember last values
     public static final String PREF_LAST_ACTIVITY = "pref_last_activity";
@@ -309,6 +311,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_LAST_WEATHER_GRAPH = "pref_last_weather_graph";
     public static final String PREF_LAST_WEATHER_VIEWPORT = "pref_last_weather_viewport";
     public static final String PREF_LAST_FORECAST_TYPE = "pref_last_forecast_type";
+    public static final String PREF_LAST_FORECAST_LOCATION = "pref_last_forecast_location";
     public static final String PREF_LAST_FORECAST_WAYPOINT = "pref_last_forecast_waypoint";
 
     public static final String PREF_LAST_TRACK = "pref_last_track";
@@ -2883,6 +2886,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Reference controls
         final Spinner spWaypoint = (Spinner) viewForecast.findViewById(R.id.spWaypoint);
+        final CheckBox chkWaypoint = (CheckBox) viewForecast.findViewById(R.id.chkWaypoint);
         ImageView ivViewDay = (ImageView) viewForecast.findViewById(R.id.ivViewDay);
         ImageView ivViewWeek = (ImageView) viewForecast.findViewById(R.id.ivViewWeek);
         TextView tvHeaderTemperature = (TextView) viewForecast.findViewById(R.id.tvHeaderTemperature);
@@ -2901,16 +2905,21 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 new int[]{android.R.id.text1},
                 0);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spWaypoint.setAdapter(adapter);
         dh.close();
 
         spWaypoint.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                Cursor cursor = (Cursor) adapter.getItem(position);
-                prefs.edit().putLong(PREF_LAST_FORECAST_WAYPOINT, cursor.getLong(cursor.getColumnIndex("_id"))).apply();
-                location.setLatitude(cursor.getDouble(cursor.getColumnIndex("latitude")));
-                location.setLongitude(cursor.getDouble(cursor.getColumnIndex("longitude")));
+                if (chkWaypoint.isChecked()) {
+                    Cursor cursor = (Cursor) adapter.getItem(position);
+                    prefs.edit().putLong(PREF_LAST_FORECAST_WAYPOINT, cursor.getLong(cursor.getColumnIndex("_id"))).apply();
+                    location.setLatitude(cursor.getDouble(cursor.getColumnIndex("latitude")));
+                    location.setLongitude(cursor.getDouble(cursor.getColumnIndex("longitude")));
+                } else {
+                    Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+                    location.setLatitude(lastLocation.getLatitude());
+                    location.setLongitude(lastLocation.getLongitude());
+                }
 
                 int type = prefs.getInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_DAILY);
                 new updateForecast(type, location, viewForecast).execute();
@@ -2918,8 +2927,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-                Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
                 prefs.edit().putLong(PREF_LAST_FORECAST_WAYPOINT, -1).apply();
+
+                Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
                 location.setLatitude(lastLocation.getLatitude());
                 location.setLongitude(lastLocation.getLongitude());
 
@@ -2986,19 +2996,32 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         });
 
         // Fill waypoint list
+        boolean loc = prefs.getBoolean(PREF_LAST_FORECAST_LOCATION, false);
+        long wpt = prefs.getLong(PREF_LAST_FORECAST_WAYPOINT, -1);
+        chkWaypoint.setChecked(loc);
+        spWaypoint.setEnabled(loc);
         spWaypoint.setAdapter(adapter);
-
-        // Select last waypoint
         int spinnerCount = spWaypoint.getCount();
-        long rowid = prefs.getLong(PREF_LAST_FORECAST_WAYPOINT, -1);
         for (int i = 0; i < spinnerCount; i++) {
             Cursor value = (Cursor) spWaypoint.getItemAtPosition(i);
             long id = value.getLong(value.getColumnIndex("_id"));
-            if (id == rowid) {
+            if (id == wpt) {
                 spWaypoint.setSelection(i);
                 break;
             }
         }
+
+        // Handle last/selected location
+        chkWaypoint.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                prefs.edit().putBoolean(PREF_LAST_FORECAST_LOCATION, isChecked).apply();
+                spWaypoint.setEnabled(isChecked);
+                int pos = spWaypoint.getSelectedItemPosition();
+                spWaypoint.setAdapter(adapter);
+                spWaypoint.setSelection(pos);
+            }
+        });
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());

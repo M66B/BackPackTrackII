@@ -49,8 +49,12 @@ public class ForecastIO {
         long time = new Date().getTime();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         long last = prefs.getLong(SettingsFragment.PREF_FORECAST_TIME, 0);
+        float latitude = prefs.getFloat(SettingsFragment.PREF_FORECAST_LATITUDE, Float.NaN);
+        float longitude = prefs.getFloat(SettingsFragment.PREF_FORECAST_LONGITUDE, Float.NaN);
         int duration = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_CACHE, SettingsFragment.DEFAULT_WEATHER_CACHE));
-        if (last + duration * 60 * 1000L > time) {
+        if (last + duration * 60 * 1000L > time &&
+                (float) location.getLatitude() == latitude &&
+                (float) location.getLongitude() == longitude) {
             String json = prefs.getString(SettingsFragment.PREF_FORECAST_DATA, null);
             return decodeResult(type, json);
         }
@@ -97,6 +101,8 @@ public class ForecastIO {
             // Cache result
             if (type == TYPE_HOURLY || type == TYPE_DAILY) {
                 prefs.edit().putLong(SettingsFragment.PREF_FORECAST_TIME, new Date().getTime()).apply();
+                prefs.edit().putFloat(SettingsFragment.PREF_FORECAST_LATITUDE, (float) location.getLatitude()).apply();
+                prefs.edit().putFloat(SettingsFragment.PREF_FORECAST_LONGITUDE, (float) location.getLongitude()).apply();
                 prefs.edit().putString(SettingsFragment.PREF_FORECAST_DATA, json.toString()).apply();
             }
 
