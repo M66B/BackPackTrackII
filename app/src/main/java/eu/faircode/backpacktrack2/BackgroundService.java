@@ -1630,13 +1630,6 @@ public class BackgroundService extends IntentService {
 
     public static void showWeatherNotification(Weather weather, Context context) {
         Notification.Builder notificationBuilder = new Notification.Builder(context);
-        int resId = (weather.icon == null ? -1 : context.getResources().getIdentifier(weather.icon.replace("-", "_"), "drawable", context.getPackageName()));
-        if (resId > 0) {
-            Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), resId).copy(Bitmap.Config.ARGB_8888, true);
-            notificationBuilder.setLargeIcon(largeIcon);
-            notificationBuilder.setSmallIcon(getTemperatureIcon((float) weather.temperature, context));
-        } else
-            notificationBuilder.setSmallIcon(android.R.drawable.ic_menu_help);
 
         String summary = "";
         if (weather.summary != null)
@@ -1681,6 +1674,14 @@ public class BackgroundService extends IntentService {
             else if ("f".equals(temperature_unit))
                 sb.append(context.getString(R.string.header_fahrenheit));
         }
+
+        int resId = (weather.icon == null ? -1 : context.getResources().getIdentifier(weather.icon.replace("-", "_"), "drawable", context.getPackageName()));
+        if (resId > 0) {
+            Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), resId).copy(Bitmap.Config.ARGB_8888, true);
+            notificationBuilder.setLargeIcon(largeIcon);
+            notificationBuilder.setSmallIcon(getTemperatureIcon((float) temperature, context));
+        } else
+            notificationBuilder.setSmallIcon(android.R.drawable.ic_menu_help);
 
         // Humidity
         double humidity = weather.humidity;
