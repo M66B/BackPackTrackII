@@ -1629,6 +1629,9 @@ public class BackgroundService extends IntentService {
     }
 
     public static void showWeatherNotification(Weather weather, Context context) {
+        if (weather.isEmpty())
+            return;
+
         Notification.Builder notificationBuilder = new Notification.Builder(context);
 
         String summary = "";

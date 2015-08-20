@@ -52,6 +52,24 @@ public class Weather {
 
     private static final DecimalFormat DF = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ROOT));
 
+    public boolean isEmpty() {
+        return (Double.isNaN(temperature) &&
+                Double.isNaN(temperature_min) &&
+                Double.isNaN(temperature_max) &&
+                Double.isNaN(humidity) &&
+                Double.isNaN(pressure) &&
+                Double.isNaN(wind_speed) &&
+                Double.isNaN(wind_gust) &&
+                Double.isNaN(wind_direction) &&
+                Double.isNaN(visibility) &&
+                Double.isNaN(rain_1h) &&
+                Double.isNaN(rain_today) &&
+                Double.isNaN(rain_probability) &&
+                Double.isNaN(clouds) &&
+                icon == null &&
+                summary == null);
+    }
+
     @Override
     public String toString() {
         return SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT).format(time) + " " +
