@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import java.util.Date;
+
 public class BootReceiver extends BroadcastReceiver {
     private static final String TAG = "BPT2.Boot";
 
@@ -28,6 +30,13 @@ public class BootReceiver extends BroadcastReceiver {
             public void run() {
                 synchronized (context.getApplicationContext()) {
                     SettingsFragment.firstRun(context);
+
+                    // Update weather
+                    if (Util.isConnected(context)) {
+                        Intent intentWeather = new Intent(context, BackgroundService.class);
+                        intentWeather.setAction(BackgroundService.EXPORTED_ACTION_UPDATE_WEATHER);
+                        context.startService(intentWeather);
+                    }
                 }
             }
         }).start();
