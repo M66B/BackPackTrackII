@@ -1,7 +1,9 @@
 package eu.faircode.backpacktrack2;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -42,15 +44,24 @@ public class ForecastIO {
             String apikey, final Location location, int type, Context context)
             throws IOException, JSONException {
         // https:developer.forecast.io/docs/v2
-        List<Weather> result = new ArrayList<Weather>();
+
+        // Check cache
+        long time = new Date().getTime();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        long last = prefs.getLong(SettingsFragment.PREF_FORECAST_TIME, 0);
+        int duration = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_CACHE, SettingsFragment.DEFAULT_WEATHER_CACHE));
+        if (last + duration * 60 * 1000L > time) {
+            String json = prefs.getString(SettingsFragment.PREF_FORECAST_DATA, null);
+            return decodeResult(type, json);
+        }
 
         String exclude = "currently,minutely,hourly,daily,alerts,flags";
         if (type == TYPE_CURRENT)
             exclude = exclude.replace("currently,", "");
-        else if (type == TYPE_HOURLY)
+        else if (type == TYPE_HOURLY || type == TYPE_DAILY) {
             exclude = exclude.replace("hourly,", "");
-        else if (type == TYPE_DAILY)
             exclude = exclude.replace("daily,", "");
+        }
         URL url = new URL(BASE_URL + "/" + apikey + "/" +
                 String.valueOf(location.getLatitude()) + "," +
                 String.valueOf(location.getLongitude()) +
@@ -83,47 +94,47 @@ public class ForecastIO {
                 json.append(line);
             Log.d(TAG, json.toString());
 
-            // Decode result
-            JSONObject jroot = new JSONObject(json.toString());
-            if (!jroot.has("latitude") || !jroot.has("longitude"))
-                return result;
-
-            if (type == TYPE_CURRENT) {
-                if (jroot.has("currently")) {
-                    JSONObject current = jroot.getJSONObject("currently");
-                    if (current.has("time"))
-                        result.add(decodeWeather(jroot, current));
-                }
-            } else if (type == TYPE_HOURLY) {
-                if (jroot.has("hourly")) {
-                    JSONObject hourly = jroot.getJSONObject("hourly");
-                    if (hourly.has("data")) {
-                        JSONArray data = hourly.getJSONArray("data");
-                        for (int i = 0; i < data.length(); i++) {
-                            JSONObject hour = data.getJSONObject(i);
-                            if (hour.has("time"))
-                                result.add(decodeWeather(jroot, hour));
-                        }
-                    }
-                }
-            } else if (type == TYPE_DAILY) {
-                if (jroot.has("daily")) {
-                    JSONObject daily = jroot.getJSONObject("daily");
-                    if (daily.has("data")) {
-                        JSONArray data = daily.getJSONArray("data");
-                        for (int i = 0; i < data.length(); i++) {
-                            JSONObject day = data.getJSONObject(i);
-                            if (day.has("time"))
-                                result.add(decodeWeather(jroot, day));
-                        }
-                    }
-                }
+            // Cache result
+            if (type == TYPE_HOURLY || type == TYPE_DAILY) {
+                prefs.edit().putLong(SettingsFragment.PREF_FORECAST_TIME, new Date().getTime()).apply();
+                prefs.edit().putString(SettingsFragment.PREF_FORECAST_DATA, json.toString()).apply();
             }
 
-            return result;
+            // Decode result
+            return decodeResult(type, json.toString());
         } finally {
             urlConnection.disconnect();
         }
+    }
+
+    private static List<Weather> decodeResult(int type, String json) throws JSONException {
+        List<Weather> result = new ArrayList<Weather>();
+
+        JSONObject jroot = new JSONObject(json);
+        if (!jroot.has("latitude") || !jroot.has("longitude"))
+            return result;
+
+        if (type == TYPE_CURRENT) {
+            if (jroot.has("currently")) {
+                JSONObject current = jroot.getJSONObject("currently");
+                if (current.has("time"))
+                    result.add(decodeWeather(jroot, current));
+            }
+        } else if (type == TYPE_HOURLY || type == TYPE_DAILY) {
+            if (jroot.has(type == TYPE_HOURLY ? "hourly" : "daily")) {
+                JSONObject proot = jroot.getJSONObject(type == TYPE_HOURLY ? "hourly" : "daily");
+                if (proot.has("data")) {
+                    JSONArray data = proot.getJSONArray("data");
+                    for (int i = 0; i < data.length(); i++) {
+                        JSONObject period = data.getJSONObject(i);
+                        if (period.has("time"))
+                            result.add(decodeWeather(jroot, period));
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     @NonNull

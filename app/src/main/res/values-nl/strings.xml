@@ -86,6 +86,7 @@
     <string name="title_weather_test">Show weather data</string>
     <string name="title_weather_notification">Toon weer notificatie</string>
     <string name="title_weather_guard">Weernotificatie geldig: %s minuten</string>
+    <string name="title_weather_cache">Weersvoorspelling geldig tijd: %s minuten</string>
     <string name="title_weather_fio">Forecast.io</string>
     <string name="title_weather_register">Registeren</string>
     <string name="title_weather_owm">OpenWeatherMap</string>
@@ -182,6 +183,7 @@
 
     <string name="summary_weather_interval">Fetch weather data every selected number of minutes</string>
     <string name="summary_weather_test">Tap to display raw weather data</string>
+    <string name="summary_weather_cache">Cache forecast data for the selected number of minutes</string>
     <string name="summary_weather_stations">Fetch data for the selected number of weather stations</string>
     <string name="summary_weather_maxage">Display weather data for maximum the selected number of minutes</string>
     <string name="summary_weather_weight">0=sorteer op afstand\n&#8734;=sorteer op leeftijd</string>

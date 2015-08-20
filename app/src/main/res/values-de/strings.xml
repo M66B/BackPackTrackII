@@ -86,6 +86,7 @@
     <string name="title_weather_test">Zeige Wetter Daten</string>
     <string name="title_weather_notification">Zeige Wetterbenachrichtigung</string>
     <string name="title_weather_guard">Wetterbenachrichtigung Gültigkeit: %s Minuten</string>
+    <string name="title_weather_cache">Vorhersage Cachezeit: %s Minuten</string>
     <string name="title_weather_fio">Forecast.io</string>
     <string name="title_weather_register">Registrieren</string>
     <string name="title_weather_owm">OpenWeatherMap</string>
@@ -182,6 +183,7 @@
 
     <string name="summary_weather_interval">Wetterdaten jede Anzahl von Minuten abrufen</string>
     <string name="summary_weather_test">Drücken um rohe Wetterdaten anzuzeigen</string>
+    <string name="summary_weather_cache">Vorhersagedaten für die ausgewählte Anzahl an Minuten cachen</string>
     <string name="summary_weather_stations">Wetterdaten für die ausgewählte Anzahl von Wetterstationen abrufen</string>
     <string name="summary_weather_maxage">Wetterdaten maximal für die ausgewählte Anzahl von Mintuen zeigen</string>
     <string name="summary_weather_weight">0=Sortiere nach Entfernung\n&#8734;=Sortiere nach Alter</string>

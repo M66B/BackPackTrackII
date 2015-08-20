@@ -399,6 +399,12 @@
                     android:dependency="pref_weather_apikey_fio"
                     android:inputType="number"
                     android:key="pref_weather_guard" />
+                <EditTextPreference
+                    android:defaultValue="15"
+                    android:dependency="pref_weather_apikey_fio"
+                    android:inputType="number"
+                    android:key="pref_weather_cache"
+                    android:summary="@string/summary_weather_cache" />
                 <Preference
                     android:dependency="pref_weather_enabled"
                     android:summary="@string/summary_weather_tos"

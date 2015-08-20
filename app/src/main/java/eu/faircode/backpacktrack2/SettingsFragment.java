@@ -141,6 +141,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_WEATHER_APIKEY_FIO = "pref_weather_apikey_fio";
     public static final String PREF_WEATHER_NOTIFICATION = "pref_weather_notification";
     public static final String PREF_WEATHER_GUARD = "pref_weather_guard";
+    public static final String PREF_WEATHER_CACHE = "pref_weather_cache";
     public static final String PREF_WEATHER_APIKEY_OWM = "pref_weather_apikey";
     public static final String PREF_WEATHER_STATIONS = "pref_weather_stations";
     public static final String PREF_WEATHER_MAXAGE = "pref_weather_maxage";
@@ -236,6 +237,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_WEATHER_INTERVAL = "30"; // minutes
     public static final boolean DEFAULT_WEATHER_NOTIFICATION = true;
     public static final String DEFAULT_WEATHER_GUARD = "60"; // minutes
+    public static final String DEFAULT_WEATHER_CACHE = "15"; // minutes
     public static final String DEFAULT_WEATHER_STATIONS = "10"; // count
     public static final String DEFAULT_WEATHER_MAXAGE = "120"; // minutes
     public static final String DEFAULT_WEATHER_WEIGHT = "0.2";
@@ -290,6 +292,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_PRESSURE_REF_VALUE = "pref_pressure_ref_value";
     public static final String PREF_PRESSURE_REF_TEMP = "pref_pressure_ref_temp";
     public static final String PREF_PRESSURE_REF_TIME = "pref_pressure_ref_time";
+
+    public static final String PREF_FORECAST_DATA = "pref_forecast_data";
+    public static final String PREF_FORECAST_TIME = "pref_forecast_time";
 
     // Remember last values
     public static final String PREF_LAST_ACTIVITY = "pref_last_activity";
@@ -483,6 +488,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_WEATHER_INTERVAL);
         updateTitle(prefs, PREF_WEATHER_APIKEY_FIO);
         updateTitle(prefs, PREF_WEATHER_GUARD);
+        updateTitle(prefs, PREF_WEATHER_CACHE);
         updateTitle(prefs, PREF_WEATHER_APIKEY_OWM);
         updateTitle(prefs, PREF_WEATHER_STATIONS);
         updateTitle(prefs, PREF_WEATHER_MAXAGE);
@@ -3084,6 +3090,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref.setTitle(getString(R.string.title_weather_apikey, prefs.getString(key, getString(R.string.msg_notset))));
         else if (PREF_WEATHER_GUARD.equals(key))
             pref.setTitle(getString(R.string.title_weather_guard, prefs.getString(key, DEFAULT_WEATHER_GUARD)));
+        else if (PREF_WEATHER_CACHE.equals(key))
+            pref.setTitle(getString(R.string.title_weather_cache, prefs.getString(key, DEFAULT_WEATHER_CACHE)));
         else if (PREF_WEATHER_STATIONS.equals(key))
             pref.setTitle(getString(R.string.title_weather_stations, prefs.getString(key, DEFAULT_WEATHER_STATIONS)));
         else if (PREF_WEATHER_MAXAGE.equals(key))
