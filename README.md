@@ -39,7 +39,7 @@ As a bonus BackPackTrack includes:
 * a step counter which doesn't count false steps, because activity recognition will be used to count steps only while you are walking (your device needs to have a hardware step counter for this to work)
 * tabular and graphical actual and historical weather information
 * a current weather status bar notification, including current temperature icon
-* hourly or daily weather forecasting for the last or a selected location
+* hourly and daily weather forecasting for the last or a selected location
 
 BackPackTrack II is a complete rewrite of [BackPackTrack](https://github.com/M66B/BackPackTrack), the first Android application I wrote in 2011.
 
