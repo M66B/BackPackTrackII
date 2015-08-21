@@ -58,6 +58,7 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
         TextView tvWindSpeed = (TextView) convertView.findViewById(R.id.tvWindSpeed);
         ImageView ivWindDirection = (ImageView) convertView.findViewById(R.id.ivWindDirection);
         TextView tvPressure = (TextView) convertView.findViewById(R.id.tvPressure);
+        TextView tvOzone = (TextView) convertView.findViewById(R.id.tvOzone);
 
         // Time
         tvDate.setText(SDFD.format(weather.time));
@@ -186,6 +187,12 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
                 pressure = pressure / 1.33322368f;
             tvPressure.setText(DF.format(pressure));
         }
+
+        // Pressure
+        if (Double.isNaN(weather.ozone))
+            tvOzone.setText("");
+        else
+            tvOzone.setText(DF2.format(weather.ozone));
 
         return convertView;
     }

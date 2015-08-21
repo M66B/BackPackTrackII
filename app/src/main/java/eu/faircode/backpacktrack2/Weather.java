@@ -46,6 +46,7 @@ public class Weather {
     public double rain_today = Double.NaN;
     public double rain_probability = Double.NaN;
     public double clouds = Double.NaN;
+    public double ozone = Double.NaN;
     public String icon = null;
     public String summary = null;
     public String rawData = null;
@@ -66,6 +67,7 @@ public class Weather {
                 Double.isNaN(rain_today) &&
                 Double.isNaN(rain_probability) &&
                 Double.isNaN(clouds) &&
+                Double.isNaN(ozone) &&
                 icon == null &&
                 summary == null);
     }
@@ -87,6 +89,7 @@ public class Weather {
                 (Double.isNaN(rain_today) ? "-" : DF.format(rain_today)) + " mm " +
                 (Double.isNaN(rain_probability) ? "-" : DF.format(rain_probability)) + "% " +
                 (Double.isNaN(clouds) ? "-" : DF.format(clouds)) + "% " +
+                (Double.isNaN(ozone) ? "-" : DF.format(ozone)) + " " +
                 icon + " " + summary;
     }
 

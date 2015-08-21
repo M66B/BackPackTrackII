@@ -170,6 +170,7 @@ public class ForecastIO {
         weather.rain_today = (data.has("precipAccumulation") ? data.getDouble("precipAccumulation") * 10 : Double.NaN);
         weather.rain_probability = (data.has("precipProbability") ? data.getDouble("precipProbability") * 100 : Double.NaN);
         weather.clouds = (data.has("cloudCover") ? data.getDouble("cloudCover") * 100 : Double.NaN);
+        weather.ozone = (data.has("ozone") ? data.getDouble("ozone") : Double.NaN); // Dobson units
         weather.icon = (data.has("icon") ? data.getString("icon") : null);
         // clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night
         weather.summary = (data.has("summary") ? data.getString("summary") : null);
