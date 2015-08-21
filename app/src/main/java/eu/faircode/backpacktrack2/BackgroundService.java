@@ -1340,17 +1340,20 @@ public class BackgroundService extends IntentService {
             // New location
             Log.i(TAG, "New location=" + location + " type=" + locationType);
 
+            int altitude_type = (location.hasAltitude() ? ALTITUDE_GPS : ALTITUDE_NONE);
+
             // Derive altitude from pressure
             int pref_accuracy = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_ACCURACY, SettingsFragment.DEFAULT_PRESSURE_ACCURACY));
             if (!location.hasAltitude() || !location.hasAccuracy() ||
                     location.getAltitude() * pref_accuracy / 100 >= location.getAccuracy() * 1.5) {
                 float altitude = PressureService.getAltitude(location, this);
-                if (!Float.isNaN(altitude))
+                if (!Float.isNaN(altitude)) {
                     location.setAltitude(altitude);
+                    locationType = ALTITUDE_PRESSURE;
+                }
             }
 
             // Add elevation data
-            int altitude_type = (location.hasAltitude() ? ALTITUDE_GPS : ALTITUDE_NONE);
             try {
                 if (!location.hasAltitude() && Util.isConnected(this)) {
                     if (locationType == LOCATION_WAYPOINT) {
