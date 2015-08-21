@@ -1280,7 +1280,10 @@ public class BackgroundService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_GUARD, SettingsFragment.DEFAULT_WEATHER_GUARD));
         long trigger = new Date().getTime() + 60 * 1000 * interval;
-        am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pi);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pi);
+        else
+            am.set(AlarmManager.RTC_WAKEUP, trigger, pi);
         Log.i(TAG, "Set weather guard interval=" + interval + "m" + " trigger=" + SimpleDateFormat.getDateTimeInstance().format(trigger));
     }
 
