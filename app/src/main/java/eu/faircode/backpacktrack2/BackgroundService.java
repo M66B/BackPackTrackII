@@ -1001,7 +1001,8 @@ public class BackgroundService extends IntentService {
 
         // Request passive location updates
         boolean passive = prefs.getBoolean(SettingsFragment.PREF_PASSIVE_ENABLED, SettingsFragment.DEFAULT_PASSIVE_ENABLED);
-        boolean hasPermision = (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
+        boolean hasPermision = (Build.VERSION.SDK_INT < Build.VERSION_CODES.M
+                || context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
         if (passive && hasPermision) {
             Intent locationIntent = new Intent(context, BackgroundService.class);
             locationIntent.setAction(BackgroundService.ACTION_LOCATION_PASSIVE);
@@ -1115,8 +1116,10 @@ public class BackgroundService extends IntentService {
         boolean gps = prefs.getBoolean(SettingsFragment.PREF_USE_GPS, SettingsFragment.DEFAULT_USE_GPS);
         int minTime = Integer.parseInt(prefs.getString(SettingsFragment.PREF_MINTIME, SettingsFragment.DEFAULT_MINTIME));
         int minDist = Integer.parseInt(prefs.getString(SettingsFragment.PREF_MINDIST, SettingsFragment.DEFAULT_MINDIST));
-        boolean hasCoarsePermision = (context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED);
-        boolean hasFinePermision = (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
+        boolean hasCoarsePermision = (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED);
+        boolean hasFinePermision = (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
 
         // Request coarse location
         if (network && hasCoarsePermision && lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
