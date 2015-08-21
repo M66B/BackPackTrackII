@@ -176,9 +176,6 @@ public class ForecastIO {
         weather.summary = (data.has("summary") ? data.getString("summary") : null);
         weather.rawData = data.toString();
 
-        if (weather.ozone == 0)
-            weather.ozone = Double.NaN;
-
         return weather;
     }
 }
