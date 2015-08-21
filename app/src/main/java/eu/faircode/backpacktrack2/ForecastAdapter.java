@@ -68,7 +68,7 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
         tvTime.setTypeface(null, type == ForecastIO.TYPE_HOURLY ? Typeface.BOLD : Typeface.NORMAL);
 
         // Icon
-        int resId = (weather.icon == null ? -1 : getContext().getResources().getIdentifier(weather.icon.replace("-", "_"), "drawable", getContext().getPackageName()));
+        int resId = (weather.icon == null ? -1 : getContext().getResources().getIdentifier(weather.icon.replace("-", "_") + "_60", "drawable", getContext().getPackageName()));
         ivWeather.setImageResource(resId > 0 ? resId : android.R.drawable.ic_menu_help);
 
         // Temperature

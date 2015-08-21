@@ -1694,7 +1694,7 @@ public class BackgroundService extends IntentService {
                 sb.append(context.getString(R.string.header_fahrenheit));
         }
 
-        int resId = (weather.icon == null ? -1 : context.getResources().getIdentifier(weather.icon.replace("-", "_"), "drawable", context.getPackageName()));
+        int resId = (weather.icon == null ? -1 : context.getResources().getIdentifier(weather.icon.replace("-", "_") + "_black", "drawable", context.getPackageName()));
         if (resId > 0) {
             Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), resId).copy(Bitmap.Config.ARGB_8888, true);
             notificationBuilder.setLargeIcon(largeIcon);

@@ -278,18 +278,7 @@ Acknowledgements
 * The launcher/application icon was taken from [Wikimedia Commons](http://commons.wikimedia.org/wiki/File:Exquisite-backpack.svg "Exquisite backpack")
 * [Backpacker](http://www.flaticon.com/free-icon/backpacker_10595) icon made by [Freepik](http://www.freepik.com "Freepik") from [www.flaticon.com](http://www.flaticon.com "Flaticon") is licensed under [CC BY 3.0](http://creativecommons.org/licenses/by/3.0/ "Creative Commons BY 3.0")
 * Activity icons from [Material icons](https://www.google.com/design/icons/)
-* Weather icons from [Icon archive](http://iconarchive.com/)
-	* [Clear Day](http://icons.iconarchive.com/icons/oxygen-icons.org/oxygen/96/Status-weather-clear-icon.png)
-	* [Clear Night](http://icons.iconarchive.com/icons/oxygen-icons.org/oxygen/96/Status-weather-clear-night-icon.png)
-	* [Cloudy](http://icons.iconarchive.com/icons/jaan-jaak/weather/96/cloudy-icon.png)
-	* [Fog](http://icons.iconarchive.com/icons/custom-icon-design/weather/128/fog-icon.png)
-	* [Partly Cloudy Day](http://icons.iconarchive.com/icons/jaan-jaak/weather/96/cloudy-partly-icon.png)
-	* [Partly Cloudy Night](http://icons.iconarchive.com/icons/oxygen-icons.org/oxygen/96/Status-weather-clouds-night-icon.png)
-	* [Rain](http://icons.iconarchive.com/icons/oxygen-icons.org/oxygen/96/Status-weather-showers-icon.png)
-	* [Sleet](http://icons.iconarchive.com/icons/jaan-jaak/weather/96/sleet-icon.png)
-	* [Snow](http://icons.iconarchive.com/icons/oxygen-icons.org/oxygen/96/Status-weather-snow-icon.png)
-	* [Wind](http://icons.iconarchive.com/icons/icons-land/weather/128/Wind-Flag-Storm-icon.png)
-
+* Weather icons from [Adam Whitcroft](http://adamwhitcroft.com/climacons/)
 
 The following libraries are being used:
 
