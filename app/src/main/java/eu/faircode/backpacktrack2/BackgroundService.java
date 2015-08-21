@@ -1795,6 +1795,13 @@ public class BackgroundService extends IntentService {
                 sb.append(context.getString(R.string.header_mmhg));
         }
 
+        // Ozone
+        if (!Double.isNaN(weather.ozone)) {
+            if (sb.length() > 0)
+                sb.append(" ");
+            sb.append(Math.round(weather.ozone));
+        }
+
         notificationBuilder.setContentText(sb.toString());
 
         // Build main intent
