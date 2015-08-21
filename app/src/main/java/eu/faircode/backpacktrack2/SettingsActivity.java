@@ -38,7 +38,18 @@ public class SettingsActivity extends Activity {
             tvPermission.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
             tvPermission.setText(R.string.msg_permissions);
             view.addView(tvPermission);
+
+            requestPermissions(new String[]{
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+            }, 1);
         }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        recreate();
     }
 
     @Override
