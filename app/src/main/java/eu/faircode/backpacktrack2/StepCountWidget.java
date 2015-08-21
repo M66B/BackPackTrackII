@@ -20,7 +20,7 @@ public class StepCountWidget extends AppWidgetProvider {
 
             Intent riMain = new Intent(context, SettingsActivity.class);
             riMain.putExtra(SettingsFragment.EXTRA_ACTION, SettingsFragment.ACTION_STEPS);
-            PendingIntent piMain = PendingIntent.getActivity(context, 3, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
+            PendingIntent piMain = PendingIntent.getActivity(context, BackgroundService.REQUEST_STEPS, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
 
             for (int id : appWidgetIds) {
                 RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.step_widget);

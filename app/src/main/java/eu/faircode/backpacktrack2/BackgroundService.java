@@ -134,6 +134,15 @@ public class BackgroundService extends IntentService {
 
     private static final int NOTIFICATION_LOCATION = 0;
     private static final int NOTIFICATION_WEATHER = 1;
+
+    public static final int REQUEST_LOCATION = 1;
+    public static final int REQUEST_TRACKPOINT = 2;
+    public static final int REQUEST_WAYPOINT = 3;
+    public static final int REQUEST_STOP = 4;
+    public static final int REQUEST_TIMEOUT = 5;
+    public static final int REQUEST_WEATHER = 6;
+    public static final int REQUEST_STEPS = 7;
+
     private static int mEGM96Pointer = -1;
     private static int mEGM96Offset;
 
@@ -1540,7 +1549,7 @@ public class BackgroundService extends IntentService {
         // Build main intent
         Intent riMain = new Intent(context, SettingsActivity.class);
         riMain.putExtra(SettingsFragment.EXTRA_ACTION, SettingsFragment.ACTION_LOCATION);
-        PendingIntent piMain = PendingIntent.getActivity(context, 1, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent piMain = PendingIntent.getActivity(context, REQUEST_LOCATION, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
 
         // Build notification
         Notification.Builder notificationBuilder = new Notification.Builder(context);
@@ -1581,12 +1590,12 @@ public class BackgroundService extends IntentService {
             // Build trackpoint intent
             Intent riTrackpoint = new Intent(context, BackgroundService.class);
             riTrackpoint.setAction(BackgroundService.ACTION_TRACKPOINT);
-            PendingIntent piTrackpoint = PendingIntent.getService(context, 2, riTrackpoint, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent piTrackpoint = PendingIntent.getService(context, REQUEST_TRACKPOINT, riTrackpoint, PendingIntent.FLAG_UPDATE_CURRENT);
 
             // Build waypoint intent
             Intent riWaypoint = new Intent(context, BackgroundService.class);
             riWaypoint.setAction(BackgroundService.ACTION_WAYPOINT);
-            PendingIntent piWaypoint = PendingIntent.getService(context, 3, riWaypoint, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent piWaypoint = PendingIntent.getService(context, REQUEST_WAYPOINT, riWaypoint, PendingIntent.FLAG_UPDATE_CURRENT);
 
             // Add actions
             notificationBuilder.addAction(android.R.drawable.ic_menu_mylocation, context.getString(R.string.title_trackpoint),
@@ -1606,12 +1615,12 @@ public class BackgroundService extends IntentService {
             // Build stop intent
             Intent riStop = new Intent(context, BackgroundService.class);
             riStop.setAction(BackgroundService.ACTION_STOP_LOCATING);
-            PendingIntent piStop = PendingIntent.getService(context, 4, riStop, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent piStop = PendingIntent.getService(context, REQUEST_STOP, riStop, PendingIntent.FLAG_UPDATE_CURRENT);
 
             // Build accept intent
             Intent riAccept = new Intent(context, BackgroundService.class);
             riAccept.setAction(BackgroundService.ACTION_LOCATION_TIMEOUT);
-            PendingIntent piAccept = PendingIntent.getService(context, 5, riAccept, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent piAccept = PendingIntent.getService(context, REQUEST_TIMEOUT, riAccept, PendingIntent.FLAG_UPDATE_CURRENT);
 
             // Add cancel action
             notificationBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(android.R.string.cancel),
@@ -1788,7 +1797,7 @@ public class BackgroundService extends IntentService {
         // Build main intent
         Intent riMain = new Intent(context, SettingsActivity.class);
         riMain.putExtra(SettingsFragment.EXTRA_ACTION, SettingsFragment.ACTION_WEATHER);
-        PendingIntent piMain = PendingIntent.getActivity(context, 2, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent piMain = PendingIntent.getActivity(context, REQUEST_WEATHER, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
         notificationBuilder.setContentIntent(piMain);
         notificationBuilder.setUsesChronometer(true);
         notificationBuilder.setWhen(weather.time);

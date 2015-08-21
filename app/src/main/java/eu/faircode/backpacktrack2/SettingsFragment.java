@@ -324,6 +324,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String ACTION_LOCATION = "Location";
     public static final String ACTION_STEPS = "Steps";
     public static final String ACTION_WEATHER = "Weather";
+
     private static final int ACTIVITY_PICKPLACE = 1;
     private static final int GEOCODER_RESULTS = 5;
     private static final long DAY_MS = 24L * 3600L * 1000L;
@@ -380,7 +381,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Bundle extras = getActivity().getIntent().getExtras();
         if (extras != null && extras.containsKey(EXTRA_ACTION)) {
             String action = extras.getString(EXTRA_ACTION);
-            if (ACTION_STEPS.equals(action))
+            if (ACTION_LOCATION.equals(action))
+                location_history();
+            else if (ACTION_STEPS.equals(action))
                 step_history();
             else if (ACTION_WEATHER.equals(action))
                 weather_forecast();
