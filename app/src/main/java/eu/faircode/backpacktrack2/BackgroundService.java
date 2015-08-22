@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Icon;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -1604,7 +1605,9 @@ public class BackgroundService extends IntentService {
         else
             notificationBuilder.setSmallIcon(R.drawable.explore);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            notificationBuilder.setColor(context.getResources().getColor(R.color.color_teal_600, null));
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             notificationBuilder.setColor(context.getResources().getColor(R.color.color_teal_600));
 
         notificationBuilder.setContentTitle(title);
@@ -1632,10 +1635,13 @@ public class BackgroundService extends IntentService {
             PendingIntent piWaypoint = PendingIntent.getService(context, REQUEST_WAYPOINT, riWaypoint, PendingIntent.FLAG_UPDATE_CURRENT);
 
             // Add actions
-            notificationBuilder.addAction(android.R.drawable.ic_menu_mylocation, context.getString(R.string.title_trackpoint),
-                    piTrackpoint);
-            notificationBuilder.addAction(android.R.drawable.ic_menu_myplaces, context.getString(R.string.title_waypoint),
-                    piWaypoint);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+                notificationBuilder.addAction(new Notification.Action.Builder(Icon.createWithResource(context, android.R.drawable.ic_menu_mylocation), context.getString(R.string.title_trackpoint), piTrackpoint).build());
+                notificationBuilder.addAction(new Notification.Action.Builder(Icon.createWithResource(context, android.R.drawable.ic_menu_myplaces), context.getString(R.string.title_waypoint), piWaypoint).build());
+            } else {
+                notificationBuilder.addAction(android.R.drawable.ic_menu_mylocation, context.getString(R.string.title_trackpoint), piTrackpoint);
+                notificationBuilder.addAction(android.R.drawable.ic_menu_myplaces, context.getString(R.string.title_waypoint), piWaypoint);
+            }
 
         } else {
             // Indeterminate progress
@@ -1657,16 +1663,20 @@ public class BackgroundService extends IntentService {
             PendingIntent piAccept = PendingIntent.getService(context, REQUEST_TIMEOUT, riAccept, PendingIntent.FLAG_UPDATE_CURRENT);
 
             // Add cancel action
-            notificationBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(android.R.string.cancel),
-                    piStop);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH)
+                notificationBuilder.addAction(new Notification.Action.Builder(Icon.createWithResource(context, android.R.drawable.ic_menu_close_clear_cancel), context.getString(android.R.string.cancel), piStop).build());
+            else
+                notificationBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(android.R.string.cancel), piStop);
 
             // Add accept action
             Location bestLocation = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_BEST_LOCATION, null));
             boolean pressure = prefs.getBoolean(SettingsFragment.PREF_PRESSURE_ENABLED, SettingsFragment.DEFAULT_PRESSURE_ENABLED);
             pressure = (pressure ? prefs.getFloat(SettingsFragment.PREF_PRESSURE_VALUE, -1) >= 0 : true);
             if (bestLocation != null && pressure)
-                notificationBuilder.addAction(android.R.drawable.ic_menu_save, context.getString(R.string.title_accept),
-                        piAccept);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH)
+                    notificationBuilder.addAction(new Notification.Action.Builder(Icon.createWithResource(context, android.R.drawable.ic_menu_save), context.getString(R.string.title_accept), piAccept).build());
+                else
+                    notificationBuilder.addAction(android.R.drawable.ic_menu_save, context.getString(R.string.title_accept), piAccept);
         }
 
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
