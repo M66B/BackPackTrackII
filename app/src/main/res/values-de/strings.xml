@@ -189,10 +189,10 @@
     <string name="summary_weather_interval">Wetterdaten jede Anzahl von Minuten abrufen</string>
     <string name="summary_weather_test">Drücken um rohe Wetterdaten anzuzeigen</string>
 
-    <string name="summary_weather_mandatory">Mandatory</string>
-    <string name="summary_weather_register">Registration is required to obtain an API key</string>
-    <string name="summary_weather_rain_warning">Show a status bar notification when the precipitation probability is higher than the selected percentage</string>
-    <string name="summary_weather_guard">Remove weather notifications after the selected number of minutes when there are no updates</string>
++    <string name="summary_weather_mandatory">Pflicht</string>
++    <string name="summary_weather_register">Registrierung ist Pflicht um einen API Key zu bekommen</string>
++    <string name="summary_weather_rain_warning">Zeige eine Statusleiste Benachrichtigugn wenn die Niederschalgswahscheinlichkeit höher ist als die ausgewählte Prozentzahl</string>
++    <string name="summary_weather_guard">Entferne die Wetterbenachrichtigung nach der angegebenen Anzahl von Minuten wenn es keine neuen Updates gibt</string>
     <string name="summary_weather_cache">Vorhersagedaten für die ausgewählte Anzahl an Minuten cachen</string>
 
     <string name="summary_weather_optional">Optional</string>
@@ -222,7 +222,7 @@
     <string name="title_trackpoint">Trackpoint</string>
     <string name="title_waypoint">Wegpunkt</string>
     <string name="title_accept">Akzeptieren</string>
-    <string name="title_refresh">Refresh</string>
+    <string name="title_refresh">Aktualisieren</string>
 
     <string name="title_track">Track Name:</string>
     <string name="title_extensions">Benutze Extensions</string>
