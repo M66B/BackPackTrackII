@@ -1852,7 +1852,6 @@ public class BackgroundService extends IntentService {
         notificationBuilder.setUsesChronometer(true);
         notificationBuilder.setWhen(weather.time);
         notificationBuilder.setAutoCancel(false);
-        notificationBuilder.setOngoing(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             notificationBuilder.setCategory(Notification.CATEGORY_STATUS);
             notificationBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
