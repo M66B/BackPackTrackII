@@ -88,7 +88,7 @@
     <string name="title_weather_rain_warning">Zeige Regenwarnung Benachrichtigung: %s%%</string>
     <string name="title_weather_rain_sound">Regenwarnung Klingelton: %s</string>
     <string name="title_weather_guard">Wetterbenachrichtigung Gültigkeit: %s Minuten</string>
-    <string name="title_weather_cache">Vorhersage Cachezeit: %s Minuten</string>
+    <string name="title_weather_cache">Vorhersage Cache: %s Minuten</string>
     <string name="title_weather_fio">Forecast.io</string>
     <string name="title_weather_register">Registrieren</string>
     <string name="title_weather_owm">OpenWeatherMap</string>
