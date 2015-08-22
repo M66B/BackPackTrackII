@@ -300,6 +300,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_PRESSURE_REF_TEMP = "pref_pressure_ref_temp";
     public static final String PREF_PRESSURE_REF_TIME = "pref_pressure_ref_time";
 
+    public static final String PREF_WEATHER_RAIN_SHOWING = "pref_weather_rain_showing";
+
     public static final String PREF_FORECAST_TIME = "pref_forecast_time";
     public static final String PREF_FORECAST_LATITUDE = "pref_forecast_latitude";
     public static final String PREF_FORECAST_LONGITUDE = "pref_forecast_longitude";

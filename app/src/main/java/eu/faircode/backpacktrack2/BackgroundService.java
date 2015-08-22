@@ -1837,13 +1837,15 @@ public class BackgroundService extends IntentService {
 
     public static void showRainNotification(Weather weather, Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean showing = prefs.getBoolean(SettingsFragment.PREF_WEATHER_RAIN_SHOWING, false);
 
         Notification.Builder notificationBuilder = new Notification.Builder(context);
         Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.umbrella_black).copy(Bitmap.Config.ARGB_8888, true);
         notificationBuilder.setLargeIcon(largeIcon);
         notificationBuilder.setSmallIcon(R.drawable.umbrella_black);
         notificationBuilder.setContentTitle(context.getString(R.string.msg_rain_warning, Math.round(weather.rain_probability)));
-        notificationBuilder.setSound(Uri.parse(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_SOUND, SettingsFragment.DEFAULT_WEATHER_RAIN_SOUND)));
+        if (!showing)
+            notificationBuilder.setSound(Uri.parse(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_SOUND, SettingsFragment.DEFAULT_WEATHER_RAIN_SOUND)));
 
         // Build main intent
         Intent riMain = new Intent(context, SettingsActivity.class);
@@ -1859,11 +1861,15 @@ public class BackgroundService extends IntentService {
         }
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         nm.notify(NOTIFICATION_RAIN, notificationBuilder.build());
+
+        prefs.edit().putBoolean(SettingsFragment.PREF_WEATHER_RAIN_SHOWING, true).apply();
     }
 
     public static void removeRainNotification(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         nm.cancel(NOTIFICATION_RAIN);
+        prefs.edit().remove(SettingsFragment.PREF_WEATHER_RAIN_SHOWING).apply();
     }
 
     public static String getActivityName(int activityType, Context context) {
