@@ -1622,10 +1622,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         int colTime = cursor.getColumnIndex("time");
         int colAltitude = cursor.getColumnIndex("altitude");
+        int colAltitudeType = cursor.getColumnIndex("altitude_type");
 
         int samples = Integer.parseInt(prefs.getString(PREF_ALTITUDE_AVG, DEFAULT_ALTITUDE_AVG));
         LineGraphSeries<DataPoint> seriesAltitudeReal = new LineGraphSeries<DataPoint>();
-        LineGraphSeries<DataPoint> seriesAltitudeAvg = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesAltitudeAvgGPS = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesAltitudeAvgPressure = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesAltitudeAvgLookup = new LineGraphSeries<DataPoint>();
 
         while (cursor.moveToNext()) {
             data = true;
@@ -1636,6 +1639,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 maxTime = time;
 
             double alt = (cursor.isNull(colAltitude) ? Double.NaN : cursor.getDouble(colAltitude));
+            int type = (cursor.isNull(colAltitudeType) ? BackgroundService.ALTITUDE_NONE : cursor.getInt(colAltitudeType));
 
             if (!Double.isNaN(alt)) {
                 if (alt < minAlt)
@@ -1649,7 +1653,20 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
 
             seriesAltitudeReal.appendData(new DataPoint(new Date(time), alt), true, Integer.MAX_VALUE);
-            seriesAltitudeAvg.appendData(new DataPoint(new Date(time), Double.isNaN(alt) ? Double.NaN : avg), true, Integer.MAX_VALUE);
+
+            if (type == BackgroundService.ALTITUDE_PRESSURE) {
+                seriesAltitudeAvgGPS.appendData(new DataPoint(new Date(time), Double.NaN), true, Integer.MAX_VALUE);
+                seriesAltitudeAvgPressure.appendData(new DataPoint(new Date(time), avg), true, Integer.MAX_VALUE);
+                seriesAltitudeAvgLookup.appendData(new DataPoint(new Date(time), Double.NaN), true, Integer.MAX_VALUE);
+            } else if (type == BackgroundService.ALTITUDE_LOOKUP) {
+                seriesAltitudeAvgGPS.appendData(new DataPoint(new Date(time), Double.NaN), true, Integer.MAX_VALUE);
+                seriesAltitudeAvgPressure.appendData(new DataPoint(new Date(time), Double.NaN), true, Integer.MAX_VALUE);
+                seriesAltitudeAvgLookup.appendData(new DataPoint(new Date(time), avg), true, Integer.MAX_VALUE);
+            } else {
+                seriesAltitudeAvgGPS.appendData(new DataPoint(new Date(time), avg), true, Integer.MAX_VALUE);
+                seriesAltitudeAvgPressure.appendData(new DataPoint(new Date(time), Double.NaN), true, Integer.MAX_VALUE);
+                seriesAltitudeAvgLookup.appendData(new DataPoint(new Date(time), Double.NaN), true, Integer.MAX_VALUE);
+            }
         }
 
         if (data) {
@@ -1671,12 +1688,21 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)));
             graph.getGridLabelRenderer().setNumHorizontalLabels(2);
 
-            seriesAltitudeAvg.setDrawDataPoints(true);
-            seriesAltitudeAvg.setDataPointsRadius(2);
+            seriesAltitudeAvgGPS.setDrawDataPoints(true);
+            seriesAltitudeAvgGPS.setDataPointsRadius(2);
+            seriesAltitudeAvgPressure.setDrawDataPoints(true);
+            seriesAltitudeAvgPressure.setDataPointsRadius(2);
+            seriesAltitudeAvgLookup.setDrawDataPoints(true);
+            seriesAltitudeAvgLookup.setDataPointsRadius(2);
+
+            seriesAltitudeAvgGPS.setColor(Color.YELLOW);
+            seriesAltitudeAvgPressure.setColor(Color.GREEN);
             seriesAltitudeReal.setColor(Color.GRAY);
 
             graph.addSeries(seriesAltitudeReal);
-            graph.addSeries(seriesAltitudeAvg);
+            graph.addSeries(seriesAltitudeAvgGPS);
+            graph.addSeries(seriesAltitudeAvgPressure);
+            graph.addSeries(seriesAltitudeAvgLookup);
 
             graph.setVisibility(View.VISIBLE);
         } else
