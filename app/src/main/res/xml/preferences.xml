@@ -408,7 +408,7 @@
                     android:showSilent="true" />
                 <EditTextPreference
                     android:defaultValue="60"
-                    android:dependency="pref_weather_apikey_fio"
+                    android:dependency="pref_weather_notification"
                     android:inputType="number"
                     android:key="pref_weather_guard" />
                 <EditTextPreference
