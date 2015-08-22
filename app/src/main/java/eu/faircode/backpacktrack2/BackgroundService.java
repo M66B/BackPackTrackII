@@ -144,7 +144,8 @@ public class BackgroundService extends IntentService {
     public static final int REQUEST_STOP = 4;
     public static final int REQUEST_TIMEOUT = 5;
     public static final int REQUEST_WEATHER = 6;
-    public static final int REQUEST_STEPS = 7;
+    public static final int REQUEST_RAIN = 7;
+    public static final int REQUEST_STEPS = 8;
 
     private static int mEGM96Pointer = -1;
     private static int mEGM96Offset;
@@ -1859,7 +1860,7 @@ public class BackgroundService extends IntentService {
         // Build main intent
         Intent riMain = new Intent(context, SettingsActivity.class);
         riMain.putExtra(SettingsFragment.EXTRA_ACTION, SettingsFragment.ACTION_WEATHER);
-        PendingIntent piMain = PendingIntent.getActivity(context, REQUEST_WEATHER, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
+        PendingIntent piMain = PendingIntent.getActivity(context, REQUEST_RAIN, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
         notificationBuilder.setContentIntent(piMain);
 
         notificationBuilder.setUsesChronometer(true);
