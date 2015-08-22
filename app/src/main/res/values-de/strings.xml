@@ -86,6 +86,7 @@
     <string name="title_weather_test">Zeige Wetter Daten</string>
     <string name="title_weather_notification">Zeige Wetterbenachrichtigung</string>
     <string name="title_weather_rain_warning">Show rain warning notification: %s%%</string>
+    <string name="title_weather_rain_sound">Rain warning ringtone: %s</string>
     <string name="title_weather_guard">Wetterbenachrichtigung Gültigkeit: %s Minuten</string>
     <string name="title_weather_cache">Vorhersage Cachezeit: %s Minuten</string>
     <string name="title_weather_fio">Forecast.io</string>

@@ -399,6 +399,13 @@
                     android:dependency="pref_weather_notification"
                     android:inputType="number"
                     android:key="pref_weather_rain_warning" />
+                <RingtonePreference
+                    android:defaultValue="content://settings/system/notification_sound"
+                    android:dependency="pref_weather_notification"
+                    android:key="pref_weather_rain_sound"
+                    android:ringtoneType="notification"
+                    android:showDefault="true"
+                    android:showSilent="true" />
                 <EditTextPreference
                     android:defaultValue="60"
                     android:dependency="pref_weather_apikey_fio"

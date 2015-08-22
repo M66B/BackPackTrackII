@@ -23,6 +23,8 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -32,6 +34,7 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.preference.RingtonePreference;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
@@ -141,6 +144,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_WEATHER_APIKEY_FIO = "pref_weather_apikey_fio";
     public static final String PREF_WEATHER_NOTIFICATION = "pref_weather_notification";
     public static final String PREF_WEATHER_RAIN_WARNING = "pref_weather_rain_warning";
+    public static final String PREF_WEATHER_RAIN_SOUND = "pref_weather_rain_sound";
     public static final String PREF_WEATHER_GUARD = "pref_weather_guard";
     public static final String PREF_WEATHER_CACHE = "pref_weather_cache";
     public static final String PREF_WEATHER_APIKEY_OWM = "pref_weather_apikey";
@@ -238,6 +242,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_WEATHER_INTERVAL = "30"; // minutes
     public static final boolean DEFAULT_WEATHER_NOTIFICATION = true;
     public static final String DEFAULT_WEATHER_RAIN_WARNING = "50"; // percent
+    public static final String DEFAULT_WEATHER_RAIN_SOUND = "content://settings/system/notification_sound";
     public static final String DEFAULT_WEATHER_GUARD = "60"; // minutes
     public static final String DEFAULT_WEATHER_CACHE = "15"; // minutes
     public static final String DEFAULT_WEATHER_STATIONS = "10"; // count
@@ -496,6 +501,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_WEATHER_INTERVAL);
         updateTitle(prefs, PREF_WEATHER_APIKEY_FIO);
         updateTitle(prefs, PREF_WEATHER_RAIN_WARNING);
+        updateTitle(prefs, PREF_WEATHER_RAIN_SOUND);
         updateTitle(prefs, PREF_WEATHER_GUARD);
         updateTitle(prefs, PREF_WEATHER_CACHE);
         updateTitle(prefs, PREF_WEATHER_APIKEY_OWM);
@@ -3122,7 +3128,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref.setTitle(getString(R.string.title_weather_apikey, prefs.getString(key, getString(R.string.msg_notset))));
         else if (PREF_WEATHER_RAIN_WARNING.equals(key))
             pref.setTitle(getString(R.string.title_weather_rain_warning, prefs.getString(key, DEFAULT_WEATHER_RAIN_WARNING)));
-        else if (PREF_WEATHER_GUARD.equals(key))
+        else if (PREF_WEATHER_RAIN_SOUND.equals(key)) {
+            Uri uri = Uri.parse(prefs.getString(key, DEFAULT_WEATHER_RAIN_SOUND));
+            Ringtone ringtone = RingtoneManager.getRingtone(getActivity(), uri);
+            String name = ringtone.getTitle(getActivity());
+            pref.setTitle(getString(R.string.title_weather_rain_sound, name));
+        } else if (PREF_WEATHER_GUARD.equals(key))
             pref.setTitle(getString(R.string.title_weather_guard, prefs.getString(key, DEFAULT_WEATHER_GUARD)));
         else if (PREF_WEATHER_CACHE.equals(key))
             pref.setTitle(getString(R.string.title_weather_cache, prefs.getString(key, DEFAULT_WEATHER_CACHE)));
