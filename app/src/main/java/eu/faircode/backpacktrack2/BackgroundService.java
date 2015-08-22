@@ -1852,6 +1852,7 @@ public class BackgroundService extends IntentService {
             notificationBuilder.setContentText(geocoded);
         notificationBuilder.setSound(Uri.parse(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_SOUND, SettingsFragment.DEFAULT_WEATHER_RAIN_SOUND)));
         notificationBuilder.setOnlyAlertOnce(true);
+        notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
         // Build main intent
         Intent riMain = new Intent(context, SettingsActivity.class);
