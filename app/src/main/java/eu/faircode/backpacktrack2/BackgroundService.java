@@ -1628,7 +1628,7 @@ public class BackgroundService extends IntentService {
             PendingIntent piWaypoint = PendingIntent.getService(context, REQUEST_WAYPOINT, riWaypoint, PendingIntent.FLAG_UPDATE_CURRENT);
 
             // Add actions
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 notificationBuilder.addAction(new Notification.Action.Builder(Icon.createWithResource(context, android.R.drawable.ic_menu_mylocation), context.getString(R.string.title_trackpoint), piTrackpoint).build());
                 notificationBuilder.addAction(new Notification.Action.Builder(Icon.createWithResource(context, android.R.drawable.ic_menu_myplaces), context.getString(R.string.title_waypoint), piWaypoint).build());
             } else {
@@ -1656,7 +1656,7 @@ public class BackgroundService extends IntentService {
             PendingIntent piAccept = PendingIntent.getService(context, REQUEST_TIMEOUT, riAccept, PendingIntent.FLAG_UPDATE_CURRENT);
 
             // Add cancel action
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                 notificationBuilder.addAction(new Notification.Action.Builder(Icon.createWithResource(context, android.R.drawable.ic_menu_close_clear_cancel), context.getString(android.R.string.cancel), piStop).build());
             else
                 notificationBuilder.addAction(android.R.drawable.ic_menu_close_clear_cancel, context.getString(android.R.string.cancel), piStop);
@@ -1666,7 +1666,7 @@ public class BackgroundService extends IntentService {
             boolean pressure = prefs.getBoolean(SettingsFragment.PREF_PRESSURE_ENABLED, SettingsFragment.DEFAULT_PRESSURE_ENABLED);
             pressure = (pressure ? prefs.getFloat(SettingsFragment.PREF_PRESSURE_VALUE, -1) >= 0 : true);
             if (bestLocation != null && pressure)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
                     notificationBuilder.addAction(new Notification.Action.Builder(Icon.createWithResource(context, android.R.drawable.ic_menu_save), context.getString(R.string.title_accept), piAccept).build());
                 else
                     notificationBuilder.addAction(android.R.drawable.ic_menu_save, context.getString(R.string.title_accept), piAccept);
