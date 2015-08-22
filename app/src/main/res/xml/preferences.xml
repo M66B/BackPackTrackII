@@ -381,9 +381,11 @@
             <PreferenceCategory android:title="@string/title_weather_fio">
                 <EditTextPreference
                     android:dependency="pref_weather_enabled"
-                    android:key="pref_weather_apikey_fio" />
+                    android:key="pref_weather_apikey_fio"
+                    android:summary="@string/summary_weather_mandatory" />
                 <Preference
                     android:dependency="pref_weather_enabled"
+                    android:summary="@string/summary_weather_register"
                     android:title="@string/title_weather_register">
                     <intent
                         android:action="android.intent.action.VIEW"
@@ -398,7 +400,8 @@
                     android:defaultValue="50"
                     android:dependency="pref_weather_notification"
                     android:inputType="number"
-                    android:key="pref_weather_rain_warning" />
+                    android:key="pref_weather_rain_warning"
+                    android:summary="@string/summary_weather_rain_warning" />
                 <RingtonePreference
                     android:defaultValue="content://settings/system/notification_sound"
                     android:dependency="pref_weather_notification"
@@ -411,7 +414,8 @@
                     android:defaultValue="60"
                     android:dependency="pref_weather_notification"
                     android:inputType="number"
-                    android:key="pref_weather_guard" />
+                    android:key="pref_weather_guard"
+                    android:summary="@string/summary_weather_guard" />
                 <EditTextPreference
                     android:defaultValue="15"
                     android:dependency="pref_weather_apikey_fio"
@@ -430,7 +434,8 @@
             <PreferenceCategory android:title="@string/title_weather_owm">
                 <EditTextPreference
                     android:dependency="pref_weather_enabled"
-                    android:key="pref_weather_apikey" />
+                    android:key="pref_weather_apikey"
+                    android:summary="@string/summary_weather_optional" />
                 <EditTextPreference
                     android:defaultValue="10"
                     android:dependency="pref_weather_enabled"
