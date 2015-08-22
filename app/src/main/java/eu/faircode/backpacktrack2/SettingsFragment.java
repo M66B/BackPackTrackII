@@ -839,8 +839,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             findPreference(PREF_WEATHER_FORECAST).setEnabled("fio".equals(prefs.getString(key, DEFAULT_WEATHER_API)) && Util.isConnected(getActivity()));
 
         } else if (PREF_WEATHER_NOTIFICATION.equals(key)) {
-            if (!prefs.getBoolean(key, DEFAULT_WEATHER_NOTIFICATION))
+            if (!prefs.getBoolean(key, DEFAULT_WEATHER_NOTIFICATION)) {
                 BackgroundService.removeWeatherNotification(getActivity());
+                BackgroundService.removeRainNotification(getActivity());
+            }
 
         } else if (PREF_WEATHER_RAIN_WARNING.equals(key)) {
             BackgroundService.removeRainNotification(getActivity());

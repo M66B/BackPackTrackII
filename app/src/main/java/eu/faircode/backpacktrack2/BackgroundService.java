@@ -78,6 +78,7 @@ public class BackgroundService extends IntentService {
     public static final String ACTION_DAILY = "Daily";
     public static final String ACTION_UPDATE_WEATHER = "WeatherUpdate";
     public static final String ACTION_GUARD_WEATHER = "WeatherGuard";
+    public static final String ACTION_DELETE_RAIN = "DeleteRain";
     public static final String ACTION_ACTIVITY = "Activity";
     public static final String ACTION_LOCATION_FINE = "LocationFine";
     public static final String ACTION_LOCATION_COARSE = "LocationCoarse";
@@ -236,6 +237,9 @@ public class BackgroundService extends IntentService {
 
             else if (ACTION_GUARD_WEATHER.equals(intent.getAction()))
                 handleWeatherGuard(intent);
+
+            else if (ACTION_DELETE_RAIN.equals(intent.getAction()))
+                handleDeleteRain(intent);
 
             else
                 Log.i(TAG, "Unknown action");
@@ -878,9 +882,20 @@ public class BackgroundService extends IntentService {
                 if (notification && listWeather.size() > 0) {
                     Weather weather = listWeather.get(0);
                     if (!weather.isEmpty()) {
-                        showWeatherNotification(weather, this);
+                        String geocoded = null;
+                        if (weather.station_location != null) {
+                            try {
+                                List<String> listLine = reverseGeocode(weather.station_location, this);
+                                if (listLine.size() > 0)
+                                    geocoded = TextUtils.join(", ", listLine);
+                            } catch (IOException ex) {
+                                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                            }
+                        }
+
+                        showWeatherNotification(weather, geocoded, this);
                         if (weather.rain_probability >= warnrain)
-                            showRainNotification(weather, this);
+                            showRainNotification(weather, geocoded, this);
                         else
                             removeRainNotification(this);
                         startWeatherGuard(this);
@@ -982,6 +997,10 @@ public class BackgroundService extends IntentService {
 
     private void handleWeatherGuard(Intent intent) {
         removeWeatherNotification(this);
+        removeRainNotification(this);
+    }
+
+    private void handleDeleteRain(Intent intent) {
         removeRainNotification(this);
     }
 
@@ -1659,33 +1678,9 @@ public class BackgroundService extends IntentService {
         nm.cancel(NOTIFICATION_LOCATION);
     }
 
-    public static void showWeatherNotification(Weather weather, Context context) {
+    public static void showWeatherNotification(Weather weather, String geocoded, Context context) {
         Notification.Builder notificationBuilder = new Notification.Builder(context);
-
-        String summary = "";
-        if (weather.summary != null)
-            summary += weather.summary;
-        if (weather.station_location != null && Geocoder.isPresent()) {
-            // Reverse geocode station location
-            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-            try {
-                List<Address> listAddress = geocoder.getFromLocation(
-                        weather.station_location.getLatitude(), weather.station_location.getLongitude(), 1);
-                if (listAddress.size() > 0) {
-                    int count = listAddress.get(0).getMaxAddressLineIndex();
-                    if (count > 0) {
-                        String place = listAddress.get(0).getAddressLine(count - 1);
-                        if (summary.length() > 0)
-                            summary += ", ";
-                        summary += place;
-                    }
-                }
-            } catch (IOException ex) {
-                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            }
-        }
-
-        notificationBuilder.setContentTitle(summary);
+        notificationBuilder.setContentTitle(weather.summary == null ? "" : weather.summary);
 
         StringBuilder sb = new StringBuilder();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -1809,6 +1804,7 @@ public class BackgroundService extends IntentService {
             if (sb.length() > 0)
                 sb.append(" ");
             sb.append(Math.round(weather.ozone));
+            sb.append(" DU");
         }
 
         notificationBuilder.setContentText(sb.toString());
@@ -1827,7 +1823,14 @@ public class BackgroundService extends IntentService {
             notificationBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        nm.notify(NOTIFICATION_WEATHER, notificationBuilder.build());
+        Notification.BigTextStyle notification = new Notification.BigTextStyle(notificationBuilder);
+
+        if (geocoded != null) {
+            notification.bigText(sb.toString());
+            notification.setSummaryText(geocoded);
+        }
+
+        nm.notify(NOTIFICATION_WEATHER, notification.build());
     }
 
     public static void removeWeatherNotification(Context context) {
@@ -1835,7 +1838,7 @@ public class BackgroundService extends IntentService {
         nm.cancel(NOTIFICATION_WEATHER);
     }
 
-    public static void showRainNotification(Weather weather, Context context) {
+    public static void showRainNotification(Weather weather, String geocoded, Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         boolean showing = prefs.getBoolean(SettingsFragment.PREF_WEATHER_RAIN_SHOWING, false);
 
@@ -1844,6 +1847,8 @@ public class BackgroundService extends IntentService {
         notificationBuilder.setLargeIcon(largeIcon);
         notificationBuilder.setSmallIcon(R.drawable.umbrella_black);
         notificationBuilder.setContentTitle(context.getString(R.string.msg_rain_warning, Math.round(weather.rain_probability)));
+        if (geocoded != null)
+            notificationBuilder.setContentText(geocoded);
         if (!showing)
             notificationBuilder.setSound(Uri.parse(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_SOUND, SettingsFragment.DEFAULT_WEATHER_RAIN_SOUND)));
 
@@ -1852,6 +1857,13 @@ public class BackgroundService extends IntentService {
         riMain.putExtra(SettingsFragment.EXTRA_ACTION, SettingsFragment.ACTION_WEATHER);
         PendingIntent piMain = PendingIntent.getActivity(context, REQUEST_WEATHER, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
         notificationBuilder.setContentIntent(piMain);
+
+        // Build delete intent
+        Intent riDelete = new Intent(context, BackgroundService.class);
+        riDelete.setAction(BackgroundService.ACTION_DELETE_RAIN);
+        PendingIntent piDelete = PendingIntent.getService(context, REQUEST_WAYPOINT, riDelete, PendingIntent.FLAG_UPDATE_CURRENT);
+        notificationBuilder.setDeleteIntent(piDelete);
+
         notificationBuilder.setUsesChronometer(true);
         notificationBuilder.setWhen(weather.time);
         notificationBuilder.setAutoCancel(false);
