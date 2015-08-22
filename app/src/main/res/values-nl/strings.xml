@@ -86,7 +86,7 @@
     <string name="title_weather_test">Show weather data</string>
     <string name="title_weather_notification">Toon weer notificatie</string>
     <string name="title_weather_rain_warning">Toon regenwaarschuwing notificatie: %s%%</string>
-    <string name="title_weather_rain_sound">Regenwaarschuwing beltoon: %s</string>
+    <string name="title_weather_rain_sound">Regenwaarschuwing beltoon</string>
     <string name="title_weather_guard">Weernotificatie geldig: %s minuten</string>
     <string name="title_weather_cache">Weersvoorspelling geldig: %s minuten</string>
     <string name="title_weather_fio">Forecast.io</string>

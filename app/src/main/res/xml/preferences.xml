@@ -405,7 +405,8 @@
                     android:key="pref_weather_rain_sound"
                     android:ringtoneType="notification"
                     android:showDefault="true"
-                    android:showSilent="true" />
+                    android:showSilent="true"
+                    android:title="@string/title_weather_rain_sound" />
                 <EditTextPreference
                     android:defaultValue="60"
                     android:dependency="pref_weather_notification"
