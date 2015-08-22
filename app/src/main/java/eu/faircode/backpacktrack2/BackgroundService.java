@@ -134,6 +134,7 @@ public class BackgroundService extends IntentService {
 
     private static final int NOTIFICATION_LOCATION = 0;
     private static final int NOTIFICATION_WEATHER = 1;
+    private static final int NOTIFICATION_RAIN = 2;
 
     public static final int REQUEST_LOCATION = 1;
     public static final int REQUEST_TRACKPOINT = 2;
@@ -359,7 +360,7 @@ public class BackgroundService extends IntentService {
                 Util.toast(getActivityName(activity.getType(), this), Toast.LENGTH_SHORT, this);
 
             // Feedback
-            showState(this, "new activity");
+            showStateNotification(this);
 
             // Get parameters
             int act = activity.getType();
@@ -457,7 +458,7 @@ public class BackgroundService extends IntentService {
             editor.putInt(SettingsFragment.PREF_STATE, STATE_ACQUIRED);
             editor.putString(SettingsFragment.PREF_BEST_LOCATION, LocationSerializer.serialize(location));
             editor.apply();
-            showState(this, "better location");
+            showStateNotification(this);
         }
 
         // Check altitude
@@ -576,7 +577,7 @@ public class BackgroundService extends IntentService {
             }
 
             // Feedback
-            showState(this, "passive location");
+            showStateNotification(this);
             if (Util.debugMode(this))
                 Util.toast(getString(R.string.title_trackpoint) +
                         " " + getProviderName(location, this) +
@@ -607,7 +608,7 @@ public class BackgroundService extends IntentService {
     }
 
     private void handleStateChanged(Intent intent) {
-        showState(this, "state changed");
+        showStateNotification(this);
     }
 
     private void handleLocationTimeout(Intent intent) {
@@ -825,7 +826,7 @@ public class BackgroundService extends IntentService {
             new DatabaseHelper(this).vacuum().close();
         } finally {
             startDaily(this);
-            showState(this, "daily alarm");
+            showStateNotification(this);
             StepCountWidget.updateWidgets(this);
         }
     }
@@ -854,6 +855,7 @@ public class BackgroundService extends IntentService {
 
             // Get settings
             boolean notification = prefs.getBoolean(SettingsFragment.PREF_WEATHER_NOTIFICATION, SettingsFragment.DEFAULT_WEATHER_NOTIFICATION);
+            int warnrain = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_WARNING, SettingsFragment.DEFAULT_WEATHER_RAIN_WARNING));
             int stations = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_STATIONS, SettingsFragment.DEFAULT_WEATHER_STATIONS));
             int maxage = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXAGE, SettingsFragment.DEFAULT_PRESSURE_MAXAGE));
             int maxdist = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXDIST, SettingsFragment.DEFAULT_PRESSURE_MAXDIST));
@@ -873,8 +875,17 @@ public class BackgroundService extends IntentService {
             if ("fio".equals(api)) {
                 // Forecast.io
                 listWeather = ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, ForecastIO.TYPE_CURRENT, this);
-                if (notification && listWeather.size() > 0)
-                    showWeatherNotification(listWeather.get(0), this);
+                if (notification && listWeather.size() > 0) {
+                    Weather weather = listWeather.get(0);
+                    if (!weather.isEmpty()) {
+                        showWeatherNotification(weather, this);
+                        if (weather.rain_probability >= warnrain)
+                            showRainNotification(weather, this);
+                        else
+                            removeRainNotification(this);
+                        startWeatherGuard(this);
+                    }
+                }
             } else if ("owm".equals(api)) {
                 // OpenWeatherMap
                 if (id < 0)
@@ -965,12 +976,13 @@ public class BackgroundService extends IntentService {
 
         } finally {
             startWeatherUpdates(this);
-            showState(this, "weather");
+            showStateNotification(this);
         }
     }
 
     private void handleWeatherGuard(Intent intent) {
-        removeWeatherIcon(this);
+        removeWeatherNotification(this);
+        removeRainNotification(this);
     }
 
     // Start/stop methods
@@ -985,7 +997,7 @@ public class BackgroundService extends IntentService {
             return;
         }
 
-        showState(context, "start tracking");
+        showStateNotification(context);
 
         // Start activity recognition / repeating alarm
         boolean recognition = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_ENABLED, SettingsFragment.DEFAULT_RECOGNITION_ENABLED);
@@ -1020,7 +1032,7 @@ public class BackgroundService extends IntentService {
 
         stopPeriodicLocating(context);
         stopLocating(context);
-        removeState(context);
+        removeStateNotification(context);
 
         // Cancel activity updates
         stopActivityRecognition(context);
@@ -1154,7 +1166,7 @@ public class BackgroundService extends IntentService {
             Log.i(TAG, "Set timeout=" + timeout + "s");
 
             prefs.edit().putInt(SettingsFragment.PREF_STATE, STATE_ACQUIRING).apply();
-            showState(context, "start locating");
+            showStateNotification(context);
         } else
             Log.i(TAG, "No location providers");
 
@@ -1238,7 +1250,7 @@ public class BackgroundService extends IntentService {
         editor.remove(SettingsFragment.PREF_LOCATION_TYPE);
         editor.remove(SettingsFragment.PREF_BEST_LOCATION);
         editor.apply();
-        showState(context, "stop locating");
+        showStateNotification(context);
     }
 
     public static void startWeatherUpdates(Context context) {
@@ -1418,7 +1430,7 @@ public class BackgroundService extends IntentService {
             }
 
             // Feedback
-            showState(this, "handle location");
+            showStateNotification(this);
             if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT) {
                 if (locationType == LOCATION_WAYPOINT)
                     Util.toast(waypointName, Toast.LENGTH_LONG, this);
@@ -1496,7 +1508,7 @@ public class BackgroundService extends IntentService {
         return listline;
     }
 
-    private static void showState(Context context, String reason) {
+    private static void showStateNotification(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         // Check if tracking enabled
@@ -1548,9 +1560,6 @@ public class BackgroundService extends IntentService {
                     getProviderName(bestLocation, context),
                     bestLocation.hasAccuracy() ? Math.round(bestLocation.getAccuracy()) : 0);
         }
-
-        //if (debugMode(context))
-        //    text += " " + reason;
 
         // Build main intent
         Intent riMain = new Intent(context, SettingsActivity.class);
@@ -1645,15 +1654,12 @@ public class BackgroundService extends IntentService {
         nm.notify(NOTIFICATION_LOCATION, notificationBuilder.build());
     }
 
-    private static void removeState(Context context) {
+    private static void removeStateNotification(Context context) {
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         nm.cancel(NOTIFICATION_LOCATION);
     }
 
     public static void showWeatherNotification(Weather weather, Context context) {
-        if (weather.isEmpty())
-            return;
-
         Notification.Builder notificationBuilder = new Notification.Builder(context);
 
         String summary = "";
@@ -1822,13 +1828,42 @@ public class BackgroundService extends IntentService {
         }
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         nm.notify(NOTIFICATION_WEATHER, notificationBuilder.build());
-
-        startWeatherGuard(context);
     }
 
-    public static void removeWeatherIcon(Context context) {
+    public static void removeWeatherNotification(Context context) {
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         nm.cancel(NOTIFICATION_WEATHER);
+    }
+
+    public static void showRainNotification(Weather weather, Context context) {
+        Notification.Builder notificationBuilder = new Notification.Builder(context);
+
+        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.umbrella_black).copy(Bitmap.Config.ARGB_8888, true);
+        notificationBuilder.setLargeIcon(largeIcon);
+        notificationBuilder.setSmallIcon(R.drawable.umbrella_black);
+        notificationBuilder.setContentTitle(context.getString(R.string.msg_rain_warning, Math.round(weather.rain_probability)));
+        notificationBuilder.setDefaults(Notification.DEFAULT_SOUND);
+
+        // Build main intent
+        Intent riMain = new Intent(context, SettingsActivity.class);
+        riMain.putExtra(SettingsFragment.EXTRA_ACTION, SettingsFragment.ACTION_WEATHER);
+        PendingIntent piMain = PendingIntent.getActivity(context, REQUEST_WEATHER, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
+        notificationBuilder.setContentIntent(piMain);
+        notificationBuilder.setUsesChronometer(true);
+        notificationBuilder.setWhen(weather.time);
+        notificationBuilder.setAutoCancel(false);
+        notificationBuilder.setOngoing(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            notificationBuilder.setCategory(Notification.CATEGORY_STATUS);
+            notificationBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
+        }
+        NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        nm.notify(NOTIFICATION_RAIN, notificationBuilder.build());
+    }
+
+    public static void removeRainNotification(Context context) {
+        NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        nm.cancel(NOTIFICATION_RAIN);
     }
 
     public static String getActivityName(int activityType, Context context) {

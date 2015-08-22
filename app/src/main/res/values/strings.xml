@@ -85,6 +85,7 @@
     <string name="title_weather_interval">Weather fetch interval: %s minutes</string>
     <string name="title_weather_test">Show weather data</string>
     <string name="title_weather_notification">Show weather notification</string>
+    <string name="title_weather_rain_warning">Show rain warning notification: %s%%</string>
     <string name="title_weather_guard">Weather notification valid: %s minutes</string>
     <string name="title_weather_cache">Forecast cache time: %s minutes</string>
     <string name="title_weather_fio">Forecast.io</string>
@@ -267,6 +268,7 @@
     <string name="msg_geocoding">Geocoding \'%s\' &#8230;</string>
     <string name="msg_rgeocoding">Reverse geocoding &#8230;</string>
     <string name="msg_requesting">Requesting &#8230;</string>
+    <string name="msg_rain_warning">%d%% chance of rain</string>
 
     <string name="msg_permissions">One or more required permissions missing</string>
 

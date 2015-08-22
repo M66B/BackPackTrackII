@@ -395,6 +395,11 @@
                     android:key="pref_weather_notification"
                     android:title="@string/title_weather_notification" />
                 <EditTextPreference
+                    android:defaultValue="50"
+                    android:dependency="pref_weather_notification"
+                    android:inputType="number"
+                    android:key="pref_weather_rain_warning" />
+                <EditTextPreference
                     android:defaultValue="60"
                     android:dependency="pref_weather_apikey_fio"
                     android:inputType="number"

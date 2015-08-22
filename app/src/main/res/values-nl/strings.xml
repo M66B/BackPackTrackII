@@ -85,6 +85,7 @@
     <string name="title_weather_interval">Weer ververs interval: %s minuten</string>
     <string name="title_weather_test">Show weather data</string>
     <string name="title_weather_notification">Toon weer notificatie</string>
+    <string name="title_weather_rain_warning">Toon regen waarschuwing notificatie: %s%%</string>
     <string name="title_weather_guard">Weernotificatie geldig: %s minuten</string>
     <string name="title_weather_cache">Weersvoorspelling geldig tijd: %s minuten</string>
     <string name="title_weather_fio">Forecast.io</string>
@@ -266,6 +267,7 @@
     <string name="msg_geocoding">Geocoding \'%s\' &#8230;</string>
     <string name="msg_rgeocoding">Reverse geocoding &#8230;</string>
     <string name="msg_requesting">Wordt opgevraagd &#8230;</string>
+    <string name="msg_rain_warning">%d%% kans op regen</string>
 
     <string name="msg_permissions">One or more required permissions missing</string>
 

@@ -85,6 +85,7 @@
     <string name="title_weather_interval">Wetter Aktualisierungsintervall: %s Minuten</string>
     <string name="title_weather_test">Zeige Wetter Daten</string>
     <string name="title_weather_notification">Zeige Wetterbenachrichtigung</string>
+    <string name="title_weather_rain_warning">Show rain warning notification: %s%%</string>
     <string name="title_weather_guard">Wetterbenachrichtigung Gültigkeit: %s Minuten</string>
     <string name="title_weather_cache">Vorhersage Cachezeit: %s Minuten</string>
     <string name="title_weather_fio">Forecast.io</string>
@@ -266,6 +267,7 @@
     <string name="msg_geocoding">Geocoding \'%s\' &#8230;</string>
     <string name="msg_rgeocoding">Umgewandelte Geocoding &#8230;</string>
     <string name="msg_requesting">Abfragen &#8230;</string>
+    <string name="msg_rain_warning">%d%% chance of rain</string>
 
     <string name="msg_permissions">Eine oder mehrere benötigte Berechtigungen fehlen</string>
 
