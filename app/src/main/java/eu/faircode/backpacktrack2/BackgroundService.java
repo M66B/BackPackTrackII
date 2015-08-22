@@ -1818,6 +1818,18 @@ public class BackgroundService extends IntentService {
         riMain.putExtra(SettingsFragment.EXTRA_ACTION, SettingsFragment.ACTION_WEATHER);
         PendingIntent piMain = PendingIntent.getActivity(context, REQUEST_WEATHER, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
         notificationBuilder.setContentIntent(piMain);
+
+        // Build update intent
+        Intent riUpdate = new Intent(context, BackgroundService.class);
+        riUpdate.setAction(BackgroundService.ACTION_UPDATE_WEATHER);
+        PendingIntent piUpdate = PendingIntent.getService(context, REQUEST_TRACKPOINT, riUpdate, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // Add action
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            notificationBuilder.addAction(new Notification.Action.Builder(Icon.createWithResource(context, R.drawable.refresh), context.getString(R.string.title_refresh), piUpdate).build());
+        else
+            notificationBuilder.addAction(android.R.drawable.ic_menu_add, context.getString(R.string.title_refresh), piUpdate);
+
         notificationBuilder.setUsesChronometer(true);
         notificationBuilder.setWhen(weather.time);
         notificationBuilder.setAutoCancel(false);
@@ -1862,6 +1874,17 @@ public class BackgroundService extends IntentService {
         riMain.putExtra(SettingsFragment.EXTRA_ACTION, SettingsFragment.ACTION_WEATHER);
         PendingIntent piMain = PendingIntent.getActivity(context, REQUEST_RAIN, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
         notificationBuilder.setContentIntent(piMain);
+
+        // Build update intent
+        Intent riUpdate = new Intent(context, BackgroundService.class);
+        riUpdate.setAction(BackgroundService.ACTION_UPDATE_WEATHER);
+        PendingIntent piUpdate = PendingIntent.getService(context, REQUEST_TRACKPOINT, riUpdate, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        // Add action
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            notificationBuilder.addAction(new Notification.Action.Builder(Icon.createWithResource(context, R.drawable.refresh), context.getString(R.string.title_refresh), piUpdate).build());
+        else
+            notificationBuilder.addAction(android.R.drawable.ic_menu_add, context.getString(R.string.title_refresh), piUpdate);
 
         notificationBuilder.setUsesChronometer(true);
         notificationBuilder.setWhen(weather.time);

@@ -224,6 +224,7 @@
     <string name="title_trackpoint">Trackpoint</string>
     <string name="title_waypoint">Waypoint</string>
     <string name="title_accept">Accept</string>
+    <string name="title_refresh">Refresh</string>
 
     <string name="title_track">Track name:</string>
     <string name="title_extensions">Use extensions</string>
