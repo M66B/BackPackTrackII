@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Icon;
 import android.location.Address;
 import android.location.Geocoder;
@@ -1851,6 +1852,7 @@ public class BackgroundService extends IntentService {
         if (geocoded != null)
             notificationBuilder.setContentText(geocoded);
         notificationBuilder.setSound(Uri.parse(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_SOUND, SettingsFragment.DEFAULT_WEATHER_RAIN_SOUND)));
+        notificationBuilder.setLights(Color.RED, 300, 300);
         notificationBuilder.setOnlyAlertOnce(true);
         notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
