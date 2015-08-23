@@ -1789,12 +1789,29 @@ public class BackgroundService extends IntentService {
 
     private static void showRainNotification(Weather weather, String geocoded, Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        DecimalFormat DF1 = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ROOT));
+        DecimalFormat DF2 = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.ROOT));
+
+        String content = null;
+        double rain_1h = weather.rain_1h;
+        if (!Double.isNaN(rain_1h)) {
+            String rain_unit = prefs.getString(SettingsFragment.PREF_PRECIPITATION, SettingsFragment.DEFAULT_PRECIPITATION);
+            if ("in".equals(rain_unit))
+                rain_1h = rain_1h / 25.4f;
+
+            if ("in".equals(rain_unit))
+                content = DF2.format(rain_1h) + " " + context.getString(R.string.header_inch);
+            else
+                content = DF1.format(rain_1h) + " " + context.getString(R.string.header_mm);
+        }
 
         Notification.Builder notificationBuilder = new Notification.Builder(context);
         Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.umbrella_black).copy(Bitmap.Config.ARGB_8888, true);
         notificationBuilder.setLargeIcon(largeIcon);
         notificationBuilder.setSmallIcon(R.drawable.umbrella_black);
         notificationBuilder.setContentTitle(context.getString(R.string.msg_rain_warning, Math.round(weather.rain_probability)));
+        if (content != null)
+            notificationBuilder.setContentText(content);
         notificationBuilder.setSound(Uri.parse(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_SOUND, SettingsFragment.DEFAULT_WEATHER_RAIN_SOUND)));
         notificationBuilder.setLights(Color.YELLOW, 1000, 1000);
         notificationBuilder.setOnlyAlertOnce(true);
@@ -1828,8 +1845,11 @@ public class BackgroundService extends IntentService {
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         Notification.BigTextStyle notification = new Notification.BigTextStyle(notificationBuilder);
 
-        if (geocoded != null)
+        if (geocoded != null) {
+            if (content != null)
+                notification.bigText(content);
             notification.setSummaryText(geocoded);
+        }
 
         nm.notify(NOTIFICATION_RAIN, notification.build());
     }
