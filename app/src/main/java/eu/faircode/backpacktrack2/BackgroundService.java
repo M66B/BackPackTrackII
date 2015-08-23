@@ -1800,9 +1800,9 @@ public class BackgroundService extends IntentService {
                 rain_1h = rain_1h / 25.4f;
 
             if ("in".equals(rain_unit))
-                content = DF2.format(rain_1h) + " " + context.getString(R.string.header_inch);
+                content = getRainIntensity(weather.rain_1h, context) + " " + DF2.format(rain_1h) + " " + context.getString(R.string.header_inch);
             else
-                content = DF1.format(rain_1h) + " " + context.getString(R.string.header_mm);
+                content = getRainIntensity(weather.rain_1h, context) + " " + DF1.format(rain_1h) + " " + context.getString(R.string.header_mm);
         }
 
         Notification.Builder notificationBuilder = new Notification.Builder(context);
@@ -1897,6 +1897,24 @@ public class BackgroundService extends IntentService {
         int b = Math.round(degrees);
         int resId = context.getResources().getIdentifier("degrees_" + (degrees < 0 ? "m" : "p") + b, "drawable", context.getPackageName());
         return (resId > 0 ? resId : android.R.drawable.ic_menu_help);
+    }
+
+    public static String getRainIntensity(double rain_1h, Context context) {
+        // 0 in./hr. no precipitation
+        // 0.002 in./hr. 0.0508 mm/hr corresponds to very light precipitation
+        // 0.017 in./hr. 0.4318 mm/hr corresponds to light precipitation
+        // 0.1 in./hr. 2.54 mm/hr corresponds to moderate precipitation
+        // 0.4 in./hr. 10.16 mm/hr corresponds to heavy precipitation
+        if (rain_1h > 10.16)
+            return context.getString(R.string.rain_heavy);
+        else if (rain_1h > 2.54)
+            return context.getString(R.string.rain_moderate);
+        else if (rain_1h > 0.4318)
+            return context.getString(R.string.rain_light);
+        else if (rain_1h > 0.0508)
+            return context.getString(R.string.rain_very_light);
+        else
+            return context.getString(R.string.rain_no);
     }
 
     public static String getWindDirectionName(float bearing, Context context) {

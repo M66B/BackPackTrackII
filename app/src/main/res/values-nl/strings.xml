@@ -301,6 +301,12 @@
     <string name="weather_fog">Mist</string>
     <string name="weather_rain">Regel</string>
     <string name="weather_snow">Sneeuw</string>
-    <string name="weather_sleet">IJzel</string>>
-    <string name="weather_wind">Wind</string>>
+    <string name="weather_sleet">IJzel</string>
+    <string name="weather_wind">Wind</string>
+
+    <string name="rain_no">Geen regen</string>
+    <string name="rain_very_light">Heel lichte regen</string>
+    <string name="rain_light">Lichte regen</string>
+    <string name="rain_moderate">Matige regen</string>
+    <string name="rain_heavy">Hevig regen</string>
 </resources>
