@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -56,8 +57,10 @@ public class SettingsActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         setIntent(intent);
 
+        Uri data = intent.getData();
         Bundle extras = intent.getExtras();
-        if (extras != null && extras.containsKey(SettingsFragment.EXTRA_ACTION))
+        if ((data != null && "geo".equals(data.getScheme())) ||
+                (extras != null && extras.containsKey(SettingsFragment.EXTRA_ACTION)))
             recreate();
     }
 }

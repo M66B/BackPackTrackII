@@ -363,6 +363,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             geopointIntent.setAction(BackgroundService.ACTION_GEOPOINT);
             geopointIntent.putExtra(BackgroundService.EXTRA_GEOURI, data);
             getActivity().startService(geopointIntent);
+
+            edit_waypoints();
         }
 
         Bundle extras = getActivity().getIntent().getExtras();
