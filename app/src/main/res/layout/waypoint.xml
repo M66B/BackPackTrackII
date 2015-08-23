@@ -22,7 +22,7 @@
         android:layout_height="24dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="6dp"
-        android:src="@android:drawable/ic_menu_preferences" />
+        android:src="@android:drawable/ic_menu_more" />
 
     <ImageView
         android:id="@+id/ivSave"
