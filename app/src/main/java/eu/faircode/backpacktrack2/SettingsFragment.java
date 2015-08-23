@@ -2526,8 +2526,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         ivForecast.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                alertDialog.dismiss();
                 weather_forecast();
+                alertDialog.dismiss();
             }
         });
     }
