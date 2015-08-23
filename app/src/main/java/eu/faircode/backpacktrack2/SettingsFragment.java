@@ -2816,6 +2816,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         TextView tvHeaderWindSpeed = (TextView) viewForecast.findViewById(R.id.tvHeaderWindSpeed);
         TextView tvHeaderPressure = (TextView) viewForecast.findViewById(R.id.tvHeaderPressure);
         final ListView lv = (ListView) viewForecast.findViewById(R.id.lvWeatherForecast);
+        TextView tvPoweredBy = (TextView) viewForecast.findViewById(R.id.tvPoweredBy);
 
         // Create waypoint adapter
         DatabaseHelper dh = new DatabaseHelper(getActivity());
@@ -2944,6 +2945,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 spWaypoint.setSelection(pos);
             }
         });
+
+        // Powered by
+        String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
+        if ("fio".equals(api)) {
+            tvPoweredBy.setVisibility(View.VISIBLE);
+            tvPoweredBy.setMovementMethod(LinkMovementMethod.getInstance());
+        } else
+            tvPoweredBy.setVisibility(View.GONE);
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
