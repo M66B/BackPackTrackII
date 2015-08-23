@@ -1285,7 +1285,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-
                         switch (item.getItemId()) {
                             case R.id.menu_share:
                                 try {
@@ -2394,10 +2393,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                 long time = cursor.getLong(cursor.getColumnIndex("time"));
                 final long weather_id = cursor.getLong(cursor.getColumnIndex("ID"));
-                String provider = cursor.getString(cursor.getColumnIndex("provider"));
-                final long station_id = cursor.getLong(cursor.getColumnIndex("station_id"));
-                int station_type = cursor.getInt(cursor.getColumnIndex("station_type"));
-                String station_name = cursor.getString(cursor.getColumnIndex("station_name"));
                 final String summary = cursor.getString(cursor.getColumnIndex("summary"));
 
                 Location station = null;
@@ -2408,19 +2403,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     station.setLongitude(cursor.getDouble(cursor.getColumnIndex("station_longitude")));
                 }
 
-                Location observer = null;
-                if (!cursor.isNull(cursor.getColumnIndex("latitude")) &&
-                        !cursor.isNull(cursor.getColumnIndex("longitude"))) {
-                    observer = new Location("station");
-                    observer.setLatitude(cursor.getDouble(cursor.getColumnIndex("latitude")));
-                    observer.setLongitude(cursor.getDouble(cursor.getColumnIndex("longitude")));
-                }
-
-                float distance = (station == null || observer == null ? Float.NaN : station.distanceTo(observer));
-
                 final double latitude = (station == null ? Double.NaN : station.getLatitude());
                 final double longitude = (station == null ? Double.NaN : station.getLongitude());
-                final String name = (Float.isNaN(distance) ? "-" : Math.round(distance / 1000)) + " km";
 
                 PopupMenu popupMenu = new PopupMenu(getActivity(), view);
 
@@ -2431,7 +2415,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             case R.id.menu_share:
                                 try {
                                     String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude;
-                                    uri += "(" + Uri.encode(name) + ")";
                                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
                                 } catch (Throwable ex) {
                                     Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
@@ -2449,10 +2432,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 });
 
                 popupMenu.inflate(R.menu.weather);
-                if (name != null) {
-                    popupMenu.getMenu().findItem(R.id.menu_name).setTitle(name);
-                    popupMenu.getMenu().findItem(R.id.menu_name).setVisible(true);
-                }
                 popupMenu.getMenu().findItem(R.id.menu_time).setTitle(SimpleDateFormat.getDateTimeInstance().format(time));
                 popupMenu.getMenu().findItem(R.id.menu_summary).setTitle(summary);
                 popupMenu.getMenu().findItem(R.id.menu_share).setEnabled(station != null);
