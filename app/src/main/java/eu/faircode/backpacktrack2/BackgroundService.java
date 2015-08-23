@@ -940,9 +940,10 @@ public class BackgroundService extends IntentService {
 
         // Request passive location updates
         boolean passive = prefs.getBoolean(SettingsFragment.PREF_PASSIVE_ENABLED, SettingsFragment.DEFAULT_PASSIVE_ENABLED);
-        boolean hasPermision = (Build.VERSION.SDK_INT < Build.VERSION_CODES.M
-                || context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
-        if (passive && hasPermision) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                passive = false;
+        if (passive) {
             Intent locationIntent = new Intent(context, BackgroundService.class);
             locationIntent.setAction(BackgroundService.ACTION_LOCATION_PASSIVE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -1051,17 +1052,22 @@ public class BackgroundService extends IntentService {
             return;
         }
 
+        // Get settings
         boolean network = prefs.getBoolean(SettingsFragment.PREF_USE_NETWORK, SettingsFragment.DEFAULT_USE_NETWORK);
         boolean gps = prefs.getBoolean(SettingsFragment.PREF_USE_GPS, SettingsFragment.DEFAULT_USE_GPS);
         int minTime = Integer.parseInt(prefs.getString(SettingsFragment.PREF_MINTIME, SettingsFragment.DEFAULT_MINTIME));
         int minDist = Integer.parseInt(prefs.getString(SettingsFragment.PREF_MINDIST, SettingsFragment.DEFAULT_MINDIST));
-        boolean hasCoarsePermision = (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED);
-        boolean hasFinePermision = (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
+
+        // Check permissions
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                network = false;
+            if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+                gps = false;
+        }
 
         // Request coarse location
-        if (network && hasCoarsePermision && lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+        if (network && lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             Intent locationIntent = new Intent(context, BackgroundService.class);
             locationIntent.setAction(BackgroundService.ACTION_LOCATION_COARSE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -1070,7 +1076,7 @@ public class BackgroundService extends IntentService {
         }
 
         // Request fine location
-        if (gps && hasFinePermision && lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        if (gps && lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Intent locationIntent = new Intent(context, BackgroundService.class);
             locationIntent.setAction(BackgroundService.ACTION_LOCATION_FINE);
             PendingIntent pi = PendingIntent.getService(context, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
