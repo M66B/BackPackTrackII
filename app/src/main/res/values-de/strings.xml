@@ -290,7 +290,7 @@
     <string name="direction_300">NW</string>
     <string name="direction_330">NNW</string>
 
-    <string name="weather_clear_day">Klarer Tag/string>
+    <string name="weather_clear_day">Klarer Tag</string>
     <string name="weather_clear_night">Klare Nacht</string>
     <string name="weather_partly_cloudy_day">Teilweise bewölkter Tag</string>
     <string name="weather_partly_cloudy_night">Teilweise bewölkte Nacht</string>
