@@ -173,7 +173,7 @@
     <string name="summary_weight">Ihr Gewicht in Kilogramm um die Anzahl von verbrannten Kalorien zu ermitteln</string>
 
     <string name="summary_weather_interval">Wetterdaten jede Anzahl von Minuten abrufen</string>
-    <string name="summary_weather_wakeup">Gerät von \'Doze\' Modus aufwachen um das Wetter zu aktualisieren (Android Marshmallow or später)</string>
+    <string name="summary_weather_wakeup">Gerät von \'Doze\' Modus aufwachen um das Wetter zu aktualisieren (Android 6 oder später)</string>
     <string name="summary_weather_mandatory">Pflicht</string>
     <string name="summary_weather_register">Registrierung ist Pflicht um einen API Key zu bekommen</string>
     <string name="summary_weather_rain_warning">Zeige eine Statusleiste Benachrichtigugn wenn die Niederschalgswahscheinlichkeit höher ist als die ausgewählte Prozentzahl</string>

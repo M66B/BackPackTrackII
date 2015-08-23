@@ -173,7 +173,7 @@
     <string name="summary_weight">Your weight in kilograms to calculate the number of calories burned</string>
 
     <string name="summary_weather_interval">Fetch weather data every selected number of minutes</string>
-    <string name="summary_weather_wakeup">Wakeup the device from doze mode to update the weather (Android Marshmallow or later only)</string>
+    <string name="summary_weather_wakeup">Wakeup the device from \'doze\' mode to update the weather (Android 6 or later)</string>
     <string name="summary_weather_mandatory">Mandatory</string>
     <string name="summary_weather_register">Registration is required to obtain an API key</string>
     <string name="summary_weather_rain_warning">Show a status bar notification when the precipitation probability is higher than the selected percentage</string>
