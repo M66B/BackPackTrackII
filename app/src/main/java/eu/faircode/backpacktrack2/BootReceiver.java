@@ -30,13 +30,6 @@ public class BootReceiver extends BroadcastReceiver {
             public void run() {
                 synchronized (context.getApplicationContext()) {
                     SettingsFragment.firstRun(context);
-
-                    // Update weather
-                    if (Util.isConnected(context)) {
-                        Intent intentWeather = new Intent(context, BackgroundService.class);
-                        intentWeather.setAction(BackgroundService.EXPORTED_ACTION_UPDATE_WEATHER);
-                        context.startService(intentWeather);
-                    }
                 }
             }
         }).start();
