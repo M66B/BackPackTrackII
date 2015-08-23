@@ -866,7 +866,6 @@ public class BackgroundService extends IntentService {
                 if (dh.insertWeather(weather, lastLocation) && Util.debugMode(this))
                     Util.toast(getString(R.string.title_weather_settings), Toast.LENGTH_SHORT, this);
                 dh.close();
-                prefs.edit().putString(SettingsFragment.PREF_LAST_WEATHER_REPORT, weather.serialize()).apply();
 
                 if (!weather.isEmpty()) {
                     // Persist reference pressure
@@ -880,8 +879,11 @@ public class BackgroundService extends IntentService {
                     editor.apply();
 
                     // Notify
-                    showWeatherNotification(weather, this);
-                    WeatherWidget.updateWidgets(this);
+                    if (weather.isValid(this)) {
+                        prefs.edit().putString(SettingsFragment.PREF_LAST_WEATHER_REPORT, weather.serialize()).apply();
+                        showWeatherNotification(weather, this);
+                        WeatherWidget.updateWidgets(this);
+                    }
                 }
 
                 break;
