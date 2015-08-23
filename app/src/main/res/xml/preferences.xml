@@ -506,34 +506,34 @@
             </PreferenceCategory>
             <PreferenceCategory android:title="@string/title_weather_settings">
                 <Preference
-                    android:icon="@drawable/clear_day_60"
+                    android:icon="@drawable/clear_day_white"
                     android:title="@string/weather_clear_day" />
                 <Preference
-                    android:icon="@drawable/clear_night_60"
+                    android:icon="@drawable/clear_night_white"
                     android:title="@string/weather_clear_night" />
                 <Preference
-                    android:icon="@drawable/partly_cloudy_day_60"
+                    android:icon="@drawable/partly_cloudy_day_white"
                     android:title="@string/weather_partly_cloudy_day" />
                 <Preference
-                    android:icon="@drawable/partly_cloudy_night_60"
+                    android:icon="@drawable/partly_cloudy_night_white"
                     android:title="@string/weather_partly_cloudy_night" />
                 <Preference
-                    android:icon="@drawable/cloudy_60"
+                    android:icon="@drawable/cloudy_white"
                     android:title="@string/weather_cloudy" />
                 <Preference
-                    android:icon="@drawable/fog_60"
+                    android:icon="@drawable/fog_white"
                     android:title="@string/weather_fog" />
                 <Preference
-                    android:icon="@drawable/rain_60"
+                    android:icon="@drawable/rain_white"
                     android:title="@string/weather_rain" />
                 <Preference
-                    android:icon="@drawable/snow_60"
+                    android:icon="@drawable/snow_white"
                     android:title="@string/weather_snow" />
                 <Preference
-                    android:icon="@drawable/sleet_60"
+                    android:icon="@drawable/sleet_white"
                     android:title="@string/weather_sleet" />
                 <Preference
-                    android:icon="@drawable/wind_60"
+                    android:icon="@drawable/wind_white"
                     android:title="@string/weather_wind" />
             </PreferenceCategory>
         </PreferenceScreen>

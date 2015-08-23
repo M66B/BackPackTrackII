@@ -833,6 +833,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             if (weather != null && weather.isValid(context))
                 BackgroundService.showWeatherNotification(weather, context);
         }
+        WeatherWidget.updateWidgets(context);
 
         // Initialize weather updates
         BackgroundService.stopWeatherUpdates(context);

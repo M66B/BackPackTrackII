@@ -89,13 +89,25 @@
         </receiver>
         <receiver
             android:name=".StepCountWidget"
-            android:enabled="true">
+            android:enabled="true"
+            android:label="@string/title_step_counter">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/step_widget_info" />
+        </receiver>
+        <receiver
+            android:name=".WeatherWidget"
+            android:enabled="true"
+            android:label="@string/title_weather_settings">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/weather_widget_info" />
         </receiver>
         <receiver
             android:name=".ConnectivityChangedReceiver"

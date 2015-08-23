@@ -881,6 +881,7 @@ public class BackgroundService extends IntentService {
 
                     // Notify
                     showWeatherNotification(weather, this);
+                    WeatherWidget.updateWidgets(this);
                 }
 
                 break;
@@ -908,6 +909,7 @@ public class BackgroundService extends IntentService {
     private void handleWeatherGuard(Intent intent) {
         removeWeatherNotification(this);
         removeRainNotification(this);
+        WeatherWidget.updateWidgets(this);
     }
 
     // Start/stop methods
@@ -1637,13 +1639,10 @@ public class BackgroundService extends IntentService {
                 sb.append(context.getString(R.string.header_fahrenheit));
         }
 
-        int resId = (weather.icon == null ? -1 : context.getResources().getIdentifier(weather.icon.replace("-", "_") + "_black", "drawable", context.getPackageName()));
-        if (resId > 0) {
-            Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), resId).copy(Bitmap.Config.ARGB_8888, true);
-            notificationBuilder.setLargeIcon(largeIcon);
-            notificationBuilder.setSmallIcon(getTemperatureIcon((float) temperature, context));
-        } else
-            notificationBuilder.setSmallIcon(android.R.drawable.ic_menu_help);
+        int resId = getWeatherIcon(weather, true, context);
+        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), resId).copy(Bitmap.Config.ARGB_8888, true);
+        notificationBuilder.setLargeIcon(largeIcon);
+        notificationBuilder.setSmallIcon(getTemperatureIcon((float) temperature, context));
 
         // Humidity
         double humidity = weather.humidity;
@@ -1859,6 +1858,13 @@ public class BackgroundService extends IntentService {
             default:
                 return context.getString(R.string.undefined);
         }
+    }
+
+    public static int getWeatherIcon(Weather weather, boolean black, Context context) {
+        int resId = -1;
+        if (weather.icon != null)
+            resId = context.getResources().getIdentifier(weather.icon.replace("-", "_") + "_" + (black ? "black" : "white"), "drawable", context.getPackageName());
+        return (resId > 0 ? resId : android.R.drawable.ic_menu_help);
     }
 
     private static int getTemperatureIcon(float degrees, Context context) {
