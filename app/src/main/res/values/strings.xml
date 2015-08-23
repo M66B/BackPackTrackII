@@ -267,6 +267,7 @@
     <string name="menu_elevation_day">Fetch elevations for day</string>
     <string name="menu_time">Time</string>
     <string name="menu_geocode">Geocode</string>
+    <string name="menu_hidden">Hidden</string>
     <string name="menu_delete">Delete</string>
 
     <string name="still">Still</string>

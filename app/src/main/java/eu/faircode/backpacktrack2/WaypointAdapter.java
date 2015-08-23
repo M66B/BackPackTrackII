@@ -45,6 +45,7 @@ public class WaypointAdapter extends CursorAdapter {
     private int colLatitude;
     private int colLongitude;
     private int colName;
+    private int colHidden;
 
     private static final int GEOCODER_RESULTS = 5;
 
@@ -60,6 +61,7 @@ public class WaypointAdapter extends CursorAdapter {
         colLatitude = cursor.getColumnIndex("latitude");
         colLongitude = cursor.getColumnIndex("longitude");
         colName = cursor.getColumnIndex("name");
+        colHidden = cursor.getColumnIndex("hidden");
     }
 
     @Override
@@ -75,6 +77,7 @@ public class WaypointAdapter extends CursorAdapter {
         final double latitude = cursor.getDouble(colLatitude);
         final double longitude = cursor.getDouble(colLongitude);
         final String name = cursor.getString(colName);
+        final boolean hidden = !(cursor.isNull(colHidden) || cursor.getInt(colHidden) == 0);
 
         // Get views
         final EditText etName = (EditText) view.findViewById(R.id.etName);
@@ -231,6 +234,21 @@ public class WaypointAdapter extends CursorAdapter {
 
                                 return true;
 
+                            case R.id.menu_hidden:
+                                new AsyncTask<Object, Object, Object>() {
+                                    protected Object doInBackground(Object... params) {
+                                        new DatabaseHelper(context).hideLocation(id, !hidden).close();
+                                        return null;
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(Object result) {
+                                        Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
+                                    }
+                                }.execute();
+
+                                return true;
+
                             case R.id.menu_delete:
                                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
                                 alertDialogBuilder.setTitle(context.getString(R.string.msg_delete, name));
@@ -270,6 +288,7 @@ public class WaypointAdapter extends CursorAdapter {
 
                 popupMenu.inflate(R.menu.waypoint);
                 popupMenu.getMenu().findItem(R.id.menu_geocode).setEnabled(Geocoder.isPresent());
+                popupMenu.getMenu().findItem(R.id.menu_hidden).setChecked(hidden);
                 popupMenu.show();
             }
         });

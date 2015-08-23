@@ -23,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 20;
+    private static final int DB_VERSION = 21;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
@@ -80,6 +80,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", activity_type INTEGER NULL" +
                 ", activity_confidence INTEGER NULL" +
                 ", stepcount INTEGER NULL" +
+                ", hidden INTEGER NULL" +
                 ");");
         db.execSQL("CREATE INDEX idx_location_time ON location(time)");
         db.execSQL("CREATE INDEX idx_location_name ON location(name)");
@@ -284,6 +285,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 oldVersion = 20;
             }
 
+            if (oldVersion < 21) {
+                db.execSQL("ALTER TABLE location ADD COLUMN hidden INTEGER NULL");
+                oldVersion = 21;
+            }
+
             db.setVersion(DB_VERSION);
 
             db.setTransactionSuccessful();
@@ -412,6 +418,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this;
     }
 
+    public DatabaseHelper hideLocation(long id, boolean hidden) {
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            cv.put("hidden", hidden ? 1 : 0);
+            if (db.update("location", cv, "ID = ?", new String[]{Long.toString(id)}) != 1)
+                Log.e(TAG, "Update location hidden failed");
+        }
+
+        for (LocationChangedListener listener : mLocationChangedListeners)
+            try {
+                listener.onLocationUpdated();
+            } catch (Throwable ex) {
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
+
+        return this;
+    }
+
     public DatabaseHelper deleteLocation(long id) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
@@ -434,7 +459,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.i(TAG, "Delete from=" + from + " to=" + to);
             SQLiteDatabase db = this.getWritableDatabase();
             int rows = db.delete("location", "time >= ? AND time <= ? AND name IS NULL", new String[]{Long.toString(from), Long.toString(to)});
-            Log.i(TAG, rows+ " trackpoints deleted");
+            Log.i(TAG, rows + " trackpoints deleted");
         }
 
         for (LocationChangedListener listener : mLocationChangedListeners)
@@ -463,7 +488,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public Cursor getWaypoints() {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT ID AS _id, latitude, longitude, name FROM location WHERE NOT name IS NULL ORDER BY name", new String[0]);
+        String query = "SELECT ID AS _id, latitude, longitude, name";
+        query += " FROM location";
+        query += " WHERE NOT name IS NULL AND (hidden IS NULL OR hidden = 0)";
+        query += " ORDER BY name";
+        return db.rawQuery(query, new String[0]);
     }
 
     // Activity
