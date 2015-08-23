@@ -297,6 +297,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_LAST_LOCATION_VIEWPORT = "pref_last_location_viewport";
     public static final String PREF_LAST_WEATHER_GRAPH = "pref_last_weather_graph";
     public static final String PREF_LAST_WEATHER_VIEWPORT = "pref_last_weather_viewport";
+    public static final String PREF_LAST_WEATHER_REPORT = "pref_last_weather_report";
     public static final String PREF_LAST_FORECAST_TYPE = "pref_last_forecast_type";
     public static final String PREF_LAST_FORECAST_LOCATION = "pref_last_forecast_location";
     public static final String PREF_LAST_FORECAST_WAYPOINT = "pref_last_forecast_waypoint";
@@ -743,7 +744,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             findPreference(PREF_WEATHER_FORECAST).setEnabled("fio".equals(prefs.getString(key, DEFAULT_WEATHER_API)) && Util.isConnected(getActivity()));
 
         } else if (PREF_WEATHER_NOTIFICATION.equals(key)) {
-            if (!prefs.getBoolean(key, DEFAULT_WEATHER_NOTIFICATION)) {
+            if (prefs.getBoolean(key, DEFAULT_WEATHER_NOTIFICATION)) {
+                String report = prefs.getString(PREF_LAST_WEATHER_REPORT, null);
+                Weather weather = (report == null ? null : Weather.deserialize(report));
+                if (weather != null && weather.isValid(getActivity()))
+                    BackgroundService.showWeatherNotification(weather, getActivity());
+            } else {
                 BackgroundService.removeWeatherNotification(getActivity());
                 BackgroundService.removeRainNotification(getActivity());
             }
@@ -818,6 +824,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Initialize daily alarm
         BackgroundService.stopDaily(context);
         BackgroundService.startDaily(context);
+
+        // Show last weather
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (prefs.getBoolean(PREF_WEATHER_NOTIFICATION, DEFAULT_WEATHER_NOTIFICATION)) {
+            String report = prefs.getString(PREF_LAST_WEATHER_REPORT, null);
+            Weather weather = (report == null ? null : Weather.deserialize(report));
+            if (weather != null && weather.isValid(context))
+                BackgroundService.showWeatherNotification(weather, context);
+        }
 
         // Initialize weather updates
         BackgroundService.stopWeatherUpdates(context);

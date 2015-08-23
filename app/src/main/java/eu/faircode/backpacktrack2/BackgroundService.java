@@ -866,6 +866,7 @@ public class BackgroundService extends IntentService {
                 if (dh.insertWeather(weather, lastLocation) && Util.debugMode(this))
                     Util.toast(getString(R.string.title_weather_settings), Toast.LENGTH_SHORT, this);
                 dh.close();
+                prefs.edit().putString(SettingsFragment.PREF_LAST_WEATHER_REPORT, weather.serialize()).apply();
 
                 if (!weather.isEmpty()) {
                     // Persist reference pressure
@@ -879,33 +880,7 @@ public class BackgroundService extends IntentService {
                     editor.apply();
 
                     // Notify
-                    boolean notification = prefs.getBoolean(SettingsFragment.PREF_WEATHER_NOTIFICATION, SettingsFragment.DEFAULT_WEATHER_NOTIFICATION);
-                    if (notification) {
-                        // Get weather location name
-                        String geocoded = null;
-                        if (weather.station_location != null) {
-                            try {
-                                List<String> listLine = Util.reverseGeocode(weather.station_location, this);
-                                if (listLine.size() > 0)
-                                    geocoded = TextUtils.join(", ", listLine);
-                            } catch (IOException ex) {
-                                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                            }
-                        }
-
-                        // Show weather notification
-                        showWeatherNotification(weather, geocoded, this);
-
-                        // Show rain notification
-                        int warnrain = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_WARNING, SettingsFragment.DEFAULT_WEATHER_RAIN_WARNING));
-                        if (weather.rain_probability >= warnrain)
-                            showRainNotification(weather, geocoded, this);
-                        else
-                            removeRainNotification(this);
-
-                        // Start weather guard
-                        startWeatherGuard(this);
-                    }
+                    showWeatherNotification(weather, this);
                 }
 
                 break;
@@ -1608,7 +1583,38 @@ public class BackgroundService extends IntentService {
         nm.cancel(NOTIFICATION_LOCATION);
     }
 
-    public static void showWeatherNotification(Weather weather, String geocoded, Context context) {
+    public static void showWeatherNotification(Weather weather, Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean notification = prefs.getBoolean(SettingsFragment.PREF_WEATHER_NOTIFICATION, SettingsFragment.DEFAULT_WEATHER_NOTIFICATION);
+        if (notification) {
+            // Get weather location name
+            String geocoded = null;
+            if (weather.station_location != null) {
+                try {
+                    List<String> listLine = Util.reverseGeocode(weather.station_location, context);
+                    if (listLine.size() > 0)
+                        geocoded = TextUtils.join(", ", listLine);
+                } catch (IOException ex) {
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                }
+            }
+
+            // Show weather notification
+            showWeatherNotification(weather, geocoded, context);
+
+            // Show rain notification
+            int warnrain = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_WARNING, SettingsFragment.DEFAULT_WEATHER_RAIN_WARNING));
+            if (weather.rain_probability >= warnrain)
+                showRainNotification(weather, geocoded, context);
+            else
+                removeRainNotification(context);
+
+            // Start weather guard
+            startWeatherGuard(context);
+        }
+    }
+
+    private static void showWeatherNotification(Weather weather, String geocoded, Context context) {
         Notification.Builder notificationBuilder = new Notification.Builder(context);
         notificationBuilder.setContentTitle(weather.summary == null ? "" : weather.summary);
 
@@ -1780,7 +1786,7 @@ public class BackgroundService extends IntentService {
         nm.cancel(NOTIFICATION_WEATHER);
     }
 
-    public static void showRainNotification(Weather weather, String geocoded, Context context) {
+    private static void showRainNotification(Weather weather, String geocoded, Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         Notification.Builder notificationBuilder = new Notification.Builder(context);

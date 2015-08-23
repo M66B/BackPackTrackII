@@ -1,8 +1,13 @@
 package eu.faircode.backpacktrack2;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
+import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -70,6 +75,26 @@ public class Weather {
                 Double.isNaN(ozone) &&
                 icon == null &&
                 summary == null);
+    }
+
+    public boolean isValid(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_GUARD, SettingsFragment.DEFAULT_WEATHER_GUARD));
+        return (this.time + 60 * 1000 * interval >= new Date().getTime());
+    }
+
+    public String serialize() {
+        GsonBuilder builder = new GsonBuilder();
+        builder.serializeSpecialFloatingPointValues();
+        Gson gson = builder.create();
+        return gson.toJson(this);
+    }
+
+    public static Weather deserialize(String text) {
+        GsonBuilder builder = new GsonBuilder();
+        builder.serializeSpecialFloatingPointValues();
+        Gson gson = builder.create();
+        return gson.fromJson(text, Weather.class);
     }
 
     @Override
