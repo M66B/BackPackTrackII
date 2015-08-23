@@ -49,7 +49,7 @@ public class WeatherWidget extends AppWidgetProvider {
                     }
                 } else {
                     views.setImageViewResource(R.id.ivWeather, android.R.drawable.ic_menu_help);
-                    views.setTextViewText(R.id.tvDegrees, "");
+                    views.setTextViewText(R.id.tvDegrees, "?");
                 }
                 appWidgetManager.updateAppWidget(id, views);
             }
