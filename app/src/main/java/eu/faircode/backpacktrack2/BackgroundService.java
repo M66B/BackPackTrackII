@@ -1770,6 +1770,7 @@ public class BackgroundService extends IntentService {
             notificationBuilder.setCategory(Notification.CATEGORY_STATUS);
             notificationBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
+
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         Notification.BigTextStyle notification = new Notification.BigTextStyle(notificationBuilder);
 
@@ -1794,10 +1795,8 @@ public class BackgroundService extends IntentService {
         notificationBuilder.setLargeIcon(largeIcon);
         notificationBuilder.setSmallIcon(R.drawable.umbrella_black);
         notificationBuilder.setContentTitle(context.getString(R.string.msg_rain_warning, Math.round(weather.rain_probability)));
-        if (geocoded != null)
-            notificationBuilder.setContentText(geocoded);
         notificationBuilder.setSound(Uri.parse(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_SOUND, SettingsFragment.DEFAULT_WEATHER_RAIN_SOUND)));
-        notificationBuilder.setLights(Color.RED, 1000, 1000);
+        notificationBuilder.setLights(Color.YELLOW, 1000, 1000);
         notificationBuilder.setOnlyAlertOnce(true);
         notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
@@ -1825,8 +1824,14 @@ public class BackgroundService extends IntentService {
             notificationBuilder.setCategory(Notification.CATEGORY_STATUS);
             notificationBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
         }
+
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        nm.notify(NOTIFICATION_RAIN, notificationBuilder.build());
+        Notification.BigTextStyle notification = new Notification.BigTextStyle(notificationBuilder);
+
+        if (geocoded != null)
+            notification.setSummaryText(geocoded);
+
+        nm.notify(NOTIFICATION_RAIN, notification.build());
     }
 
     public static void removeRainNotification(Context context) {
