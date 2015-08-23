@@ -15,8 +15,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Icon;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -887,7 +885,7 @@ public class BackgroundService extends IntentService {
                         String geocoded = null;
                         if (weather.station_location != null) {
                             try {
-                                List<String> listLine = reverseGeocode(weather.station_location, this);
+                                List<String> listLine = Util.reverseGeocode(weather.station_location, this);
                                 if (listLine.size() > 0)
                                     geocoded = TextUtils.join(", ", listLine);
                             } catch (IOException ex) {
@@ -1356,7 +1354,7 @@ public class BackgroundService extends IntentService {
             if (locationType == LOCATION_WAYPOINT) {
                 List<String> listAddress;
                 try {
-                    listAddress = reverseGeocode(location, this);
+                    listAddress = Util.reverseGeocode(location, this);
                 } catch (IOException ex) {
                     Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                     listAddress = new ArrayList<String>();
@@ -1445,19 +1443,6 @@ public class BackgroundService extends IntentService {
                 }
             }
         }
-    }
-
-    private static List<String> reverseGeocode(Location location, Context context) throws IOException {
-        List<String> listline = new ArrayList<>();
-        if (location != null && Geocoder.isPresent()) {
-            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-            List<Address> listPlace = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-            if (listPlace != null && listPlace.size() > 0) {
-                for (int l = 0; l < listPlace.get(0).getMaxAddressLineIndex(); l++)
-                    listline.add(listPlace.get(0).getAddressLine(l));
-            }
-        }
-        return listline;
     }
 
     private static void showStateNotification(Context context) {
