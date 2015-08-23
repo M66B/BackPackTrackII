@@ -289,4 +289,15 @@
     <string name="direction_270">W</string>
     <string name="direction_300">NW</string>
     <string name="direction_330">NNW</string>
+
+    <string name="weather_clear_day">Clear day</string>
+    <string name="weather_clear_night">Clear night</string>
+    <string name="weather_partly_cloudy_day">Partly cloudy day</string>
+    <string name="weather_partly_cloudy_night">Partly cloudy night</string>
+    <string name="weather_cloudy">Cloudy</string>
+    <string name="weather_fog">Fog</string>
+    <string name="weather_rain">Rain</string>
+    <string name="weather_snow">Snow</string>
+    <string name="weather_sleet">Sleet</string>>
+    <string name="weather_wind">Wind</string>>
 </resources>

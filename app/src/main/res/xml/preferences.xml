@@ -478,24 +478,58 @@
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_info">
         <PreferenceScreen android:title="@string/title_legend">
-            <Preference
-                android:icon="@drawable/pause"
-                android:title="@string/still" />
-            <Preference
-                android:icon="@drawable/walk"
-                android:title="@string/on_foot" />
-            <Preference
-                android:icon="@drawable/run"
-                android:title="@string/running" />
-            <Preference
-                android:icon="@drawable/bike"
-                android:title="@string/on_bicycle" />
-            <Preference
-                android:icon="@drawable/car"
-                android:title="@string/in_vehicle" />
-            <Preference
-                android:icon="@drawable/explore"
-                android:title="@string/unknown" />
+            <PreferenceCategory android:title="@string/title_recognition">
+                <Preference
+                    android:icon="@drawable/pause"
+                    android:title="@string/still" />
+                <Preference
+                    android:icon="@drawable/walk"
+                    android:title="@string/on_foot" />
+                <Preference
+                    android:icon="@drawable/run"
+                    android:title="@string/running" />
+                <Preference
+                    android:icon="@drawable/bike"
+                    android:title="@string/on_bicycle" />
+                <Preference
+                    android:icon="@drawable/car"
+                    android:title="@string/in_vehicle" />
+                <Preference
+                    android:icon="@drawable/explore"
+                    android:title="@string/unknown" />
+            </PreferenceCategory>
+            <PreferenceCategory android:title="@string/title_weather_settings">
+                <Preference
+                    android:icon="@drawable/clear_day_60"
+                    android:title="@string/weather_clear_day" />
+                <Preference
+                    android:icon="@drawable/clear_night_60"
+                    android:title="@string/weather_clear_night" />
+                <Preference
+                    android:icon="@drawable/partly_cloudy_day_60"
+                    android:title="@string/weather_partly_cloudy_day" />
+                <Preference
+                    android:icon="@drawable/partly_cloudy_night_60"
+                    android:title="@string/weather_partly_cloudy_night" />
+                <Preference
+                    android:icon="@drawable/cloudy_60"
+                    android:title="@string/weather_cloudy" />
+                <Preference
+                    android:icon="@drawable/fog_60"
+                    android:title="@string/weather_fog" />
+                <Preference
+                    android:icon="@drawable/rain_60"
+                    android:title="@string/weather_rain" />
+                <Preference
+                    android:icon="@drawable/snow_60"
+                    android:title="@string/weather_snow" />
+                <Preference
+                    android:icon="@drawable/sleet_60"
+                    android:title="@string/weather_sleet" />
+                <Preference
+                    android:icon="@drawable/wind_60"
+                    android:title="@string/weather_wind" />
+            </PreferenceCategory>
         </PreferenceScreen>
         <Preference
             android:key="pref_version"

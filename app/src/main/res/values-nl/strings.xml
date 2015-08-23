@@ -289,4 +289,15 @@
     <string name="direction_270">W</string>
     <string name="direction_300">NW</string>
     <string name="direction_330">NNW</string>
+
+    <string name="weather_clear_day">Helder dag</string>
+    <string name="weather_clear_night">Helder nacht</string>
+    <string name="weather_partly_cloudy_day">Gedeeltelijk bewolkt dag</string>
+    <string name="weather_partly_cloudy_night">Gedeeltelijk bewolkt nacht</string>
+    <string name="weather_cloudy">Bewolkt</string>
+    <string name="weather_fog">Mist</string>
+    <string name="weather_rain">Regel</string>
+    <string name="weather_snow">Sneeuw</string>
+    <string name="weather_sleet">IJzel</string>>
+    <string name="weather_wind">Wind</string>>
 </resources>
