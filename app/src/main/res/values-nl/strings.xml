@@ -263,6 +263,8 @@
     <string name="menu_share">Delen</string>
     <string name="menu_elevation_loc">Hoogte voor locatie opvragen</string>
     <string name="menu_elevation_day">Hoogtes voor dag opvragen</string>
+    <string name="menu_time">Tijd</string>
+    <string name="menu_geocode">Geocode</string>
     <string name="menu_delete">Verwijderen</string>
 
     <string name="still">Stil</string>

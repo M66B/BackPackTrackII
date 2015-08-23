@@ -4,13 +4,6 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <ImageView
-        android:id="@+id/ivShare"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_gravity="center_vertical"
-        android:src="@android:drawable/ic_menu_share" />
-
     <EditText
         android:id="@+id/etName"
         android:layout_width="0dp"
@@ -24,34 +17,18 @@
         android:textAppearance="?android:attr/textAppearance" />
 
     <ImageView
-        android:id="@+id/ivGeocode"
+        android:id="@+id/ivManage"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="3dp"
-        android:src="@android:drawable/ic_menu_mylocation" />
+        android:layout_marginLeft="6dp"
+        android:src="@android:drawable/ic_menu_preferences" />
 
     <ImageView
         android:id="@+id/ivSave"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="3dp"
+        android:layout_marginLeft="6dp"
         android:src="@android:drawable/ic_menu_save" />
-
-    <ImageView
-        android:id="@+id/ivTime"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="3dp"
-        android:src="@android:drawable/ic_menu_recent_history" />
-
-    <ImageView
-        android:id="@+id/ivDelete"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="3dp"
-        android:src="@android:drawable/ic_menu_delete" />
 </LinearLayout>
