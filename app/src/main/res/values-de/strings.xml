@@ -83,7 +83,7 @@
     <string name="title_weather_enabled">Wetter Aktualisierungen aktiviert</string>
     <string name="title_weather_api">Wetter Provider: %s</string>
     <string name="title_weather_interval">Wetter Aktualisierungsintervall: %s Minuten</string>
-    <string name="title_weather_wakeup">Wakeup device to refresh</string>
+    <string name="title_weather_wakeup">Gerät aufwachen zum aktualisieren</string>
     <string name="title_weather_fio">Forecast.io</string>
     <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_register">Registrieren</string>
@@ -173,7 +173,7 @@
     <string name="summary_weight">Ihr Gewicht in Kilogramm um die Anzahl von verbrannten Kalorien zu ermitteln</string>
 
     <string name="summary_weather_interval">Wetterdaten jede Anzahl von Minuten abrufen</string>
-    <string name="summary_weather_wakeup">Wakeup the device from doze mode to update the weather (Android Marshmallow or later only)</string>
+    <string name="summary_weather_wakeup">Gerät von \'Doze\' Modus aufwachen um das Wetter zu aktualisieren (Android Marshmallow or später)</string>
     <string name="summary_weather_mandatory">Pflicht</string>
     <string name="summary_weather_register">Registrierung ist Pflicht um einen API Key zu bekommen</string>
     <string name="summary_weather_rain_warning">Zeige eine Statusleiste Benachrichtigugn wenn die Niederschalgswahscheinlichkeit höher ist als die ausgewählte Prozentzahl</string>
