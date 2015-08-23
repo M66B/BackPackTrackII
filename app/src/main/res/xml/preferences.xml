@@ -373,6 +373,12 @@
                 android:inputType="number"
                 android:key="pref_weather_interval"
                 android:summary="@string/summary_weather_interval" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="pref_weather_enabled"
+                android:key="pref_weather_wakeup"
+                android:summary="@string/summary_weather_wakeup"
+                android:title="@string/title_weather_wakeup" />
             <PreferenceCategory android:title="@string/title_weather_fio">
                 <EditTextPreference
                     android:dependency="pref_weather_enabled"

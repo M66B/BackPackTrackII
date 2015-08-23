@@ -1219,11 +1219,14 @@ public class BackgroundService extends IntentService {
         int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_INTERVAL, SettingsFragment.DEFAULT_WEATHER_INTERVAL));
         int ms = 60 * 1000 * interval;
         long trigger = new Date().getTime() / ms * ms + ms;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+        boolean wakeup = prefs.getBoolean(SettingsFragment.PREF_WEATHER_WAKEUP, SettingsFragment.DEFAULT_WEATHER_WAKEUP);
+        if (wakeup && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pi);
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             am.setExact(AlarmManager.RTC_WAKEUP, trigger, pi);
         else
             am.set(AlarmManager.RTC_WAKEUP, trigger, pi);
-        Log.i(TAG, "Start weather updates frequency=" + interval + "m" + " next=" + SimpleDateFormat.getDateTimeInstance().format(trigger));
+        Log.i(TAG, "Start weather updates frequency=" + interval + "m" + " next=" + SimpleDateFormat.getDateTimeInstance().format(trigger) + " wakeup=" + wakeup);
     }
 
     public static void stopWeatherUpdates(Context context) {

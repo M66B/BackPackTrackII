@@ -27,6 +27,7 @@ import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -138,6 +139,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_WEATHER_ENABLED = "pref_weather_enabled";
     public static final String PREF_WEATHER_API = "pref_weather_api";
     public static final String PREF_WEATHER_INTERVAL = "pref_weather_interval";
+    public static final String PREF_WEATHER_WAKEUP = "pref_weather_wakeup";
     public static final String PREF_WEATHER_APIKEY_FIO = "pref_weather_apikey_fio";
     public static final String PREF_WEATHER_NOTIFICATION = "pref_weather_notification";
     public static final String PREF_WEATHER_RAIN_WARNING = "pref_weather_rain_warning";
@@ -226,6 +228,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final boolean DEFAULT_WEATHER_ENABLED = true;
     public static final String DEFAULT_WEATHER_API = "fio";
     public static final String DEFAULT_WEATHER_INTERVAL = "30"; // minutes
+    public static final boolean DEFAULT_WEATHER_WAKEUP = false;
     public static final boolean DEFAULT_WEATHER_NOTIFICATION = true;
     public static final String DEFAULT_WEATHER_RAIN_WARNING = "50"; // percent
     public static final String DEFAULT_WEATHER_RAIN_SOUND = "content://settings/system/notification_sound";
@@ -438,6 +441,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Preference pref_step_update = findPreference(PREF_STEP_DELTA);
         Preference pref_step_size = findPreference(PREF_STEP_SIZE);
         Preference pref_weight = findPreference(PREF_WEIGHT);
+        Preference pref_wakeup = findPreference(PREF_WEATHER_WAKEUP);
 
         // Set titles/summaries
         updateTitle(prefs, PREF_SHARE_GPX);
@@ -668,6 +672,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         pref_step_update.setEnabled(hasStepCounter);
         pref_weight.setEnabled(hasStepCounter);
 
+        // Weather wakeups
+        pref_wakeup.setEnabled((Build.VERSION.SDK_INT >= Build.VERSION_CODES.M));
+
         // Handle Play store link
         Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getActivity().getPackageName()));
         if (getActivity().getPackageManager().queryIntentActivities(playStoreIntent, 0).size() > 0)
@@ -787,7 +794,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }).start();
 
         if (PREF_WEATHER_ENABLED.equals(key) ||
-                PREF_WEATHER_INTERVAL.equals(key)) {
+                PREF_WEATHER_INTERVAL.equals(key) ||
+                PREF_WEATHER_WAKEUP.equals(key)) {
             BackgroundService.stopWeatherUpdates(getActivity());
             BackgroundService.startWeatherUpdates(getActivity());
         }
