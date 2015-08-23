@@ -83,29 +83,14 @@
     <string name="title_weather_enabled">Weer bijwerken aan</string>
     <string name="title_weather_api">Weer provider: %s</string>
     <string name="title_weather_interval">Weer ververs interval: %s minuten</string>
-    <string name="title_weather_test">Show weather data</string>
-
     <string name="title_weather_fio">Forecast.io</string>
+    <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_register">Registeren</string>
     <string name="title_weather_notification">Toon weer notificatie</string>
     <string name="title_weather_rain_warning">Toon regenwaarschuwing notificatie: %s%%</string>
     <string name="title_weather_rain_sound">Regenwaarschuwing beltoon</string>
     <string name="title_weather_guard">Weernotificaties geldig: %s minuten</string>
     <string name="title_weather_cache">Weersvoorspelling geldig: %s minuten</string>
-
-    <string name="title_weather_owm">OpenWeatherMap</string>
-    <string name="title_weather_stations">Aantal weerstations: %s</string>
-    <string name="title_weather_maxage">Weergegevens max. leeftijd: %s minuten</string>
-    <string name="title_weather_weight">Weergegevems sorteer factor: %s</string>
-    <string name="title_weather_id">Gebruik weerstation: %s</string>
-    <string name="title_weather_airport">Gebruik luchthaven stations</string>
-    <string name="title_weather_cwop">Gebruik CWOP stations</string>
-    <string name="title_weather_synop">Gebruik SYNOP stations</string>
-    <string name="title_weather_diy">Gebruik DIY stations</string>
-    <string name="title_weather_other">Gebruik andere stations</string>
-    <string name="title_weather_rain">Gebruik eerste neerslaggegevens</string>
-
-    <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_tos">Voorwaarden</string>
 
     <string name="title_blog">WordPress weblog</string>
@@ -187,26 +172,11 @@
     <string name="summary_weight">Your weight in kilograms to calculate the number of calories burned</string>
 
     <string name="summary_weather_interval">Fetch weather data every selected number of minutes</string>
-    <string name="summary_weather_test">Tap to display raw weather data</string>
-
-    <string name="summary_weather_optional">Optional</string>
     <string name="summary_weather_mandatory">Mandatory</string>
     <string name="summary_weather_register">Registration is required to obtain an API key</string>
     <string name="summary_weather_rain_warning">Show a status bar notification when the precipitation probability is higher than the selected percentage</string>
     <string name="summary_weather_guard">Remove weather notifications after the selected number of minutes when there are no updates</string>
     <string name="summary_weather_cache">Cache forecast data for the selected number of minutes</string>
-
-    <string name="summary_weather_stations">Fetch data for the selected number of weather stations</string>
-    <string name="summary_weather_maxage">Display weather data for maximum the selected number of minutes</string>
-    <string name="summary_weather_weight">0=sorteer op afstand\n&#8734;=sorteer op leeftijd</string>
-    <string name="summary_weather_id">Use specific weather station designated by ID</string>
-    <string name="summary_weather_airport">Use data of airport weather stations</string>
-    <string name="summary_weather_cwop">Use data of Citizen Weather Observer Program weather stations</string>
-    <string name="summary_weather_synop">Use data of Surface Synoptic Observations weather stations</string>
-    <string name="summary_weather_diy">Use data of amateur weather stations</string>
-    <string name="summary_weather_other">Use data of other weather station types</string>
-    <string name="summary_weather_rain">Use first available precipitation data, ignoring the station type, but honoring the sort order</string>
-
     <string name="summary_weather_tos">Tap to read the terms of service (will start the browser)</string>
 
     <string name="summary_blogurl">WordPress weblog address</string>

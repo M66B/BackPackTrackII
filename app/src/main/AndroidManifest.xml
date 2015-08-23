@@ -43,9 +43,6 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAhHRogRuNQ2R2RiK6v3XUmRVG0odwhTQg" />
-        <meta-data
-            android:name="org.openweathermap.API_KEY"
-            android:value="864e7cbda85229f66bc58b483c0ae312" />
 
         <activity
             android:name=".SettingsActivity"

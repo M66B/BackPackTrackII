@@ -83,32 +83,17 @@
     <string name="title_weather_enabled">Weather updates enabled</string>
     <string name="title_weather_api">Weather provider: %s</string>
     <string name="title_weather_interval">Weather fetch interval: %s minutes</string>
-    <string name="title_weather_test">Show weather data</string>
-
     <string name="title_weather_fio">Forecast.io</string>
+    <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_register">Register</string>
     <string name="title_weather_notification">Show weather notification</string>
     <string name="title_weather_rain_warning">Show rain warning notification: %s%%</string>
     <string name="title_weather_rain_sound">Rain warning ringtone</string>
     <string name="title_weather_guard">Weather notifications valid: %s minutes</string>
     <string name="title_weather_cache">Forecast cache: %s minutes</string>
-
-    <string name="title_weather_owm">OpenWeatherMap</string>
-    <string name="title_weather_stations">Number of weather stations: %s</string>
-    <string name="title_weather_maxage">Weather data max. age: %s minutes</string>
-    <string name="title_weather_weight">Weather data sort factor: %s</string>
-    <string name="title_weather_id">Use weather station: %s</string>
-    <string name="title_weather_airport">Use airport stations</string>
-    <string name="title_weather_cwop">Use CWOP stations</string>
-    <string name="title_weather_synop">Use SYNOP stations</string>
-    <string name="title_weather_diy">Use DIY stations</string>
-    <string name="title_weather_other">Use other stations</string>
-    <string name="title_weather_rain">Use first precipitation data</string>
-
-    <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_tos">TOS</string>
 
-    <string name="title_weather_poweredby" translatable="false">Powered by <a href="http://forecast.io/">Forecast</a></string>
+    <string name="title_weather_poweredby" translatable="false">Powered by <a href="http://forecast.io/">Forecast.io</a></string>
 
     <string name="title_blog">WordPress weblog</string>
     <string name="title_blogurl">URL: %s</string>
@@ -189,26 +174,11 @@
     <string name="summary_weight">Your weight in kilograms to calculate the number of calories burned</string>
 
     <string name="summary_weather_interval">Fetch weather data every selected number of minutes</string>
-    <string name="summary_weather_test">Tap to display raw weather data</string>
-
     <string name="summary_weather_mandatory">Mandatory</string>
     <string name="summary_weather_register">Registration is required to obtain an API key</string>
     <string name="summary_weather_rain_warning">Show a status bar notification when the precipitation probability is higher than the selected percentage</string>
     <string name="summary_weather_guard">Remove weather notifications after the selected number of minutes when there are no updates</string>
     <string name="summary_weather_cache">Cache forecast data for the selected number of minutes</string>
-
-    <string name="summary_weather_optional">Optional</string>
-    <string name="summary_weather_stations">Fetch data for the selected number of weather stations</string>
-    <string name="summary_weather_maxage">Display weather data for maximum the selected number of minutes</string>
-    <string name="summary_weather_weight">0=sort on distance\n&#8734;=sort on age</string>
-    <string name="summary_weather_id">Use specific weather station designated by ID</string>
-    <string name="summary_weather_airport">Use data of airport weather stations</string>
-    <string name="summary_weather_cwop">Use data of Citizen Weather Observer Program weather stations</string>
-    <string name="summary_weather_synop">Use data of Surface Synoptic Observations weather stations</string>
-    <string name="summary_weather_diy">Use data of amateur weather stations</string>
-    <string name="summary_weather_other">Use data of other weather station types</string>
-    <string name="summary_weather_rain">Use first available precipitation data, ignoring the station type, but honoring the sort order</string>
-
     <string name="summary_weather_tos">Tap to read the terms of service (will start the browser)</string>
 
     <string name="summary_blogurl">WordPress weblog address</string>

@@ -83,29 +83,14 @@
     <string name="title_weather_enabled">Wetter Aktualisierungen aktiviert</string>
     <string name="title_weather_api">Wetter Provider: %s</string>
     <string name="title_weather_interval">Wetter Aktualisierungsintervall: %s Minuten</string>
-    <string name="title_weather_test">Zeige Wetter Daten</string>
-
     <string name="title_weather_fio">Forecast.io</string>
+    <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_register">Registrieren</string>
     <string name="title_weather_notification">Zeige Wetterbenachrichtigung</string>
     <string name="title_weather_rain_warning">Zeige Regenwarnung Benachrichtigung: %s%%</string>
     <string name="title_weather_rain_sound">Regenwarnung Klingelton</string>
     <string name="title_weather_guard">Wetterbenachrichtigung Gültigkeit: %s Minuten</string>
     <string name="title_weather_cache">Vorhersage Cache: %s Minuten</string>
-
-    <string name="title_weather_owm">OpenWeatherMap</string>
-    <string name="title_weather_stations">Anzahl der Wetterstationen: %s</string>
-    <string name="title_weather_maxage">Max. Alter für Wetterdaten: %s Minuten</string>
-    <string name="title_weather_weight">Wetterdaten Sortierungsfaktor: %s</string>
-    <string name="title_weather_id">Nutze Wetterstation: %s</string>
-    <string name="title_weather_airport">Nutze Flughafenstationen</string>
-    <string name="title_weather_cwop">Nutze CWOP Stationen</string>
-    <string name="title_weather_synop">Nutze SYNOP Stationen</string>
-    <string name="title_weather_diy">Nutze DIY Stationen</string>
-    <string name="title_weather_other">Nutze andere Stationen</string>
-    <string name="title_weather_rain">Nutze erste Niederschlagdaten</string>
-
-    <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_tos">Nutzungsbedingungen</string>
 
     <string name="title_blog">WordPress Weblog</string>
@@ -187,26 +172,11 @@
     <string name="summary_weight">Ihr Gewicht in Kilogramm um die Anzahl von verbrannten Kalorien zu ermitteln</string>
 
     <string name="summary_weather_interval">Wetterdaten jede Anzahl von Minuten abrufen</string>
-    <string name="summary_weather_test">Drücken um rohe Wetterdaten anzuzeigen</string>
-
-+    <string name="summary_weather_mandatory">Pflicht</string>
-+    <string name="summary_weather_register">Registrierung ist Pflicht um einen API Key zu bekommen</string>
-+    <string name="summary_weather_rain_warning">Zeige eine Statusleiste Benachrichtigugn wenn die Niederschalgswahscheinlichkeit höher ist als die ausgewählte Prozentzahl</string>
-+    <string name="summary_weather_guard">Entferne die Wetterbenachrichtigung nach der angegebenen Anzahl von Minuten wenn es keine neuen Updates gibt</string>
+    <string name="summary_weather_mandatory">Pflicht</string>
+    <string name="summary_weather_register">Registrierung ist Pflicht um einen API Key zu bekommen</string>
+    <string name="summary_weather_rain_warning">Zeige eine Statusleiste Benachrichtigugn wenn die Niederschalgswahscheinlichkeit höher ist als die ausgewählte Prozentzahl</string>
+    <string name="summary_weather_guard">Entferne die Wetterbenachrichtigung nach der angegebenen Anzahl von Minuten wenn es keine neuen Updates gibt</string>
     <string name="summary_weather_cache">Vorhersagedaten für die ausgewählte Anzahl an Minuten cachen</string>
-
-    <string name="summary_weather_optional">Optional</string>
-    <string name="summary_weather_stations">Wetterdaten für die ausgewählte Anzahl von Wetterstationen abrufen</string>
-    <string name="summary_weather_maxage">Wetterdaten maximal für die ausgewählte Anzahl von Mintuen zeigen</string>
-    <string name="summary_weather_weight">0=Sortiere nach Entfernung\n&#8734;=Sortiere nach Alter</string>
-    <string name="summary_weather_id">Nutze Wetterstation designiert anhand von einer IDU</string>
-    <string name="summary_weather_airport">Nutze Daten von Flughafen Wetterstationen</string>
-    <string name="summary_weather_cwop">Nutze Daten von Citizen Weather Observer Program Wetterstationen</string>
-    <string name="summary_weather_synop">Nutze Daten Surface Synoptic Observations Wetterstationen</string>
-    <string name="summary_weather_diy">Nutze Daten von Amateur-Wetterstation</string>
-    <string name="summary_weather_other">Nutze Daten anderen Wetterstationen</string>
-    <string name="summary_weather_rain">Nutze erste verfügbare Niederschagdaten, ohne Rücksicht auf Stationtyp, aber mit Rücksicht auf die Sortierreihenfolge</string>
-
     <string name="summary_weather_tos">Klicken um Nutzungsbedingungen anzuzeigen (Öffnet im Browser)</string>
 
     <string name="summary_blogurl">WordPress Weblog Adresse</string>

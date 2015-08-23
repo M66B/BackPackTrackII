@@ -9,7 +9,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -837,11 +836,7 @@ public class BackgroundService extends IntentService {
     private void handleWeatherUpdate(Intent intent) throws Throwable {
         // Get weather
         try {
-            // Get last location
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
-            if (lastLocation == null)
-                return;
 
             // Check connectivity
             if (!Util.isConnected(this))
@@ -850,37 +845,45 @@ public class BackgroundService extends IntentService {
             // Get API key
             String api = prefs.getString(SettingsFragment.PREF_WEATHER_API, SettingsFragment.DEFAULT_WEATHER_API);
             String apikey_fio = prefs.getString(SettingsFragment.PREF_WEATHER_APIKEY_FIO, null);
-            String apikey_owm = prefs.getString(SettingsFragment.PREF_WEATHER_APIKEY_OWM, null);
-            if (apikey_owm == null) {
-                ApplicationInfo app = getPackageManager().getApplicationInfo(getPackageName(), PackageManager.GET_META_DATA);
-                apikey_owm = app.metaData.getString("org.openweathermap.API_KEY", null);
-            }
 
-            // Get settings
-            boolean notification = prefs.getBoolean(SettingsFragment.PREF_WEATHER_NOTIFICATION, SettingsFragment.DEFAULT_WEATHER_NOTIFICATION);
-            int warnrain = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_WARNING, SettingsFragment.DEFAULT_WEATHER_RAIN_WARNING));
-            int stations = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_STATIONS, SettingsFragment.DEFAULT_WEATHER_STATIONS));
-            int maxage = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXAGE, SettingsFragment.DEFAULT_PRESSURE_MAXAGE));
-            int maxdist = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_MAXDIST, SettingsFragment.DEFAULT_PRESSURE_MAXDIST));
-            float weight = Float.parseFloat(prefs.getString(SettingsFragment.PREF_WEATHER_WEIGHT, SettingsFragment.DEFAULT_WEATHER_WEIGHT));
-            long id = Long.parseLong(prefs.getString(SettingsFragment.PREF_WEATHER_ID, "-1"));
-            boolean airport = prefs.getBoolean(SettingsFragment.PREF_WEATHER_AIRPORT, SettingsFragment.DEFAULT_WEATHER_AIRPORT);
-            boolean cwop = prefs.getBoolean(SettingsFragment.PREF_WEATHER_CWOP, SettingsFragment.DEFAULT_WEATHER_CWOP);
-            boolean synop = prefs.getBoolean(SettingsFragment.PREF_WEATHER_SYNOP, SettingsFragment.DEFAULT_WEATHER_SYNOP);
-            boolean diy = prefs.getBoolean(SettingsFragment.PREF_WEATHER_DIY, SettingsFragment.DEFAULT_WEATHER_DIY);
-            boolean other = prefs.getBoolean(SettingsFragment.PREF_WEATHER_OTHER, SettingsFragment.DEFAULT_WEATHER_OTHER);
-            boolean firstrain = prefs.getBoolean(SettingsFragment.PREF_WEATHER_RAIN, SettingsFragment.DEFAULT_WEATHER_RAIN);
-            Log.i(TAG, "stations=" + stations + " maxage=" + maxage + " maxdist=" + maxdist + " weight=" + weight +
-                    " id=" + id + " airport=" + airport + " cwop=" + cwop + " synop=" + synop + " diy=" + diy + " other=" + other);
+            // Get last location
+            Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+            if (lastLocation == null)
+                return;
 
             // Fetch weather
             List<Weather> listWeather = new ArrayList<Weather>();
             if ("fio".equals(api)) {
                 // Forecast.io
+                if (apikey_fio == null)
+                    throw new Throwable("Forecast.io API key not set");
                 listWeather = ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, ForecastIO.TYPE_CURRENT, this);
-                if (notification && listWeather.size() > 0) {
-                    Weather weather = listWeather.get(0);
-                    if (!weather.isEmpty()) {
+            } else
+                throw new Throwable("Unknown weather provider");
+
+            // Select best weather station
+            for (Weather weather : listWeather) {
+                // Persist weather
+                DatabaseHelper dh = new DatabaseHelper(this);
+                if (dh.insertWeather(weather, lastLocation) && Util.debugMode(this))
+                    Util.toast(getString(R.string.title_weather_settings), Toast.LENGTH_SHORT, this);
+                dh.close();
+
+                if (!weather.isEmpty()) {
+                    // Persist reference pressure
+                    Log.i(TAG, "Reference pressure " + weather.pressure + "hPa " + " @" + SimpleDateFormat.getDateTimeInstance().format(weather.time));
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_LAT, (float) weather.station_location.getLatitude());
+                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_LON, (float) weather.station_location.getLongitude());
+                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_TEMP, (float) weather.temperature);
+                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, (float) weather.pressure);
+                    editor.putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, weather.time);
+                    editor.apply();
+
+                    // Notify
+                    boolean notification = prefs.getBoolean(SettingsFragment.PREF_WEATHER_NOTIFICATION, SettingsFragment.DEFAULT_WEATHER_NOTIFICATION);
+                    if (notification) {
+                        // Get weather location name
                         String geocoded = null;
                         if (weather.station_location != null) {
                             try {
@@ -892,87 +895,22 @@ public class BackgroundService extends IntentService {
                             }
                         }
 
+                        // Show weather notification
                         showWeatherNotification(weather, geocoded, this);
+
+                        // Show rain notification
+                        int warnrain = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_WARNING, SettingsFragment.DEFAULT_WEATHER_RAIN_WARNING));
                         if (weather.rain_probability >= warnrain)
                             showRainNotification(weather, geocoded, this);
                         else
                             removeRainNotification(this);
+
+                        // Start weather guard
                         startWeatherGuard(this);
                     }
                 }
-            } else if ("owm".equals(api)) {
-                // OpenWeatherMap
-                if (id < 0)
-                    listWeather = OpenWeatherMap.getWeatherByLocation(apikey_owm, lastLocation, stations, maxage, maxdist, weight, this);
-                else {
-                    Weather w = OpenWeatherMap.getWeatherByStation(apikey_owm, id, this);
-                    if (w != null)
-                        listWeather.add(w);
-                }
-            } else
-                throw new Throwable("Unknown weather API");
 
-            long time = new Date().getTime();
-
-            // Find station with precipitation data
-            Weather rainy = null;
-            if (firstrain && "owm".equals(api))
-                for (Weather weather : listWeather) {
-                    float distance = weather.station_location.distanceTo(lastLocation);
-                    if (weather.time + maxage * 60 * 1000 >= time && distance <= maxdist * 1000) {
-                        if (!Double.isNaN(weather.rain_1h) && !Double.isNaN(weather.rain_today)
-                                && (weather.rain_1h > 0 || weather.rain_today > 0)) {
-                            rainy = weather;
-                            Log.i(TAG, "Rainy " + rainy);
-                            break;
-                        }
-                    }
-                }
-
-            // Select best weather station
-            boolean found = false;
-            for (Weather weather : listWeather) {
-                float distance = weather.station_location.distanceTo(lastLocation);
-                Log.i(TAG, weather.toString() + " " + Math.round(distance) + "m");
-
-                if (!found &&
-                        weather.time + maxage * 60 * 1000 >= time &&
-                        ("fio".equals(api) || id > 0 ||
-                                (weather.station_type == 1 && airport) ||
-                                (weather.station_type == 2 && cwop) ||
-                                (weather.station_type == 3 && synop) ||
-                                (weather.station_type == 5 && diy) ||
-                                ((weather.station_type < 1 || weather.station_type > 5 || weather.station_type == 4) && other))
-                        && !Double.isNaN(weather.pressure)) {
-                    found = true;
-
-                    // Persist weather
-                    DatabaseHelper dh = new DatabaseHelper(this);
-                    if (dh.insertWeather(weather, lastLocation) && Util.debugMode(this))
-                        Util.toast(getString(R.string.title_weather_settings), Toast.LENGTH_SHORT, this);
-                    if (rainy != null && Double.isNaN(weather.rain_1h) && Double.isNaN(weather.rain_today)) {
-                        rainy.temperature = Double.NaN;
-                        rainy.humidity = Double.NaN;
-                        rainy.pressure = Double.NaN;
-                        rainy.wind_speed = Double.NaN;
-                        rainy.wind_gust = Double.NaN;
-                        rainy.wind_direction = Double.NaN;
-                        rainy.visibility = Double.NaN;
-                        dh.insertWeather(rainy, lastLocation);
-                    }
-                    dh.close();
-
-                    // Persist reference pressure
-                    Log.i(TAG, "Reference pressure " + weather.pressure + "hPa " +
-                            weather.station_name + " @" + SimpleDateFormat.getDateTimeInstance().format(weather.time));
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_LAT, (float) weather.station_location.getLatitude());
-                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_LON, (float) weather.station_location.getLongitude());
-                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_TEMP, (float) weather.temperature);
-                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, (float) weather.pressure);
-                    editor.putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, weather.time);
-                    editor.apply();
-                }
+                break;
             }
         } catch (Throwable ex) {
             if (EXPORTED_ACTION_UPDATE_WEATHER.equals(intent.getAction()))
