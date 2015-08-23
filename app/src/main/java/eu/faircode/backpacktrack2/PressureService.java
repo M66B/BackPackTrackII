@@ -106,6 +106,19 @@ public class PressureService extends Service {
         }).start();
     }
 
+    public static void updateReferencePressure(Weather weather, Context context) {
+        // Persist reference pressure
+        Log.i(TAG, "Reference pressure " + weather.pressure + "hPa " + " @" + SimpleDateFormat.getDateTimeInstance().format(weather.time));
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_LAT, (float) weather.station_location.getLatitude());
+        editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_LON, (float) weather.station_location.getLongitude());
+        editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_TEMP, (float) weather.temperature);
+        editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, (float) weather.pressure);
+        editor.putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, weather.time);
+        editor.apply();
+    }
+
     public static float getAltitude(Location location, Context context) {
         // Get settings
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

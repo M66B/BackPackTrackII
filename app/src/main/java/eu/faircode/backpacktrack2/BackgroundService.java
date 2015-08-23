@@ -868,17 +868,10 @@ public class BackgroundService extends IntentService {
                 dh.close();
 
                 if (!weather.isEmpty()) {
-                    // Persist reference pressure
-                    Log.i(TAG, "Reference pressure " + weather.pressure + "hPa " + " @" + SimpleDateFormat.getDateTimeInstance().format(weather.time));
-                    SharedPreferences.Editor editor = prefs.edit();
-                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_LAT, (float) weather.station_location.getLatitude());
-                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_LON, (float) weather.station_location.getLongitude());
-                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_TEMP, (float) weather.temperature);
-                    editor.putFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, (float) weather.pressure);
-                    editor.putLong(SettingsFragment.PREF_PRESSURE_REF_TIME, weather.time);
-                    editor.apply();
+                    // Update reference pressure
+                    PressureService.updateReferencePressure(weather, this);
 
-                    // Notify
+                    // Update weather
                     if (weather.isValid(this)) {
                         prefs.edit().putString(SettingsFragment.PREF_LAST_WEATHER_REPORT, weather.serialize()).apply();
                         showWeatherNotification(weather, this);
