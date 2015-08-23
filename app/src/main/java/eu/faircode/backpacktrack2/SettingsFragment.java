@@ -2317,6 +2317,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final Spinner spGraph = (Spinner) viewHistory.findViewById(R.id.spGraph);
         final GraphView graph = (GraphView) viewHistory.findViewById(R.id.gvWeather);
         ImageView ivAdd = (ImageView) viewHistory.findViewById(R.id.ivAdd);
+        ImageView ivForecast = (ImageView) viewHistory.findViewById(R.id.ivForecast);
         ImageView ivViewDay = (ImageView) viewHistory.findViewById(R.id.ivViewDay);
         ImageView ivViewWeek = (ImageView) viewHistory.findViewById(R.id.ivViewWeek);
         TextView tvHeaderTemperature = (TextView) viewHistory.findViewById(R.id.tvHeaderTemperature);
@@ -2511,7 +2512,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         alertDialogBuilder.setTitle(R.string.title_weather_history);
         alertDialogBuilder.setIcon(R.drawable.sunny_60);
         alertDialogBuilder.setView(viewHistory);
-        AlertDialog alertDialog = alertDialogBuilder.create();
+        final AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
             public void onDismiss(DialogInterface dialogInterface) {
@@ -2520,6 +2521,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         });
         alertDialog.show();
         dialogs.add(alertDialog);
+
+        // Handle forecast request
+        ivForecast.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog.dismiss();
+                weather_forecast();
+            }
+        });
     }
 
     private void showWeatherGraph(GraphView graph) {
