@@ -7,6 +7,7 @@
         <item>Luftdruck</item>
         <item>Wolken</item>
         <item>Sichtweite</item>
+        <item>Ozone</item>
     </string-array>
     <!-- do not translate values -->
     <string-array name="listWeatherValue">
@@ -16,5 +17,6 @@
         <item>pressure</item>
         <item>clouds</item>
         <item>visibility</item>
+        <item>ozone</item>
     </string-array>
 </resources>
