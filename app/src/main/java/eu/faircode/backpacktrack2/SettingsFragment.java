@@ -1,12 +1,16 @@
 package eu.faircode.backpacktrack2;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.TimePickerDialog;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -29,6 +33,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -334,7 +339,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
             Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
             findPreference(PREF_WEATHER_FORECAST).setEnabled("fio".equals(api) && Util.isConnected(getActivity()));
-            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted && connected);
+            //findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted && connected);
         }
     };
 
@@ -347,7 +352,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             findPreference(PREF_SHARE_GPX).setEnabled(mounted);
             findPreference(PREF_SHARE_KML).setEnabled(mounted);
-            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted && connected);
+            //findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted && connected);
         }
     };
 
@@ -543,7 +548,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         });
 
         // Handle upload GPX
-        pref_upload_gpx.setEnabled(blogConfigured() && Util.storageMounted() && Util.isConnected(getActivity()));
+        pref_upload_gpx.setEnabled(blogConfigured() && Util.storageMounted()); // && Util.isConnected(getActivity()));
         pref_upload_gpx.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -1102,6 +1107,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final TextView tvTrackName = (TextView) view.findViewById(R.id.tvTrackName);
         final CheckBox cbExtensions = (CheckBox) view.findViewById(R.id.cbExtensions);
         final CheckBox cbDelete = (CheckBox) view.findViewById(R.id.cbDelete);
+        final CheckBox cbSchedule = (CheckBox) view.findViewById(R.id.cbSchedule);
         Button btnDateFrom = (Button) view.findViewById(R.id.btnDateFrom);
         Button btnTimeFrom = (Button) view.findViewById(R.id.btnTimeFrom);
         Button btnDateTo = (Button) view.findViewById(R.id.btnDateTo);
@@ -1235,6 +1241,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         alertDialogBuilder
                 .setPositiveButton(android.R.string.ok,
                         new DialogInterface.OnClickListener() {
+                            @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
                             public void onClick(DialogInterface dialog, int id) {
                                 if (!cbDelete.isChecked()) {
                                     SharedPreferences.Editor editor = prefs.edit();
@@ -1244,12 +1251,33 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                     editor.putLong(PREF_LAST_TO, to.getTimeInMillis());
                                     editor.apply();
                                 }
-                                intent.putExtra(BackgroundService.EXTRA_TRACK_NAME, tvTrackName.getText().toString());
-                                intent.putExtra(BackgroundService.EXTRA_WRITE_EXTENSIONS, cbExtensions.isChecked());
-                                intent.putExtra(BackgroundService.EXTRA_DELETE_DATA, cbDelete.isChecked());
-                                intent.putExtra(BackgroundService.EXTRA_TIME_FROM, from.getTimeInMillis());
-                                intent.putExtra(BackgroundService.EXTRA_TIME_TO, to.getTimeInMillis());
-                                getActivity().startService(intent);
+
+                                if (cbSchedule.isChecked()) {
+                                    Log.i(TAG, "Scheduling intent=" + intent);
+                                    PersistableBundle extras = new PersistableBundle();
+                                    extras.putString(BackgroundService.EXTRA_ACTION, intent.getAction());
+                                    extras.putString(BackgroundService.EXTRA_TRACK_NAME, tvTrackName.getText().toString());
+                                    extras.putBoolean(BackgroundService.EXTRA_WRITE_EXTENSIONS, cbExtensions.isChecked());
+                                    extras.putBoolean(BackgroundService.EXTRA_DELETE_DATA, cbDelete.isChecked());
+                                    extras.putLong(BackgroundService.EXTRA_TIME_FROM, from.getTimeInMillis());
+                                    extras.putLong(BackgroundService.EXTRA_TIME_TO, to.getTimeInMillis());
+                                    JobInfo job = new JobInfo.Builder(1, new ComponentName(getActivity(), JobSchedulerService.class))
+                                            .setPersisted(true)
+                                            .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+                                            .setExtras(extras)
+                                            .build();
+                                    JobScheduler scheduler = (JobScheduler) getActivity().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+                                    if (scheduler.schedule(job) == JobScheduler.RESULT_SUCCESS)
+                                        Log.i(TAG, "Scheduled intent=" + intent);
+
+                                } else {
+                                    intent.putExtra(BackgroundService.EXTRA_TRACK_NAME, tvTrackName.getText().toString());
+                                    intent.putExtra(BackgroundService.EXTRA_WRITE_EXTENSIONS, cbExtensions.isChecked());
+                                    intent.putExtra(BackgroundService.EXTRA_DELETE_DATA, cbDelete.isChecked());
+                                    intent.putExtra(BackgroundService.EXTRA_TIME_FROM, from.getTimeInMillis());
+                                    intent.putExtra(BackgroundService.EXTRA_TIME_TO, to.getTimeInMillis());
+                                    getActivity().startService(intent);
+                                }
                             }
                         })
                 .setNegativeButton(android.R.string.cancel,

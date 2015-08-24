@@ -138,7 +138,6 @@
                 <action android:name="eu.faircode.backpacktrack2.GET_ALTITUDE" />
                 <action android:name="eu.faircode.backpacktrack2.UPDATE_WEATHER" />
             </intent-filter>
-
         </service>
         <service
             android:name=".GpsStatusService"
@@ -152,6 +151,11 @@
             android:name=".PressureService"
             android:enabled="true"
             android:exported="false" />
+        <service
+            android:name=".JobSchedulerService"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
 </manifest>

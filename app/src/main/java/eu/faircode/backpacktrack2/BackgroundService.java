@@ -103,11 +103,13 @@ public class BackgroundService extends IntentService {
 
     // Extras
     public static final String EXTRA_ENABLE = "Enable";
+    public static final String EXTRA_ACTION = "Action";
     public static final String EXTRA_TRACK_NAME = "TrackName";
     public static final String EXTRA_WRITE_EXTENSIONS = "WriteExtensions";
     public static final String EXTRA_DELETE_DATA = "DeleteData";
     public static final String EXTRA_TIME_FROM = "TimeFrom";
     public static final String EXTRA_TIME_TO = "TimeTo";
+    public static final String EXTRA_SCHEDULED = "Scheduled";
     public static final String EXTRA_GEOURI = "Geopoint";
 
     public static final String DEFAULT_TRACK_NAME = "BackPackTrack";
