@@ -113,7 +113,8 @@
             android:id="@+id/ivWindDirection"
             android:layout_width="18dp"
             android:layout_height="18dp"
-            android:layout_gravity="center_horizontal|right"
+            android:layout_gravity="center_horizontal|left"
+            android:layout_marginLeft="6dp"
             android:src="@drawable/trending_60" />
     </LinearLayout>
 
