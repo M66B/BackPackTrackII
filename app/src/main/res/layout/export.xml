@@ -30,13 +30,6 @@
         android:layout_marginTop="6dp"
         android:text="@string/title_delete" />
 
-    <CheckBox
-        android:id="@+id/cbSchedule"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:text="Schedule" />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
