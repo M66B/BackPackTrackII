@@ -36,6 +36,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -2814,7 +2815,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 Toast.makeText(context, ((Throwable) result).toString(), Toast.LENGTH_LONG).show();
             else if (result instanceof List) {
                 List<Weather> listWeather = (List<Weather>) result;
-                showForecastGraph(graph, listWeather);
+                showForecastGraph(graph, listWeather, this.type == ForecastIO.TYPE_DAILY);
                 header.setVisibility(View.VISIBLE);
                 ForecastAdapter adapter = new ForecastAdapter(context, listWeather, type);
                 list.setAdapter(adapter);
@@ -2991,7 +2992,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         dialogs.add(alertDialog);
     }
 
-    private void showForecastGraph(GraphView graph, List<Weather> listWeather) {
+    private void showForecastGraph(GraphView graph, List<Weather> listWeather, final boolean daily) {
         SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
         boolean data = false;
@@ -3016,7 +3017,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             if (weather.time > maxTime)
                 maxTime = weather.time;
 
-            double temperature_min = (Double.isNaN(weather.temperature) ? weather.temperature_min : weather.temperature);
+            double temperature_min = (daily ? weather.temperature_min : weather.temperature);
             if (!Double.isNaN(temperature_min)) {
                 if ("f".equals(temperature_unit))
                     temperature_min = temperature_min * 9 / 5 + 32;
@@ -3026,7 +3027,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     maxTemp = temperature_min;
             }
 
-            double temperature_max = weather.temperature_max;
+            double temperature_max = (daily ? weather.temperature_max : Double.NaN);
             if (!Double.isNaN(temperature_max)) {
                 if ("f".equals(temperature_unit))
                     temperature_max = temperature_max * 9 / 5 + 32;
@@ -3037,6 +3038,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
 
             double rain_1h = weather.rain_1h;
+            if (daily)
+                rain_1h *= 24;
             if (!Double.isNaN(rain_1h)) {
                 if ("in".equals(rain_unit))
                     rain_1h = rain_1h / 25.4;
@@ -3068,18 +3071,21 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.getViewport().setScalable(true);
 
             final DecimalFormat DF = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ROOT));
+            final DateFormat SDFT = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT);
             graph.getGridLabelRenderer().setLabelFormatter(
-                    new DateAsXAxisLabelFormatter(getActivity(),
-                            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)) {
+                    new DateAsXAxisLabelFormatter(getActivity(), new SimpleDateFormat("c")) {
                         @Override
                         public String formatLabel(double value, boolean isValueX) {
                             if (isValueX)
-                                return super.formatLabel(value, isValueX);
+                                if (DateUtils.isToday((long) value))
+                                    return SDFT.format((long) value);
+                                else
+                                    return super.formatLabel(value, isValueX);
                             else
                                 return DF.format(value);
                         }
                     });
-            graph.getGridLabelRenderer().setNumHorizontalLabels(2);
+            graph.getGridLabelRenderer().setNumHorizontalLabels(3);
 
             seriesMaxTemp.setColor(Color.MAGENTA);
 
