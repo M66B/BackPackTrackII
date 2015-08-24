@@ -806,7 +806,12 @@ public class BackgroundService extends IntentService {
 
     private void handleDaily(Intent intent) {
         try {
-            long time = new Date().getTime() / (5 * 60 * 1000) * (5 * 60 * 1000);
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            long time = calendar.getTimeInMillis();
             Log.i(TAG, "Daily task at " + SimpleDateFormat.getDateTimeInstance().format(time));
 
             // Reset step counter
