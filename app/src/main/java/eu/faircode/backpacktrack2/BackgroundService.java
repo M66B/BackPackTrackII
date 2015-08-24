@@ -1899,18 +1899,15 @@ public class BackgroundService extends IntentService {
     }
 
     public static String getRainIntensity(double rain_1h, Context context) {
-        // 0 in./hr. no precipitation
-        // 0.002 in./hr. 0.0508 mm/hr corresponds to very light precipitation
-        // 0.017 in./hr. 0.4318 mm/hr corresponds to light precipitation
-        // 0.1 in./hr. 2.54 mm/hr corresponds to moderate precipitation
-        // 0.4 in./hr. 10.16 mm/hr corresponds to heavy precipitation
-        if (rain_1h > 10.16)
+        // https://developer.forecast.io/docs/v2
+        double rain_1h_in = rain_1h / 25.4f;
+        if (rain_1h_in >= 0.4)
             return context.getString(R.string.rain_heavy);
-        else if (rain_1h > 2.54)
+        else if (rain_1h_in >= 0.1)
             return context.getString(R.string.rain_moderate);
-        else if (rain_1h > 0.4318)
+        else if (rain_1h_in >= 0.017)
             return context.getString(R.string.rain_light);
-        else if (rain_1h > 0.0508)
+        else if (rain_1h_in >= 0.002)
             return context.getString(R.string.rain_very_light);
         else
             return context.getString(R.string.rain_no);

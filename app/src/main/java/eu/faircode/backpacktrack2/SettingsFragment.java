@@ -2926,7 +2926,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Weather weather = (Weather) lv.getItemAtPosition(position);
-                Toast.makeText(getActivity(), weather.summary, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(),
+                        weather.summary + " - " + BackgroundService.getRainIntensity(weather.rain_1h, getActivity()),
+                        Toast.LENGTH_SHORT).show();
             }
         });
 
