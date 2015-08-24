@@ -94,7 +94,7 @@
     <string name="title_weather_cache">Forecast cache: %s minutes</string>
     <string name="title_weather_tos">TOS</string>
 
-    <string name="title_weather_poweredby" translatable="false">Powered by <a href="http://forecast.io/">Forecast.io</a></string>
+    <string name="title_weather_poweredby" translatable="false">Powered by <a href="http://forecast.io/">Forecast</a></string>
 
     <string name="title_blog">WordPress weblog</string>
     <string name="title_blogurl">URL: %s</string>
