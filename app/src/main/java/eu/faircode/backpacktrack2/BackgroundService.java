@@ -1199,6 +1199,8 @@ public class BackgroundService extends IntentService {
         long trigger = new Date().getTime() / ms * ms + ms;
         boolean wakeup = prefs.getBoolean(SettingsFragment.PREF_WEATHER_WAKEUP, SettingsFragment.DEFAULT_WEATHER_WAKEUP);
         if (wakeup && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            // https://code.google.com/p/android-developer-preview/issues/detail?id=2233
+            // https://code.google.com/p/android-developer-preview/issues/detail?id=2225
             am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pi);
         else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             am.setExact(AlarmManager.RTC_WAKEUP, trigger, pi);
@@ -1226,10 +1228,7 @@ public class BackgroundService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_GUARD, SettingsFragment.DEFAULT_WEATHER_GUARD));
         long trigger = new Date().getTime() + 60 * 1000 * interval;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            am.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, trigger, pi);
-        else
-            am.set(AlarmManager.RTC_WAKEUP, trigger, pi);
+        am.set(AlarmManager.RTC_WAKEUP, trigger, pi);
         Log.i(TAG, "Set weather guard interval=" + interval + "m" + " trigger=" + SimpleDateFormat.getDateTimeInstance().format(trigger));
     }
 
