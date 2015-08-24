@@ -41,22 +41,24 @@ public class ForecastIO {
     public static final int TYPE_DAILY = 3;
 
     public static List<Weather> getWeatherByLocation(
-            String apikey, final Location location, int type, Context context)
+            String apikey, final Location location, int type, boolean usecache, Context context)
             throws IOException, JSONException {
         // https:developer.forecast.io/docs/v2
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         // Check cache
-        long time = new Date().getTime();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        long last = prefs.getLong(SettingsFragment.PREF_FORECAST_TIME, 0);
-        float latitude = prefs.getFloat(SettingsFragment.PREF_FORECAST_LATITUDE, Float.NaN);
-        float longitude = prefs.getFloat(SettingsFragment.PREF_FORECAST_LONGITUDE, Float.NaN);
-        int duration = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_CACHE, SettingsFragment.DEFAULT_WEATHER_CACHE));
-        if (last + duration * 60 * 1000L > time &&
-                (float) location.getLatitude() == latitude &&
-                (float) location.getLongitude() == longitude) {
-            String json = prefs.getString(SettingsFragment.PREF_FORECAST_DATA, null);
-            return decodeResult(type, json);
+        if (usecache) {
+            long time = new Date().getTime();
+            long last = prefs.getLong(SettingsFragment.PREF_FORECAST_TIME, 0);
+            float latitude = prefs.getFloat(SettingsFragment.PREF_FORECAST_LATITUDE, Float.NaN);
+            float longitude = prefs.getFloat(SettingsFragment.PREF_FORECAST_LONGITUDE, Float.NaN);
+            int duration = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_CACHE, SettingsFragment.DEFAULT_WEATHER_CACHE));
+            if (last + duration * 60 * 1000L > time &&
+                    (float) location.getLatitude() == latitude &&
+                    (float) location.getLongitude() == longitude) {
+                String json = prefs.getString(SettingsFragment.PREF_FORECAST_DATA, null);
+                return decodeResult(type, json);
+            }
         }
 
         String exclude = "currently,minutely,hourly,daily,alerts,flags";
@@ -99,7 +101,7 @@ public class ForecastIO {
             Log.d(TAG, json.toString());
 
             // Cache result
-            if (type == TYPE_HOURLY || type == TYPE_DAILY) {
+            if (usecache) {
                 prefs.edit().putLong(SettingsFragment.PREF_FORECAST_TIME, new Date().getTime()).apply();
                 prefs.edit().putFloat(SettingsFragment.PREF_FORECAST_LATITUDE, (float) location.getLatitude()).apply();
                 prefs.edit().putFloat(SettingsFragment.PREF_FORECAST_LONGITUDE, (float) location.getLongitude()).apply();

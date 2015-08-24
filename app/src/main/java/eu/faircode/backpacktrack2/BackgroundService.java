@@ -860,7 +860,7 @@ public class BackgroundService extends IntentService {
                 // Forecast.io
                 if (apikey_fio == null)
                     throw new Throwable("Forecast.io API key not set");
-                listWeather = ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, ForecastIO.TYPE_CURRENT, this);
+                listWeather = ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, ForecastIO.TYPE_CURRENT, false, this);
             } else
                 throw new Throwable("Unknown weather provider");
 
@@ -1762,7 +1762,7 @@ public class BackgroundService extends IntentService {
 
         // Add action
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            notificationBuilder.addAction(new Notification.Action.Builder(Icon.createWithResource(context, R.drawable.refresh), context.getString(R.string.title_refresh), piUpdate).build());
+            notificationBuilder.addAction(new Notification.Action.Builder(Icon.createWithResource(context, R.drawable.refresh_black), context.getString(R.string.title_refresh), piUpdate).build());
         else
             notificationBuilder.addAction(android.R.drawable.ic_menu_add, context.getString(R.string.title_refresh), piUpdate);
 
@@ -1834,7 +1834,7 @@ public class BackgroundService extends IntentService {
 
         // Add action
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-            notificationBuilder.addAction(new Notification.Action.Builder(Icon.createWithResource(context, R.drawable.refresh), context.getString(R.string.title_refresh), piUpdate).build());
+            notificationBuilder.addAction(new Notification.Action.Builder(Icon.createWithResource(context, R.drawable.refresh_black), context.getString(R.string.title_refresh), piUpdate).build());
         else
             notificationBuilder.addAction(android.R.drawable.ic_menu_add, context.getString(R.string.title_refresh), piUpdate);
 

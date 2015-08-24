@@ -15,13 +15,24 @@
             android:id="@+id/chkWaypoint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_weight="0" />
 
         <Spinner
             android:id="@+id/spWaypoint"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/ivRefresh"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="6dp"
+            android:layout_weight="0"
+            android:src="@drawable/refresh_60" />
     </LinearLayout>
 
     <com.jjoe64.graphview.GraphView

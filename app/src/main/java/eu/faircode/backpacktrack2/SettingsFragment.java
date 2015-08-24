@@ -2777,8 +2777,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         private ListView list;
         private SharedPreferences prefs;
         private Location location;
+        private boolean cache;
 
-        public updateForecast(int type, Location location, View view) {
+        public updateForecast(int type, Location location, boolean cache, View view) {
             this.type = type;
             this.context = view.getContext();
             this.progress = (ProgressBar) view.findViewById(R.id.pbWeatherForecast);
@@ -2787,6 +2788,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             this.list = (ListView) view.findViewById(R.id.lvWeatherForecast);
             this.prefs = getPreferenceScreen().getSharedPreferences();
             this.location = location;
+            this.cache = cache;
         }
 
         @Override
@@ -2801,7 +2803,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         protected Object doInBackground(Object... params) {
             try {
                 String apikey_fio = prefs.getString(PREF_WEATHER_APIKEY_FIO, null);
-                return ForecastIO.getWeatherByLocation(apikey_fio, location, type, context);
+                return ForecastIO.getWeatherByLocation(apikey_fio, location, type, cache, context);
             } catch (Throwable ex) {
                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                 return ex;
@@ -2835,6 +2837,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Reference controls
         final CheckBox chkWaypoint = (CheckBox) viewForecast.findViewById(R.id.chkWaypoint);
         final Spinner spWaypoint = (Spinner) viewForecast.findViewById(R.id.spWaypoint);
+        ImageView ivRefresh = (ImageView) viewForecast.findViewById(R.id.ivRefresh);
         ImageView ivViewDay = (ImageView) viewForecast.findViewById(R.id.ivViewDay);
         ImageView ivViewWeek = (ImageView) viewForecast.findViewById(R.id.ivViewWeek);
         TextView tvHeaderTemperature = (TextView) viewForecast.findViewById(R.id.tvHeaderTemperature);
@@ -2871,7 +2874,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 }
 
                 int type = prefs.getInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_DAILY);
-                new updateForecast(type, location, viewForecast).execute();
+                new updateForecast(type, location, true, viewForecast).execute();
             }
 
             @Override
@@ -2883,7 +2886,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 location.setLongitude(lastLocation.getLongitude());
 
                 int type = prefs.getInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_DAILY);
-                new updateForecast(type, location, viewForecast).execute();
+                new updateForecast(type, location, true, viewForecast).execute();
+            }
+        });
+
+        ivRefresh.setOnClickListener(new AdapterView.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int type = prefs.getInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_DAILY);
+                new updateForecast(type, location, false, viewForecast).execute();
             }
         });
 
@@ -2892,7 +2903,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             @Override
             public void onClick(View view) {
                 prefs.edit().putInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_HOURLY).apply();
-                new updateForecast(ForecastIO.TYPE_HOURLY, location, viewForecast).execute();
+                new updateForecast(ForecastIO.TYPE_HOURLY, location, true, viewForecast).execute();
             }
         });
 
@@ -2901,7 +2912,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             @Override
             public void onClick(View view) {
                 prefs.edit().putInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_DAILY).apply();
-                new updateForecast(ForecastIO.TYPE_DAILY, location, viewForecast).execute();
+                new updateForecast(ForecastIO.TYPE_DAILY, location, true, viewForecast).execute();
             }
         });
 
