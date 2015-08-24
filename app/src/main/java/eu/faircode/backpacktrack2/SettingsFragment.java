@@ -2584,6 +2584,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         } else if ("visibility".equals(column)) {
             minValue = 0;
             maxValue = 10000;
+        } else if ("ozone".equals(column)) {
+            minValue = 300;
+            maxValue = 500;
         }
 
         Cursor cursor = db.getWeather(true);
