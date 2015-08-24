@@ -304,9 +304,9 @@
     <string name="weather_sleet">Schneeregen</string>
     <string name="weather_wind">Wind</string>
 
-    <string name="rain_no">No precipitation</string>
-    <string name="rain_very_light">Very light precipitation</string>
-    <string name="rain_light">Light precipitation</string>
-    <string name="rain_moderate">Moderate precipitation</string>
-    <string name="rain_heavy">Heavy precipitation</string>
+    <string name="rain_no">Kein Niederschlag</string>
+    <string name="rain_very_light">Sehr leichter Niederschlag</string>
+    <string name="rain_light">Leichter Niederschlag</string>
+    <string name="rain_moderate">Mäßiger Niederschlag</string>
+    <string name="rain_heavy">Starker Niederschlag</string>
 </resources>
