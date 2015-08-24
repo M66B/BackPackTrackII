@@ -24,7 +24,14 @@
             android:layout_weight="1" />
     </LinearLayout>
 
+    <com.jjoe64.graphview.GraphView
+        android:id="@+id/gvForecast"
+        android:layout_width="match_parent"
+        android:layout_height="150dp"
+        android:layout_marginTop="6dp" />
+
     <LinearLayout
+        android:id="@+id/llHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"

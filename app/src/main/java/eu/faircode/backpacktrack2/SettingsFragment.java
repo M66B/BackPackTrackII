@@ -49,6 +49,7 @@ import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
@@ -2770,6 +2771,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         private int type;
         private Context context;
         private ProgressBar progress;
+        private GraphView graph;
+        private LinearLayout header;
         private ListView list;
         private SharedPreferences prefs;
         private Location location;
@@ -2778,6 +2781,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             this.type = type;
             this.context = view.getContext();
             this.progress = (ProgressBar) view.findViewById(R.id.pbWeatherForecast);
+            this.graph = (GraphView) view.findViewById(R.id.gvForecast);
+            this.header = (LinearLayout) view.findViewById(R.id.llHeader);
             this.list = (ListView) view.findViewById(R.id.lvWeatherForecast);
             this.prefs = getPreferenceScreen().getSharedPreferences();
             this.location = location;
@@ -2786,6 +2791,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         @Override
         protected void onPreExecute() {
             progress.setVisibility(View.VISIBLE);
+            graph.setVisibility(View.GONE);
+            header.setVisibility(View.GONE);
             list.setVisibility(View.GONE);
         }
 
@@ -2806,7 +2813,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             if (result instanceof Throwable)
                 Toast.makeText(context, ((Throwable) result).toString(), Toast.LENGTH_LONG).show();
             else if (result instanceof List) {
-                ForecastAdapter adapter = new ForecastAdapter(context, (List<Weather>) result, type);
+                List<Weather> listWeather = (List<Weather>) result;
+                showForecastGraph(graph, listWeather);
+                header.setVisibility(View.VISIBLE);
+                ForecastAdapter adapter = new ForecastAdapter(context, listWeather, type);
                 list.setAdapter(adapter);
                 list.setVisibility(View.VISIBLE);
             }
@@ -2822,8 +2832,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final View viewForecast = inflater.inflate(R.layout.weather_forecast, null);
 
         // Reference controls
-        final Spinner spWaypoint = (Spinner) viewForecast.findViewById(R.id.spWaypoint);
         final CheckBox chkWaypoint = (CheckBox) viewForecast.findViewById(R.id.chkWaypoint);
+        final Spinner spWaypoint = (Spinner) viewForecast.findViewById(R.id.spWaypoint);
         ImageView ivViewDay = (ImageView) viewForecast.findViewById(R.id.ivViewDay);
         ImageView ivViewWeek = (ImageView) viewForecast.findViewById(R.id.ivViewWeek);
         TextView tvHeaderTemperature = (TextView) viewForecast.findViewById(R.id.tvHeaderTemperature);
@@ -2979,6 +2989,123 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
         dialogs.add(alertDialog);
+    }
+
+    private void showForecastGraph(GraphView graph, List<Weather> listWeather) {
+        SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+
+        boolean data = false;
+        long minTime = Long.MAX_VALUE;
+        long maxTime = 0;
+        double minTemp = Double.MAX_VALUE;
+        double maxTemp = 0;
+        double maxRain = 0;
+
+        String temperature_unit = prefs.getString(PREF_TEMPERATURE, DEFAULT_TEMPERATURE);
+        String rain_unit = prefs.getString(PREF_PRECIPITATION, DEFAULT_PRECIPITATION);
+
+        LineGraphSeries<DataPoint> seriesMinTemp = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesMaxTemp = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesRain = new LineGraphSeries<DataPoint>();
+
+        for (Weather weather : listWeather) {
+            data = true;
+
+            if (weather.time < minTime)
+                minTime = weather.time;
+            if (weather.time > maxTime)
+                maxTime = weather.time;
+
+            double temperature_min = (Double.isNaN(weather.temperature) ? weather.temperature_min : weather.temperature);
+            if (!Double.isNaN(temperature_min)) {
+                if ("f".equals(temperature_unit))
+                    temperature_min = temperature_min * 9 / 5 + 32;
+                if (temperature_min < minTemp)
+                    minTemp = temperature_min;
+                if (temperature_min > maxTemp)
+                    maxTemp = temperature_min;
+            }
+
+            double temperature_max = weather.temperature_max;
+            if (!Double.isNaN(temperature_max)) {
+                if ("f".equals(temperature_unit))
+                    temperature_max = temperature_max * 9 / 5 + 32;
+                if (temperature_max < minTemp)
+                    minTemp = temperature_max;
+                if (temperature_max > maxTemp)
+                    maxTemp = temperature_max;
+            }
+
+            double rain_1h = weather.rain_1h;
+            if (!Double.isNaN(rain_1h)) {
+                if ("in".equals(rain_unit))
+                    rain_1h = rain_1h / 25.4;
+                if (rain_1h > maxRain)
+                    maxRain = rain_1h;
+            }
+
+            seriesMinTemp.appendData(new DataPoint(new Date(weather.time), temperature_min), true, Integer.MAX_VALUE);
+            seriesMaxTemp.appendData(new DataPoint(new Date(weather.time), temperature_max), true, Integer.MAX_VALUE);
+            seriesRain.appendData(new DataPoint(new Date(weather.time), rain_1h), true, Integer.MAX_VALUE);
+        }
+
+        if (data) {
+            graph.removeAllSeries();
+            graph.getSecondScale().getSeries().clear();
+
+            graph.getViewport().setXAxisBoundsManual(true);
+            graph.getViewport().setMinX(minTime);
+            graph.getViewport().setMaxX(maxTime);
+
+            graph.getViewport().setYAxisBoundsManual(true);
+            graph.getViewport().setMinY(minTemp);
+            graph.getViewport().setMaxY(maxTemp);
+
+            graph.getSecondScale().setMinY(0);
+            graph.getSecondScale().setMaxY(maxRain);
+
+            graph.getViewport().setScrollable(true);
+            graph.getViewport().setScalable(true);
+
+            final DecimalFormat DF = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ROOT));
+            graph.getGridLabelRenderer().setLabelFormatter(
+                    new DateAsXAxisLabelFormatter(getActivity(),
+                            SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT)) {
+                        @Override
+                        public String formatLabel(double value, boolean isValueX) {
+                            if (isValueX)
+                                return super.formatLabel(value, isValueX);
+                            else
+                                return DF.format(value);
+                        }
+                    });
+            graph.getGridLabelRenderer().setNumHorizontalLabels(2);
+
+            seriesMaxTemp.setColor(Color.MAGENTA);
+
+            seriesRain.setColor(Color.YELLOW);
+            graph.getGridLabelRenderer().setVerticalLabelsSecondScaleColor(Color.YELLOW);
+            graph.getSecondScale().setLabelFormatter(new DefaultLabelFormatter() {
+                @Override
+                public String formatLabel(double value, boolean isValueX) {
+                    return " " + DF.format(value);
+                }
+            });
+
+            seriesMinTemp.setDrawDataPoints(true);
+            seriesMinTemp.setDataPointsRadius(2);
+            seriesMaxTemp.setDrawDataPoints(true);
+            seriesMaxTemp.setDataPointsRadius(2);
+            seriesRain.setDrawDataPoints(true);
+            seriesRain.setDataPointsRadius(2);
+
+            graph.getSecondScale().addSeries(seriesRain);
+            graph.addSeries(seriesMinTemp);
+            graph.addSeries(seriesMaxTemp);
+
+            graph.setVisibility(View.VISIBLE);
+        } else
+            graph.setVisibility(View.GONE);
     }
 
     private void updateTitle(SharedPreferences prefs, String key) {
