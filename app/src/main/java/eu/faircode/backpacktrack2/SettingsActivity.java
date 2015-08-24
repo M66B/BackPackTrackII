@@ -51,6 +51,15 @@ public class SettingsActivity extends Activity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         recreate();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (getApplicationContext()) {
+                    SettingsFragment.firstRun(SettingsActivity.this);
+                }
+            }
+        }).start();
     }
 
     @Override
