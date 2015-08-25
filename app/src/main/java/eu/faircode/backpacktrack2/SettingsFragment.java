@@ -287,7 +287,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_FORECAST_TIME = "pref_forecast_time";
     public static final String PREF_FORECAST_LATITUDE = "pref_forecast_latitude";
     public static final String PREF_FORECAST_LONGITUDE = "pref_forecast_longitude";
-    public static final String PREF_FORECAST_DATA = "pref_forecast_data";
 
     // Remember last values
     public static final String PREF_LAST_ACTIVITY = "pref_last_activity";
@@ -3067,7 +3066,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             graph.getViewport().setXAxisBoundsManual(true);
             graph.getViewport().setMinX(minTime);
-            graph.getViewport().setMaxX(maxTime);
+            graph.getViewport().setMaxX(daily ? maxTime : minTime + 24 * 3600 * 1000L);
 
             graph.getViewport().setYAxisBoundsManual(true);
             graph.getViewport().setMinY(minTemp);
@@ -3082,7 +3081,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             final DecimalFormat DF = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ROOT));
             final DateFormat SDFT = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT);
             graph.getGridLabelRenderer().setLabelFormatter(
-                    new DateAsXAxisLabelFormatter(getActivity(), new SimpleDateFormat("c")) {
+                    new DateAsXAxisLabelFormatter(getActivity(), new SimpleDateFormat("c kk")) {
                         @Override
                         public String formatLabel(double value, boolean isValueX) {
                             if (isValueX)
