@@ -1491,8 +1491,8 @@ public class BackgroundService extends IntentService {
         // Build notification
         Notification.Builder notificationBuilder = new Notification.Builder(context);
 
-        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.backpacker_black).copy(Bitmap.Config.ARGB_8888, true);
-        notificationBuilder.setLargeIcon(largeIcon);
+        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ? R.drawable.backpacker_white : R.drawable.backpacker_black);
+        notificationBuilder.setLargeIcon(largeIcon.copy(Bitmap.Config.ARGB_8888, true));
 
         if (activityType == DetectedActivity.STILL)
             notificationBuilder.setSmallIcon(R.drawable.pause);
@@ -1644,9 +1644,9 @@ public class BackgroundService extends IntentService {
                 sb.append(context.getString(R.string.header_fahrenheit));
         }
 
-        int resId = getWeatherIcon(weather, true, context);
-        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), resId).copy(Bitmap.Config.ARGB_8888, true);
-        notificationBuilder.setLargeIcon(largeIcon);
+        int resId = getWeatherIcon(weather, Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP, context);
+        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), resId);
+        notificationBuilder.setLargeIcon(largeIcon.copy(Bitmap.Config.ARGB_8888, true));
         notificationBuilder.setSmallIcon(getTemperatureIcon((float) temperature, context));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
@@ -1817,8 +1817,8 @@ public class BackgroundService extends IntentService {
 
         Notification.Builder notificationBuilder = new Notification.Builder(context);
 
-        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.umbrella_black).copy(Bitmap.Config.ARGB_8888, true);
-        notificationBuilder.setLargeIcon(largeIcon);
+        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP ? R.drawable.umbrella_white : R.drawable.umbrella_black);
+        notificationBuilder.setLargeIcon(largeIcon.copy(Bitmap.Config.ARGB_8888, true));
         notificationBuilder.setSmallIcon(R.drawable.umbrella_white);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
