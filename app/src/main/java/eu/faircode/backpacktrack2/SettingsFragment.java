@@ -747,22 +747,18 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if (PREF_WEATHER_API.equals(key)) {
             findPreference(PREF_WEATHER_FORECAST).setEnabled("fio".equals(prefs.getString(key, DEFAULT_WEATHER_API)) && Util.isConnected(getActivity()));
 
-        } else if (PREF_WEATHER_NOTIFICATION.equals(key)) {
-            if (prefs.getBoolean(key, DEFAULT_WEATHER_NOTIFICATION)) {
-                String report = prefs.getString(PREF_LAST_WEATHER_REPORT, null);
-                Weather weather = (report == null ? null : Weather.deserialize(report));
-                if (weather != null && weather.isValid(getActivity()))
-                    BackgroundService.showWeatherNotification(weather, getActivity());
-            } else {
-                BackgroundService.removeWeatherNotification(getActivity());
-                BackgroundService.removeRainNotification(getActivity());
-            }
-
-        } else if (PREF_WEATHER_RAIN_WARNING.equals(key))
+        } else if (PREF_WEATHER_NOTIFICATION.equals(key) ||
+                PREF_WEATHER_RAIN_WARNING.equals(key)) {
+            BackgroundService.removeWeatherNotification(getActivity());
             BackgroundService.removeRainNotification(getActivity());
 
+            String report = prefs.getString(PREF_LAST_WEATHER_REPORT, null);
+            Weather weather = (report == null ? null : Weather.deserialize(report));
+            if (weather != null && weather.isValid(getActivity()))
+                BackgroundService.showWeatherNotification(weather, getActivity());
+
             // Update blog URL
-        else if (PREF_BLOGURL.equals(key)) {
+        } else if (PREF_BLOGURL.equals(key)) {
             String blogurl = prefs.getString(key, null);
             if (blogurl != null) {
                 if (!blogurl.startsWith("http://") && !blogurl.startsWith("https://"))
