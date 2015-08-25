@@ -3081,7 +3081,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             final DecimalFormat DF = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ROOT));
             final DateFormat SDFT = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT);
             graph.getGridLabelRenderer().setLabelFormatter(
-                    new DateAsXAxisLabelFormatter(getActivity(), new SimpleDateFormat("c kk")) {
+                    new DateAsXAxisLabelFormatter(getActivity(), new SimpleDateFormat("c kk:hh")) {
                         @Override
                         public String formatLabel(double value, boolean isValueX) {
                             if (isValueX)
