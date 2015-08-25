@@ -146,6 +146,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_WEATHER_NOTIFICATION = "pref_weather_notification";
     public static final String PREF_WEATHER_RAIN_WARNING = "pref_weather_rain_warning";
     public static final String PREF_WEATHER_RAIN_SOUND = "pref_weather_rain_sound";
+    public static final String PREF_WEATHER_RAIN_LIGHT = "pref_weather_rain_light";
     public static final String PREF_WEATHER_GUARD = "pref_weather_guard";
     public static final String PREF_WEATHER_CACHE = "pref_weather_cache";
 
@@ -234,6 +235,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final boolean DEFAULT_WEATHER_NOTIFICATION = true;
     public static final String DEFAULT_WEATHER_RAIN_WARNING = "50"; // percent
     public static final String DEFAULT_WEATHER_RAIN_SOUND = "content://settings/system/notification_sound";
+    public static final boolean DEFAULT_WEATHER_RAIN_LIGHT = true;
     public static final String DEFAULT_WEATHER_GUARD = "60"; // minutes
     public static final String DEFAULT_WEATHER_CACHE = "15"; // minutes
 

@@ -405,12 +405,18 @@
                     android:summary="@string/summary_weather_rain_warning" />
                 <RingtonePreference
                     android:defaultValue="content://settings/system/notification_sound"
-                    android:dependency="pref_weather_notification"
+                    android:dependency="pref_weather_rain_warning"
                     android:key="pref_weather_rain_sound"
                     android:ringtoneType="notification"
                     android:showDefault="true"
                     android:showSilent="true"
                     android:title="@string/title_weather_rain_sound" />
+                <CheckBoxPreference
+                    android:defaultValue="true"
+                    android:dependency="pref_weather_rain_warning"
+                    android:key="pref_weather_rain_light"
+                    android:summary="@string/summary_weather_rain_light"
+                    android:title="@string/title_weather_rain_light" />
                 <EditTextPreference
                     android:defaultValue="60"
                     android:dependency="pref_weather_notification"

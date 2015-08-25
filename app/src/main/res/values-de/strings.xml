@@ -90,6 +90,7 @@
     <string name="title_weather_notification">Zeige Wetterbenachrichtigung</string>
     <string name="title_weather_rain_warning">Zeige Regenwarnung Benachrichtigung: %s%%</string>
     <string name="title_weather_rain_sound">Regenwarnung Klingelton</string>
+    <string name="title_weather_rain_light">Rain warning lights</string>
     <string name="title_weather_guard">Wetterbenachrichtigung Gültigkeit: %s Minuten</string>
     <string name="title_weather_cache">Vorhersage Cache: %s Minuten</string>
     <string name="title_weather_tos">Nutzungsbedingungen</string>
@@ -177,6 +178,7 @@
     <string name="summary_weather_mandatory">Pflicht</string>
     <string name="summary_weather_register">Registrierung ist Pflicht um einen API Key zu bekommen</string>
     <string name="summary_weather_rain_warning">Zeige eine Statusleiste Benachrichtigugn wenn die Niederschalgswahscheinlichkeit höher ist als die ausgewählte Prozentzahl</string>
+    <string name="summary_weather_rain_light">Show a blinking light when there is a rain warning</string>
     <string name="summary_weather_guard">Entferne die Wetterbenachrichtigung nach der angegebenen Anzahl von Minuten wenn es keine neuen Updates gibt</string>
     <string name="summary_weather_cache">Vorhersagedaten für die ausgewählte Anzahl an Minuten cachen</string>
     <string name="summary_weather_tos">Klicken um Nutzungsbedingungen anzuzeigen (Öffnet im Browser)</string>

@@ -1793,6 +1793,7 @@ public class BackgroundService extends IntentService {
 
     private static void showRainNotification(Weather weather, String geocoded, Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean light = prefs.getBoolean(SettingsFragment.PREF_WEATHER_RAIN_LIGHT, SettingsFragment.DEFAULT_WEATHER_RAIN_LIGHT);
         DecimalFormat DF1 = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ROOT));
         DecimalFormat DF2 = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.ROOT));
 
@@ -1817,7 +1818,8 @@ public class BackgroundService extends IntentService {
         if (content != null)
             notificationBuilder.setContentText(content);
         notificationBuilder.setSound(Uri.parse(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_SOUND, SettingsFragment.DEFAULT_WEATHER_RAIN_SOUND)));
-        notificationBuilder.setLights(Color.YELLOW, 1000, 1000);
+        if (light)
+            notificationBuilder.setLights(Color.YELLOW, 1000, 1000);
         notificationBuilder.setOnlyAlertOnce(true);
         notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 

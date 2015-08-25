@@ -90,6 +90,7 @@
     <string name="title_weather_notification">Show weather notification</string>
     <string name="title_weather_rain_warning">Show rain warning notification: %s%%</string>
     <string name="title_weather_rain_sound">Rain warning ringtone</string>
+    <string name="title_weather_rain_light">Rain warning lights</string>
     <string name="title_weather_guard">Weather notifications valid: %s minutes</string>
     <string name="title_weather_cache">Forecast cache: %s minutes</string>
     <string name="title_weather_tos">TOS</string>
@@ -179,6 +180,7 @@
     <string name="summary_weather_mandatory">Mandatory</string>
     <string name="summary_weather_register">Registration is required to obtain an API key</string>
     <string name="summary_weather_rain_warning">Show a status bar notification when the precipitation probability is higher than the selected percentage</string>
+    <string name="summary_weather_rain_light">Show a blinking light when there is a rain warning</string>
     <string name="summary_weather_guard">Remove weather notifications after the selected number of minutes when there are no updates</string>
     <string name="summary_weather_cache">Cache forecast data for the selected number of minutes</string>
     <string name="summary_weather_tos">Tap to read the terms of service (will start the browser)</string>
