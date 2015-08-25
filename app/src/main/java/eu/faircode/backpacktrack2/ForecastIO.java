@@ -72,6 +72,7 @@ public class ForecastIO {
                 String.valueOf(location.getLatitude()) + "," +
                 String.valueOf(location.getLongitude()) +
                 "?exclude=" + exclude +
+                (type == TYPE_CURRENT ? "" : "&extend=hourly") +
                 "&units=si" +
                 "&lang=" + Locale.getDefault().getLanguage());
 
