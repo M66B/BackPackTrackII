@@ -92,6 +92,9 @@ public class ForecastIO {
             if (code != HttpsURLConnection.HTTP_OK)
                 throw new IOException("HTTP error " + urlConnection.getResponseCode());
 
+            Log.i(TAG, "API calls=" + urlConnection.getHeaderField("X-Forecast-API-Calls") +
+                    " reponse time=" + urlConnection.getHeaderField("X-Response-Time"));
+
             // Get response
             BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
             StringBuilder json = new StringBuilder();
