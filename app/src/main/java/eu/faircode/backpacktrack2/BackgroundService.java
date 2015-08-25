@@ -1819,7 +1819,7 @@ public class BackgroundService extends IntentService {
 
         Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.umbrella_black).copy(Bitmap.Config.ARGB_8888, true);
         notificationBuilder.setLargeIcon(largeIcon);
-        notificationBuilder.setSmallIcon(R.drawable.rain_white);
+        notificationBuilder.setSmallIcon(R.drawable.umbrella_white);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             notificationBuilder.setColor(context.getResources().getColor(R.color.color_teal_600, null));
