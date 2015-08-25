@@ -90,7 +90,7 @@
     <string name="title_weather_notification">Zeige Wetterbenachrichtigung</string>
     <string name="title_weather_rain_warning">Zeige Regenwarnung Benachrichtigung: %s%%</string>
     <string name="title_weather_rain_sound">Regenwarnung Klingelton</string>
-    <string name="title_weather_rain_light">Regenwarung Licht</string>
+    <string name="title_weather_rain_light">Regenwarnung Licht</string>
     <string name="title_weather_guard">Wetterbenachrichtigung Gültigkeit: %s Minuten</string>
     <string name="title_weather_cache">Vorhersage Cache: %s Minuten</string>
     <string name="title_weather_tos">Nutzungsbedingungen</string>
