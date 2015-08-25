@@ -33,7 +33,6 @@ public class ForecastIO {
 
     private static final String BASE_URL = "https://api.forecast.io/forecast";
     private static final int cTimeOutMs = 30 * 1000;
-    private static final DecimalFormat DF = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ROOT));
 
     public static final int TYPE_CURRENT = 1;
     public static final int TYPE_HOURLY = 2;
