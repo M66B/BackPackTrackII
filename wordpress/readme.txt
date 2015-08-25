@@ -2,14 +2,14 @@
 Contributors: Marcel Bokhorst, M66B
 Tags: Android, track, trackpoint, waypoint, geocode, travel, journey, GPX
 Requires at least: 3.1
-Tested up to: 4.2.2
+Tested up to: 4.3
 Stable tag: 0.8
 
 WordPress plugin and open source Android application to track your journeys
 
 == Description ==
 
-Companion plugin for the Android application [BackPackTrack II](https://github.com/M66B/BackPackTrackII/)
+Companion plugin for the Android application [BackPackTrack II](https://play.google.com/store/apps/details?id=eu.faircode.backpacktrack2)
 
 == Installation ==
 
