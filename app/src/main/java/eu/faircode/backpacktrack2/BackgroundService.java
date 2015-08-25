@@ -1491,7 +1491,7 @@ public class BackgroundService extends IntentService {
         // Build notification
         Notification.Builder notificationBuilder = new Notification.Builder(context);
 
-        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.backpacker_grey).copy(Bitmap.Config.ARGB_8888, true);
+        Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.backpacker_black).copy(Bitmap.Config.ARGB_8888, true);
         notificationBuilder.setLargeIcon(largeIcon);
 
         if (activityType == DetectedActivity.STILL)
@@ -1648,6 +1648,11 @@ public class BackgroundService extends IntentService {
         Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), resId).copy(Bitmap.Config.ARGB_8888, true);
         notificationBuilder.setLargeIcon(largeIcon);
         notificationBuilder.setSmallIcon(getTemperatureIcon((float) temperature, context));
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            notificationBuilder.setColor(context.getResources().getColor(R.color.color_teal_600, null));
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            notificationBuilder.setColor(context.getResources().getColor(R.color.color_teal_600));
 
         // Humidity
         double humidity = weather.humidity;
@@ -1811,9 +1816,16 @@ public class BackgroundService extends IntentService {
         }
 
         Notification.Builder notificationBuilder = new Notification.Builder(context);
+
         Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.umbrella_black).copy(Bitmap.Config.ARGB_8888, true);
         notificationBuilder.setLargeIcon(largeIcon);
-        notificationBuilder.setSmallIcon(R.drawable.umbrella_black);
+        notificationBuilder.setSmallIcon(R.drawable.rain_white);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            notificationBuilder.setColor(context.getResources().getColor(R.color.color_teal_600, null));
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            notificationBuilder.setColor(context.getResources().getColor(R.color.color_teal_600));
+
         notificationBuilder.setContentTitle(context.getString(R.string.msg_rain_warning, Math.round(weather.rain_probability)));
         if (content != null)
             notificationBuilder.setContentText(content);

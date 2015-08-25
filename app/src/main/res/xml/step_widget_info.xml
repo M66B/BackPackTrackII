@@ -4,7 +4,7 @@
     android:initialLayout="@layout/step_widget"
     android:minHeight="40dp"
     android:minWidth="40dp"
-    android:previewImage="@drawable/backpacker"
+    android:previewImage="@drawable/backpacker_white"
     android:resizeMode="none"
     android:updatePeriodMillis="0"
     android:widgetCategory="home_screen" />
