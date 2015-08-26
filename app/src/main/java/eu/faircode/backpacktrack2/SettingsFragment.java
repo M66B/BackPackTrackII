@@ -866,6 +866,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     final EditText address = (EditText) viewEdit.findViewById(R.id.etAdd);
 
                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                    alertDialogBuilder.setIcon(android.R.drawable.ic_menu_add);
                     alertDialogBuilder.setTitle(R.string.title_geocode);
                     alertDialogBuilder.setView(viewEdit);
                     alertDialogBuilder
@@ -946,8 +947,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setTitle(R.string.title_edit);
         alertDialogBuilder.setIcon(R.drawable.create_60);
+        alertDialogBuilder.setTitle(R.string.title_edit);
         alertDialogBuilder.setView(viewEdit);
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -995,6 +996,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                         // Show address selector
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                        alertDialogBuilder.setIcon(android.R.drawable.ic_menu_add);
                         alertDialogBuilder.setTitle(getString(R.string.title_geocode));
                         alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int item) {
@@ -1232,8 +1234,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setTitle(resTitle);
         alertDialogBuilder.setIcon(resIcon);
+        alertDialogBuilder.setTitle(resTitle);
         alertDialogBuilder.setView(view);
         alertDialogBuilder
                 .setPositiveButton(android.R.string.ok,
@@ -1422,6 +1424,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             case R.id.menu_delete:
                                 final String title = (name == null ? getString(R.string.title_trackpoint) : name);
                                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                                alertDialogBuilder.setIcon(android.R.drawable.ic_menu_delete);
                                 alertDialogBuilder.setTitle(getString(R.string.msg_delete, title));
                                 alertDialogBuilder
                                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -1511,8 +1514,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setTitle(R.string.title_location_history);
         alertDialogBuilder.setIcon(R.drawable.location_60);
+        alertDialogBuilder.setTitle(R.string.title_location_history);
         alertDialogBuilder.setView(viewHistory);
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -1809,8 +1812,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setTitle(R.string.title_activity_history);
         alertDialogBuilder.setIcon(R.drawable.history_60);
+        alertDialogBuilder.setTitle(R.string.title_activity_history);
         alertDialogBuilder.setView(viewHistory);
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -2035,6 +2038,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                alertDialogBuilder.setIcon(android.R.drawable.ic_menu_delete);
                 alertDialogBuilder.setTitle(getString(R.string.msg_delete, getString(R.string.title_activity_history)));
                 alertDialogBuilder
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -2092,8 +2096,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setTitle(R.string.title_activity_history);
         alertDialogBuilder.setIcon(R.drawable.history_60);
+        alertDialogBuilder.setTitle(R.string.title_activity_history);
         alertDialogBuilder.setView(viewHistory);
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -2150,8 +2154,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setTitle(R.string.title_activity_history);
         alertDialogBuilder.setIcon(R.drawable.history_60);
+        alertDialogBuilder.setTitle(R.string.title_activity_history);
         alertDialogBuilder.setView(viewHistory);
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -2245,8 +2249,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setTitle(R.string.title_step_history);
         alertDialogBuilder.setIcon(R.drawable.walk_60);
+        alertDialogBuilder.setTitle(R.string.title_step_history);
         alertDialogBuilder.setView(viewHistory);
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -2514,8 +2518,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setTitle(R.string.title_weather_history);
         alertDialogBuilder.setIcon(R.drawable.sunny_60);
+        alertDialogBuilder.setTitle(R.string.title_weather_history);
         alertDialogBuilder.setView(viewHistory);
         final AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -2998,8 +3002,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Show layout
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setTitle(R.string.title_weather_forecast);
         alertDialogBuilder.setIcon(R.drawable.trending_up_60);
+        alertDialogBuilder.setTitle(R.string.title_weather_forecast);
         alertDialogBuilder.setView(viewForecast);
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
