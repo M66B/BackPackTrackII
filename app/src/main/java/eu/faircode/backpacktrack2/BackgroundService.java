@@ -1837,7 +1837,7 @@ public class BackgroundService extends IntentService {
 
         // Build main intent
         Intent riMain = new Intent(context, SettingsActivity.class);
-        riMain.putExtra(SettingsFragment.EXTRA_ACTION, SettingsFragment.ACTION_WEATHER);
+        riMain.putExtra(SettingsFragment.EXTRA_ACTION, SettingsFragment.ACTION_FORECAST);
         PendingIntent piMain = PendingIntent.getActivity(context, REQUEST_RAIN, riMain, PendingIntent.FLAG_CANCEL_CURRENT);
         notificationBuilder.setContentIntent(piMain);
 

@@ -315,6 +315,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String ACTION_LOCATION = "Location";
     public static final String ACTION_STEPS = "Steps";
     public static final String ACTION_WEATHER = "Weather";
+    public static final String ACTION_FORECAST = "Forecast";
 
     private static final int ACTIVITY_PICKPLACE = 1;
     private static final int GEOCODER_RESULTS = 5;
@@ -379,6 +380,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 step_history();
             else if (ACTION_WEATHER.equals(action))
                 weather_history();
+            else if (ACTION_FORECAST.equals(action))
+                weather_forecast();
         }
     }
 
