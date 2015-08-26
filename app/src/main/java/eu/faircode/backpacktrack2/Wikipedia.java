@@ -22,6 +22,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,8 +46,20 @@ public class Wikipedia {
         return result;
     }
 
+    private static void cleanupCache(File folder) {
+        long time = new Date().getTime();
+        for (File file : folder.listFiles())
+            if (file.lastModified() + 7 * 24 * 3600 * 1000L < time) {
+                Log.i(TAG, "Deleting " + file);
+                file.delete();
+            }
+    }
+
     private static List<Page> geosearch(Location location, int radius, int limit, Context context, String baseurl) throws IOException, JSONException {
-        File cache = new File(context.getCacheDir(),
+        File folder = new File(context.getCacheDir(), "wiki");
+        folder.mkdir();
+        cleanupCache(folder);
+        File cache = new File(folder,
                 String.format(Locale.ROOT,
                         "%s_%f_%f_%d_%d.json",
                         Uri.parse(baseurl).getHost(),
