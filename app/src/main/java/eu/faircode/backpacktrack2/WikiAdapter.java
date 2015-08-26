@@ -44,12 +44,12 @@ public class WikiAdapter extends ArrayAdapter<Wikipedia.Page> {
 
         TextView tvTitle = (TextView) convertView.findViewById(R.id.tvTitle);
         TextView tvDistance = (TextView) convertView.findViewById(R.id.tvDistance);
-        TextView tvMeta = (TextView) convertView.findViewById(R.id.tvMeta);
+        TextView tvSource = (TextView) convertView.findViewById(R.id.tvSource);
         ImageView ivShare = (ImageView) convertView.findViewById(R.id.ivShare);
 
         tvTitle.setText(page.title);
-        tvDistance.setText(Math.round(page.location.distanceTo(location)) + " m");
-        tvMeta.setText(Uri.parse(page.baseurl).getHost() + (page.type == null ? "" : "/" + page.type));
+        tvDistance.setText(Math.round(page.location.distanceTo(location)) + " m" + (page.type == null ? "" : " " + page.type));
+        tvSource.setText(Uri.parse(page.baseurl).getHost());
 
         ivShare.setOnClickListener(new View.OnClickListener() {
             @Override
