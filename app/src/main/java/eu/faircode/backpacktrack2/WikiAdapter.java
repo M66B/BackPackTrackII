@@ -58,6 +58,7 @@ public class WikiAdapter extends ArrayAdapter<Wikipedia.Page> {
                             "?q=" + page.location.getLatitude() + "," + page.location.getLongitude() + "(" + Uri.encode(page.title) + ")";
                     context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
                 } catch (Throwable ex) {
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                     Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -67,10 +68,13 @@ public class WikiAdapter extends ArrayAdapter<Wikipedia.Page> {
             @Override
             public void onClick(View view) {
                 try {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(page.getPageUrl()));
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                    String baseurl = prefs.getString(SettingsFragment.PREF_WIKI_BASE_URL, SettingsFragment.DEFAULT_WIKI_BASE_URL);
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(page.getPageUrl(baseurl)));
                     context.startActivity(browserIntent);
                 } catch (Throwable ex) {
                     Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -487,6 +487,24 @@
                 android:entryValues="@array/listPrecipitationValue"
                 android:key="pref_precipitation" />
         </PreferenceScreen>
+        <PreferenceScreen android:title="@string/title_misc">
+            <EditTextPreference
+                android:defaultValue="https://en.wikipedia.org"
+                android:inputType="textUri"
+                android:key="pref_wiki_base_url" />
+            <EditTextPreference
+                android:defaultValue="10"
+                android:inputType="number"
+                android:key="pref_wiki_results" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_debug"
+                android:title="@string/title_debug" />
+            <Preference
+                android:dependency="pref_debug"
+                android:key="pref_logcat"
+                android:title="@string/title_logcat" />
+        </PreferenceScreen>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_info">
         <PreferenceScreen android:title="@string/title_legend">
@@ -554,14 +572,6 @@
                 android:action="android.intent.action.VIEW"
                 android:data="http://forum.xda-developers.com/showthread.php?t=3123682" />
         </Preference>
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="pref_debug"
-            android:title="@string/title_debug" />
-        <Preference
-            android:dependency="pref_debug"
-            android:key="pref_logcat"
-            android:title="@string/title_logcat" />
         <Preference
             android:summary="@string/summary_author"
             android:title="@string/title_author">

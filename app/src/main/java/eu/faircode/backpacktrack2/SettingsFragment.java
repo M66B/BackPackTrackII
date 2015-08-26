@@ -176,10 +176,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_WINDSPEED = "pref_windspeed";
     public static final String PREF_PRECIPITATION = "pref_precipitation";
 
-    public static final String PREF_VERSION = "pref_version";
-    public static final String PREF_SUPPORT = "pref_support";
+    public static final String PREF_WIKI_BASE_URL = "pref_wiki_base_url";
+    public static final String PREF_WIKI_RESULTS = "pref_wiki_results";
     public static final String PREF_DEBUG = "pref_debug";
     public static final String PREF_LOGCAT = "pref_logcat";
+
+    public static final String PREF_VERSION = "pref_version";
 
     public static final String PREF_GRAPH_STILL = "pref_graph_still";
     public static final String PREF_GRAPH_WALKING = "pref_graph_walking";
@@ -258,6 +260,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_PRESSURE = "hpa";
     public static final String DEFAULT_WINDSPEED = "bft";
     public static final String DEFAULT_PRECIPITATION = "mm";
+
+    public static final String DEFAULT_WIKI_BASE_URL = "https://en.wikipedia.org";
+    public static final String DEFAULT_WIKI_RESULTS = "10";
 
     public static final boolean DEFAULT_GRAPH_STILL = false;
     public static final boolean DEFAULT_GRAPH_WALKING = true;
@@ -514,7 +519,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_WINDSPEED);
         updateTitle(prefs, PREF_PRECIPITATION);
 
-        updateTitle(prefs, PREF_SUPPORT);
+        updateTitle(prefs, PREF_WIKI_BASE_URL);
+        updateTitle(prefs, PREF_WIKI_RESULTS);
 
         // Handle waypoint_edit waypoints
         pref_edit.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -3275,7 +3281,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             else if ("in".equals(rain_unit))
                 rain_unit = getString(R.string.header_inch);
             pref.setTitle(getString(R.string.title_precipitation, rain_unit));
-        }
+
+        } else if (PREF_WIKI_BASE_URL.equals(key))
+            pref.setTitle(getString(R.string.title_wiki_baseurl, prefs.getString(key, DEFAULT_WIKI_BASE_URL)));
+        else if (PREF_WIKI_RESULTS.equals(key))
+            pref.setTitle(getString(R.string.title_wiki_results, prefs.getString(key, DEFAULT_WIKI_RESULTS)));
     }
 
     private boolean blogConfigured() {

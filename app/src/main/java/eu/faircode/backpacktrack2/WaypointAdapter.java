@@ -9,6 +9,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
@@ -16,6 +17,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -49,6 +51,9 @@ public class WaypointAdapter extends CursorAdapter {
     private int colName;
     private int colHidden;
 
+    private String baseurl;
+    public int results;
+
     private static final int GEOCODER_RESULTS = 5;
 
     private DatabaseHelper db;
@@ -58,12 +63,17 @@ public class WaypointAdapter extends CursorAdapter {
         super(context, cursor, 0);
         this.db = db;
         this.fm = fm;
-        colID = cursor.getColumnIndex("ID");
-        colTime = cursor.getColumnIndex("time");
-        colLatitude = cursor.getColumnIndex("latitude");
-        colLongitude = cursor.getColumnIndex("longitude");
-        colName = cursor.getColumnIndex("name");
-        colHidden = cursor.getColumnIndex("hidden");
+
+        this.colID = cursor.getColumnIndex("ID");
+        this.colTime = cursor.getColumnIndex("time");
+        this.colLatitude = cursor.getColumnIndex("latitude");
+        this.colLongitude = cursor.getColumnIndex("longitude");
+        this.colName = cursor.getColumnIndex("name");
+        this.colHidden = cursor.getColumnIndex("hidden");
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        this.baseurl = prefs.getString(SettingsFragment.PREF_WIKI_BASE_URL, SettingsFragment.DEFAULT_WIKI_BASE_URL);
+        this.results = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WIKI_RESULTS, SettingsFragment.DEFAULT_WIKI_RESULTS));
     }
 
     @Override
@@ -248,7 +258,7 @@ public class WaypointAdapter extends CursorAdapter {
 
                                     protected Object doInBackground(Object... params) {
                                         try {
-                                            return Wikipedia.geosearch(wpt, 10000, context);
+                                            return Wikipedia.geosearch(wpt, 10000, results, context, baseurl);
                                         } catch (Throwable ex) {
                                             return ex;
                                         }

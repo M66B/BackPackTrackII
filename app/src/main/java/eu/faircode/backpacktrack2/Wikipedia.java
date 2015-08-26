@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,19 +23,18 @@ import javax.net.ssl.HttpsURLConnection;
 public class Wikipedia {
     private static final String TAG = "BPT2.Wikipedia";
 
-    private static final String BASE_URL = "https://en.wikipedia.org/w/api.php";
     private static final int cTimeOutMs = 30 * 1000;
 
-    public static List<Page> geosearch(Location location, int radius, Context context) throws IOException, JSONException {
+    public static List<Page> geosearch(Location location, int radius, int limit, Context context, String baseurl) throws IOException, JSONException {
         // https://www.mediawiki.org/wiki/Extension:GeoData
-        URL url = new URL(BASE_URL +
+        URL url = new URL(baseurl + "/w/api.php" +
                 "?action=query" +
                 "&list=geosearch" +
                 "&gsradius=" + radius +
                 "&gscoord=" +
                 String.valueOf(location.getLatitude()) + "|" +
                 String.valueOf(location.getLongitude()) +
-                "&gslimit=10" +
+                "&gslimit=" + limit +
                 "&gsprop=type" +
                 "&format=json");
 
@@ -43,6 +43,7 @@ public class Wikipedia {
         urlConnection.setConnectTimeout(cTimeOutMs);
         urlConnection.setReadTimeout(cTimeOutMs);
         urlConnection.setRequestProperty("Accept", "application/json");
+        urlConnection.setRequestProperty("User-Agent", "BackPackTrack II");
 
         // Set request type
         urlConnection.setRequestMethod("GET");
@@ -71,7 +72,6 @@ public class Wikipedia {
     }
 
     private static List<Page> decodeResult(String json) throws JSONException {
-        // {"batchcomplete":"","query":{"geosearch":[]}}
         List<Page> result = new ArrayList<Page>();
 
         JSONObject jroot = new JSONObject(json);
@@ -94,7 +94,6 @@ public class Wikipedia {
 
     @NonNull
     private static Page decodePage(JSONObject data) throws JSONException {
-        // {"pageid":28330462,"ns":0,"title":"Maasvlakte Light","lat":51.970047222222,"lon":4.0142916666667,"dist":3471.4,"primary":""}
         Page page = new Page();
         page.pageid = data.getLong("pageid");
         page.type = data.getString("type");
@@ -113,8 +112,8 @@ public class Wikipedia {
         public String title;
         public Location location;
 
-        public String getPageUrl() {
-            return "https://en.wikipedia.org/?curid=" + pageid;
+        public String getPageUrl(String baseurl) throws IOException {
+            return baseurl + "/wiki/" + this.title.replace(" ", "_");
         }
     }
 }
