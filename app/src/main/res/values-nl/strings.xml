@@ -109,7 +109,7 @@
     <string name="title_precipitation">Neerslag: %s</string>
 
     <string name="title_misc">Overige</string>
-    <string name="title_wiki_baseurl">Wiki basis URL: %s</string>
+    <string name="title_wiki_baseurl">Wiki basis URLs</string>
     <string name="title_wiki_results">Wiki resultaten: %s</string>
     <string name="title_debug">Debug modus</string>
     <string name="title_logcat">Verstuur logcat</string>

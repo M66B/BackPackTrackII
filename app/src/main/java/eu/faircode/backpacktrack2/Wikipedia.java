@@ -16,6 +16,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -25,7 +27,20 @@ public class Wikipedia {
 
     private static final int cTimeOutMs = 30 * 1000;
 
-    public static List<Page> geosearch(Location location, int radius, int limit, Context context, String baseurl) throws IOException, JSONException {
+    public static List<Page> geosearch(final Location location, int radius, int limit, Context context, String[] baseurls) throws IOException, JSONException {
+        List<Page> result = new ArrayList<Page>();
+        for (String baseurl : baseurls)
+            result.addAll(geosearch(location, radius, limit, context, baseurl));
+        Collections.sort(result, new Comparator<Page>() {
+            @Override
+            public int compare(Page p1, Page p2) {
+                return Double.compare(p1.location.distanceTo(location), p2.location.distanceTo(location));
+            }
+        });
+        return result;
+    }
+
+    private static List<Page> geosearch(Location location, int radius, int limit, Context context, String baseurl) throws IOException, JSONException {
         // https://www.mediawiki.org/wiki/Extension:GeoData
         URL url = new URL(baseurl + "/w/api.php" +
                 "?action=query" +
@@ -65,13 +80,13 @@ public class Wikipedia {
             Log.d(TAG, json.toString());
 
             // Decode result
-            return decodeResult(json.toString());
+            return decodeResult(json.toString(), baseurl);
         } finally {
             urlConnection.disconnect();
         }
     }
 
-    private static List<Page> decodeResult(String json) throws JSONException {
+    private static List<Page> decodeResult(String json, String baseurl) throws JSONException {
         List<Page> result = new ArrayList<Page>();
 
         JSONObject jroot = new JSONObject(json);
@@ -86,14 +101,14 @@ public class Wikipedia {
         for (int i = 0; i < geosearch.length(); i++) {
             JSONObject page = geosearch.getJSONObject(i);
             if (page.has("pageid") && page.has("title") && page.has("lat") && page.has("lon"))
-                result.add(decodePage(page));
+                result.add(decodePage(page, baseurl));
         }
 
         return result;
     }
 
     @NonNull
-    private static Page decodePage(JSONObject data) throws JSONException {
+    private static Page decodePage(JSONObject data, String baseurl) throws JSONException {
         Page page = new Page();
         page.pageid = data.getLong("pageid");
         page.type = data.getString("type");
@@ -103,6 +118,7 @@ public class Wikipedia {
         page.location = new Location("wikipedia");
         page.location.setLatitude(data.getDouble("lat"));
         page.location.setLongitude(data.getDouble("lon"));
+        page.baseurl = baseurl;
         return page;
     }
 
@@ -111,8 +127,9 @@ public class Wikipedia {
         public String type;
         public String title;
         public Location location;
+        public String baseurl;
 
-        public String getPageUrl(String baseurl) throws IOException {
+        public String getPageUrl() {
             return baseurl + "/wiki/" + this.title.replace(" ", "_");
         }
     }

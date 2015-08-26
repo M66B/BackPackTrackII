@@ -489,9 +489,10 @@
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_misc">
             <EditTextPreference
-                android:defaultValue="https://en.wikipedia.org"
+                android:defaultValue="https://en.wikipedia.org,https://en.wikivoyage.org"
                 android:inputType="textUri"
-                android:key="pref_wiki_base_url" />
+                android:key="pref_wiki_base_url"
+                android:title="@string/title_wiki_baseurl" />
             <EditTextPreference
                 android:defaultValue="10"
                 android:inputType="number"

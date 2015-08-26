@@ -259,7 +259,7 @@ public class WaypointAdapter extends CursorAdapter {
 
                                     protected Object doInBackground(Object... params) {
                                         try {
-                                            return Wikipedia.geosearch(wpt, 10000, results, context, baseurl);
+                                            return Wikipedia.geosearch(wpt, 10000, results, context, baseurl.split(","));
                                         } catch (Throwable ex) {
                                             return ex;
                                         }
@@ -284,10 +284,8 @@ public class WaypointAdapter extends CursorAdapter {
                                                 @Override
                                                 public void onItemClick(AdapterView<?> adapterView, View view, final int position, long iid) {
                                                     Wikipedia.Page page = (Wikipedia.Page) lv.getItemAtPosition(position);
-                                                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                                                    String baseurl = prefs.getString(SettingsFragment.PREF_WIKI_BASE_URL, SettingsFragment.DEFAULT_WIKI_BASE_URL);
                                                     try {
-                                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(page.getPageUrl(baseurl)));
+                                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(page.getPageUrl()));
                                                         context.startActivity(browserIntent);
                                                     } catch (Throwable ex) {
                                                         Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));

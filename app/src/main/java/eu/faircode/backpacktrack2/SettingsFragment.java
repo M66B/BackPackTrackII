@@ -261,7 +261,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_WINDSPEED = "bft";
     public static final String DEFAULT_PRECIPITATION = "mm";
 
-    public static final String DEFAULT_WIKI_BASE_URL = "https://en.wikipedia.org";
+    public static final String DEFAULT_WIKI_BASE_URL = "https://en.wikipedia.org,https://en.wikivoyage.org";
     public static final String DEFAULT_WIKI_RESULTS = "10";
 
     public static final boolean DEFAULT_GRAPH_STILL = false;
@@ -3283,7 +3283,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref.setTitle(getString(R.string.title_precipitation, rain_unit));
 
         } else if (PREF_WIKI_BASE_URL.equals(key))
-            pref.setTitle(getString(R.string.title_wiki_baseurl, prefs.getString(key, DEFAULT_WIKI_BASE_URL)));
+            pref.setSummary(prefs.getString(key, DEFAULT_WIKI_BASE_URL));
         else if (PREF_WIKI_RESULTS.equals(key))
             pref.setTitle(getString(R.string.title_wiki_results, prefs.getString(key, DEFAULT_WIKI_RESULTS)));
     }

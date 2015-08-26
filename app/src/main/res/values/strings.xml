@@ -111,7 +111,7 @@
     <string name="title_precipitation">Precipitation: %s</string>
 
     <string name="title_misc">Miscellaneous</string>
-    <string name="title_wiki_baseurl">Wiki base URL: %s</string>
+    <string name="title_wiki_baseurl">Wiki base URLs</string>
     <string name="title_wiki_results">Wiki results: %s</string>
     <string name="title_debug">Debug mode</string>
     <string name="title_logcat">Send logcat</string>
