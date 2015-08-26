@@ -21,7 +21,7 @@ public class SettingsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Window window = getWindow();
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -29,6 +29,13 @@ public class SettingsActivity extends Activity {
                 window.setStatusBarColor(getResources().getColor(R.color.color_teal_600, null));
             else
                 window.setStatusBarColor(getResources().getColor(R.color.color_teal_600));
+        }
+        
+        else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)  {
+            Window window = getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getResources().getColor(R.color.color_teal_600));
         }
 
         boolean hasPermision = true;
