@@ -2,6 +2,7 @@ package eu.faircode.backpacktrack2;
 
 import android.content.Context;
 import android.location.Location;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -10,6 +11,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -19,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -41,6 +46,31 @@ public class Wikipedia {
     }
 
     private static List<Page> geosearch(Location location, int radius, int limit, Context context, String baseurl) throws IOException, JSONException {
+        File cache = new File(context.getCacheDir(),
+                String.format(Locale.ROOT,
+                        "%s_%f_%f_%d_%d.json",
+                        Uri.parse(baseurl).getHost(),
+                        location.getLatitude(),
+                        location.getLongitude(),
+                        radius,
+                        limit));
+
+        // Check cache
+        if (cache.exists()) {
+            Log.i(TAG, "Reading " + cache);
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(cache);
+                byte[] buffer = new byte[fis.available()];
+                fis.read(buffer);
+                String json = new String(buffer);
+                return decodeResult(json, baseurl);
+            } finally {
+                if (fis != null)
+                    fis.close();
+            }
+        }
+
         // https://www.mediawiki.org/wiki/Extension:GeoData
         URL url = new URL(baseurl + "/w/api.php" +
                 "?action=query" +
@@ -78,6 +108,17 @@ public class Wikipedia {
             while ((line = br.readLine()) != null)
                 json.append(line);
             Log.d(TAG, json.toString());
+
+            // Cache result
+            Log.i(TAG, "Writing " + cache);
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(cache);
+                fos.write(json.toString().getBytes());
+            } finally {
+                if (fos != null)
+                    fos.close();
+            }
 
             // Decode result
             return decodeResult(json.toString(), baseurl);
