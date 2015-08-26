@@ -1,6 +1,7 @@
 package eu.faircode.backpacktrack2;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,6 +19,7 @@ public class SettingsActivity extends Activity {
     private static final String TAG = "BPT2.Settings";
 
     @Override
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -25,7 +27,10 @@ public class SettingsActivity extends Activity {
             Window window = getWindow();
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(getResources().getColor(R.color.color_teal_600, null));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                window.setStatusBarColor(getResources().getColor(R.color.color_teal_600, null));
+            else
+                window.setStatusBarColor(getResources().getColor(R.color.color_teal_600));
         }
 
         boolean hasPermision = true;
