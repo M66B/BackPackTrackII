@@ -13,7 +13,7 @@
     <string name="title_weather_history">Wetterhistorie</string>
     <string name="title_weather_forecast">Wettervorhersage</string>
     <string name="title_loc_settings">Standorteinstellungen</string>
-    <string name="title_useful_links">Useful links</string>
+    <string name="title_useful_links">Nützliche Links</string>
 
     <string name="title_geocode">Geocode-Adresse</string>
     <string name="title_rgeocode">Umwandlung der Geocode-Position</string>
@@ -132,7 +132,7 @@
     <string name="summary_weather_history">Zeige lokale Wetterhistorie</string>
     <string name="summary_weather_forecast">Zeige lokale Wettervorhersage</string>
     <string name="summary_loc_settings">Klicken um Android Standorteinstellungen zu öffnen</string>
-    <string name="summary_useful_links">Links to information relevant to travelers</string>
+    <string name="summary_useful_links">Links zu relevanten Informationen für Reisende</string>
 
     <string name="summary_interval">Versuche eine neue Position jede Anzahl von Sekunden zu bestimmen</string>
     <string name="summary_altitude">Bevorzuge eine ungenauere Position mit Höheninformationen zu einer genaueren Position ohne Höheninformationen</string>
