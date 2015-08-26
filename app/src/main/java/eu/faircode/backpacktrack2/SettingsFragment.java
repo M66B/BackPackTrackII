@@ -401,6 +401,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public void onResume() {
         super.onResume();
 
+        getView().setPadding(0, 0, 0, 0);
+        ((ListView) getView().findViewById(android.R.id.list)).setPadding(0, 0, 0, 0);
+
         final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
         // Listen for preference changes
