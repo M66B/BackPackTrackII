@@ -2,12 +2,8 @@ package eu.faircode.backpacktrack2;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.location.Location;
 import android.net.Uri;
-import android.preference.PreferenceManager;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,20 +13,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
-public class WikiAdapter extends ArrayAdapter<Wikipedia.Page> {
+public class WikiAdapter extends ArrayAdapter<Wikimedia.Page> {
     private static final String TAG = "BPT2.Wiki";
 
     private Context context;
     private Location location;
 
-    public WikiAdapter(Context context, List<Wikipedia.Page> pages, Location location) {
+    public WikiAdapter(Context context, List<Wikimedia.Page> pages, Location location) {
         super(context, 0, pages);
         this.context = context;
         this.location = location;
@@ -38,7 +29,7 @@ public class WikiAdapter extends ArrayAdapter<Wikipedia.Page> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final Wikipedia.Page page = getItem(position);
+        final Wikimedia.Page page = getItem(position);
         if (convertView == null)
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.wiki, parent, false);
 

@@ -28,8 +28,8 @@ import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class Wikipedia {
-    private static final String TAG = "BPT2.Wikipedia";
+public class Wikimedia {
+    private static final String TAG = "BPT2.Wikimedia";
 
     private static final int cTimeOutMs = 30 * 1000;
 

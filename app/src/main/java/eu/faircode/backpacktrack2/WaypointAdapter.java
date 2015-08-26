@@ -259,7 +259,7 @@ public class WaypointAdapter extends CursorAdapter {
 
                                     protected Object doInBackground(Object... params) {
                                         try {
-                                            return Wikipedia.geosearch(wpt, 10000, results, context, baseurl.split(","));
+                                            return Wikimedia.geosearch(wpt, 10000, results, context, baseurl.split(","));
                                         } catch (Throwable ex) {
                                             return ex;
                                         }
@@ -271,7 +271,7 @@ public class WaypointAdapter extends CursorAdapter {
                                             Log.e(TAG, result.toString() + "\n" + Log.getStackTraceString((Throwable) result));
                                             Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show();
                                         } else {
-                                            final List<Wikipedia.Page> listPage = (List<Wikipedia.Page>) result;
+                                            final List<Wikimedia.Page> listPage = (List<Wikimedia.Page>) result;
 
                                             LayoutInflater inflater = LayoutInflater.from(context);
                                             View view = inflater.inflate(R.layout.wiki_list, null);
@@ -283,7 +283,7 @@ public class WaypointAdapter extends CursorAdapter {
                                             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                                 @Override
                                                 public void onItemClick(AdapterView<?> adapterView, View view, final int position, long iid) {
-                                                    Wikipedia.Page page = (Wikipedia.Page) lv.getItemAtPosition(position);
+                                                    Wikimedia.Page page = (Wikimedia.Page) lv.getItemAtPosition(position);
                                                     try {
                                                         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(page.getPageUrl()));
                                                         context.startActivity(browserIntent);
