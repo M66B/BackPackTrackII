@@ -47,7 +47,8 @@ public class WikiAdapter extends ArrayAdapter<Wikipedia.Page> {
 
         tvTitle.setText(page.title + " " +
                 (page.type == null ? "" : "(" + page.type + ") ") +
-                Math.round(page.location.distanceTo(location)) + " m");
+                Math.round(page.location.distanceTo(location)) + " m " +
+                " (" + Uri.parse(page.baseurl).getHost() + ")");
 
         ivShare.setOnClickListener(new View.OnClickListener() {
             @Override
