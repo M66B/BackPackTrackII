@@ -246,7 +246,7 @@
     <string name="msg_no">nein</string>
 
     <string name="msg_notification">%1$s %2$s @%3$sm #%4$d</string>
-    <string name="msg_idle">Letzte @%1$s %2$s</string>
+    <string name="msg_idle">Letzte @%1$s %2$s &#177;%3$sm</string>
     <string name="msg_acquiring">Ermitteln &#8230;</string>
     <string name="msg_acquired">Ermittelt @%1$s %2$s &#177;%3$dm</string>
 

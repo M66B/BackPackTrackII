@@ -1471,7 +1471,8 @@ public class BackgroundService extends IntentService {
             else {
                 text = context.getString(R.string.msg_idle,
                         SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(new Date(lastLocation.getTime())),
-                        getProviderName(lastLocation, context));
+                        getProviderName(lastLocation, context),
+                        lastLocation.hasAccuracy() ? Math.round(lastLocation.getAccuracy()) : "?");
             }
         else if (state == STATE_ACQUIRING)
             text = context.getString(R.string.msg_acquiring);
@@ -1582,7 +1583,9 @@ public class BackgroundService extends IntentService {
         }
 
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        nm.notify(NOTIFICATION_LOCATION, notificationBuilder.build());
+        Notification.BigTextStyle notification = new Notification.BigTextStyle(notificationBuilder);
+        notification.bigText(text);
+        nm.notify(NOTIFICATION_LOCATION, notification.build());
     }
 
     private static void removeStateNotification(Context context) {

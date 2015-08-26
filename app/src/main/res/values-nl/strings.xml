@@ -246,7 +246,7 @@
     <string name="msg_no">nee</string>
 
     <string name="msg_notification">%1$s %2$s @%3$sm #%4$d</string>
-    <string name="msg_idle">Laatste @%1$s %2$s</string>
+    <string name="msg_idle">Laatste @%1$s %2$s &#177;%3$sm</string>
     <string name="msg_acquiring">Bepalen &#8230;</string>
     <string name="msg_acquired">Bepaald @%1$s %2$s &#177;%3$dm</string>
 
