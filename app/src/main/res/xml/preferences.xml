@@ -54,6 +54,39 @@
             android:key="pref_settings"
             android:summary="@string/summary_loc_settings"
             android:title="@string/title_loc_settings" />
+        <PreferenceScreen
+            android:icon="@drawable/link_60"
+            android:summary="@string/summary_useful_links"
+            android:title="@string/title_useful_links">
+            <Preference
+                android:summary="Everything you need to know about budget independent travel"
+                android:title="Travel Independent">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="http://www.travelindependent.info/" />
+            </Preference>
+            <Preference
+                android:summary="Airline seat maps"
+                android:title="SeatGuru">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="http://www.seatguru.com/" />
+            </Preference>
+            <Preference
+                android:summary="Plug &amp; socket types"
+                android:title="World Standards: Electricy">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="http://www.worldstandards.eu/electricity/plugs-and-sockets/" />
+            </Preference>
+            <Preference
+                android:summary="Wiki about prepaid mobile phone plans from all over the world"
+                android:title="Prepaid Data SIM Card Wiki">
+                <intent
+                    android:action="android.intent.action.VIEW"
+                    android:data="http://prepaid-data-sim-card.wikia.com" />
+            </Preference>
+        </PreferenceScreen>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_app_settings">
         <PreferenceScreen android:title="@string/title_tracking">

@@ -13,6 +13,7 @@
     <string name="title_weather_history">Weather history</string>
     <string name="title_weather_forecast">Weather forecast</string>
     <string name="title_loc_settings">Location settings</string>
+    <string name="title_useful_links">Useful links</string>
 
     <string name="title_geocode">Geocode address</string>
     <string name="title_rgeocode">Reverse geocode location</string>
@@ -133,6 +134,7 @@
     <string name="summary_weather_history">Show local weather history</string>
     <string name="summary_weather_forecast">Show local weather forecast</string>
     <string name="summary_loc_settings">Tap to open the Android location settings</string>
+    <string name="summary_useful_links">Links to information relevant to travelers</string>
 
     <string name="summary_interval">Try to acquire a new location every selected number of seconds</string>
     <string name="summary_altitude">Prefer less accurate locations with altitude information over more accurate locations without altitude information</string>
