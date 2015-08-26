@@ -35,6 +35,7 @@ public class Wikipedia {
                 String.valueOf(location.getLatitude()) + "|" +
                 String.valueOf(location.getLongitude()) +
                 "&gslimit=10" +
+                "&gsprop=type" +
                 "&format=json");
 
         Log.i(TAG, "url=" + url);
@@ -96,6 +97,9 @@ public class Wikipedia {
         // {"pageid":28330462,"ns":0,"title":"Maasvlakte Light","lat":51.970047222222,"lon":4.0142916666667,"dist":3471.4,"primary":""}
         Page page = new Page();
         page.pageid = data.getLong("pageid");
+        page.type = data.getString("type");
+        if ("null".equals(page.type))
+            page.type = null;
         page.title = data.getString("title");
         page.location = new Location("wikipedia");
         page.location.setLatitude(data.getDouble("lat"));
@@ -105,6 +109,7 @@ public class Wikipedia {
 
     public static class Page {
         public long pageid;
+        public String type;
         public String title;
         public Location location;
 
