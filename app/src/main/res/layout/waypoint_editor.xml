@@ -26,7 +26,6 @@
             android:src="@drawable/location_60" />
     </LinearLayout>
 
-
     <ListView
         android:id="@+id/lvEdit"
         android:layout_width="match_parent"

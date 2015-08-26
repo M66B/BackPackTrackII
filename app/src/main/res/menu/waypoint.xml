@@ -10,6 +10,9 @@
         android:id="@+id/menu_geocode"
         android:title="@string/menu_geocode" />
     <item
+        android:id="@+id/menu_wiki"
+        android:title="@string/menu_wiki" />
+    <item
         android:id="@+id/menu_hidden"
         android:checkable="true"
         android:title="@string/menu_hidden" />

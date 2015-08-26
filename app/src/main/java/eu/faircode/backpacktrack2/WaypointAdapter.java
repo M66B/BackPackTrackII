@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import android.widget.CursorAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -38,7 +40,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class WaypointAdapter extends CursorAdapter {
-    private static final String TAG = "BPT2.Settings";
+    private static final String TAG = "BPT2.Waypoint";
 
     private int colID;
     private int colTime;
@@ -228,6 +230,52 @@ public class WaypointAdapter extends CursorAdapter {
                                                 alertDialogBuilder.show();
                                             } else
                                                 Toast.makeText(context, context.getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                }.execute();
+
+                                return true;
+
+                            case R.id.menu_wiki:
+                                new AsyncTask<Object, Object, Object>() {
+                                    Location wpt = new Location("geosearch");
+
+                                    @Override
+                                    protected void onPreExecute() {
+                                        wpt.setLatitude(latitude);
+                                        wpt.setLongitude(longitude);
+                                    }
+
+                                    protected Object doInBackground(Object... params) {
+                                        try {
+                                            return Wikipedia.geosearch(wpt, 10000, context);
+                                        } catch (Throwable ex) {
+                                            return ex;
+                                        }
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(final Object result) {
+                                        if (result instanceof Throwable) {
+                                            Log.e(TAG, result.toString() + "\n" + Log.getStackTraceString((Throwable) result));
+                                            Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            final List<Wikipedia.Page> listPage = (List<Wikipedia.Page>) result;
+
+                                            LayoutInflater inflater = LayoutInflater.from(context);
+                                            View view = inflater.inflate(R.layout.wiki_list, null);
+                                            ListView lv = (ListView) view.findViewById(R.id.lvWiki);
+
+                                            WikiAdapter adapter = new WikiAdapter(context, listPage, wpt);
+                                            lv.setAdapter(adapter);
+
+                                            // Show address selector
+                                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                                            alertDialogBuilder.setIcon(android.R.drawable.ic_menu_info_details);
+                                            alertDialogBuilder.setTitle(context.getString(R.string.menu_wiki));
+                                            alertDialogBuilder.setView(view);
+                                            AlertDialog alertDialog = alertDialogBuilder.create();
+                                            alertDialog.show();
                                         }
                                     }
                                 }.execute();

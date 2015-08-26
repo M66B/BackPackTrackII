@@ -268,6 +268,7 @@
     <string name="menu_time">Zeit</string>
     <string name="menu_geocode">Geocode</string>
     <string name="menu_hidden">Versteckt</string>
+    <string name="menu_wiki">Wiki</string>
     <string name="menu_delete">Löschen</string>
 
     <string name="still">Stillstand</string>

@@ -4,31 +4,29 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <EditText
-        android:id="@+id/etName"
+    <TextView
+        android:id="@+id/tvTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="3dp"
         android:layout_weight="1"
-        android:drawableRight="@android:drawable/ic_menu_close_clear_cancel"
         android:gravity="center_vertical"
-        android:inputType="textCapSentences"
         android:textAppearance="?android:attr/textAppearance" />
 
     <ImageView
-        android:id="@+id/ivManage"
+        android:id="@+id/ivShare"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="6dp"
-        android:src="@android:drawable/ic_menu_more" />
+        android:src="@android:drawable/ic_menu_share" />
 
     <ImageView
-        android:id="@+id/ivSave"
+        android:id="@+id/ivBrowse"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="6dp"
-        android:src="@android:drawable/ic_menu_save" />
+        android:src="@android:drawable/ic_menu_view" />
 </LinearLayout>
