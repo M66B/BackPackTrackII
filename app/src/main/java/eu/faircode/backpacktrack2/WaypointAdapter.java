@@ -255,6 +255,7 @@ public class WaypointAdapter extends CursorAdapter {
                                     protected void onPreExecute() {
                                         wpt.setLatitude(latitude);
                                         wpt.setLongitude(longitude);
+                                        Toast.makeText(context, context.getString(R.string.msg_lookup), Toast.LENGTH_SHORT).show();
                                     }
 
                                     protected Object doInBackground(Object... params) {

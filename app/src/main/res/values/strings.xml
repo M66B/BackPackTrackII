@@ -262,6 +262,7 @@
     <string name="msg_geocoding">Geocoding \'%s\' &#8230;</string>
     <string name="msg_rgeocoding">Reverse geocoding &#8230;</string>
     <string name="msg_requesting">Requesting &#8230;</string>
+    <string name="msg_lookup">Looking up &#8230;</string>
     <string name="msg_rain_warning">%d%% chance of rain</string>
 
     <string name="msg_permissions">One or more required permissions missing</string>
