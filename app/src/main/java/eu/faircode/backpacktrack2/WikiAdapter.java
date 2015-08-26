@@ -44,7 +44,6 @@ public class WikiAdapter extends ArrayAdapter<Wikipedia.Page> {
 
         TextView tvTitle = (TextView) convertView.findViewById(R.id.tvTitle);
         ImageView ivShare = (ImageView) convertView.findViewById(R.id.ivShare);
-        ImageView ivBrowse = (ImageView) convertView.findViewById(R.id.ivBrowse);
 
         tvTitle.setText(page.title + " " +
                 (page.type == null ? "" : "(" + page.type + ") ") +
@@ -57,21 +56,6 @@ public class WikiAdapter extends ArrayAdapter<Wikipedia.Page> {
                     String uri = "geo:" + page.location.getLatitude() + "," + page.location.getLongitude() +
                             "?q=" + page.location.getLatitude() + "," + page.location.getLongitude() + "(" + Uri.encode(page.title) + ")";
                     context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
-                } catch (Throwable ex) {
-                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                    Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        ivBrowse.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-                    String baseurl = prefs.getString(SettingsFragment.PREF_WIKI_BASE_URL, SettingsFragment.DEFAULT_WIKI_BASE_URL);
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(page.getPageUrl(baseurl)));
-                    context.startActivity(browserIntent);
                 } catch (Throwable ex) {
                     Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                     Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();

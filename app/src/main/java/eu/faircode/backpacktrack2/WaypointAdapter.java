@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.CursorAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -274,10 +275,26 @@ public class WaypointAdapter extends CursorAdapter {
 
                                             LayoutInflater inflater = LayoutInflater.from(context);
                                             View view = inflater.inflate(R.layout.wiki_list, null);
-                                            ListView lv = (ListView) view.findViewById(R.id.lvWiki);
+                                            final ListView lv = (ListView) view.findViewById(R.id.lvWiki);
 
                                             WikiAdapter adapter = new WikiAdapter(context, listPage, wpt);
                                             lv.setAdapter(adapter);
+
+                                            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                                @Override
+                                                public void onItemClick(AdapterView<?> adapterView, View view, final int position, long iid) {
+                                                    Wikipedia.Page page = (Wikipedia.Page) lv.getItemAtPosition(position);
+                                                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+                                                    String baseurl = prefs.getString(SettingsFragment.PREF_WIKI_BASE_URL, SettingsFragment.DEFAULT_WIKI_BASE_URL);
+                                                    try {
+                                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(page.getPageUrl(baseurl)));
+                                                        context.startActivity(browserIntent);
+                                                    } catch (Throwable ex) {
+                                                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                                        Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            });
 
                                             // Show address selector
                                             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
