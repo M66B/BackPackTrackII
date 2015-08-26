@@ -40,6 +40,7 @@ As a bonus BackPackTrack includes:
 * tabular and graphical actual and historical weather information
 * a current weather status bar notification, including current temperature icon
 * hourly and daily weather forecasting for the last or a selected location
+* search for Wikipedia articles around a waypoint
 
 BackPackTrack II is a complete rewrite of [BackPackTrack](https://github.com/M66B/BackPackTrack), the first Android application I wrote in 2011.
 
