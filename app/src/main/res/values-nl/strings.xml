@@ -3,7 +3,7 @@
     <string name="app_description">Neem voortdurend uw locatie op, zonder uw battery leeg te maken</string>
 
     <string name="title_action">Acties</string>
-    <string name="title_edit">Bewerk waypointen</string>
+    <string name="title_edit">Beheer waypoints</string>
     <string name="title_share_gpx">Deel GPX-bestand</string>
     <string name="title_share_kml">Deel KML-bestand</string>
     <string name="title_upload_gpx">Upload GPX-bestand</string>
@@ -122,7 +122,7 @@
     <string name="title_author">Auteur</string>
     <string name="title_license">Licentie</string>
 
-    <string name="summary_edit">Add, change or delete waypoints</string>
+    <string name="summary_edit">Use, add, change or delete waypoints</string>
     <string name="summary_share_gpx">Tap to write and share a GPX file\nLast share: %s</string>
     <string name="summary_share_kml">Tap to write and share a KML file\nLast share: %s</string>
     <string name="summary_upload_gpx">Tap to write and upload a GPX file to a WordPress weblog\nLast upload: %s</string>
@@ -275,7 +275,7 @@
     <string name="menu_time">Tijd</string>
     <string name="menu_geocode">Geocode</string>
     <string name="menu_hidden">Verstopt</string>
-    <string name="menu_wiki">Wiki</string>
+    <string name="menu_wiki">Wiki zoeken</string>
     <string name="menu_delete">Verwijderen</string>
 
     <string name="still">Stil</string>

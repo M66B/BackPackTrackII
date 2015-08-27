@@ -3,7 +3,7 @@
     <string name="app_description">Continuously record your location, without draining your battery</string>
 
     <string name="title_action">Actions</string>
-    <string name="title_edit">Edit waypoints</string>
+    <string name="title_edit">Manage waypoints</string>
     <string name="title_share_gpx">Share GPX file</string>
     <string name="title_share_kml">Share KML file</string>
     <string name="title_upload_gpx">Upload GPX file</string>
@@ -124,7 +124,7 @@
     <string name="title_author">Author</string>
     <string name="title_license">License</string>
 
-    <string name="summary_edit">Add, change or delete waypoints</string>
+    <string name="summary_edit">Use, add, change or delete waypoints</string>
     <string name="summary_share_gpx">Tap to write and share a GPX file\nLast share: %s</string>
     <string name="summary_share_kml">Tap to write and share a KML file\nLast share: %s</string>
     <string name="summary_upload_gpx">Tap to write and upload a GPX file to a WordPress weblog\nLast upload: %s</string>
@@ -277,7 +277,7 @@
     <string name="menu_time">Time</string>
     <string name="menu_geocode">Geocode</string>
     <string name="menu_hidden">Hidden</string>
-    <string name="menu_wiki">Wiki</string>
+    <string name="menu_wiki">Wiki search</string>
     <string name="menu_delete">Delete</string>
 
     <string name="still">Still</string>
