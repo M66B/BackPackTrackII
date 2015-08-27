@@ -122,6 +122,9 @@ public class Wikimedia {
                 json.append(line);
             Log.d(TAG, json.toString());
 
+            // Decode result
+            List<Page> listPage = decodeResult(json.toString(), baseurl);
+
             // Cache result
             Log.i(TAG, "Writing " + cache);
             FileOutputStream fos = null;
@@ -133,17 +136,19 @@ public class Wikimedia {
                     fos.close();
             }
 
-            // Decode result
-            return decodeResult(json.toString(), baseurl);
+            return listPage;
         } finally {
             urlConnection.disconnect();
         }
     }
 
-    private static List<Page> decodeResult(String json, String baseurl) throws JSONException {
+    private static List<Page> decodeResult(String json, String baseurl) throws JSONException, IOException {
         List<Page> result = new ArrayList<Page>();
 
         JSONObject jroot = new JSONObject(json);
+        if (jroot.has("warnings") || jroot.has("error"))
+            throw new IOException(json);
+
         if (!jroot.has("query"))
             return result;
 
