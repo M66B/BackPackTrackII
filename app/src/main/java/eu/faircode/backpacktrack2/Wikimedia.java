@@ -46,6 +46,10 @@ public class Wikimedia {
         return result;
     }
 
+    private static File getCacheFolder(Context context) {
+        return new File(context.getCacheDir(), "wiki");
+    }
+
     private static void cleanupCache(File folder) {
         long time = new Date().getTime();
         for (File file : folder.listFiles())
@@ -55,8 +59,16 @@ public class Wikimedia {
             }
     }
 
+    public static void clearCache(Context context) {
+        File folder = getCacheFolder(context);
+        for (File file : folder.listFiles()) {
+            Log.i(TAG, "Deleting " + file);
+            file.delete();
+        }
+    }
+
     private static List<Page> geosearch(Location location, int radius, int limit, Context context, String baseurl) throws IOException, JSONException {
-        File folder = new File(context.getCacheDir(), "wiki");
+        File folder = getCacheFolder(context);
         folder.mkdir();
         cleanupCache(folder);
         File cache = new File(folder,

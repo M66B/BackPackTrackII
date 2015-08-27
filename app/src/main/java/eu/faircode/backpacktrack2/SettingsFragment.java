@@ -818,6 +818,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             BackgroundService.stopWeatherUpdates(getActivity());
             BackgroundService.startWeatherUpdates(getActivity());
         }
+
+        if (PREF_WIKI_BASE_URL.equals(key) ||
+                PREF_WIKI_RESULTS.equals(key))
+            Wikimedia.clearCache(getActivity());
     }
 
     // Helper methods
