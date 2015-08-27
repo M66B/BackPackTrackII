@@ -3,7 +3,7 @@
     <string name="app_description">Ihre Position kontinuierlich aufzeichnen, ohne Ihr Akku zu belasten</string>
 
     <string name="title_action">Aktionen</string>
-    <string name="title_edit">Wegpunkte bearbeiten</string>
+    <string name="title_edit">Wegpunkte verwalten</string>
     <string name="title_share_gpx">GPX Datei teilen</string>
     <string name="title_share_kml">KML Datei teilen</string>
     <string name="title_upload_gpx">GPX Datei Hochladen</string>
@@ -122,7 +122,7 @@
     <string name="title_author">Verfasser</string>
     <string name="title_license">Lizenz</string>
 
-    <string name="summary_edit">Wegpunkte hinzufügen, ändern oder entfernen</string>
+    <string name="summary_edit">Wegpunkte benutzen, hinzufügen, ändern oder entfernen</string>
     <string name="summary_share_gpx">Klicken um eine GPX Datei zu erstellen und teilen\nLetzte Teilung: %s</string>
     <string name="summary_share_kml">Klicken um eine KML Datei zu erstellen und teilen\nLetzte Teilung: %s</string>
     <string name="summary_upload_gpx">Klicken um eine GPX Dateien zu erstellen und auf ein WordPress Weblog hochzuladen\nLetzter Upload: %s</string>
@@ -275,7 +275,7 @@
     <string name="menu_time">Zeit</string>
     <string name="menu_geocode">Geocode</string>
     <string name="menu_hidden">Versteckt</string>
-    <string name="menu_wiki">Wiki</string>
+    <string name="menu_wiki">Wiki Suche</string>
     <string name="menu_delete">Löschen</string>
 
     <string name="still">Stillstand</string>
