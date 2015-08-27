@@ -182,9 +182,12 @@ public class Wikimedia {
     private static Page decodePage(JSONObject data, String baseurl) throws JSONException {
         Page page = new Page();
         page.pageid = data.getLong("pageid");
+
+        // https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Geographical_coordinates#type:T
         page.type = data.getString("type");
         if ("null".equals(page.type))
             page.type = null;
+
         page.title = data.getString("title");
         page.location = new Location("wikipedia");
         page.location.setLatitude(data.getDouble("lat"));

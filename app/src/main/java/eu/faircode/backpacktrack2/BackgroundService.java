@@ -1467,7 +1467,7 @@ public class BackgroundService extends IntentService {
         String text = null;
         if (state == STATE_IDLE)
             if (lastLocation == null)
-                text = context.getString(R.string.msg_idle, "-", "");
+                text = context.getString(R.string.msg_idle, "-", "", "?");
             else {
                 text = context.getString(R.string.msg_idle,
                         SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.MEDIUM).format(new Date(lastLocation.getTime())),
