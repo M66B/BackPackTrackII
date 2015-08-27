@@ -113,6 +113,9 @@ public class ForecastIO {
                 json.append(line);
             Log.d(TAG, json.toString());
 
+            // Decode result
+            List<Weather> listWeather = decodeResult(type, json.toString());
+
             // Cache result
             if (usecache) {
                 Log.i(TAG, "Writing " + cache);
@@ -132,8 +135,7 @@ public class ForecastIO {
                 editor.apply();
             }
 
-            // Decode result
-            return decodeResult(type, json.toString());
+            return listWeather;
         } finally {
             urlConnection.disconnect();
         }
