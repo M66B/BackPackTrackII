@@ -154,7 +154,7 @@ public class Geonames {
         JSONArray geonames = jroot.getJSONArray("geonames");
         for (int i = 0; i < geonames.length(); i++) {
             JSONObject name = geonames.getJSONObject(i);
-            if (name.has("geonameId") && name.has("name") && name.has("lat") && name.has("lng"))
+            if (name.has("name") && name.has("lat") && name.has("lng"))
                 result.add(decodePage(name));
         }
 
@@ -164,7 +164,6 @@ public class Geonames {
     @NonNull
     private static Geoname decodePage(JSONObject data) throws JSONException {
         Geoname name = new Geoname();
-        name.geonameId = data.getLong("geonameId");
 
         if (data.has("fcodeName"))
             name.fcodeName = data.getString("fcodeName");
@@ -183,7 +182,6 @@ public class Geonames {
     }
 
     public static class Geoname {
-        public long geonameId;
         public String fcodeName;
         public String name;
         public long population;
