@@ -33,6 +33,8 @@ public class Geonames {
     private static final int cTimeOutMs = 30 * 1000;
     public static final String BASE_URL = "http://api.geonames.org";
 
+    private static OkHttpClient okHttpClient = new OkHttpClient();
+
     private static File getCacheFolder(Context context) {
         return new File(context.getCacheDir(), "geonames");
     }
@@ -95,7 +97,7 @@ public class Geonames {
                 "&username=" + username);
 
         Log.i(TAG, "url=" + url);
-        HttpURLConnection urlConnection = (HttpURLConnection) new OkUrlFactory(new OkHttpClient()).open(url);
+        HttpURLConnection urlConnection = (HttpURLConnection) new OkUrlFactory(okHttpClient).open(url);
         urlConnection.setConnectTimeout(cTimeOutMs);
         urlConnection.setReadTimeout(cTimeOutMs);
         urlConnection.setRequestProperty("Accept", "application/json");

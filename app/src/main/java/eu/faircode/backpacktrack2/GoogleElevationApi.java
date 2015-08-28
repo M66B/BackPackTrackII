@@ -20,7 +20,10 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class GoogleElevationApi {
     private static final String TAG = "BPT2.GoogleElevation";
+
     public static final int cTimeOutMs = 30 * 1000;
+
+    private static OkHttpClient okHttpClient = new OkHttpClient();
 
     public static void getElevation(Location location, Context context) throws IOException, JSONException {
         // https://developers.google.com/maps/documentation/elevation/
@@ -28,7 +31,7 @@ public class GoogleElevationApi {
                 String.valueOf(location.getLatitude()) + "," +
                 String.valueOf(location.getLongitude()));
         Log.d(TAG, "url=" + url);
-        HttpsURLConnection urlConnection = (HttpsURLConnection) new OkUrlFactory(new OkHttpClient()).open(url);
+        HttpsURLConnection urlConnection = (HttpsURLConnection) new OkUrlFactory(okHttpClient).open(url);
 
         urlConnection.setConnectTimeout(cTimeOutMs);
         urlConnection.setReadTimeout(cTimeOutMs);

@@ -39,6 +39,8 @@ public class ForecastIO {
     public static final int TYPE_HOURLY = 2;
     public static final int TYPE_DAILY = 3;
 
+    private static OkHttpClient okHttpClient = new OkHttpClient();
+
     public static List<Weather> getWeatherByLocation(
             String apikey, final Location location, int type, boolean usecache, Context context)
             throws IOException, JSONException {
@@ -87,7 +89,7 @@ public class ForecastIO {
                 "&lang=" + Locale.getDefault().getLanguage());
 
         Log.i(TAG, "url=" + url);
-        HttpURLConnection urlConnection = (HttpURLConnection) new OkUrlFactory(new OkHttpClient()).open(url);
+        HttpURLConnection urlConnection = (HttpURLConnection) new OkUrlFactory(okHttpClient).open(url);
         urlConnection.setConnectTimeout(cTimeOutMs);
         urlConnection.setReadTimeout(cTimeOutMs);
         urlConnection.setRequestProperty("Accept", "application/json");

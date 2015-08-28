@@ -35,6 +35,8 @@ public class Wikimedia {
 
     private static final int cTimeOutMs = 30 * 1000;
 
+    private static OkHttpClient okHttpClient = new OkHttpClient();
+
     public static List<Page> geosearch(final Location location, int radius, int limit, Context context, String[] baseurls) throws IOException, JSONException {
         if (radius > 10)
             radius = 10;
@@ -113,7 +115,7 @@ public class Wikimedia {
                 "&format=json");
 
         Log.i(TAG, "url=" + url);
-        HttpURLConnection urlConnection = (HttpURLConnection) new OkUrlFactory(new OkHttpClient()).open(url);
+        HttpURLConnection urlConnection = (HttpURLConnection) new OkUrlFactory(okHttpClient).open(url);
         urlConnection.setConnectTimeout(cTimeOutMs);
         urlConnection.setReadTimeout(cTimeOutMs);
         urlConnection.setRequestProperty("Accept", "application/json");
