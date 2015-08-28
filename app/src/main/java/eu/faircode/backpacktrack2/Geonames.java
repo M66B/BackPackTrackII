@@ -5,6 +5,9 @@ import android.location.Location;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.OkUrlFactory;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -92,7 +95,7 @@ public class Geonames {
                 "&username=" + username);
 
         Log.i(TAG, "url=" + url);
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection urlConnection = (HttpURLConnection) new OkUrlFactory(new OkHttpClient()).open(url);
         urlConnection.setConnectTimeout(cTimeOutMs);
         urlConnection.setReadTimeout(cTimeOutMs);
         urlConnection.setRequestProperty("Accept", "application/json");

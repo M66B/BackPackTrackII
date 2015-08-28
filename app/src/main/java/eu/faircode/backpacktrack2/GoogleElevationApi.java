@@ -4,6 +4,9 @@ import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.OkUrlFactory;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,7 +28,8 @@ public class GoogleElevationApi {
                 String.valueOf(location.getLatitude()) + "," +
                 String.valueOf(location.getLongitude()));
         Log.d(TAG, "url=" + url);
-        HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
+        HttpsURLConnection urlConnection = (HttpsURLConnection) new OkUrlFactory(new OkHttpClient()).open(url);
+
         urlConnection.setConnectTimeout(cTimeOutMs);
         urlConnection.setReadTimeout(cTimeOutMs);
         urlConnection.setRequestProperty("Accept", "application/json");

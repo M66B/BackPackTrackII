@@ -7,6 +7,9 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.OkUrlFactory;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -19,8 +22,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -86,7 +87,7 @@ public class ForecastIO {
                 "&lang=" + Locale.getDefault().getLanguage());
 
         Log.i(TAG, "url=" + url);
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection urlConnection = (HttpURLConnection) new OkUrlFactory(new OkHttpClient()).open(url);
         urlConnection.setConnectTimeout(cTimeOutMs);
         urlConnection.setReadTimeout(cTimeOutMs);
         urlConnection.setRequestProperty("Accept", "application/json");

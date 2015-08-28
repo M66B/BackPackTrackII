@@ -6,6 +6,9 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.OkUrlFactory;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,7 +21,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -104,14 +106,14 @@ public class Wikimedia {
                 "&list=geosearch" +
                 "&gsradius=" + (radius * 1000) +
                 "&gscoord=" +
-                String.valueOf(location.getLatitude()) + "|" +
+                String.valueOf(location.getLatitude()) + "%7C" +
                 String.valueOf(location.getLongitude()) +
                 "&gslimit=" + limit +
                 "&gsprop=type" +
                 "&format=json");
 
         Log.i(TAG, "url=" + url);
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        HttpURLConnection urlConnection = (HttpURLConnection) new OkUrlFactory(new OkHttpClient()).open(url);
         urlConnection.setConnectTimeout(cTimeOutMs);
         urlConnection.setReadTimeout(cTimeOutMs);
         urlConnection.setRequestProperty("Accept", "application/json");

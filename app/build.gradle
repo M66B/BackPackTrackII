@@ -27,6 +27,7 @@ dependencies {
     compile 'org.jdom:jdom2:2.0.6'
     compile 'com.jjoe64:graphview:4.0.1'
     compile 'joda-time:joda-time:2.8.2'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.4.0'
 }
 
 android {
