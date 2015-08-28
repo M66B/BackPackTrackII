@@ -275,7 +275,7 @@ public class WaypointAdapter extends CursorAdapter {
                                             final List<Wikimedia.Page> listPage = (List<Wikimedia.Page>) result;
 
                                             LayoutInflater inflater = LayoutInflater.from(context);
-                                            View view = inflater.inflate(R.layout.wiki_list, null);
+                                            View view = inflater.inflate(R.layout.wiki_search, null);
                                             final ListView lv = (ListView) view.findViewById(R.id.lvWiki);
 
                                             WikiAdapter adapter = new WikiAdapter(context, listPage, wpt);
