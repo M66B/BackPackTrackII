@@ -173,15 +173,19 @@ public class Geonames {
     private static Geoname decodePage(JSONObject data) throws JSONException {
         Geoname name = new Geoname();
 
+        if (data.has("fcode"))
+            name.fcode = data.getString("fcode");
+
         if (data.has("fcodeName"))
             name.fcodeName = data.getString("fcodeName");
-        else
-            name.fcodeName = "";
 
         name.name = data.getString("name");
 
         if (data.has("population"))
             name.population = data.getLong("population");
+
+        if (data.has("countryCode"))
+            name.countryCode = data.getString("countryCode");
 
         name.location = new Location("geoname");
         name.location.setLatitude(data.getDouble("lat"));
@@ -190,9 +194,11 @@ public class Geonames {
     }
 
     public static class Geoname {
+        public String fcode;
         public String fcodeName;
         public String name;
         public long population;
+        public String countryCode;
         public Location location;
     }
 }

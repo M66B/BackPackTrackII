@@ -39,9 +39,9 @@ public class GeonameAdapter extends ArrayAdapter<Geonames.Geoname> {
         TextView tvPopulation = (TextView) convertView.findViewById(R.id.tvPopulation);
 
         tvTitle.setText(name.name);
-        tvDistance.setText(Math.round(name.location.distanceTo(location)) + " m");
-        tvType.setText(name.fcodeName);
-        tvPopulation.setVisibility(name.population > 0? View.VISIBLE:View.GONE);
+        tvDistance.setText((name.countryCode == null ? "" : name.countryCode + " ") + Math.round(name.location.distanceTo(location)) + " m");
+        tvType.setText((name.fcode == null ? "" : name.fcode) + (name.fcodeName == null ? "" : " " + name.fcodeName));
+        tvPopulation.setVisibility(name.population > 0 ? View.VISIBLE : View.GONE);
         tvPopulation.setText(Long.toString(name.population));
 
         return convertView;
