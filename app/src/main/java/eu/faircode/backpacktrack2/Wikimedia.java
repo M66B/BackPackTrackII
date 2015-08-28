@@ -173,7 +173,7 @@ public class Wikimedia {
         JSONArray geosearch = query.getJSONArray("geosearch");
         for (int i = 0; i < geosearch.length(); i++) {
             JSONObject page = geosearch.getJSONObject(i);
-            if (page.has("pageid") && page.has("title") && page.has("lat") && page.has("lon"))
+            if (page.has("title") && page.has("lat") && page.has("lon"))
                 result.add(decodePage(page, baseurl));
         }
 
@@ -183,7 +183,6 @@ public class Wikimedia {
     @NonNull
     private static Page decodePage(JSONObject data, String baseurl) throws JSONException {
         Page page = new Page();
-        page.pageid = data.getLong("pageid");
 
         // https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Geographical_coordinates#type:T
         page.type = data.getString("type");
@@ -199,7 +198,6 @@ public class Wikimedia {
     }
 
     public static class Page {
-        public long pageid;
         public String type;
         public String title;
         public Location location;
