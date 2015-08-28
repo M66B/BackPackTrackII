@@ -115,6 +115,7 @@
     <string name="title_wiki_results">Wiki resultaten: %s</string>
     <string name="title_geoname_radius">Geoname straal: %s km</string>
     <string name="title_geoname_results">Geoname resultaten: %s</string>
+    <string name="title_search_cache">Zoek cache: %s dagen</string>
     <string name="title_debug">Debug modus</string>
     <string name="title_logcat">Verstuur logcat</string>
 

@@ -1,7 +1,9 @@
 package eu.faircode.backpacktrack2;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.location.Location;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -39,10 +41,14 @@ public class Geonames {
         return new File(context.getCacheDir(), "geonames");
     }
 
-    private static void cleanupCache(File folder) {
+    public static void cleanupCache(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+
         long time = new Date().getTime();
+        File folder = getCacheFolder(context);
+        int days = Integer.parseInt(prefs.getString(SettingsFragment.PREF_SEARCH_CACHE, SettingsFragment.DEFAULT_SEARCH_CACHE));
         for (File file : folder.listFiles())
-            if (file.lastModified() + 7 * 24 * 3600 * 1000L < time) {
+            if (file.lastModified() + days * 24 * 3600 * 1000L < time) {
                 Log.i(TAG, "Deleting " + file);
                 file.delete();
             }
@@ -57,9 +63,10 @@ public class Geonames {
     }
 
     public static List<Geoname> findNearby(String username, Location location, int radius, int limit, Context context) throws IOException, JSONException {
+        cleanupCache(context);
+
         File folder = getCacheFolder(context);
         folder.mkdir();
-        cleanupCache(folder);
         File cache = new File(folder,
                 String.format(Locale.ROOT,
                         "%f_%f_%d_%d.json",

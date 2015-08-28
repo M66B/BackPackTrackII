@@ -542,6 +542,10 @@
                 android:defaultValue="50"
                 android:inputType="number"
                 android:key="pref_geoname_results" />
+            <EditTextPreference
+                android:defaultValue="7"
+                android:inputType="number"
+                android:key="pref_search_cache" />
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="pref_debug"

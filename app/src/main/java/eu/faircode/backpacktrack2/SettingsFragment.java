@@ -181,6 +181,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_WIKI_RESULTS = "pref_wiki_results";
     public static final String PREF_GEONAME_RADIUS = "pref_geoname_radius";
     public static final String PREF_GEONAME_RESULTS = "pref_geoname_results";
+    public static final String PREF_SEARCH_CACHE = "pref_search_cache";
     public static final String PREF_DEBUG = "pref_debug";
     public static final String PREF_LOGCAT = "pref_logcat";
 
@@ -265,10 +266,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_PRECIPITATION = "mm";
 
     public static final String DEFAULT_WIKI_BASE_URL = "https://en.wikipedia.org,https://en.wikivoyage.org";
-    public static final String DEFAULT_WIKI_RADIUS = "10";
+    public static final String DEFAULT_WIKI_RADIUS = "10"; // km
     public static final String DEFAULT_WIKI_RESULTS = "25";
-    public static final String DEFAULT_GEONAME_RADIUS = "10";
+    public static final String DEFAULT_GEONAME_RADIUS = "10"; // km
     public static final String DEFAULT_GEONAME_RESULTS = "50";
+    public static final String DEFAULT_SEARCH_CACHE = "7"; // days
 
     public static final boolean DEFAULT_GRAPH_STILL = false;
     public static final boolean DEFAULT_GRAPH_WALKING = true;
@@ -531,6 +533,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_WIKI_RESULTS);
         updateTitle(prefs, PREF_GEONAME_RADIUS);
         updateTitle(prefs, PREF_GEONAME_RESULTS);
+        updateTitle(prefs, PREF_SEARCH_CACHE);
 
         // Handle waypoint_edit waypoints
         pref_edit.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -837,6 +840,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if (PREF_GEONAME_RADIUS.equals(key) ||
                 PREF_GEONAME_RESULTS.equals(key))
             Geonames.clearCache(getActivity());
+
+        if (PREF_SEARCH_CACHE.equals(key)) {
+            Wikimedia.cleanupCache(getActivity());
+            Geonames.cleanupCache(getActivity());
+        }
     }
 
     // Helper methods
@@ -3299,6 +3307,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref.setTitle(getString(R.string.title_geoname_radius, prefs.getString(key, DEFAULT_GEONAME_RADIUS)));
         else if (PREF_GEONAME_RESULTS.equals(key))
             pref.setTitle(getString(R.string.title_geoname_results, prefs.getString(key, DEFAULT_GEONAME_RESULTS)));
+        else if (PREF_SEARCH_CACHE.equals(key))
+            pref.setTitle(getString(R.string.title_search_cache, prefs.getString(key, DEFAULT_SEARCH_CACHE)));
     }
 
     private boolean blogConfigured() {

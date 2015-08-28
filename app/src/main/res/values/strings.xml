@@ -117,6 +117,7 @@
     <string name="title_wiki_results">Wiki results: %s</string>
     <string name="title_geoname_radius">Geoname radius: %s km</string>
     <string name="title_geoname_results">Geoname results: %s</string>
+    <string name="title_search_cache">Search cache: %s days</string>
     <string name="title_debug">Debug mode</string>
     <string name="title_logcat">Send logcat</string>
 
