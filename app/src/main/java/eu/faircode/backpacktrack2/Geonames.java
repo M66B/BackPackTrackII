@@ -91,9 +91,8 @@ public class Geonames {
                 "&lng=" + String.valueOf(location.getLongitude()) +
                 "&radius=" + radius +
                 "&maxRows=" + limit +
-                "&username=" + username +
                 "&isReduced=false" +
-                "&style=LONG");
+                "&username=" + username);
 
         Log.i(TAG, "url=" + url);
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
