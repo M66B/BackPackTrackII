@@ -529,7 +529,19 @@
             <EditTextPreference
                 android:defaultValue="10"
                 android:inputType="number"
+                android:key="pref_wiki_radius" />
+            <EditTextPreference
+                android:defaultValue="25"
+                android:inputType="number"
                 android:key="pref_wiki_results" />
+            <EditTextPreference
+                android:defaultValue="10"
+                android:inputType="number"
+                android:key="pref_geoname_radius" />
+            <EditTextPreference
+                android:defaultValue="50"
+                android:inputType="number"
+                android:key="pref_geoname_results" />
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="pref_debug"

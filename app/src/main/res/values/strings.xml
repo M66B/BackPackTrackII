@@ -113,7 +113,10 @@
 
     <string name="title_misc">Miscellaneous</string>
     <string name="title_wiki_baseurl">Wiki base URLs</string>
+    <string name="title_wiki_radius">Wiki radius: %s km</string>
     <string name="title_wiki_results">Wiki results: %s</string>
+    <string name="title_geoname_radius">Geoname radius: %s km</string>
+    <string name="title_geoname_results">Geoname results: %s</string>
     <string name="title_debug">Debug mode</string>
     <string name="title_logcat">Send logcat</string>
 
@@ -278,6 +281,7 @@
     <string name="menu_geocode">Geocode</string>
     <string name="menu_hidden">Hidden</string>
     <string name="menu_wiki">Wiki search</string>
+    <string name="menu_geoname">Geoname search</string>
     <string name="menu_delete">Delete</string>
 
     <string name="still">Still</string>

@@ -52,8 +52,11 @@ public class WaypointAdapter extends CursorAdapter {
     private int colName;
     private int colHidden;
 
-    private String baseurl;
-    public int results;
+    private String wiki_baseurl;
+    public int wiki_radius;
+    public int wiki_results;
+    public int geoname_radius;
+    public int geoname_results;
 
     private static final int GEOCODER_RESULTS = 5;
 
@@ -73,8 +76,11 @@ public class WaypointAdapter extends CursorAdapter {
         this.colHidden = cursor.getColumnIndex("hidden");
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        this.baseurl = prefs.getString(SettingsFragment.PREF_WIKI_BASE_URL, SettingsFragment.DEFAULT_WIKI_BASE_URL);
-        this.results = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WIKI_RESULTS, SettingsFragment.DEFAULT_WIKI_RESULTS));
+        this.wiki_baseurl = prefs.getString(SettingsFragment.PREF_WIKI_BASE_URL, SettingsFragment.DEFAULT_WIKI_BASE_URL);
+        this.wiki_radius = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WIKI_RADIUS, SettingsFragment.DEFAULT_WIKI_RADIUS));
+        this.wiki_results = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WIKI_RESULTS, SettingsFragment.DEFAULT_WIKI_RESULTS));
+        this.geoname_radius = Integer.parseInt(prefs.getString(SettingsFragment.PREF_GEONAME_RADIUS, SettingsFragment.DEFAULT_GEONAME_RADIUS));
+        this.geoname_results = Integer.parseInt(prefs.getString(SettingsFragment.PREF_GEONAME_RESULTS, SettingsFragment.DEFAULT_GEONAME_RESULTS));
     }
 
     @Override
@@ -249,7 +255,7 @@ public class WaypointAdapter extends CursorAdapter {
 
                             case R.id.menu_wiki:
                                 new AsyncTask<Object, Object, Object>() {
-                                    Location wpt = new Location("geosearch");
+                                    Location wpt = new Location("search");
 
                                     @Override
                                     protected void onPreExecute() {
@@ -260,7 +266,7 @@ public class WaypointAdapter extends CursorAdapter {
 
                                     protected Object doInBackground(Object... params) {
                                         try {
-                                            return Wikimedia.geosearch(wpt, 10000, results, context, baseurl.split(","));
+                                            return Wikimedia.geosearch(wpt, wiki_radius, wiki_results, context, wiki_baseurl.split(","));
                                         } catch (Throwable ex) {
                                             return ex;
                                         }
@@ -299,6 +305,53 @@ public class WaypointAdapter extends CursorAdapter {
                                             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
                                             alertDialogBuilder.setIcon(android.R.drawable.ic_menu_info_details);
                                             alertDialogBuilder.setTitle(context.getString(R.string.menu_wiki));
+                                            alertDialogBuilder.setView(view);
+                                            AlertDialog alertDialog = alertDialogBuilder.create();
+                                            alertDialog.show();
+                                        }
+                                    }
+                                }.execute();
+
+                                return true;
+
+                            case R.id.menu_geoname:
+                                new AsyncTask<Object, Object, Object>() {
+                                    Location wpt = new Location("search");
+
+                                    @Override
+                                    protected void onPreExecute() {
+                                        wpt.setLatitude(latitude);
+                                        wpt.setLongitude(longitude);
+                                        Toast.makeText(context, context.getString(R.string.msg_lookup), Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    protected Object doInBackground(Object... params) {
+                                        try {
+                                            return Geonames.findNearby("faircode", wpt, geoname_radius, geoname_results, context);
+                                        } catch (Throwable ex) {
+                                            return ex;
+                                        }
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(final Object result) {
+                                        if (result instanceof Throwable) {
+                                            Log.e(TAG, result.toString() + "\n" + Log.getStackTraceString((Throwable) result));
+                                            Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            final List<Geonames.Geoname> listName = (List<Geonames.Geoname>) result;
+
+                                            LayoutInflater inflater = LayoutInflater.from(context);
+                                            View view = inflater.inflate(R.layout.geoname_search, null);
+                                            final ListView lv = (ListView) view.findViewById(R.id.lvGeonames);
+
+                                            GeonameAdapter adapter = new GeonameAdapter(context, listName, wpt);
+                                            lv.setAdapter(adapter);
+
+                                            // Show address selector
+                                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                                            alertDialogBuilder.setIcon(android.R.drawable.ic_menu_info_details);
+                                            alertDialogBuilder.setTitle(context.getString(R.string.menu_geoname));
                                             alertDialogBuilder.setView(view);
                                             AlertDialog alertDialog = alertDialogBuilder.create();
                                             alertDialog.show();

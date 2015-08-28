@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,28 +27,14 @@ import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class Wikimedia {
-    private static final String TAG = "BPT2.Wikimedia";
+public class Geonames {
+    private static final String TAG = "BPT2.Geonames";
 
     private static final int cTimeOutMs = 30 * 1000;
-
-    public static List<Page> geosearch(final Location location, int radius, int limit, Context context, String[] baseurls) throws IOException, JSONException {
-        if (radius > 10)
-            radius = 10;
-        List<Page> result = new ArrayList<Page>();
-        for (String baseurl : baseurls)
-            result.addAll(geosearch(location, radius, limit, context, baseurl));
-        Collections.sort(result, new Comparator<Page>() {
-            @Override
-            public int compare(Page p1, Page p2) {
-                return Double.compare(p1.location.distanceTo(location), p2.location.distanceTo(location));
-            }
-        });
-        return result;
-    }
+    public static final String BASE_URL = "http://api.geonames.org";
 
     private static File getCacheFolder(Context context) {
-        return new File(context.getCacheDir(), "wiki");
+        return new File(context.getCacheDir(), "geonames");
     }
 
     private static void cleanupCache(File folder) {
@@ -69,14 +54,13 @@ public class Wikimedia {
         }
     }
 
-    private static List<Page> geosearch(Location location, int radius, int limit, Context context, String baseurl) throws IOException, JSONException {
+    public static List<Geoname> findNearby(String username, Location location, int radius, int limit, Context context) throws IOException, JSONException {
         File folder = getCacheFolder(context);
         folder.mkdir();
         cleanupCache(folder);
         File cache = new File(folder,
                 String.format(Locale.ROOT,
-                        "%s_%f_%f_%d_%d.json",
-                        Uri.parse(baseurl).getHost(),
+                        "%f_%f_%d_%d.json",
                         location.getLatitude(),
                         location.getLongitude(),
                         radius,
@@ -91,24 +75,25 @@ public class Wikimedia {
                 byte[] buffer = new byte[fis.available()];
                 fis.read(buffer);
                 String json = new String(buffer);
-                return decodeResult(json, baseurl);
+                return decodeResult(json);
             } finally {
                 if (fis != null)
                     fis.close();
             }
         }
 
-        // https://www.mediawiki.org/wiki/Extension:GeoData
-        URL url = new URL(baseurl + "/w/api.php" +
-                "?action=query" +
-                "&list=geosearch" +
-                "&gsradius=" + (radius * 1000) +
-                "&gscoord=" +
-                String.valueOf(location.getLatitude()) + "|" +
-                String.valueOf(location.getLongitude()) +
-                "&gslimit=" + limit +
-                "&gsprop=type" +
-                "&format=json");
+        // http://www.geonames.org/export/web-services.html#findNearby
+        // 4 credits per request
+        // 30'000 credits daily limit per application
+        // the hourly limit is 2000 credits
+        URL url = new URL(BASE_URL + "/findNearbyJSON" +
+                "?lat=" + String.valueOf(location.getLatitude()) +
+                "&lng=" + String.valueOf(location.getLongitude()) +
+                "&radius=" + radius +
+                "&maxRows=" + limit +
+                "&username=" + username +
+                "&isReduced=false" +
+                "&style=LONG");
 
         Log.i(TAG, "url=" + url);
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -137,7 +122,7 @@ public class Wikimedia {
             Log.d(TAG, json.toString());
 
             // Decode result
-            List<Page> listPage = decodeResult(json.toString(), baseurl);
+            List<Geoname> listGeoname = decodeResult(json.toString());
 
             // Cache result
             Log.i(TAG, "Writing " + cache);
@@ -150,63 +135,52 @@ public class Wikimedia {
                     fos.close();
             }
 
-            return listPage;
+            return listGeoname;
         } finally {
             urlConnection.disconnect();
         }
     }
 
-    private static List<Page> decodeResult(String json, String baseurl) throws JSONException, IOException {
-        List<Page> result = new ArrayList<Page>();
+    private static List<Geoname> decodeResult(String json) throws JSONException, IOException {
+        List<Geoname> result = new ArrayList<Geoname>();
 
         JSONObject jroot = new JSONObject(json);
-        if (jroot.has("warnings") || jroot.has("error"))
+        if (jroot.has("status"))
             throw new IOException(json);
 
-        if (!jroot.has("query"))
+        if (!jroot.has("geonames"))
             return result;
 
-        JSONObject query = jroot.getJSONObject("query");
-        if (!query.has("geosearch"))
-            return result;
-
-        JSONArray geosearch = query.getJSONArray("geosearch");
-        for (int i = 0; i < geosearch.length(); i++) {
-            JSONObject page = geosearch.getJSONObject(i);
-            if (page.has("pageid") && page.has("title") && page.has("lat") && page.has("lon"))
-                result.add(decodePage(page, baseurl));
+        JSONArray geonames = jroot.getJSONArray("geonames");
+        for (int i = 0; i < geonames.length(); i++) {
+            JSONObject name = geonames.getJSONObject(i);
+            if (name.has("geonameId") && name.has("name") && name.has("lat") && name.has("lng"))
+                result.add(decodePage(name));
         }
 
         return result;
     }
 
     @NonNull
-    private static Page decodePage(JSONObject data, String baseurl) throws JSONException {
-        Page page = new Page();
-        page.pageid = data.getLong("pageid");
-
-        // https://en.wikipedia.org/wiki/Wikipedia:WikiProject_Geographical_coordinates#type:T
-        page.type = data.getString("type");
-        if ("null".equals(page.type))
-            page.type = null;
-
-        page.title = data.getString("title");
-        page.location = new Location("wikipedia");
-        page.location.setLatitude(data.getDouble("lat"));
-        page.location.setLongitude(data.getDouble("lon"));
-        page.baseurl = baseurl;
-        return page;
+    private static Geoname decodePage(JSONObject data) throws JSONException {
+        Geoname name = new Geoname();
+        name.geonameId = data.getLong("geonameId");
+        name.fcode = data.getString("fcode");
+        name.fcodeName = data.getString("fcodeName");
+        name.name = data.getString("name");
+        name.population = data.getLong("population");
+        name.location = new Location("geoname");
+        name.location.setLatitude(data.getDouble("lat"));
+        name.location.setLongitude(data.getDouble("lng"));
+        return name;
     }
 
-    public static class Page {
-        public long pageid;
-        public String type;
-        public String title;
+    public static class Geoname {
+        public long geonameId;
+        public String fcode;
+        public String fcodeName;
+        public String name;
+        public long population;
         public Location location;
-        public String baseurl;
-
-        public String getPageUrl() {
-            return baseurl + "/wiki/" + this.title.replace(" ", "_");
-        }
     }
 }

@@ -13,6 +13,9 @@
         android:id="@+id/menu_wiki"
         android:title="@string/menu_wiki" />
     <item
+        android:id="@+id/menu_geoname"
+        android:title="@string/menu_geoname" />
+    <item
         android:id="@+id/menu_hidden"
         android:checkable="true"
         android:title="@string/menu_hidden" />
