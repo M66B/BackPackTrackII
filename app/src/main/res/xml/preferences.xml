@@ -66,13 +66,6 @@
                     android:data="http://www.travelindependent.info/" />
             </Preference>
             <Preference
-                android:summary="Airline seat maps"
-                android:title="SeatGuru">
-                <intent
-                    android:action="android.intent.action.VIEW"
-                    android:data="http://www.seatguru.com/" />
-            </Preference>
-            <Preference
                 android:summary="Plug &amp; socket types"
                 android:title="World Standards: Electricy">
                 <intent
