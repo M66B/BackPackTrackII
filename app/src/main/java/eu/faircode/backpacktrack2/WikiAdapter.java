@@ -18,12 +18,10 @@ import java.util.List;
 public class WikiAdapter extends ArrayAdapter<Wikimedia.Page> {
     private static final String TAG = "BPT2.Wiki";
 
-    private Context context;
     private Location location;
 
     public WikiAdapter(Context context, List<Wikimedia.Page> pages, Location location) {
         super(context, 0, pages);
-        this.context = context;
         this.location = location;
     }
 
@@ -45,14 +43,7 @@ public class WikiAdapter extends ArrayAdapter<Wikimedia.Page> {
         ivShare.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    String uri = "geo:" + page.location.getLatitude() + "," + page.location.getLongitude() +
-                            "?q=" + page.location.getLatitude() + "," + page.location.getLongitude() + "(" + Uri.encode(page.title) + ")";
-                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
-                } catch (Throwable ex) {
-                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                    Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
-                }
+                Util.geoShare(page.location, page.title, getContext());
             }
         });
 

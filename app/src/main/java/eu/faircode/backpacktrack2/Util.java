@@ -208,6 +208,20 @@ public class Util {
         return listline;
     }
 
+    public static void geoShare(Location location, String name, Context context) {
+        try {
+            // https://developer.android.com/guide/components/intents-common.html#Maps
+            // https://developers.google.com/maps/documentation/android/intents
+            String uri = "geo:" + location.getLatitude() + "," + location.getLongitude() +
+                    "?q=" + location.getLatitude() + "," + location.getLongitude() +
+                    (name == null ? "" : "(" + Uri.encode(name) + ")");
+            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
+        } catch (Throwable ex) {
+            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public static void logExtras(Intent intent) {
         Bundle extras = intent.getExtras();
         if (extras != null) {

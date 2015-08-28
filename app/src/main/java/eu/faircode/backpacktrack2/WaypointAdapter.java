@@ -95,8 +95,12 @@ public class WaypointAdapter extends CursorAdapter {
         final long time = cursor.getLong(colTime);
         final double latitude = cursor.getDouble(colLatitude);
         final double longitude = cursor.getDouble(colLongitude);
+        final Location wpt = new Location("wpt");
         final String name = cursor.getString(colName);
         final boolean hidden = !(cursor.isNull(colHidden) || cursor.getInt(colHidden) == 0);
+
+        wpt.setLatitude(latitude);
+        wpt.setLongitude(longitude);
 
         // Get views
         final EditText etName = (EditText) view.findViewById(R.id.etName);
@@ -136,12 +140,7 @@ public class WaypointAdapter extends CursorAdapter {
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.menu_share:
-                                try {
-                                    String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude + "(" + Uri.encode(name) + ")";
-                                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
-                                } catch (Throwable ex) {
-                                    Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
-                                }
+                                Util.geoShare(wpt, name, context);
                                 return true;
 
                             case R.id.menu_time:
@@ -255,12 +254,8 @@ public class WaypointAdapter extends CursorAdapter {
 
                             case R.id.menu_wiki:
                                 new AsyncTask<Object, Object, Object>() {
-                                    Location wpt = new Location("search");
-
                                     @Override
                                     protected void onPreExecute() {
-                                        wpt.setLatitude(latitude);
-                                        wpt.setLongitude(longitude);
                                         Toast.makeText(context, context.getString(R.string.msg_requesting), Toast.LENGTH_SHORT).show();
                                     }
 
@@ -316,12 +311,8 @@ public class WaypointAdapter extends CursorAdapter {
 
                             case R.id.menu_geoname:
                                 new AsyncTask<Object, Object, Object>() {
-                                    Location wpt = new Location("search");
-
                                     @Override
                                     protected void onPreExecute() {
-                                        wpt.setLatitude(latitude);
-                                        wpt.setLongitude(longitude);
                                         Toast.makeText(context, context.getString(R.string.msg_requesting), Toast.LENGTH_SHORT).show();
                                     }
 
@@ -349,15 +340,7 @@ public class WaypointAdapter extends CursorAdapter {
                                                 @Override
                                                 public void onItemClick(AdapterView<?> adapterView, View view, final int position, long iid) {
                                                     Geonames.Geoname name = (Geonames.Geoname) lv.getItemAtPosition(position);
-                                                    try {
-                                                        String uri = "geo:" + name.location.getLatitude() + "," + name.location.getLongitude() +
-                                                                "?q=" + name.location.getLatitude() + "," + name.location.getLongitude() + "(" + Uri.encode(name.name) + ")";
-                                                        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
-                                                    } catch (Throwable ex) {
-                                                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                                                        Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
-                                                    }
-
+                                                    Util.geoShare(name.location, name.name, context);
                                                 }
                                             });
 

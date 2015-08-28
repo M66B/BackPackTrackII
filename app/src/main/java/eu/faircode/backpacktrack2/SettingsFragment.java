@@ -1345,14 +1345,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.menu_share:
-                                try {
-                                    String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude;
-                                    if (name != null)
-                                        uri += "(" + Uri.encode(name) + ")";
-                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
-                                } catch (Throwable ex) {
-                                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                                }
+                                Location location = new Location("share");
+                                location.setLatitude(latitude);
+                                location.setLongitude(longitude);
+                                Util.geoShare(location, name, getActivity());
                                 return true;
 
                             case R.id.menu_elevation_loc:
@@ -2456,16 +2452,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 final long weather_id = cursor.getLong(cursor.getColumnIndex("ID"));
                 final String summary = cursor.getString(cursor.getColumnIndex("summary"));
 
-                Location station = null;
-                if (!cursor.isNull(cursor.getColumnIndex("station_latitude")) &&
-                        !cursor.isNull(cursor.getColumnIndex("station_longitude"))) {
-                    station = new Location("station");
+                final Location station = new Location("station");
+                boolean hasStation = !cursor.isNull(cursor.getColumnIndex("station_latitude")) &&
+                        !cursor.isNull(cursor.getColumnIndex("station_longitude"));
+                if (hasStation) {
                     station.setLatitude(cursor.getDouble(cursor.getColumnIndex("station_latitude")));
                     station.setLongitude(cursor.getDouble(cursor.getColumnIndex("station_longitude")));
                 }
-
-                final double latitude = (station == null ? Double.NaN : station.getLatitude());
-                final double longitude = (station == null ? Double.NaN : station.getLongitude());
 
                 PopupMenu popupMenu = new PopupMenu(getActivity(), view);
 
@@ -2474,12 +2467,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.menu_share:
-                                try {
-                                    String uri = "geo:" + latitude + "," + longitude + "?q=" + latitude + "," + longitude;
-                                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
-                                } catch (Throwable ex) {
-                                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                                }
+                                Util.geoShare(station, null, getActivity());
                                 return true;
 
                             case R.id.menu_delete:
@@ -2495,7 +2483,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 popupMenu.inflate(R.menu.weather);
                 popupMenu.getMenu().findItem(R.id.menu_time).setTitle(SimpleDateFormat.getDateTimeInstance().format(time));
                 popupMenu.getMenu().findItem(R.id.menu_summary).setTitle(summary);
-                popupMenu.getMenu().findItem(R.id.menu_share).setEnabled(station != null);
+                popupMenu.getMenu().findItem(R.id.menu_share).setEnabled(hasStation);
                 popupMenu.getMenu().findItem(R.id.menu_delete).setEnabled(Util.debugMode(getActivity()));
                 popupMenu.show();
             }
