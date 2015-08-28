@@ -312,6 +312,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_LAST_WEATHER_GRAPH = "pref_last_weather_graph";
     public static final String PREF_LAST_WEATHER_VIEWPORT = "pref_last_weather_viewport";
     public static final String PREF_LAST_WEATHER_REPORT = "pref_last_weather_report";
+    public static final String PREF_LAST_RAIN_PROBABILITY = "pref_last_rain_probability";
     public static final String PREF_LAST_FORECAST_TYPE = "pref_last_forecast_type";
     public static final String PREF_LAST_FORECAST_LOCATION = "pref_last_forecast_location";
     public static final String PREF_LAST_FORECAST_WAYPOINT = "pref_last_forecast_waypoint";

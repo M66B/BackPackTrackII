@@ -1805,6 +1805,9 @@ public class BackgroundService extends IntentService {
         DecimalFormat DF1 = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ROOT));
         DecimalFormat DF2 = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.ROOT));
 
+        int last_probability = prefs.getInt(SettingsFragment.PREF_LAST_RAIN_PROBABILITY, 0);
+        prefs.edit().putInt(SettingsFragment.PREF_LAST_RAIN_PROBABILITY, (int) Math.round(weather.rain_probability)).apply();
+
         String content = null;
         double rain_1h = weather.rain_1h;
         if (!Double.isNaN(rain_1h)) {
@@ -1835,7 +1838,8 @@ public class BackgroundService extends IntentService {
         notificationBuilder.setSound(Uri.parse(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_SOUND, SettingsFragment.DEFAULT_WEATHER_RAIN_SOUND)));
         if (light)
             notificationBuilder.setLights(Color.YELLOW, 1000, 1000);
-        notificationBuilder.setOnlyAlertOnce(true);
+        if (weather.rain_probability < last_probability * 1.5)
+            notificationBuilder.setOnlyAlertOnce(true);
         notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
 
         // Build main intent
@@ -1879,6 +1883,8 @@ public class BackgroundService extends IntentService {
     public static void removeRainNotification(Context context) {
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         nm.cancel(NOTIFICATION_RAIN);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.edit().remove(SettingsFragment.PREF_LAST_RAIN_PROBABILITY).apply();
     }
 
     public static String getActivityName(int activityType, Context context) {
