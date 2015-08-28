@@ -345,6 +345,22 @@ public class WaypointAdapter extends CursorAdapter {
                                             View view = inflater.inflate(R.layout.geoname_search, null);
                                             final ListView lv = (ListView) view.findViewById(R.id.lvGeonames);
 
+                                            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                                @Override
+                                                public void onItemClick(AdapterView<?> adapterView, View view, final int position, long iid) {
+                                                    Geonames.Geoname name = (Geonames.Geoname) lv.getItemAtPosition(position);
+                                                    try {
+                                                        String uri = "geo:" + name.location.getLatitude() + "," + name.location.getLongitude() +
+                                                                "?q=" + name.location.getLatitude() + "," + name.location.getLongitude() + "(" + Uri.encode(name.name) + ")";
+                                                        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
+                                                    } catch (Throwable ex) {
+                                                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                                        Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
+                                                    }
+
+                                                }
+                                            });
+
                                             GeonameAdapter adapter = new GeonameAdapter(context, listName, wpt);
                                             lv.setAdapter(adapter);
 

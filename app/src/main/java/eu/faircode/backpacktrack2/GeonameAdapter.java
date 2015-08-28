@@ -44,20 +44,6 @@ public class GeonameAdapter extends ArrayAdapter<Geonames.Geoname> {
                 (name.fcodeName == null ? "" : (name.fcodeName.length() > 25 ? name.fcode : name.fcodeName)) +
                         (name.population == 0 ? "" : " " + name.population));
 
-        ivShare.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    String uri = "geo:" + name.location.getLatitude() + "," + name.location.getLongitude() +
-                            "?q=" + name.location.getLatitude() + "," + name.location.getLongitude() + "(" + Uri.encode(name.name) + ")";
-                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
-                } catch (Throwable ex) {
-                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                    Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
         return convertView;
     }
 }
