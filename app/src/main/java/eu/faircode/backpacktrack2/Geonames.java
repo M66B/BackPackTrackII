@@ -90,8 +90,8 @@ public class Geonames {
                 "?lat=" + String.valueOf(location.getLatitude()) +
                 "&lng=" + String.valueOf(location.getLongitude()) +
                 "&radius=" + radius +
+                "&localCountry=false" +
                 "&maxRows=" + limit +
-                "&isReduced=false" +
                 "&username=" + username);
 
         Log.i(TAG, "url=" + url);
