@@ -39,8 +39,8 @@ public class WikiAdapter extends ArrayAdapter<Wikimedia.Page> {
         ImageView ivShare = (ImageView) convertView.findViewById(R.id.ivShare);
 
         tvTitle.setText(page.title);
-        tvDistance.setText(Math.round(page.location.distanceTo(location)) + " m" + (page.type == null ? "" : " " + page.type));
-        tvSource.setText(Uri.parse(page.baseurl).getHost());
+        tvDistance.setText(Math.round(page.location.distanceTo(location)) + " m");
+        tvSource.setText(Uri.parse(page.baseurl).getHost() + (page.type == null ? "" : "/" + page.type));
 
         ivShare.setOnClickListener(new View.OnClickListener() {
             @Override
