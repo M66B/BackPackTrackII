@@ -17,6 +17,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -35,6 +36,7 @@ import android.widget.PopupMenu;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -277,7 +279,38 @@ public class WaypointAdapter extends CursorAdapter {
 
                                             LayoutInflater inflater = LayoutInflater.from(context);
                                             View view = inflater.inflate(R.layout.wiki_search, null);
+                                            ImageView ivGPX = (ImageView) view.findViewById(R.id.ivGPX);
                                             final ListView lv = (ListView) view.findViewById(R.id.lvWiki);
+
+                                            ivGPX.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    new AsyncTask<Object, Object, Object>() {
+                                                        @Override
+                                                        protected Object doInBackground(Object... objects) {
+                                                            try {
+                                                                File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "BackPackTrackII");
+                                                                folder.mkdirs();
+                                                                File target = new File(folder, "wikis_" + Util.sanitizeFileName(name) + ".gpx");
+                                                                Log.i(TAG, "Writing " + target);
+                                                                GPXFileWriter.writeWikiPages(listPage, target, context);
+
+                                                                Log.i(TAG, "Sharing " + target);
+                                                                Intent viewIntent = new Intent();
+                                                                viewIntent.setAction(Intent.ACTION_VIEW);
+                                                                viewIntent.setDataAndType(Uri.fromFile(target), "application/gpx+xml");
+                                                                viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                                context.startActivity(viewIntent);
+
+                                                                return null;
+                                                            } catch (Throwable ex) {
+                                                                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                                                return ex;
+                                                            }
+                                                        }
+                                                    }.execute();
+                                                }
+                                            });
 
                                             WikiAdapter adapter = new WikiAdapter(context, listPage, wpt);
                                             lv.setAdapter(adapter);
@@ -334,7 +367,38 @@ public class WaypointAdapter extends CursorAdapter {
 
                                             LayoutInflater inflater = LayoutInflater.from(context);
                                             View view = inflater.inflate(R.layout.geoname_search, null);
+                                            ImageView ivGPX = (ImageView) view.findViewById(R.id.ivGPX);
                                             final ListView lv = (ListView) view.findViewById(R.id.lvGeonames);
+
+                                            ivGPX.setOnClickListener(new View.OnClickListener() {
+                                                @Override
+                                                public void onClick(View view) {
+                                                    new AsyncTask<Object, Object, Object>() {
+                                                        @Override
+                                                        protected Object doInBackground(Object... objects) {
+                                                            try {
+                                                                File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "BackPackTrackII");
+                                                                folder.mkdirs();
+                                                                File target = new File(folder, "geonames_" + Util.sanitizeFileName(name) + ".gpx");
+                                                                Log.i(TAG, "Writing " + target);
+                                                                GPXFileWriter.writeGeonames(listName, target, context);
+
+                                                                Log.i(TAG, "Sharing " + target);
+                                                                Intent viewIntent = new Intent();
+                                                                viewIntent.setAction(Intent.ACTION_VIEW);
+                                                                viewIntent.setDataAndType(Uri.fromFile(target), "application/gpx+xml");
+                                                                viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                                context.startActivity(viewIntent);
+
+                                                                return null;
+                                                            } catch (Throwable ex) {
+                                                                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                                                return ex;
+                                                            }
+                                                        }
+                                                    }.execute();
+                                                }
+                                            });
 
                                             lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                                 @Override

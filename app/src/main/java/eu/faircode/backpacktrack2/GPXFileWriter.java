@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import android.content.Context;
@@ -23,22 +24,98 @@ import org.jdom2.output.XMLOutputter;
 
 public class GPXFileWriter {
     private static final String NS = "http://www.topografix.com/GPX/1/1";
+    private static final String XSI = "http://www.w3.org/2001/XMLSchema-instance";
+    private static final String BPT = "http://www.faircode.eu/backpacktrack2";
+    private static final String XSD = "http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd";
+    private static final String CREATOR = "BackPackTrackII";
     private static final DecimalFormat DF = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.ROOT));
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault());
 
-    // Main logic
+    public static void writeGeonames(List<Geonames.Geoname> names, File target, Context context) throws IOException {
+        Document doc = new Document();
+        Element gpx = new Element("gpx", NS);
+        Namespace xsi = Namespace.getNamespace("xsi", XSI);
+        gpx.addNamespaceDeclaration(xsi);
+        Namespace bpt2 = Namespace.getNamespace("bpt2", BPT);
+        gpx.addNamespaceDeclaration(bpt2);
+        gpx.setAttribute("schemaLocation", XSD, xsi);
+        gpx.setAttribute(new Attribute("version", "1.1"));
+        gpx.setAttribute(new Attribute("creator", CREATOR));
+
+        Collection<Element> wpts = new ArrayList<>();
+        for (Geonames.Geoname name : names) {
+            Element wpt = new Element("wpt", NS);
+            wpt.setAttribute(new Attribute("lat", Double.toString(name.location.getLatitude())));
+            wpt.setAttribute(new Attribute("lon", Double.toString(name.location.getLongitude())));
+            wpt.addContent(new Element("name", NS).addContent(name.name));
+            wpts.add(wpt);
+        }
+        gpx.addContent(wpts);
+
+        doc.setRootElement(gpx);
+
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter(target);
+            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+            xout.output(doc, fw);
+            fw.flush();
+        } finally {
+            if (fw != null)
+                fw.close();
+        }
+    }
+
+    public static void writeWikiPages(List<Wikimedia.Page> pages, File target, Context context) throws IOException {
+        Document doc = new Document();
+        Element gpx = new Element("gpx", NS);
+        Namespace xsi = Namespace.getNamespace("xsi", XSI);
+        gpx.addNamespaceDeclaration(xsi);
+        Namespace bpt2 = Namespace.getNamespace("bpt2", BPT);
+        gpx.addNamespaceDeclaration(bpt2);
+        gpx.setAttribute("schemaLocation", XSD, xsi);
+        gpx.setAttribute(new Attribute("version", "1.1"));
+        gpx.setAttribute(new Attribute("creator", CREATOR));
+
+        Collection<Element> wpts = new ArrayList<>();
+        for (Wikimedia.Page page : pages) {
+            Element wpt = new Element("wpt", NS);
+            wpt.setAttribute(new Attribute("lat", Double.toString(page.location.getLatitude())));
+            wpt.setAttribute(new Attribute("lon", Double.toString(page.location.getLongitude())));
+            wpt.addContent(new Element("name", NS).addContent(page.title));
+            Element link = new Element("link", NS);
+            link.setAttribute(new Attribute("href", page.getPageUrl()));
+            wpt.addContent(link);
+            wpts.add(wpt);
+        }
+        gpx.addContent(wpts);
+
+        doc.setRootElement(gpx);
+
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter(target);
+            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+            xout.output(doc, fw);
+            fw.flush();
+        } finally {
+            if (fw != null)
+                fw.close();
+        }
+    }
+
     public static void writeGPXFile(File target, String trackName, boolean extensions, Cursor cTrackPoints, Cursor cWayPoints, Context context)
             throws IOException {
 
         Document doc = new Document();
         Element gpx = new Element("gpx", NS);
-        Namespace xsi = Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        Namespace xsi = Namespace.getNamespace("xsi", XSI);
         gpx.addNamespaceDeclaration(xsi);
-        Namespace bpt2 = Namespace.getNamespace("bpt2", "http://www.faircode.eu/backpacktrack2");
+        Namespace bpt2 = Namespace.getNamespace("bpt2", BPT);
         gpx.addNamespaceDeclaration(bpt2);
-        gpx.setAttribute("schemaLocation", "http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd", xsi);
+        gpx.setAttribute("schemaLocation", XSD, xsi);
         gpx.setAttribute(new Attribute("version", "1.1"));
-        gpx.setAttribute(new Attribute("creator", "BackPackTrackII"));
+        gpx.setAttribute(new Attribute("creator", CREATOR));
         gpx.addContent(getWayPoints(extensions, cWayPoints, bpt2, context));
         gpx.addContent(getTrackpoints(trackName, extensions, cTrackPoints, bpt2, context));
         doc.setRootElement(gpx);

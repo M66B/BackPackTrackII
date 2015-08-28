@@ -222,6 +222,10 @@ public class Util {
         }
     }
 
+    public static String sanitizeFileName(String name) {
+        return name.replaceAll("\\W+", "");
+    }
+
     public static void logExtras(Intent intent) {
         Bundle extras = intent.getExtras();
         if (extras != null) {
