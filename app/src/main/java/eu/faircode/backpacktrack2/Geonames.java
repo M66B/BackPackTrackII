@@ -165,10 +165,17 @@ public class Geonames {
     private static Geoname decodePage(JSONObject data) throws JSONException {
         Geoname name = new Geoname();
         name.geonameId = data.getLong("geonameId");
-        name.fcode = data.getString("fcode");
-        name.fcodeName = data.getString("fcodeName");
+
+        if (data.has("fcodeName"))
+            name.fcodeName = data.getString("fcodeName");
+        else
+            name.fcodeName = "";
+
         name.name = data.getString("name");
-        name.population = data.getLong("population");
+
+        if (data.has("population"))
+            name.population = data.getLong("population");
+
         name.location = new Location("geoname");
         name.location.setLatitude(data.getDouble("lat"));
         name.location.setLongitude(data.getDouble("lng"));
@@ -177,7 +184,6 @@ public class Geonames {
 
     public static class Geoname {
         public long geonameId;
-        public String fcode;
         public String fcodeName;
         public String name;
         public long population;

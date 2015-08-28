@@ -36,12 +36,11 @@ public class GeonameAdapter extends ArrayAdapter<Geonames.Geoname> {
         TextView tvTitle = (TextView) convertView.findViewById(R.id.tvTitle);
         TextView tvDistance = (TextView) convertView.findViewById(R.id.tvDistance);
         TextView tvType = (TextView) convertView.findViewById(R.id.tvType);
-        ImageView ivShare = (ImageView) convertView.findViewById(R.id.ivShare);
 
         tvTitle.setText(name.name);
         tvDistance.setText(Math.round(name.location.distanceTo(location)) + " m");
         tvType.setText(
-                (name.fcodeName == null ? "" : (name.fcodeName.length() > 25 ? name.fcode : name.fcodeName)) +
+                (name.fcodeName.length() > 20 ? name.fcodeName.substring(0, 20) + " …" : name.fcodeName) +
                         (name.population == 0 ? "" : " " + name.population));
 
         return convertView;
