@@ -125,6 +125,7 @@ public class BackgroundService extends IntentService {
     public final static int ALTITUDE_GPS = 1;
     public final static int ALTITUDE_PRESSURE = 2;
     public final static int ALTITUDE_LOOKUP = 3;
+    public final static int ALTITUDE_KEEP = 0x80;
 
     private static final int VIBRATE_SHORT = 250; // milliseconds
     private static final int VIBRATE_LONG = 500; // milliseconds
@@ -686,6 +687,8 @@ public class BackgroundService extends IntentService {
                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
+            if (altitude_type != ALTITUDE_NONE)
+                altitude_type |= ALTITUDE_KEEP;
 
             if (name == null)
                 name = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
@@ -1333,6 +1336,9 @@ public class BackgroundService extends IntentService {
             } catch (Throwable ex) {
                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
+
+            if (locationType == LOCATION_WAYPOINT && altitude_type == ALTITUDE_GPS)
+                altitude_type |= ALTITUDE_KEEP;
 
             // Get waypoint name
             String waypointName = null;
@@ -2012,7 +2018,8 @@ public class BackgroundService extends IntentService {
                 double longitude = cursor.getDouble(colLongitude);
                 int altitude_type = (cursor.isNull(colAltitudeType) ? ALTITUDE_NONE : cursor.getInt(colAltitudeType));
 
-                if (altitude_type != ALTITUDE_LOOKUP) {
+                if ((altitude_type & ALTITUDE_KEEP) == 0 &&
+                        (altitude_type & ~ALTITUDE_KEEP) != ALTITUDE_LOOKUP) {
                     Location location = new Location(provider);
                     location.setLatitude(latitude);
                     location.setLongitude(longitude);

@@ -1056,6 +1056,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                                 }
                                         }
 
+                                        if (altitude_type != BackgroundService.ALTITUDE_NONE)
+                                            altitude_type |= BackgroundService.ALTITUDE_KEEP;
+
                                         // Persist location
                                         new DatabaseHelper(getActivity()).insertLocation(location, altitude_type, geocodedName, -1, -1, -1).close();
                                         return null;
@@ -1113,6 +1116,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                             }
                     }
+
+                    if (altitude_type != BackgroundService.ALTITUDE_NONE)
+                        altitude_type |= BackgroundService.ALTITUDE_KEEP;
 
                     // Persist location
                     new DatabaseHelper(getActivity()).insertLocation(location, altitude_type, name.toString(), -1, -1, -1).close();
@@ -1343,7 +1349,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 final long time = cursor.getLong(cursor.getColumnIndex("time"));
                 final double latitude = cursor.getDouble(cursor.getColumnIndex("latitude"));
                 final double longitude = cursor.getDouble(cursor.getColumnIndex("longitude"));
-                int altitude_type = cursor.getInt(cursor.getColumnIndex("altitude_type"));
+                final double altitude = cursor.getDouble(cursor.getColumnIndex("altitude"));
+                final int altitude_type = cursor.getInt(cursor.getColumnIndex("altitude_type"));
                 final String name = cursor.getString(cursor.getColumnIndex("name"));
 
                 PopupMenu popupMenu = new PopupMenu(getActivity(), view);
@@ -1357,6 +1364,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 location.setLatitude(latitude);
                                 location.setLongitude(longitude);
                                 Util.geoShare(location, name, getActivity());
+                                return true;
+
+                            case R.id.menu_elevation_keep:
+                                new AsyncTask<Object, Object, Object>() {
+                                    @Override
+                                    protected Object doInBackground(Object... objects) {
+                                        new DatabaseHelper(getActivity()).updateLocationAltitude(id, altitude, altitude_type ^ BackgroundService.ALTITUDE_KEEP);
+                                        return null;
+                                    }
+                                }.execute();
                                 return true;
 
                             case R.id.menu_elevation_loc:
@@ -1489,13 +1506,17 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     }
                 });
 
+                boolean keep = ((altitude_type & BackgroundService.ALTITUDE_KEEP) != 0);
+                boolean lookup = (!keep && (altitude_type & ~BackgroundService.ALTITUDE_KEEP) != BackgroundService.ALTITUDE_LOOKUP);
+
                 popupMenu.inflate(R.menu.location);
                 if (name != null) {
                     popupMenu.getMenu().findItem(R.id.menu_name).setTitle(name);
                     popupMenu.getMenu().findItem(R.id.menu_name).setVisible(true);
                 }
                 popupMenu.getMenu().findItem(R.id.menu_time).setTitle(SimpleDateFormat.getDateTimeInstance().format(time));
-                popupMenu.getMenu().findItem(R.id.menu_elevation_loc).setEnabled(Util.isConnected(getActivity()) && altitude_type != BackgroundService.ALTITUDE_LOOKUP);
+                popupMenu.getMenu().findItem(R.id.menu_elevation_keep).setChecked(keep);
+                popupMenu.getMenu().findItem(R.id.menu_elevation_loc).setEnabled(Util.isConnected(getActivity()) && lookup);
                 popupMenu.getMenu().findItem(R.id.menu_elevation_day).setEnabled(Util.isConnected(getActivity()));
                 popupMenu.getMenu().findItem(R.id.menu_delete).setEnabled(Util.debugMode(getActivity()));
                 popupMenu.show();
@@ -1594,6 +1615,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             double alt = (cursor.isNull(colAltitude) ? Double.NaN : cursor.getDouble(colAltitude));
             int type = (cursor.isNull(colAltitudeType) ? BackgroundService.ALTITUDE_NONE : cursor.getInt(colAltitudeType));
+            type &= ~BackgroundService.ALTITUDE_KEEP;
 
             if (!Double.isNaN(alt)) {
                 if (alt < minAlt)

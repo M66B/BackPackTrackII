@@ -275,6 +275,7 @@
 
     <string name="menu_details">Details</string>
     <string name="menu_share">Share</string>
+    <string name="menu_elevation_keep">Keep elevation</string>
     <string name="menu_elevation_loc">Fetch elevation for location</string>
     <string name="menu_elevation_day">Fetch elevations for day</string>
     <string name="menu_time">Time</string>

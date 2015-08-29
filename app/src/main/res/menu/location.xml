@@ -13,6 +13,10 @@
         android:id="@+id/menu_share"
         android:title="@string/menu_share" />
     <item
+        android:id="@+id/menu_elevation_keep"
+        android:checkable="true"
+        android:title="@string/menu_elevation_keep" />
+    <item
         android:id="@+id/menu_elevation_loc"
         android:title="@string/menu_elevation_loc" />
     <item
