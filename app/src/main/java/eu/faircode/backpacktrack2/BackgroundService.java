@@ -1314,7 +1314,7 @@ public class BackgroundService extends IntentService {
                 float altitude = PressureService.getAltitude(location, this);
                 if (!Float.isNaN(altitude)) {
                     location.setAltitude(altitude);
-                    locationType = ALTITUDE_PRESSURE;
+                    altitude_type = ALTITUDE_PRESSURE;
                 }
             }
 
