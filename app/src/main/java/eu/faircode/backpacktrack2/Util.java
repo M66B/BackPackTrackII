@@ -223,7 +223,9 @@ public class Util {
     }
 
     public static String sanitizeFileName(String name) {
-        return name.replaceAll("\\W+", "");
+        if (name == null)
+            return null;
+        return name.replaceAll("\\W+", "_");
     }
 
     public static void logExtras(Intent intent) {
