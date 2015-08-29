@@ -1337,7 +1337,7 @@ public class BackgroundService extends IntentService {
                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
-            if (locationType == LOCATION_WAYPOINT && altitude_type == ALTITUDE_GPS)
+            if (altitude_type != ALTITUDE_NONE && locationType == LOCATION_WAYPOINT)
                 altitude_type |= ALTITUDE_KEEP;
 
             // Get waypoint name
