@@ -56,7 +56,9 @@ public class Wikimedia {
     }
 
     private static File getCacheFolder(Context context) {
-        return new File(context.getCacheDir(), "wiki");
+        File folder = new File(context.getCacheDir(), "wiki");
+        folder.mkdirs();
+        return folder;
     }
 
     public static void cleanupCache(Context context) {
@@ -84,7 +86,6 @@ public class Wikimedia {
         cleanupCache(context);
 
         File folder = getCacheFolder(context);
-        folder.mkdir();
         File cache = new File(folder,
                 String.format(Locale.ROOT,
                         "%s_%f_%f_%d_%d.json",

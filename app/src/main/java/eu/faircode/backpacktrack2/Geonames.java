@@ -38,7 +38,9 @@ public class Geonames {
     private static OkHttpClient okHttpClient = new OkHttpClient();
 
     private static File getCacheFolder(Context context) {
-        return new File(context.getCacheDir(), "geonames");
+        File folder = new File(context.getCacheDir(), "geonames");
+        folder.mkdirs();
+        return folder;
     }
 
     public static void cleanupCache(Context context) {
@@ -66,7 +68,6 @@ public class Geonames {
         cleanupCache(context);
 
         File folder = getCacheFolder(context);
-        folder.mkdir();
         File cache = new File(folder,
                 String.format(Locale.ROOT,
                         "%f_%f_%d_%d.json",
