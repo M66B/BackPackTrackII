@@ -24,7 +24,7 @@ public class ConnectivityChangedReceiver extends BroadcastReceiver {
 
             if (ref_time + interval * 60 * 1000 < time) {
                 Intent intentWeather = new Intent(context, BackgroundService.class);
-                intentWeather.setAction(BackgroundService.EXPORTED_ACTION_UPDATE_WEATHER);
+                intentWeather.setAction(BackgroundService.ACTION_UPDATE_WEATHER);
                 context.startService(intentWeather);
             }
         }
