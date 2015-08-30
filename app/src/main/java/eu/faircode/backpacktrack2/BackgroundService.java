@@ -1343,17 +1343,9 @@ public class BackgroundService extends IntentService {
             // Get waypoint name
             String waypointName = null;
             if (locationType == LOCATION_WAYPOINT) {
-                List<String> listAddress;
-                try {
-                    listAddress = Util.reverseGeocode(location, this);
-                } catch (IOException ex) {
-                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                    listAddress = new ArrayList<String>();
-                }
-                if (listAddress == null || listAddress.size() == 0)
+                waypointName = new GeocoderEx(this).reverseGeocode(location);
+                if (waypointName == null)
                     waypointName = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
-                else
-                    waypointName = TextUtils.join(", ", listAddress);
             }
 
             // Persist new location
@@ -1604,16 +1596,7 @@ public class BackgroundService extends IntentService {
         boolean notification = prefs.getBoolean(SettingsFragment.PREF_WEATHER_NOTIFICATION, SettingsFragment.DEFAULT_WEATHER_NOTIFICATION);
         if (notification) {
             // Get weather location name
-            String geocoded = null;
-            if (weather.station_location != null) {
-                try {
-                    List<String> listLine = Util.reverseGeocode(weather.station_location, context);
-                    if (listLine.size() > 0)
-                        geocoded = TextUtils.join(", ", listLine);
-                } catch (IOException ex) {
-                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                }
-            }
+            String geocoded = new GeocoderEx(context).reverseGeocode(weather.station_location);
 
             // Show weather notification
             showWeatherNotification(weather, geocoded, context);
@@ -1791,12 +1774,9 @@ public class BackgroundService extends IntentService {
 
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         Notification.BigTextStyle notification = new Notification.BigTextStyle(notificationBuilder);
-
-        if (geocoded != null) {
-            notification.bigText(sb.toString());
+        notification.bigText(sb.toString());
+        if (geocoded != null)
             notification.setSummaryText(geocoded);
-        }
-
         nm.notify(NOTIFICATION_WEATHER, notification.build());
     }
 
@@ -1876,13 +1856,10 @@ public class BackgroundService extends IntentService {
 
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         Notification.BigTextStyle notification = new Notification.BigTextStyle(notificationBuilder);
-
-        if (geocoded != null) {
-            if (content != null)
-                notification.bigText(content);
+        if (content != null)
+            notification.bigText(content);
+        if (geocoded != null)
             notification.setSummaryText(geocoded);
-        }
-
         nm.notify(NOTIFICATION_RAIN, notification.build());
     }
 

@@ -18,8 +18,6 @@ import android.content.res.TypedArray;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.media.Ringtone;
@@ -717,7 +715,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref_version.setSummary(
                     pInfo.versionName + "/" + pInfo.versionCode + "\n" +
                             getString(R.string.msg_geocoder,
-                                    getString(Geocoder.isPresent() ? R.string.msg_yes : R.string.msg_no)) + "\n" +
+                                    getString(GeocoderEx.isPresent() ? R.string.msg_yes : R.string.msg_no)) + "\n" +
                             getString(R.string.msg_playservices,
                                     getString(Util.hasPlayServices(getActivity()) ? R.string.msg_yes : R.string.msg_no)) + "\n" +
                             getString(R.string.msg_stepcounter, getString(Util.hasStepCounter(getActivity()) ? R.string.msg_yes : R.string.msg_no)) + "\n" +
@@ -891,7 +889,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final ListView lv = (ListView) viewEdit.findViewById(R.id.lvEdit);
 
         // Handle add waypoint
-        if (Geocoder.isPresent())
+        if (GeocoderEx.isPresent())
             ivAdd.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -1003,7 +1001,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         new AsyncTask<Object, Object, Object>() {
             protected Object doInBackground(Object... params) {
                 try {
-                    Geocoder geocoder = new Geocoder(getActivity(), Locale.getDefault());
+                    GeocoderEx geocoder = new GeocoderEx(getActivity());
                     return geocoder.getFromLocationName(name, GEOCODER_RESULTS);
                 } catch (IOException ex) {
                     Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
@@ -1015,30 +1013,19 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 if (result instanceof Throwable)
                     Toast.makeText(getActivity(), ((Throwable) result).toString(), Toast.LENGTH_SHORT).show();
                 else {
-                    final List<Address> listAddress = (List<Address>) result;
-                    // Get address lines
-                    if (listAddress != null && listAddress.size() > 0) {
-                        final List<CharSequence> listAddressLine = new ArrayList<>();
-                        for (Address address : listAddress)
-                            if (address.hasLatitude() && address.hasLongitude()) {
-                                List<String> listLine = new ArrayList<>();
-                                for (int l = 0; l < address.getMaxAddressLineIndex(); l++)
-                                    listLine.add(address.getAddressLine(l));
-                                listAddressLine.add(TextUtils.join(", ", listLine));
-                            }
-
+                    final List<GeocoderEx.AddressEx> listAddress = (List<GeocoderEx.AddressEx>) result;
+                    if (listAddress.size() == 0)
+                        Toast.makeText(getActivity(), getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
+                    else {
                         // Show address selector
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
                         alertDialogBuilder.setIcon(android.R.drawable.ic_menu_add);
                         alertDialogBuilder.setTitle(getString(R.string.title_geocode));
-                        alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
+                        alertDialogBuilder.setItems(GeocoderEx.getNameList(listAddress), new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int item) {
                                 // Build location
-                                final String geocodedName = (String) listAddressLine.get(item);
-                                final Location location = new Location("geocoder");
-                                location.setLatitude(listAddress.get(item).getLatitude());
-                                location.setLongitude(listAddress.get(item).getLongitude());
-                                location.setTime(System.currentTimeMillis());
+                                final String name = listAddress.get(item).name;
+                                final Location location = listAddress.get(item).location;
 
                                 new AsyncTask<Object, Object, Object>() {
                                     protected Object doInBackground(Object... params) {
@@ -1060,13 +1047,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                             altitude_type |= BackgroundService.ALTITUDE_KEEP;
 
                                         // Persist location
-                                        new DatabaseHelper(getActivity()).insertLocation(location, altitude_type, geocodedName, -1, -1, -1).close();
+                                        new DatabaseHelper(getActivity()).insertLocation(location, altitude_type, name, -1, -1, -1).close();
                                         return null;
                                     }
 
                                     @Override
                                     protected void onPostExecute(Object result) {
-                                        Toast.makeText(getActivity(), getString(R.string.msg_added, geocodedName), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getActivity(), getString(R.string.msg_added, name), Toast.LENGTH_SHORT).show();
                                     }
                                 }.execute();
                             }
@@ -1080,8 +1067,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         AlertDialog alertDialog = alertDialogBuilder.create();
                         alertDialog.show();
                         dialogs.add(alertDialog);
-                    } else
-                        Toast.makeText(getActivity(), getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         }.execute();

@@ -8,8 +8,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -122,7 +120,7 @@ public class Util {
                 sb.insert(0, String.format("Motion sensor: %s\r\n", hasSignificantMotionSensor(context)));
                 sb.insert(0, String.format("Step counter: %s\r\n", hasStepCounter(context)));
                 sb.insert(0, String.format("Play services: %s\r\n", hasPlayServices(context)));
-                sb.insert(0, String.format("Geocoder: %s\r\n", Geocoder.isPresent()));
+                sb.insert(0, String.format("Geocoder: %s\r\n", GeocoderEx.isPresent()));
                 sb.insert(0, String.format("BPT2: %s\r\n", pInfo.versionName + "/" + pInfo.versionCode));
 
                 Intent sendEmail = new Intent(Intent.ACTION_SEND);
@@ -193,19 +191,6 @@ public class Util {
                             Math.pow(Math.abs(lastLocation.getAltitude() - location.getAltitude()), 2));
         else
             return lastLocation.distanceTo(location);
-    }
-
-    public static List<String> reverseGeocode(Location location, Context context) throws IOException {
-        List<String> listline = new ArrayList<>();
-        if (location != null && Geocoder.isPresent()) {
-            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-            List<Address> listPlace = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-            if (listPlace != null && listPlace.size() > 0) {
-                for (int l = 0; l < listPlace.get(0).getMaxAddressLineIndex(); l++)
-                    listline.add(listPlace.get(0).getAddressLine(l));
-            }
-        }
-        return listline;
     }
 
     public static void geoShare(Location location, String name, Context context) {

@@ -11,8 +11,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -194,8 +192,8 @@ public class WaypointAdapter extends CursorAdapter {
                                 new AsyncTask<Object, Object, Object>() {
                                     protected Object doInBackground(Object... params) {
                                         try {
-                                            Geocoder geocoder = new Geocoder(context, Locale.getDefault());
-                                            return geocoder.getFromLocation(latitude, longitude, GEOCODER_RESULTS);
+                                            GeocoderEx geocoder = new GeocoderEx(context);
+                                            return geocoder.getFromLocation(wpt, GEOCODER_RESULTS);
                                         } catch (IOException ex) {
                                             Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                                             return ex;
@@ -207,34 +205,25 @@ public class WaypointAdapter extends CursorAdapter {
                                         if (result instanceof Throwable)
                                             Toast.makeText(context, ((Throwable) result).toString(), Toast.LENGTH_SHORT).show();
                                         else {
-                                            List<Address> listAddress = (List<Address>) result;
-                                            // Get address lines
-                                            if (listAddress != null && listAddress.size() > 0) {
-                                                final List<CharSequence> listAddressLine = new ArrayList<>();
-                                                for (Address address : listAddress)
-                                                    if (address.hasLatitude() && address.hasLongitude()) {
-                                                        List<String> listLine = new ArrayList<>();
-                                                        for (int l = 0; l < address.getMaxAddressLineIndex(); l++)
-                                                            listLine.add(address.getAddressLine(l));
-                                                        listAddressLine.add(TextUtils.join(", ", listLine));
-                                                    }
-
+                                            final List<GeocoderEx.AddressEx> listAddress = (List<GeocoderEx.AddressEx>) result;
+                                            if (listAddress.size() == 0)
+                                                Toast.makeText(context, context.getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
+                                            else {
                                                 // Show address selector
                                                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
                                                 alertDialogBuilder.setTitle(context.getString(R.string.title_rgeocode));
-                                                alertDialogBuilder.setItems(listAddressLine.toArray(new CharSequence[0]), new DialogInterface.OnClickListener() {
+                                                alertDialogBuilder.setItems(GeocoderEx.getNameList(listAddress), new DialogInterface.OnClickListener() {
                                                     public void onClick(DialogInterface dialog, int item) {
-                                                        final String geocodedName = (String) listAddressLine.get(item);
-
+                                                        final String name = listAddress.get(item).name;
                                                         new AsyncTask<Object, Object, Object>() {
                                                             protected Object doInBackground(Object... params) {
-                                                                new DatabaseHelper(context).updateLocationName(id, geocodedName).close();
+                                                                new DatabaseHelper(context).updateLocationName(id, name).close();
                                                                 return null;
                                                             }
 
                                                             @Override
                                                             protected void onPostExecute(Object result) {
-                                                                Toast.makeText(context, context.getString(R.string.msg_updated, geocodedName), Toast.LENGTH_SHORT).show();
+                                                                Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
                                                             }
                                                         }.execute();
                                                     }
@@ -246,8 +235,7 @@ public class WaypointAdapter extends CursorAdapter {
                                                     }
                                                 });
                                                 alertDialogBuilder.show();
-                                            } else
-                                                Toast.makeText(context, context.getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
+                                            }
                                         }
                                     }
                                 }.execute();
@@ -477,7 +465,7 @@ public class WaypointAdapter extends CursorAdapter {
                 });
 
                 popupMenu.inflate(R.menu.waypoint);
-                popupMenu.getMenu().findItem(R.id.menu_geocode).setEnabled(Geocoder.isPresent());
+                popupMenu.getMenu().findItem(R.id.menu_geocode).setEnabled(GeocoderEx.isPresent());
                 popupMenu.getMenu().findItem(R.id.menu_hidden).setChecked(hidden);
                 popupMenu.show();
             }
