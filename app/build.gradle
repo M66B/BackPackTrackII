@@ -15,7 +15,20 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            applicationVariants.all { variant ->
+                setOutputFile(variant, defaultConfig)
+            }
         }
+    }
+}
+
+def setOutputFile(variant, defaultConfig) {
+    variant.outputs.each { output ->
+        def fileName = "BPT2-v" + defaultConfig.versionName + ".apk"
+        if (output.zipAlign)
+            output.outputFile = new File(output.outputFile.parent, fileName)
+        else
+            output.packageApplication.outputFile = new File(output.packageApplication.outputFile.parent, fileName)
     }
 }
 
