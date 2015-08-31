@@ -3050,6 +3050,19 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         LineGraphSeries<DataPoint> seriesMinTemp = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesMaxTemp = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesRain = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesProbability = new LineGraphSeries<DataPoint>();
+
+        for (Weather weather : listWeather) {
+            double rain_1h = weather.rain_1h;
+            if (!Double.isNaN(rain_1h)) {
+                if (daily)
+                    rain_1h *= 24;
+                if ("in".equals(rain_unit))
+                    rain_1h = rain_1h / 25.4;
+                if (rain_1h > maxRain)
+                    maxRain = rain_1h;
+            }
+        }
 
         for (Weather weather : listWeather) {
             data = true;
@@ -3080,18 +3093,17 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
 
             double rain_1h = weather.rain_1h;
-            if (daily)
-                rain_1h *= 24;
             if (!Double.isNaN(rain_1h)) {
+                if (daily)
+                    rain_1h *= 24;
                 if ("in".equals(rain_unit))
                     rain_1h = rain_1h / 25.4;
-                if (rain_1h > maxRain)
-                    maxRain = rain_1h;
             }
 
             seriesMinTemp.appendData(new DataPoint(new Date(weather.time), temperature_min), true, Integer.MAX_VALUE);
             seriesMaxTemp.appendData(new DataPoint(new Date(weather.time), temperature_max), true, Integer.MAX_VALUE);
             seriesRain.appendData(new DataPoint(new Date(weather.time), rain_1h), true, Integer.MAX_VALUE);
+            seriesProbability.appendData(new DataPoint(new Date(weather.time), weather.rain_probability / 100.0 * maxRain), true, Integer.MAX_VALUE);
         }
 
         if (data) {
@@ -3139,6 +3151,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     return " " + DF.format(value);
                 }
             });
+            seriesProbability.setColor(Color.GRAY);
 
             seriesMinTemp.setDrawDataPoints(true);
             seriesMinTemp.setDataPointsRadius(2);
@@ -3146,8 +3159,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             seriesMaxTemp.setDataPointsRadius(2);
             seriesRain.setDrawDataPoints(true);
             seriesRain.setDataPointsRadius(2);
+            seriesProbability.setDrawDataPoints(true);
+            seriesProbability.setDataPointsRadius(2);
 
             graph.getSecondScale().addSeries(seriesRain);
+            graph.getSecondScale().addSeries(seriesProbability);
             graph.addSeries(seriesMinTemp);
             graph.addSeries(seriesMaxTemp);
 
