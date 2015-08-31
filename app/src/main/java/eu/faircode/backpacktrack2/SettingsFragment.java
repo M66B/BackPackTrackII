@@ -3103,7 +3103,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             seriesMinTemp.appendData(new DataPoint(new Date(weather.time), temperature_min), true, Integer.MAX_VALUE);
             seriesMaxTemp.appendData(new DataPoint(new Date(weather.time), temperature_max), true, Integer.MAX_VALUE);
             seriesRain.appendData(new DataPoint(new Date(weather.time), rain_1h), true, Integer.MAX_VALUE);
-            seriesProbability.appendData(new DataPoint(new Date(weather.time), weather.rain_probability / 100.0 * maxRain), true, Integer.MAX_VALUE);
+            seriesProbability.appendData(new DataPoint(new Date(weather.time), weather.rain_probability * maxRain / 100), true, Integer.MAX_VALUE);
         }
 
         if (data) {
