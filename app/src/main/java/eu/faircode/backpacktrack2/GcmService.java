@@ -16,11 +16,14 @@ public class GcmService extends GcmListenerService {
     @Override
     public void onMessageReceived(String from, Bundle data) {
         Log.i(TAG, "From: " + from);
-        Util.logBundle(data);
+        Util.logBundle(TAG, data);
+
         if (from.startsWith("/topics/")) {
             if ("/topics/broadcasts".equals(from)) {
+                int id = data.getInt("id");
                 String title = data.getString("title");
                 String text = data.getString("text");
+                boolean privat = data.getBoolean("private");
 
                 Notification.Builder notificationBuilder = new Notification.Builder(this);
                 notificationBuilder.setSmallIcon(R.drawable.backpacker_white);
@@ -33,12 +36,12 @@ public class GcmService extends GcmListenerService {
                 notificationBuilder.setOngoing(false);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     notificationBuilder.setCategory(Notification.CATEGORY_MESSAGE);
-                    notificationBuilder.setVisibility(Notification.VISIBILITY_PRIVATE);
+                    notificationBuilder.setVisibility(privat ? Notification.VISIBILITY_PRIVATE : Notification.VISIBILITY_PUBLIC);
                 }
                 NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
                 Notification.BigTextStyle notification = new Notification.BigTextStyle(notificationBuilder);
                 notification.bigText(text);
-                nm.notify(999, notification.build());
+                nm.notify(id, notification.build());
             } else
                 Log.w(TAG, "Unknown GCM topic=" + from);
         } else

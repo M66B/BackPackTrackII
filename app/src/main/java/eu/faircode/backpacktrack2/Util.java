@@ -213,17 +213,17 @@ public class Util {
         return name.replaceAll("\\W+", "_");
     }
 
-    public static void logExtras(Intent intent) {
-        logBundle(intent.getExtras());
+    public static void logExtras(String tag, Intent intent) {
+        logBundle(tag, intent.getExtras());
     }
 
-    public static void logBundle(Bundle data) {
+    public static void logBundle(String tag, Bundle data) {
         if (data != null) {
             Set<String> keys = data.keySet();
             StringBuilder stringBuilder = new StringBuilder();
             for (String key : keys)
                 stringBuilder.append(key).append("=").append(data.get(key)).append("\r\n");
-            Log.d(TAG, stringBuilder.toString());
+            Log.d(tag, stringBuilder.toString());
         }
     }
 }
