@@ -31,6 +31,13 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
+    <!-- https://developers.google.com/cloud-messaging/android/client -->
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <permission
+        android:name="eu.faircode.backpacktrack2.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+    <uses-permission android:name="eu.faircode.backpacktrack2.permission.C2D_MESSAGE" />
+
     <application
         android:allowBackup="false"
         android:configChanges="keyboardHidden|orientation|screenSize"
@@ -129,6 +136,15 @@
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <category android:name="eu.faircode.backpacktrack2" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name=".BackgroundService"
@@ -144,7 +160,6 @@
                 <action android:name="eu.faircode.backpacktrack2.GET_ALTITUDE" />
                 <action android:name="eu.faircode.backpacktrack2.UPDATE_WEATHER" />
             </intent-filter>
-
         </service>
         <service
             android:name=".GpsStatusService"
@@ -158,6 +173,19 @@
             android:name=".PressureService"
             android:enabled="true"
             android:exported="false" />
+        <service
+            android:name=".GcmService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".IIDService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID" />
+            </intent-filter>
+        </service>
     </application>
-
 </manifest>

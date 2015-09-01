@@ -876,6 +876,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Initialize weather updates
         BackgroundService.stopWeatherUpdates(context);
         BackgroundService.startWeatherUpdates(context);
+
+        // Refresh GCM token
+        if (Util.hasPlayServices(context))
+            IIDService.refreshToken(context);
     }
 
     private void edit_waypoints() {
