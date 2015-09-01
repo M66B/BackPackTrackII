@@ -13,6 +13,7 @@ public class GcmService extends GcmListenerService {
         String message = data.getString("message");
         Log.i(TAG, "From: " + from);
         Log.i(TAG, "Message: " + message);
+        Util.logBundle(data);
         if (from.startsWith("/topics/"))
             ;
     }

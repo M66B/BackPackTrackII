@@ -214,12 +214,15 @@ public class Util {
     }
 
     public static void logExtras(Intent intent) {
-        Bundle extras = intent.getExtras();
-        if (extras != null) {
-            Set<String> keys = extras.keySet();
+        logBundle(intent.getExtras());
+    }
+
+    public static void logBundle(Bundle data) {
+        if (data != null) {
+            Set<String> keys = data.keySet();
             StringBuilder stringBuilder = new StringBuilder();
             for (String key : keys)
-                stringBuilder.append(key).append("=").append(extras.get(key)).append("\r\n");
+                stringBuilder.append(key).append("=").append(data.get(key)).append("\r\n");
             Log.d(TAG, stringBuilder.toString());
         }
     }
