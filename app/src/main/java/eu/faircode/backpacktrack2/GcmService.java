@@ -6,13 +6,11 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmListenerService;
 
 public class GcmService extends GcmListenerService {
-    private static final String TAG = "BPT2.Gcm";
+    private static final String TAG = "BPT2.GCM";
 
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        String message = data.getString("message");
         Log.i(TAG, "From: " + from);
-        Log.i(TAG, "Message: " + message);
         Util.logBundle(data);
         if (from.startsWith("/topics/"))
             ;

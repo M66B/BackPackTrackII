@@ -879,7 +879,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Refresh GCM token
         if (Util.hasPlayServices(context))
-            IIDService.refreshToken(context);
+            IIDService.getToken(context, false);
     }
 
     private void edit_waypoints() {
