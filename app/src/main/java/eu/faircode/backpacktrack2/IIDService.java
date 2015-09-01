@@ -27,7 +27,7 @@ public class IIDService extends InstanceIDListenerService {
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             Log.i(TAG, "Token=" + token);
 
-            String topic = "/topics/notifications";
+            String topic = "/topics/broadcasts";
             GcmPubSub pubSub = GcmPubSub.getInstance(context);
             pubSub.subscribe(token, topic, null);
             Log.i(TAG, "Subscribed to " + topic);
