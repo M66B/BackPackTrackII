@@ -85,7 +85,7 @@
     <string name="title_weather_api">Wetter Provider: %s</string>
     <string name="title_weather_interval">Wetter Aktualisierungsintervall: %s Minuten</string>
     <string name="title_weather_wakeup">Gerät aufwachen zum aktualisieren</string>
-    <string name="title_weather_gcm">Subscribe to weather push messages</string>
+    <string name="title_weather_gcm">Wetter Push-Nachrichten abonieren</string>
     <string name="title_weather_fio">Forecast.io</string>
     <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_register">Registrieren</string>
