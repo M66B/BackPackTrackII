@@ -13,7 +13,7 @@
     <string name="title_weather_history">Weergeschiedenis</string>
     <string name="title_weather_forecast">Weersverwachting</string>
     <string name="title_loc_settings">Locatie-instellingen</string>
-    <string name="title_useful_links">Useful links</string>
+    <string name="title_useful_links">Handige koppelingen</string>
 
     <string name="title_geocode">Geocode adres</string>
     <string name="title_rgeocode">Reverse geocode locatie</string>
