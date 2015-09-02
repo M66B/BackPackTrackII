@@ -85,6 +85,7 @@
     <string name="title_weather_api">Weer provider: %s</string>
     <string name="title_weather_interval">Weer ververs interval: %s minuten</string>
     <string name="title_weather_wakeup">Maak apparaat wakker voor verversen</string>
+    <string name="title_weather_gcm">Abboneer op weer push berichten</string>
     <string name="title_weather_fio">Forecast.io</string>
     <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_register">Registeren</string>

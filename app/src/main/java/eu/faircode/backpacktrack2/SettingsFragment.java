@@ -60,6 +60,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
@@ -140,6 +141,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_WEATHER_API = "pref_weather_api";
     public static final String PREF_WEATHER_INTERVAL = "pref_weather_interval";
     public static final String PREF_WEATHER_WAKEUP = "pref_weather_wakeup";
+    public static final String PREF_WEATHER_GCM = "pref_weather_gcm";
     public static final String PREF_WEATHER_APIKEY_FIO = "pref_weather_apikey_fio";
     public static final String PREF_WEATHER_NOTIFICATION = "pref_weather_notification";
     public static final String PREF_WEATHER_RAIN_WARNING = "pref_weather_rain_warning";
@@ -298,6 +300,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_FORECAST_TIME = "pref_forecast_time";
     public static final String PREF_FORECAST_LATITUDE = "pref_forecast_latitude";
     public static final String PREF_FORECAST_LONGITUDE = "pref_forecast_longitude";
+
+    public static final String PREF_GCM_TOKEN = "pref_gcm_token";
 
     // Remember last values
     public static final String PREF_LAST_ACTIVITY = "pref_last_activity";
@@ -466,6 +470,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Preference pref_step_size = findPreference(PREF_STEP_SIZE);
         Preference pref_weight = findPreference(PREF_WEIGHT);
         Preference pref_wakeup = findPreference(PREF_WEATHER_WAKEUP);
+        Preference pref_gcm = findPreference(PREF_WEATHER_GCM);
 
         // Set titles/summaries
         updateTitle(prefs, PREF_SHARE_GPX);
@@ -703,6 +708,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Weather wakeups
         pref_wakeup.setEnabled((Build.VERSION.SDK_INT >= Build.VERSION_CODES.M));
+        pref_gcm.setEnabled(prefs.getString(PREF_GCM_TOKEN, null) != null);
 
         // Handle Play store link
         Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getActivity().getPackageName()));
@@ -830,6 +836,36 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             BackgroundService.startWeatherUpdates(getActivity());
         }
 
+        if (PREF_WEATHER_GCM.equals(key)) {
+            final String token = prefs.getString(PREF_GCM_TOKEN, null);
+            final boolean subscribe = prefs.getBoolean(PREF_WEATHER_GCM, false);
+
+            new AsyncTask<Object, Object, Throwable>() {
+                @Override
+                protected Throwable doInBackground(Object... objects) {
+                    String topic = "/topics/weather";
+                    GcmPubSub pubSub = GcmPubSub.getInstance(getActivity());
+                    try {
+                        if (subscribe)
+                            pubSub.subscribe(token, topic, null);
+                        else
+                            pubSub.unsubscribe(token, topic);
+                        Log.i(TAG, "Subcribe " + topic + "=" + subscribe);
+                        return null;
+                    } catch (IOException ex) {
+                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                        return ex;
+                    }
+                }
+
+                @Override
+                protected void onPostExecute(Throwable ex) {
+                    if (ex != null)
+                        Toast.makeText(getActivity(), ex.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }.execute();
+        }
+
         if (PREF_WIKI_BASE_URL.equals(key) ||
                 PREF_WIKI_RADIUS.equals(key) ||
                 PREF_WIKI_RESULTS.equals(key))
@@ -843,6 +879,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             Wikimedia.cleanupCache(getActivity());
             Geonames.cleanupCache(getActivity());
         }
+
+        if (PREF_GCM_TOKEN.equals(key))
+            findPreference(PREF_WEATHER_GCM).setEnabled(prefs.getString(key, null) != null);
     }
 
     // Helper methods
