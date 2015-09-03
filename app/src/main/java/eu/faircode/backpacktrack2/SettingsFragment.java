@@ -269,7 +269,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_WIKI_RADIUS = "10"; // km
     public static final String DEFAULT_WIKI_RESULTS = "25";
     public static final String DEFAULT_GEONAME_RADIUS = "10"; // km
-    public static final String DEFAULT_GEONAME_RESULTS = "50";
+    public static final String DEFAULT_GEONAME_RESULTS = "100";
     public static final String DEFAULT_SEARCH_CACHE = "7"; // days
 
     public static final boolean DEFAULT_GRAPH_STILL = false;

@@ -215,6 +215,7 @@
     <string name="title_from">Van datum/tijd:</string>
     <string name="title_to">Tot datum/tijd:</string>
     <string name="title_pick">Kies</string>
+    <string name="title_all">Alle</string>
 
     <string name="header_altitude">Hgt.</string>
     <string name="header_accuracy">Nwk.</string>

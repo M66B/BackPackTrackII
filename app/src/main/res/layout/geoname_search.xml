@@ -5,12 +5,26 @@
     android:orientation="vertical"
     android:padding="12dp">
 
-    <ImageView
-        android:id="@+id/ivGPX"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_gravity="right"
-        android:src="@android:drawable/ic_menu_share" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/spFeature"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/ivGPX"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="6dp"
+            android:src="@android:drawable/ic_menu_share" />
+    </LinearLayout>
 
     <ListView
         android:id="@+id/lvGeonames"

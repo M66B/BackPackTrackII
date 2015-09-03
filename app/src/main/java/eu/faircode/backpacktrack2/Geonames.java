@@ -201,5 +201,10 @@ public class Geonames {
         public long population;
         public String countryCode;
         public Location location;
+
+        @Override
+        public String toString() {
+            return fcode; // filtering
+        }
     }
 }

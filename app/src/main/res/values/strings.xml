@@ -217,6 +217,7 @@
     <string name="title_from">From date/time:</string>
     <string name="title_to">To date/time:</string>
     <string name="title_pick">Pick</string>
+    <string name="title_all">All</string>
 
     <string name="header_altitude">Alt.</string>
     <string name="header_accuracy">Acc.</string>

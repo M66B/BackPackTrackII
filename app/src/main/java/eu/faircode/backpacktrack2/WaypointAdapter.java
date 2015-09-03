@@ -25,12 +25,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
+import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -38,6 +40,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
@@ -352,12 +355,26 @@ public class WaypointAdapter extends CursorAdapter {
                                             Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show();
                                         } else {
                                             final List<Geonames.Geoname> listName = (List<Geonames.Geoname>) result;
+                                            final List<String> listFeature = new ArrayList<String>();
 
+                                            // Build list of feature codes
+                                            for (Geonames.Geoname name : listName)
+                                                if (name.fcode != null) {
+                                                    String feature = name.fcode + " " + name.fcodeName;
+                                                    if (!listFeature.contains(feature))
+                                                        listFeature.add(feature);
+                                                }
+                                            Collections.sort(listFeature);
+                                            listFeature.add(0, context.getString(R.string.title_all));
+
+                                            // Reference controls
                                             LayoutInflater inflater = LayoutInflater.from(context);
                                             View view = inflater.inflate(R.layout.geoname_search, null);
+                                            final Spinner spFeature = (Spinner) view.findViewById(R.id.spFeature);
                                             ImageView ivGPX = (ImageView) view.findViewById(R.id.ivGPX);
                                             final ListView lv = (ListView) view.findViewById(R.id.lvGeonames);
 
+                                            // Handle share
                                             ivGPX.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View view) {
@@ -396,8 +413,29 @@ public class WaypointAdapter extends CursorAdapter {
                                                 }
                                             });
 
-                                            GeonameAdapter adapter = new GeonameAdapter(context, listName, wpt);
-                                            lv.setAdapter(adapter);
+                                            final GeonameAdapter geonamesAdapter = new GeonameAdapter(context, listName, wpt);
+                                            lv.setAdapter(geonamesAdapter);
+
+                                            ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, listFeature.toArray(new String[0]));
+                                            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                                            spFeature.setAdapter(spinnerAdapter);
+
+                                            spFeature.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                                @Override
+                                                public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                                                    String feature = listFeature.get(position);
+                                                    if (context.getString(R.string.title_all).equals(feature))
+                                                        feature = "";
+                                                    else
+                                                        feature = feature.split(" ")[0];
+                                                    geonamesAdapter.getFilter().filter(feature);
+                                                }
+
+                                                @Override
+                                                public void onNothingSelected(AdapterView<?> adapterView) {
+                                                    geonamesAdapter.getFilter().filter("");
+                                                }
+                                            });
 
                                             // Show address selector
                                             AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);

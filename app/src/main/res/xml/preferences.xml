@@ -537,7 +537,7 @@
                 android:inputType="number"
                 android:key="pref_geoname_radius" />
             <EditTextPreference
-                android:defaultValue="50"
+                android:defaultValue="100"
                 android:inputType="number"
                 android:key="pref_geoname_results" />
             <EditTextPreference
