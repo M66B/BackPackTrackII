@@ -1030,7 +1030,7 @@ public class BackgroundService extends IntentService {
         int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_INTERVAL, SettingsFragment.DEFAULT_INTERVAL));
         // setRepeating is inexact since KitKat
         am.setRepeating(AlarmManager.RTC_WAKEUP, new Date().getTime() + ALARM_DUE_TIME, interval * 1000, pi);
-        Log.i(TAG, "Start repeating alarm frequency=" + interval + "s" + " due=" + ALARM_DUE_TIME + "ms");
+        Log.i(TAG, "Start periodic locating interval=" + interval + "s" + " due=" + ALARM_DUE_TIME + "ms");
     }
 
     private static void stopPeriodicLocating(Context context) {
@@ -1040,7 +1040,7 @@ public class BackgroundService extends IntentService {
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
-        Log.i(TAG, "Stop repeating alarm");
+        Log.i(TAG, "Stop periodic locating");
     }
 
     public static void startLocating(Context context) {
@@ -1214,7 +1214,7 @@ public class BackgroundService extends IntentService {
             am.setExact(AlarmManager.RTC_WAKEUP, trigger, pi);
         else
             am.set(AlarmManager.RTC_WAKEUP, trigger, pi);
-        Log.i(TAG, "Start weather updates frequency=" + interval + "m" + " next=" + SimpleDateFormat.getDateTimeInstance().format(trigger) + " wakeup=" + wakeup);
+        Log.i(TAG, "Start weather updates interval=" + interval + "m" + " next=" + SimpleDateFormat.getDateTimeInstance().format(trigger) + " wakeup=" + wakeup);
     }
 
     public static void stopWeatherUpdates(Context context) {

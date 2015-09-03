@@ -30,7 +30,6 @@ public class IIDService extends InstanceIDListenerService {
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             Log.i(TAG, "Token=" + token);
 
-
             // Store token
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             prefs.edit().putString(SettingsFragment.PREF_GCM_TOKEN, token).apply();
