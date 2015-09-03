@@ -33,10 +33,19 @@ public class GeonameAdapter extends ArrayAdapter<Geonames.Geoname> {
         if (convertView == null)
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.geoname, parent, false);
 
+        ImageView ivFeature = (ImageView) convertView.findViewById(R.id.ivFeature);
         TextView tvTitle = (TextView) convertView.findViewById(R.id.tvTitle);
         TextView tvDistance = (TextView) convertView.findViewById(R.id.tvDistance);
         TextView tvType = (TextView) convertView.findViewById(R.id.tvType);
         TextView tvPopulation = (TextView) convertView.findViewById(R.id.tvPopulation);
+
+        int resId = 0;
+        if (name.fcode != null)
+            resId = context.getResources().getIdentifier(
+                    "feature_" + name.fcode.toLowerCase() + "_60", "drawable", context.getPackageName());
+        if (resId > 0)
+            ivFeature.setImageResource(resId);
+        ivFeature.setVisibility(resId > 0 ? View.VISIBLE : View.INVISIBLE);
 
         tvTitle.setText(name.name);
         tvDistance.setText((name.countryCode == null ? "" : name.countryCode + " ") + Math.round(name.location.distanceTo(location)) + " m");
