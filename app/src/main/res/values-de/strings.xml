@@ -248,7 +248,7 @@
     <string name="msg_stepcounter">Schrittzähler: %s</string>
     <string name="msg_significantmotion">Signifikante Bewegung: %s</string>
     <string name="msg_pressure">Atmosphärendruck: %s</string>
-    <string name="msg_optimizing">Batterie Optimierung: %s</string>
+    <string name="msg_optimizing">Akku Optimierung: %s</string>
     <string name="msg_yes">ja</string>
     <string name="msg_no">nein</string>
 
