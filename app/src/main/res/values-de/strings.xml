@@ -269,7 +269,7 @@
     <string name="msg_requesting">Abfragen &#8230;</string>
     <string name="msg_rain_warning">%d%% Niederschlagswahrscheinlichkeit</string>
 
-    <string name="msg_locunknown">Location not known yet</string>
+    <string name="msg_locunknown">Position noch nicht bekannt</string>
     <string name="msg_permissions">Eine oder mehrere benötigte Berechtigungen fehlen</string>
 
     <string name="provider_gps">GPS</string>
