@@ -43,23 +43,17 @@ public class SettingsActivity extends Activity {
                 window.setStatusBarColor(getResources().getColor(R.color.color_teal_600));
         }
 
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         boolean hasPermision = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             for (String permission : cPermission)
                 hasPermision = hasPermision && (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED);
 
-        if (hasPermision) {
-            requestWindowFeature(Window.FEATURE_NO_TITLE);
+        if (hasPermision)
             getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
-        } else {
-            ViewGroup view = (ViewGroup) findViewById(android.R.id.content);
-            TextView tvPermission = new TextView(this);
-            int p = Math.round(Util.dipToPixels(this, 12));
-            tvPermission.setPadding(p, p, p, p);
-            tvPermission.setTypeface(null, Typeface.BOLD);
-            tvPermission.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-            tvPermission.setText(R.string.msg_permissions);
-            view.addView(tvPermission);
+        else {
+            setContentView(R.layout.nopermissions);
 
             List<String> listPermission = new ArrayList<String>();
             for (String permission : cPermission)
