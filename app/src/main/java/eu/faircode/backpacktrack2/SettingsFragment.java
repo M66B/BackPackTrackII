@@ -2950,6 +2950,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
         final Location location = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
 
+        if (location == null) {
+            Toast.makeText(getActivity(), R.string.msg_locunknown, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         // Get layout
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         final View viewForecast = inflater.inflate(R.layout.weather_forecast, null);
