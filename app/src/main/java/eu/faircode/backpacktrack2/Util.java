@@ -20,7 +20,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -220,6 +222,11 @@ public class Util {
         if (name == null)
             return null;
         return name.replaceAll("\\W+", "_");
+    }
+
+    public static float dipToPixels(Context context, float dipValue) {
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics);
     }
 
     public static void logExtras(String tag, Intent intent) {

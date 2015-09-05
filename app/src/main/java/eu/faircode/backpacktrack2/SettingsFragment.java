@@ -3208,12 +3208,24 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             seriesProbability.setDrawDataPoints(true);
             seriesProbability.setDataPointsRadius(2);
 
-            seriesMinTemp.setTitle("min");
-            seriesMaxTemp.setTitle("max");
-            seriesRain.setTitle("rain");
-            seriesProbability.setTitle("chance");
+            if ("c".equals(temperature_unit)) {
+                seriesMinTemp.setTitle(getString(R.string.header_celcius));
+                seriesMaxTemp.setTitle(getString(R.string.header_celcius));
+            } else if ("f".equals(temperature_unit)) {
+                seriesMinTemp.setTitle(getString(R.string.header_fahrenheit));
+                seriesMaxTemp.setTitle(getString(R.string.header_fahrenheit));
+            }
+            if ("mm".equals(rain_unit))
+                seriesRain.setTitle(getString(R.string.header_mm));
+            else if ("in".equals(rain_unit))
+                seriesRain.setTitle(getString(R.string.header_inch));
+            seriesProbability.setTitle("%");
+
             graph.getLegendRenderer().setVisible(true);
             graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+            graph.getLegendRenderer().setPadding(0);
+            graph.getLegendRenderer().setBackgroundColor(Color.TRANSPARENT);
+            graph.getLegendRenderer().setTextSize(Util.dipToPixels(getActivity(), 11));
 
             graph.getSecondScale().addSeries(seriesRain);
             graph.getSecondScale().addSeries(seriesProbability);
