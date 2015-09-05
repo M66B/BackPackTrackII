@@ -15,8 +15,18 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class SettingsActivity extends Activity {
     private static final String TAG = "BPT2.Settings";
+
+    public static List<String> cPermission = Arrays.asList(new String[]{
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    });
 
     @Override
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -34,11 +44,9 @@ public class SettingsActivity extends Activity {
         }
 
         boolean hasPermision = true;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            hasPermision = hasPermision && (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED);
-            hasPermision = hasPermision && (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
-            hasPermision = hasPermision && (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
-        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            for (String permission : cPermission)
+                hasPermision = hasPermision && (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED);
 
         if (hasPermision) {
             requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -46,18 +54,19 @@ public class SettingsActivity extends Activity {
         } else {
             ViewGroup view = (ViewGroup) findViewById(android.R.id.content);
             TextView tvPermission = new TextView(this);
-            int p = Math.round(12 * getResources().getDisplayMetrics().density);
+            int p = Math.round(Util.dipToPixels(this, 12));
             tvPermission.setPadding(p, p, p, p);
             tvPermission.setTypeface(null, Typeface.BOLD);
             tvPermission.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
             tvPermission.setText(R.string.msg_permissions);
             view.addView(tvPermission);
 
-            requestPermissions(new String[]{
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-            }, 1);
+            List<String> listPermission = new ArrayList<String>();
+            for (String permission : cPermission)
+                if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED)
+                    listPermission.add(permission);
+
+            requestPermissions(listPermission.toArray(new String[0]), 1);
         }
     }
 
