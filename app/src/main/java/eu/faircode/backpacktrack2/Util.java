@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -59,6 +60,14 @@ public class Util {
         SensorManager sm = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
             return (sm.getDefaultSensor(Sensor.TYPE_PRESSURE) != null);
+        else
+            return false;
+    }
+
+    public static boolean isOptimizingBattery(Context context) {
+        PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            return !pm.isIgnoringBatteryOptimizations(context.getPackageName());
         else
             return false;
     }

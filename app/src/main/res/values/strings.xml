@@ -250,6 +250,7 @@
     <string name="msg_stepcounter">Step counter: %s</string>
     <string name="msg_significantmotion">Significant motion: %s</string>
     <string name="msg_pressure">Atmospheric pressure: %s</string>
+    <string name="msg_optimizing">Optimizing battery: %s</string>
     <string name="msg_yes">yes</string>
     <string name="msg_no">no</string>
 
