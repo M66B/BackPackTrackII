@@ -21,7 +21,7 @@ public class PowerSaveModeChangedReceiver extends BroadcastReceiver {
         Log.i(TAG, "Received " + intent);
 
         PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-        if (!pm.isDeviceIdleMode() && Util.isConnected(context)) {
+        if (!pm.isDeviceIdleMode()) {
             long time = new Date().getTime();
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             long ref_time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
