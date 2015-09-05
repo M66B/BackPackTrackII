@@ -2874,7 +2874,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             seriesValue3.setDataPointsRadius(2);
 
             graph.getLegendRenderer().setVisible(true);
-            graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+            graph.getLegendRenderer().setFixedPosition(0, 0);
             graph.getLegendRenderer().setTextSize(Util.dipToPixels(getActivity(), 11));
 
             if (colValue3 >= 0)
