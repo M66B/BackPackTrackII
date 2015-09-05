@@ -2623,6 +2623,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         double minValue3 = Double.MAX_VALUE;
         double maxValue3 = 0;
 
+        LineGraphSeries<DataPoint> seriesValue = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesValue2 = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesValue3 = new LineGraphSeries<DataPoint>();
+
         long viewport = prefs.getLong(PREF_LAST_WEATHER_VIEWPORT, DAY_MS);
         final String column = prefs.getString(PREF_LAST_WEATHER_GRAPH, "temperature");
 
@@ -2632,11 +2636,35 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         String speed_unit = prefs.getString(PREF_WINDSPEED, DEFAULT_WINDSPEED);
         String rain_unit = prefs.getString(PREF_PRECIPITATION, DEFAULT_PRECIPITATION);
 
+        Cursor cursor = db.getWeather(true);
+
+        int colTime = cursor.getColumnIndex("time");
+        int colValue = cursor.getColumnIndex(column);
+        int colValue2 = -1;
+        int colValue3 = -1;
+
         if ("temperature".equals(column)) {
-            // humidity
+            colValue3 = cursor.getColumnIndex("humidity");
+
             minValue3 = 0;
             maxValue3 = 100;
+
+            if ("c".equals(temperature_unit))
+                seriesValue.setTitle(getString(R.string.header_celcius));
+            else if ("f".equals(temperature_unit))
+                seriesValue.setTitle(getString(R.string.header_fahrenheit));
+            seriesValue3.setTitle("%");
+
+        } else if ("pressure".equals(column)) {
+            if ("hpa".equals(pressure_unit))
+                seriesValue.setTitle(getString(R.string.header_hpa));
+            else if ("mmhg".equals(pressure_unit))
+                seriesValue.setTitle(getString(R.string.header_mmhg));
+
         } else if ("wind_speed".equals(column)) {
+            colValue2 = cursor.getColumnIndex("wind_gust");
+            colValue3 = cursor.getColumnIndex("wind_direction");
+
             minValue = 0;
             if ("bft".equals(speed_unit))
                 maxValue = 10; // beaufort
@@ -2652,44 +2680,55 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             minValue3 = 0;
             maxValue3 = 360;
 
+            if ("bft".equals(speed_unit))
+                seriesValue.setTitle(getString(R.string.header_beaufort));
+            else if ("ms".equals(speed_unit))
+                seriesValue.setTitle(getString(R.string.header_ms));
+            else if ("kmh".equals(speed_unit))
+                seriesValue.setTitle(getString(R.string.header_kph));
+            seriesValue2.setTitle(seriesValue.getTitle());
+            seriesValue3.setTitle(getString(R.string.header_bearing));
+
         } else if ("rain_1h".equals(column)) {
-            minValue = 0;
-            minValue3 = 0; // rain today
-            if ("fio".equals(api))
-                maxValue3 = 100;
-        } else if ("clouds".equals(column)) {
-            minValue = 0;
-            maxValue = 100;
-        } else if ("visibility".equals(column)) {
-            minValue = 0;
-            maxValue = 10000;
-        } else if ("ozone".equals(column)) {
-            minValue = 300;
-            maxValue = 500;
-        }
-
-        Cursor cursor = db.getWeather(true);
-
-        int colTime = cursor.getColumnIndex("time");
-        int colValue = cursor.getColumnIndex(column);
-        int colValue2 = -1;
-        int colValue3 = -1;
-        if ("temperature".equals(column))
-            colValue3 = cursor.getColumnIndex("humidity");
-        else if ("wind_speed".equals(column)) {
-            colValue2 = cursor.getColumnIndex("wind_gust");
-            colValue3 = cursor.getColumnIndex("wind_direction");
-        } else if ("rain_1h".equals(column))
             if ("fio".equals(api))
                 colValue3 = cursor.getColumnIndex("rain_probability");
             else
                 colValue3 = cursor.getColumnIndex("rain_today");
 
-        LineGraphSeries<DataPoint> seriesValue = new LineGraphSeries<DataPoint>();
-        LineGraphSeries<DataPoint> seriesValue2 = new LineGraphSeries<DataPoint>();
-        LineGraphSeries<DataPoint> seriesValue3 = new LineGraphSeries<DataPoint>();
+            minValue = 0;
+            minValue3 = 0; // rain today
+            if ("fio".equals(api))
+                maxValue3 = 100;
 
-        boolean first = false;
+            if ("mm".equals(rain_unit))
+                seriesValue.setTitle(getString(R.string.header_mm));
+            else if ("in".equals(rain_unit))
+                seriesValue.setTitle(getString(R.string.header_inch));
+
+            if ("fio".equals(api))
+                seriesValue3.setTitle("%");
+            else
+                seriesValue3.setTitle(seriesValue.getTitle());
+
+        } else if ("clouds".equals(column)) {
+            minValue = 0;
+            maxValue = 100;
+
+            seriesValue.setTitle("%");
+
+        } else if ("visibility".equals(column)) {
+            minValue = 0;
+            maxValue = 10000;
+
+            seriesValue.setTitle("km");
+
+        } else if ("ozone".equals(column)) {
+            minValue = 300;
+            maxValue = 500;
+
+            seriesValue.setTitle("DU");
+        }
+
         while (cursor.moveToNext()) {
             data = true;
 
@@ -2833,6 +2872,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             seriesValue2.setDataPointsRadius(2);
             seriesValue3.setDrawDataPoints(true);
             seriesValue3.setDataPointsRadius(2);
+
+            graph.getLegendRenderer().setVisible(true);
+            graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
+            graph.getLegendRenderer().setTextSize(Util.dipToPixels(getActivity(), 11));
 
             if (colValue3 >= 0)
                 graph.getSecondScale().addSeries(seriesValue3);
@@ -3223,8 +3266,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             graph.getLegendRenderer().setVisible(true);
             graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
-            graph.getLegendRenderer().setPadding(0);
-            graph.getLegendRenderer().setBackgroundColor(Color.TRANSPARENT);
             graph.getLegendRenderer().setTextSize(Util.dipToPixels(getActivity(), 11));
 
             graph.getSecondScale().addSeries(seriesRain);
