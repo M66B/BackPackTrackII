@@ -33,6 +33,7 @@ public class SettingsActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Set status bar color
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -43,31 +44,38 @@ public class SettingsActivity extends Activity {
                 window.setStatusBarColor(getResources().getColor(R.color.color_teal_600));
         }
 
+        // Remove window title
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
+        // Check runtime permissions
         boolean hasPermision = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             for (String permission : cPermission)
                 hasPermision = hasPermision && (checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED);
 
+        // Show main activity
         if (hasPermision)
             getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
         else {
             setContentView(R.layout.nopermissions);
 
+            // Build list of missing runtime permissions
             List<String> listPermission = new ArrayList<String>();
             for (String permission : cPermission)
                 if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED)
                     listPermission.add(permission);
 
+            // Request runtime permissions
             requestPermissions(listPermission.toArray(new String[0]), 1);
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        // Try again
         recreate();
 
+        // Make sure first run has been called
         new Thread(new Runnable() {
             @Override
             public void run() {
