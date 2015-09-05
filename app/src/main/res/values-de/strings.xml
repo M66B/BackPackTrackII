@@ -215,7 +215,7 @@
     <string name="title_from">Von Datum/Uhrzeit:</string>
     <string name="title_to">Bis Datum/Uhrzeit:</string>
     <string name="title_pick">Auswählen</string>
-    <string name="title_all">All</string>
+    <string name="title_all">Alle</string>
 
     <string name="header_altitude">Höhe</string>
     <string name="header_accuracy">Pr.</string>
@@ -248,7 +248,7 @@
     <string name="msg_stepcounter">Schrittzähler: %s</string>
     <string name="msg_significantmotion">Signifikante Bewegung: %s</string>
     <string name="msg_pressure">Atmosphärendruck: %s</string>
-    <string name="msg_optimizing">Optimizing battery: %s</string>
+    <string name="msg_optimizing">Batterie Optimierung: %s</string>
     <string name="msg_yes">ja</string>
     <string name="msg_no">nein</string>
 
