@@ -66,6 +66,7 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.helper.DateAsXAxisLabelFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
@@ -3206,6 +3207,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             seriesRain.setDataPointsRadius(2);
             seriesProbability.setDrawDataPoints(true);
             seriesProbability.setDataPointsRadius(2);
+
+            seriesMinTemp.setTitle("min");
+            seriesMaxTemp.setTitle("max");
+            seriesRain.setTitle("rain");
+            seriesProbability.setTitle("chance");
+            graph.getLegendRenderer().setVisible(true);
+            graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
 
             graph.getSecondScale().addSeries(seriesRain);
             graph.getSecondScale().addSeries(seriesProbability);
