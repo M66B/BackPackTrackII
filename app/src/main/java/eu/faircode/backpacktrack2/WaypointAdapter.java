@@ -474,7 +474,7 @@ public class WaypointAdapter extends CursorAdapter {
                                             else
                                                 lm.addProximityAlert(latitude, longitude, newradius, -1, pi);
 
-                                            new DatabaseHelper(context).setProximity(id, newradius).close();
+                                            db.setProximity(id, newradius);
                                         }
                                         return null;
                                     }
@@ -493,8 +493,8 @@ public class WaypointAdapter extends CursorAdapter {
                                     final EditText etProximity = (EditText) view.findViewById(R.id.etProximity);
 
                                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                                    alertDialogBuilder.setIcon(android.R.drawable.ic_menu_myplaces);
-                                    alertDialogBuilder.setTitle(R.string.app_name);
+                                    alertDialogBuilder.setIcon(android.R.drawable.ic_menu_mylocation);
+                                    alertDialogBuilder.setTitle(R.string.title_radius);
                                     alertDialogBuilder.setView(view);
                                     alertDialogBuilder
                                             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -518,7 +518,7 @@ public class WaypointAdapter extends CursorAdapter {
                             case R.id.menu_hidden:
                                 new AsyncTask<Object, Object, Object>() {
                                     protected Object doInBackground(Object... params) {
-                                        new DatabaseHelper(context).hideLocation(id, !hidden).close();
+                                        db.hideLocation(id, !hidden);
                                         return null;
                                     }
 
@@ -539,7 +539,7 @@ public class WaypointAdapter extends CursorAdapter {
                                             public void onClick(DialogInterface dialog, int which) {
                                                 new AsyncTask<Object, Object, Object>() {
                                                     protected Object doInBackground(Object... params) {
-                                                        new DatabaseHelper(context).deleteLocation(id).close();
+                                                        db.deleteLocation(id);
                                                         return null;
                                                     }
 
@@ -584,7 +584,7 @@ public class WaypointAdapter extends CursorAdapter {
 
                 new AsyncTask<Object, Object, Object>() {
                     protected Object doInBackground(Object... params) {
-                        new DatabaseHelper(context).updateLocationName(id, newName).close();
+                        db.updateLocationName(id, newName);
                         return null;
                     }
 
