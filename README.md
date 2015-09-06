@@ -233,8 +233,7 @@ The weather history shows the time of the weather reports (not the time of fetch
 **(11) Is any sensitve data sent when fetching information?**
 
 When fetching Google Elevation data, your location (latitude/longitude) will be sent securely to maps.googleapis.com.
-When fetching weather data, your location (latitude/longitude) will be sent insecurely to api.openweathermap.org.
-Note, if a station ID is enter in 'Settings - Weather - Use weather station' your actaul location will not be sent, except when manually selecting the 'Show weather data' option.
+When fetching weather data, your location (latitude/longitude) will be sent insecurely to api.forecast.io.
 
 <a name="FAQ12"></a>
 **(12) How can I use forecast.io weather info?**
