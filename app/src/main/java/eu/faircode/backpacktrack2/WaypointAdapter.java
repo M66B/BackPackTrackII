@@ -47,7 +47,6 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
 
 public class WaypointAdapter extends CursorAdapter {
     private static final String TAG = "BPT2.Waypoint";
@@ -460,8 +459,8 @@ public class WaypointAdapter extends CursorAdapter {
                                 return true;
 
                             case R.id.menu_proximity:
-                                new AsyncTask<Integer, Object, Object>() {
-                                    protected Object doInBackground(Integer... params) {
+                                final AsyncTask task = new AsyncTask<Object, Object, Object>() {
+                                    protected Object doInBackground(Object... params) {
                                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
                                                 context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                                             Intent intent = new Intent(context, BackgroundService.class);
@@ -469,12 +468,13 @@ public class WaypointAdapter extends CursorAdapter {
                                             intent.putExtra(BackgroundService.EXTRA_WAYPOINT, id);
                                             PendingIntent pi = PendingIntent.getService(context, 100 + (int) id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                                             LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-                                            if (params[0] == 0)
+                                            long newradius = (long) params[0];
+                                            if (newradius == 0)
                                                 lm.removeProximityAlert(pi);
                                             else
-                                                lm.addProximityAlert(latitude, longitude, params[0], -1, pi);
+                                                lm.addProximityAlert(latitude, longitude, newradius, -1, pi);
 
-                                            new DatabaseHelper(context).setProximity(id, params[0]).close();
+                                            new DatabaseHelper(context).setProximity(id, newradius).close();
                                         }
                                         return null;
                                     }
@@ -483,7 +483,35 @@ public class WaypointAdapter extends CursorAdapter {
                                     protected void onPostExecute(Object result) {
                                         Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
                                     }
-                                }.execute(radius > 0 ? 0 : 50);
+                                };
+
+                                if (radius > 0)
+                                    task.execute(0L);
+                                else {
+                                    LayoutInflater inflater = LayoutInflater.from(context);
+                                    View view = inflater.inflate(R.layout.proximity, null);
+                                    final EditText etProximity = (EditText) view.findViewById(R.id.etProximity);
+
+                                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                                    alertDialogBuilder.setIcon(android.R.drawable.ic_menu_myplaces);
+                                    alertDialogBuilder.setTitle(R.string.app_name);
+                                    alertDialogBuilder.setView(view);
+                                    alertDialogBuilder
+                                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    task.execute(Long.parseLong(etProximity.getText().toString()));
+                                                }
+                                            })
+                                            .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    // Do nothing
+                                                }
+                                            });
+                                    AlertDialog alertDialog = alertDialogBuilder.create();
+                                    alertDialog.show();
+                                }
 
                                 return true;
 
