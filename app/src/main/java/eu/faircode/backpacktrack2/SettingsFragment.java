@@ -351,7 +351,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
             String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
-            Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
             findPreference(PREF_WEATHER_FORECAST).setEnabled("fio".equals(api) && Util.isConnected(getActivity()));
             findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted && connected);
         }
@@ -656,7 +655,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         final float ref_pressure = prefs.getFloat(SettingsFragment.PREF_PRESSURE_REF_VALUE, 0);
         final long ref_time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
-        Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+        final Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
 
         // Handle pressure reading test
         pref_pressure_test.setEnabled(ref_pressure != 0 && ref_time != 0 && lastLocation != null);
@@ -674,7 +673,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 
                             // Get altitude
-                            Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
                             float altitude = PressureService.getAltitude(lastLocation, getActivity());
 
                             // Show reference/altitude
