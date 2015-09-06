@@ -1,12 +1,16 @@
 package eu.faircode.backpacktrack2;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.TimePickerDialog;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -349,7 +353,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             boolean connected = Util.isConnected(getActivity());
             Log.i(TAG, "Connectivity changed mounted=" + mounted + " connected=" + connected);
 
-            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted && connected);
+            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted);
 
             SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
             String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
@@ -366,7 +370,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             findPreference(PREF_SHARE_GPX).setEnabled(mounted);
             findPreference(PREF_SHARE_KML).setEnabled(mounted);
-            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted && connected);
+            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted);
         }
     };
 
@@ -573,7 +577,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         });
 
         // Handle upload GPX
-        pref_upload_gpx.setEnabled(blogConfigured() && Util.storageMounted() && Util.isConnected(getActivity()));
+        pref_upload_gpx.setEnabled(blogConfigured() && Util.storageMounted());
         pref_upload_gpx.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -800,7 +804,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 prefs.edit().putString(key, blogurl).apply();
                 ((EditTextPreference) pref).setText(blogurl);
             }
-            findPreference(PREF_UPLOAD_GPX).setEnabled(blogurl != null);
+            boolean mounted = Util.storageMounted();
+            findPreference(PREF_UPLOAD_GPX).setEnabled(mounted && blogurl != null);
         }
 
         // Update preference titles
@@ -1166,6 +1171,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
     private void export(final Intent intent, int resTitle, int resIcon) {
         final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
@@ -1324,7 +1330,25 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 intent.putExtra(BackgroundService.EXTRA_DELETE_DATA, cbDelete.isChecked());
                                 intent.putExtra(BackgroundService.EXTRA_TIME_FROM, from.getTimeInMillis());
                                 intent.putExtra(BackgroundService.EXTRA_TIME_TO, to.getTimeInMillis());
-                                getActivity().startService(intent);
+
+                                if (!BackgroundService.ACTION_UPLOAD_GPX.equals(intent.getAction()) ||
+                                        Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1 || Util.isConnected(getActivity())) {
+                                    Log.i(TAG, "Immediately executing intent=" + intent);
+                                    getActivity().startService(intent);
+                                } else {
+                                    intent.putExtra(BackgroundService.EXTRA_JOB, true);
+
+                                    ComponentName component = new ComponentName(getActivity(), JobExecutionService.class);
+                                    JobInfo.Builder builder = new JobInfo.Builder(100, component);
+                                    builder.setExtras(Util.getPersistableBundle(intent.getExtras()));
+                                    builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+                                    builder.setMinimumLatency(0);
+                                    builder.setBackoffCriteria(10 * 1000, JobInfo.BACKOFF_POLICY_LINEAR);
+                                    JobScheduler js = (JobScheduler) getActivity().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+                                    JobInfo job = builder.build();
+                                    Log.i(TAG, "Scheduling intent=" + intent + " job=" + job);
+                                    js.schedule(job);
+                                }
                             }
                         })
                 .setNegativeButton(android.R.string.cancel,

@@ -108,6 +108,7 @@ public class BackgroundService extends IntentService {
     public static final String EXTRA_DELETE_DATA = "DeleteData";
     public static final String EXTRA_TIME_FROM = "TimeFrom";
     public static final String EXTRA_TIME_TO = "TimeTo";
+    public static final String EXTRA_JOB = "Job";
     public static final String EXTRA_GEOURI = "Geopoint";
 
     public static final String DEFAULT_TRACK_NAME = "BackPackTrack";
@@ -779,7 +780,7 @@ public class BackgroundService extends IntentService {
             new DatabaseHelper(this).deleteTrackpoints(from, to).close();
 
         // Feedback
-        if (ACTION_UPLOAD_GPX.equals(intent.getAction())) {
+        if (ACTION_UPLOAD_GPX.equals(intent.getAction()) && !intent.getBooleanExtra(EXTRA_JOB, false)) {
             Util.toast(getString(R.string.msg_uploaded, url), Toast.LENGTH_LONG, this);
             Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
             vibrator.vibrate(500);

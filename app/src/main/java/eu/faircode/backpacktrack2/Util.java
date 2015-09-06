@@ -1,5 +1,6 @@
 package eu.faircode.backpacktrack2;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,6 +19,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.PersistableBundle;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
@@ -227,6 +229,36 @@ public class Util {
     public static float dipToPixels(Context context, float dipValue) {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dipValue, metrics);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
+    public static PersistableBundle getPersistableBundle(Bundle bundle) {
+        PersistableBundle result = new PersistableBundle();
+        for (String key : bundle.keySet())
+            if (bundle.get(key) instanceof Boolean)
+                result.putBoolean(key, bundle.getBoolean(key));
+            else if (bundle.get(key) instanceof Integer)
+                result.putInt(key, bundle.getInt(key));
+            else if (bundle.get(key) instanceof Long)
+                result.putLong(key, bundle.getLong(key));
+            else if (bundle.get(key) instanceof String || bundle.get(key) == null)
+                result.putString(key, bundle.getString(key));
+        return result;
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
+    public static Bundle getBundle(PersistableBundle arg) {
+        Bundle result = new Bundle();
+        for (String key : arg.keySet())
+            if (arg.get(key) instanceof Boolean)
+                result.putBoolean(key, arg.getBoolean(key));
+            else if (arg.get(key) instanceof Integer)
+                result.putInt(key, arg.getInt(key));
+            else if (arg.get(key) instanceof Long)
+                result.putLong(key, arg.getLong(key));
+            else if (arg.get(key) instanceof String || arg.get(key) == null)
+                result.putString(key, arg.getString(key));
+        return result;
     }
 
     public static void logExtras(String tag, Intent intent) {
