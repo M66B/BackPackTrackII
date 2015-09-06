@@ -88,6 +88,7 @@ public class BackgroundService extends IntentService {
     public static final String ACTION_TRACKPOINT = "TrackPoint";
     public static final String ACTION_WAYPOINT = "WayPoint";
     public static final String ACTION_GEOPOINT = "Geopoint";
+    public static final String ACTION_PROXIMITY = "Proximity";
     public static final String ACTION_SHARE_GPX = "ShareGPX";
     public static final String ACTION_SHARE_KML = "ShareKML";
     public static final String ACTION_UPLOAD_GPX = "UploadGPX";
@@ -100,6 +101,8 @@ public class BackgroundService extends IntentService {
     public static final String EXPORTED_ACTION_UPLOAD_GPX = "eu.faircode.backpacktrack2.UPLOAD_GPX";
     public static final String EXPORTED_ACTION_GET_ALTITUDE = "eu.faircode.backpacktrack2.GET_ALTITUDE";
     public static final String EXPORTED_ACTION_UPDATE_WEATHER = "eu.faircode.backpacktrack2.UPDATE_WEATHER";
+    public static final String EXPORTED_ACTION_PROXIMITY_ENTER = "eu.faircode.backpacktrack2.PROXIMITY_ENTER";
+    public static final String EXPORTED_ACTION_PROXIMITY_EXIT = "eu.faircode.backpacktrack2.PROXIMITY_EXIT";
 
     // Extras
     public static final String EXTRA_ENABLE = "Enable";
@@ -109,6 +112,7 @@ public class BackgroundService extends IntentService {
     public static final String EXTRA_TIME_FROM = "TimeFrom";
     public static final String EXTRA_TIME_TO = "TimeTo";
     public static final String EXTRA_JOB = "Job";
+    public static final String EXTRA_WAYPOINT = "Waypoint";
     public static final String EXTRA_GEOURI = "Geopoint";
 
     public static final String DEFAULT_TRACK_NAME = "BackPackTrack";
@@ -204,6 +208,9 @@ public class BackgroundService extends IntentService {
 
             else if (ACTION_GEOPOINT.equals(intent.getAction()))
                 handleGeopoint(intent);
+
+            else if (ACTION_PROXIMITY.equals(intent.getAction()))
+                handleProximity(intent);
 
             else if (ACTION_SHARE_GPX.equals(intent.getAction()))
                 handleShare(intent);
@@ -698,6 +705,19 @@ public class BackgroundService extends IntentService {
             new DatabaseHelper(this).insertLocation(location, altitude_type, name, -1, -1, -1).close();
             Util.toast(getString(R.string.msg_added, name), Toast.LENGTH_LONG, this);
         }
+    }
+
+    private void handleProximity(Intent intent) {
+        long waypoint = intent.getLongExtra(EXTRA_WAYPOINT, -1);
+        boolean entering = intent.getBooleanExtra(LocationManager.KEY_PROXIMITY_ENTERING, false);
+        Log.i(TAG, "Waypoint=" + waypoint + " entering=" + entering);
+
+        // Broadcast proximity intent
+        Intent proximity = new Intent(entering ? EXPORTED_ACTION_PROXIMITY_ENTER : EXPORTED_ACTION_PROXIMITY_EXIT);
+        proximity.putExtra(EXTRA_WAYPOINT, waypoint);
+        Log.i(TAG, "Broadcasting intent=" + proximity);
+        Util.logExtras(TAG, proximity);
+        sendBroadcast(proximity);
     }
 
     private void handleShare(Intent intent) throws IOException {

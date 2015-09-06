@@ -284,6 +284,7 @@
     <string name="menu_elevation_day">Hoogtes voor dag opvragen</string>
     <string name="menu_time">Tijd</string>
     <string name="menu_geocode">Geocode</string>
+    <string name="menu_proximity">Nabijheidsalarm %sm</string>
     <string name="menu_hidden">Verstopt</string>
     <string name="menu_wiki">Wiki zoeken</string>
     <string name="menu_geoname">Geoname zoeken</string>

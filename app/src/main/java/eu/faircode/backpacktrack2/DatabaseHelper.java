@@ -23,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 22;
+    private static final int DB_VERSION = 23;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
@@ -80,6 +80,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", activity_type INTEGER NULL" +
                 ", activity_confidence INTEGER NULL" +
                 ", stepcount INTEGER NULL" +
+                ", proximity INTEGER NULL" +
                 ", hidden INTEGER NULL" +
                 ");");
         db.execSQL("CREATE INDEX idx_location_time ON location(time)");
@@ -296,6 +297,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 oldVersion = 22;
             }
 
+            if (oldVersion < 23) {
+                db.execSQL("ALTER TABLE location ADD COLUMN proximity INTEGER NULL");
+                oldVersion = 23;
+            }
+
             db.setVersion(DB_VERSION);
 
             db.setTransactionSuccessful();
@@ -431,6 +437,28 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cv.put("hidden", hidden ? 1 : 0);
             if (db.update("location", cv, "ID = ?", new String[]{Long.toString(id)}) != 1)
                 Log.e(TAG, "Update location hidden failed");
+        }
+
+        for (LocationChangedListener listener : mLocationChangedListeners)
+            try {
+                listener.onLocationUpdated();
+            } catch (Throwable ex) {
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
+
+        return this;
+    }
+
+    public DatabaseHelper setProximity(long id, long radius) {
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            if (radius <= 0)
+                cv.putNull("proximity");
+            else
+                cv.put("proximity", radius);
+            if (db.update("location", cv, "ID = ?", new String[]{Long.toString(id)}) != 1)
+                Log.e(TAG, "Update location radius failed");
         }
 
         for (LocationChangedListener listener : mLocationChangedListeners)

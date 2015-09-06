@@ -16,6 +16,10 @@
         android:id="@+id/menu_geoname"
         android:title="@string/menu_geoname" />
     <item
+        android:id="@+id/menu_proximity"
+        android:checkable="true"
+        android:title="" />
+    <item
         android:id="@+id/menu_hidden"
         android:checkable="true"
         android:title="@string/menu_hidden" />

@@ -5,19 +5,21 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -33,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -53,6 +56,7 @@ public class WaypointAdapter extends CursorAdapter {
     private int colLatitude;
     private int colLongitude;
     private int colName;
+    private int colProximity;
     private int colHidden;
 
     private String wiki_baseurl;
@@ -76,6 +80,7 @@ public class WaypointAdapter extends CursorAdapter {
         this.colLatitude = cursor.getColumnIndex("latitude");
         this.colLongitude = cursor.getColumnIndex("longitude");
         this.colName = cursor.getColumnIndex("name");
+        this.colProximity = cursor.getColumnIndex("proximity");
         this.colHidden = cursor.getColumnIndex("hidden");
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -100,17 +105,20 @@ public class WaypointAdapter extends CursorAdapter {
         final double longitude = cursor.getDouble(colLongitude);
         final Location wpt = new Location("wpt");
         final String name = cursor.getString(colName);
+        final long radius = (cursor.isNull(colProximity) ? 0 : cursor.getLong(colProximity));
         final boolean hidden = !(cursor.isNull(colHidden) || cursor.getInt(colHidden) == 0);
 
         wpt.setLatitude(latitude);
         wpt.setLongitude(longitude);
 
         // Get views
+        TextView tvId = (TextView) view.findViewById(R.id.tvId);
         final EditText etName = (EditText) view.findViewById(R.id.etName);
         ImageView ivManage = (ImageView) view.findViewById(R.id.ivManage);
         ImageView ivSave = (ImageView) view.findViewById(R.id.ivSave);
 
-        // Set waypoint name
+        // Show waypoint ID and name
+        tvId.setText(Long.toString(id));
         etName.setText(name);
 
         // Handle clear text
@@ -450,6 +458,40 @@ public class WaypointAdapter extends CursorAdapter {
 
                                 return true;
 
+                            case R.id.menu_proximity:
+                                new AsyncTask<Object, Object, Object>() {
+                                    private long r = 0;
+
+                                    @Override
+                                    protected void onPreExecute() {
+                                        // TODO: ask radius
+                                        r = (radius > 0 ? 0 : 50);
+                                    }
+
+                                    protected Object doInBackground(Object... params) {
+                                        if (context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                            Intent intent = new Intent(context, BackgroundService.class);
+                                            intent.setAction(BackgroundService.ACTION_PROXIMITY);
+                                            intent.putExtra(BackgroundService.EXTRA_WAYPOINT, id);
+                                            PendingIntent pi = PendingIntent.getService(context, 100 + (int) id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                                            LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+                                            if (r == 0)
+                                                lm.removeProximityAlert(pi);
+                                            else
+                                                lm.addProximityAlert(latitude, longitude, r, -1, pi);
+
+                                            new DatabaseHelper(context).setProximity(id, r).close();
+                                        }
+                                        return null;
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(Object result) {
+                                        Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
+                                    }
+                                }.execute();
+                                return true;
+
                             case R.id.menu_hidden:
                                 new AsyncTask<Object, Object, Object>() {
                                     protected Object doInBackground(Object... params) {
@@ -504,6 +546,8 @@ public class WaypointAdapter extends CursorAdapter {
 
                 popupMenu.inflate(R.menu.waypoint);
                 popupMenu.getMenu().findItem(R.id.menu_geocode).setEnabled(GeocoderEx.isPresent());
+                popupMenu.getMenu().findItem(R.id.menu_proximity).setTitle(context.getString(R.string.menu_proximity, Long.toString(radius)));
+                popupMenu.getMenu().findItem(R.id.menu_proximity).setChecked(radius > 0);
                 popupMenu.getMenu().findItem(R.id.menu_hidden).setChecked(hidden);
                 popupMenu.show();
             }

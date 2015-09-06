@@ -286,6 +286,7 @@
     <string name="menu_elevation_day">Fetch elevations for day</string>
     <string name="menu_time">Time</string>
     <string name="menu_geocode">Geocode</string>
+    <string name="menu_proximity">Proximity alert %sm</string>
     <string name="menu_hidden">Hidden</string>
     <string name="menu_wiki">Wiki search</string>
     <string name="menu_geoname">Geoname search</string>

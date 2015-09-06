@@ -284,6 +284,7 @@
     <string name="menu_elevation_day">Höhe für Tag beziehen</string>
     <string name="menu_time">Zeit</string>
     <string name="menu_geocode">Geocode</string>
+    <string name="menu_proximity">Nähe Alarm %sm</string>
     <string name="menu_hidden">Versteckt</string>
     <string name="menu_wiki">Wiki Suche</string>
     <string name="menu_geoname">Geoname Suche</string>
