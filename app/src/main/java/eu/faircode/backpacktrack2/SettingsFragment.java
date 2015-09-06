@@ -1356,8 +1356,12 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             JobInfo.Builder builder = new JobInfo.Builder(100, component);
             builder.setExtras(Util.getPersistableBundle(intent.getExtras()));
             builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+            builder.setRequiresCharging(false);
+            builder.setRequiresDeviceIdle(false);
             builder.setMinimumLatency(0);
             builder.setBackoffCriteria(10 * 1000, JobInfo.BACKOFF_POLICY_LINEAR);
+            builder.setOverrideDeadline(2 * 3600 * 1000L);
+            builder.setPersisted(false);
             JobScheduler js = (JobScheduler) getActivity().getSystemService(Context.JOB_SCHEDULER_SERVICE);
             JobInfo job = builder.build();
             Log.i(TAG, "Scheduling intent=" + intent + " job=" + job);
