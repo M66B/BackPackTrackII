@@ -1171,7 +1171,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             super.onActivityResult(requestCode, resultCode, data);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
     private void export(final Intent intent, int resTitle, int resIcon) {
         final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
@@ -1330,26 +1329,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 intent.putExtra(BackgroundService.EXTRA_DELETE_DATA, cbDelete.isChecked());
                                 intent.putExtra(BackgroundService.EXTRA_TIME_FROM, from.getTimeInMillis());
                                 intent.putExtra(BackgroundService.EXTRA_TIME_TO, to.getTimeInMillis());
-
-                                if (!BackgroundService.ACTION_UPLOAD_GPX.equals(intent.getAction()) ||
-                                        Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1 || Util.isConnected(getActivity())) {
-                                    Log.i(TAG, "Immediately executing intent=" + intent);
-                                    getActivity().startService(intent);
-                                } else {
-                                    intent.putExtra(BackgroundService.EXTRA_JOB, true);
-
-                                    ComponentName component = new ComponentName(getActivity(), JobExecutionService.class);
-                                    JobInfo.Builder builder = new JobInfo.Builder(100, component);
-                                    builder.setExtras(Util.getPersistableBundle(intent.getExtras()));
-                                    builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-                                    builder.setMinimumLatency(0);
-                                    builder.setBackoffCriteria(10 * 1000, JobInfo.BACKOFF_POLICY_LINEAR);
-                                    JobScheduler js = (JobScheduler) getActivity().getSystemService(Context.JOB_SCHEDULER_SERVICE);
-                                    JobInfo job = builder.build();
-                                    Log.i(TAG, "Scheduling intent=" + intent + " job=" + job);
-                                    js.schedule(job);
-                                    Toast.makeText(getActivity(), R.string.msg_scheduled, Toast.LENGTH_SHORT).show();
-                                }
+                                execute(intent);
                             }
                         })
                 .setNegativeButton(android.R.string.cancel,
@@ -1361,6 +1341,29 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
         dialogs.add(alertDialog);
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP_MR1)
+    private void execute(Intent intent) {
+        if (!BackgroundService.ACTION_UPLOAD_GPX.equals(intent.getAction()) ||
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP_MR1 || Util.isConnected(getActivity())) {
+            Log.i(TAG, "Immediately executing intent=" + intent);
+            getActivity().startService(intent);
+        } else {
+            intent.putExtra(BackgroundService.EXTRA_JOB, true);
+
+            ComponentName component = new ComponentName(getActivity(), JobExecutionService.class);
+            JobInfo.Builder builder = new JobInfo.Builder(100, component);
+            builder.setExtras(Util.getPersistableBundle(intent.getExtras()));
+            builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+            builder.setMinimumLatency(0);
+            builder.setBackoffCriteria(10 * 1000, JobInfo.BACKOFF_POLICY_LINEAR);
+            JobScheduler js = (JobScheduler) getActivity().getSystemService(Context.JOB_SCHEDULER_SERVICE);
+            JobInfo job = builder.build();
+            Log.i(TAG, "Scheduling intent=" + intent + " job=" + job);
+            js.schedule(job);
+            Toast.makeText(getActivity(), R.string.msg_scheduled, Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void location_history() {
