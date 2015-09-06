@@ -269,6 +269,7 @@
     <string name="msg_requesting">Wordt opgevraagd &#8230;</string>
     <string name="msg_rain_warning">%d%% kans op regen</string>
 
+    <string name="msg_scheduled">Upload planned</string>
     <string name="msg_locunknown">Locatie nog onbekend q</string>
     <string name="msg_permissions">One or more required permissions missing</string>
 

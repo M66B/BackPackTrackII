@@ -1348,6 +1348,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                     JobInfo job = builder.build();
                                     Log.i(TAG, "Scheduling intent=" + intent + " job=" + job);
                                     js.schedule(job);
+                                    Toast.makeText(getActivity(), R.string.msg_scheduled, Toast.LENGTH_SHORT).show();
                                 }
                             }
                         })
