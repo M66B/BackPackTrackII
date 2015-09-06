@@ -17,6 +17,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -469,7 +470,8 @@ public class WaypointAdapter extends CursorAdapter {
                                     }
 
                                     protected Object doInBackground(Object... params) {
-                                        if (context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                                                context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                                             Intent intent = new Intent(context, BackgroundService.class);
                                             intent.setAction(BackgroundService.ACTION_PROXIMITY);
                                             intent.putExtra(BackgroundService.EXTRA_WAYPOINT, id);
