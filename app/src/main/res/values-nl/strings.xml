@@ -138,7 +138,7 @@
     <string name="summary_weather_history">Show local weather history</string>
     <string name="summary_weather_forecast">Show local weather forecast</string>
     <string name="summary_loc_settings">Tap to open the Android location settings</string>
-    <string name="summary_optimizations">Tap to open the Android battery optimizations settings</string>
+    <string name="summary_optimizations">Tap to open the Android battery optimizations settings (Android 6 or later)</string>
     <string name="summary_useful_links">Links to information relevant to travelers</string>
 
     <string name="summary_interval">Try to acquire a new location every selected number of seconds</string>
