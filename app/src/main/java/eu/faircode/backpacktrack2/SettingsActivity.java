@@ -3,12 +3,16 @@ package eu.faircode.backpacktrack2;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -72,6 +76,22 @@ public class SettingsActivity extends Activity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        // Write external store permission requires a restart
+        for (int i = 0; i < permissions.length; i++)
+            if (Manifest.permission.WRITE_EXTERNAL_STORAGE.equals(permissions[i]) &&
+                    grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                Log.i(TAG, "Restarting application");
+
+                // Schedule start after 1 second
+                Intent restart = new Intent(this, SettingsActivity.class);
+                PendingIntent pi = PendingIntent.getActivity(this, BackgroundService.REQUEST_RESTART, restart, PendingIntent.FLAG_CANCEL_CURRENT);
+                AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+                am.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, pi);
+
+                // Stop now
+                System.exit(0);
+            }
+
         // Try again
         recreate();
 

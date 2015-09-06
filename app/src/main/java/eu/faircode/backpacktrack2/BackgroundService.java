@@ -145,6 +145,7 @@ public class BackgroundService extends IntentService {
     public static final int REQUEST_WEATHER = 6;
     public static final int REQUEST_RAIN = 7;
     public static final int REQUEST_STEPS = 8;
+    public static final int REQUEST_RESTART = 9;
 
     private static int mEGM96Pointer = -1;
     private static int mEGM96Offset;
