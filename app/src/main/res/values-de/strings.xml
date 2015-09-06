@@ -13,6 +13,7 @@
     <string name="title_weather_history">Wetterhistorie</string>
     <string name="title_weather_forecast">Wettervorhersage</string>
     <string name="title_loc_settings">Standorteinstellungen</string>
+    <string name="title_optimizations">Battery optimizations</string>
     <string name="title_useful_links">Nützliche Links</string>
 
     <string name="title_geocode">Geocode-Adresse</string>
@@ -137,6 +138,7 @@
     <string name="summary_weather_history">Zeige lokale Wetterhistorie</string>
     <string name="summary_weather_forecast">Zeige lokale Wettervorhersage</string>
     <string name="summary_loc_settings">Klicken um Android Standorteinstellungen zu öffnen</string>
+    <string name="summary_optimizations">Tap to open the Android battery optimizations settings</string>
     <string name="summary_useful_links">Links zu relevanten Informationen für Reisende</string>
 
     <string name="summary_interval">Versuche eine neue Position jede Anzahl von Sekunden zu bestimmen</string>
@@ -248,7 +250,6 @@
     <string name="msg_stepcounter">Schrittzähler: %s</string>
     <string name="msg_significantmotion">Signifikante Bewegung: %s</string>
     <string name="msg_pressure">Atmosphärendruck: %s</string>
-    <string name="msg_optimizing">Akku Optimierung: %s</string>
     <string name="msg_yes">ja</string>
     <string name="msg_no">nein</string>
 
