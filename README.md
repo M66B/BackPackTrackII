@@ -159,11 +159,18 @@ Get Google elevation data:
 
 When no time from/to is specified, the default is yesterday.
 
-Update weather information
+Update weather information:
 
 * *am startservice -a eu.faircode.backpacktrack2.UPDATE_WEATHER*
 
 This will work even when weather updates are disabled.
+
+Proximity alerts:
+
+* These can be set in the waypoint editor
+* BackPackTrack broadcasts when entering: *eu.faircode.backpacktrack2.PROXIMITY_ENTER*
+* BackPackTrack broadcasts when leaving: *eu.faircode.backpacktrack2.PROXIMITY_EXIT*
+* The waypoint ID as visible in the waypoint editor is sent as an long extra with the name *Waypoint*
 
 Tasker use case examples
 
