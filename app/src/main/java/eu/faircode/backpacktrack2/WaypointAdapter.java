@@ -460,16 +460,8 @@ public class WaypointAdapter extends CursorAdapter {
                                 return true;
 
                             case R.id.menu_proximity:
-                                new AsyncTask<Object, Object, Object>() {
-                                    private long r = 0;
-
-                                    @Override
-                                    protected void onPreExecute() {
-                                        // TODO: ask radius
-                                        r = (radius > 0 ? 0 : 50);
-                                    }
-
-                                    protected Object doInBackground(Object... params) {
+                                new AsyncTask<Integer, Object, Object>() {
+                                    protected Object doInBackground(Integer... params) {
                                         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
                                                 context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                                             Intent intent = new Intent(context, BackgroundService.class);
@@ -477,12 +469,12 @@ public class WaypointAdapter extends CursorAdapter {
                                             intent.putExtra(BackgroundService.EXTRA_WAYPOINT, id);
                                             PendingIntent pi = PendingIntent.getService(context, 100 + (int) id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
                                             LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-                                            if (r == 0)
+                                            if (params[0] == 0)
                                                 lm.removeProximityAlert(pi);
                                             else
-                                                lm.addProximityAlert(latitude, longitude, r, -1, pi);
+                                                lm.addProximityAlert(latitude, longitude, params[0], -1, pi);
 
-                                            new DatabaseHelper(context).setProximity(id, r).close();
+                                            new DatabaseHelper(context).setProximity(id, params[0]).close();
                                         }
                                         return null;
                                     }
@@ -491,7 +483,8 @@ public class WaypointAdapter extends CursorAdapter {
                                     protected void onPostExecute(Object result) {
                                         Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
                                     }
-                                }.execute();
+                                }.execute(radius > 0 ? 0 : 50);
+
                                 return true;
 
                             case R.id.menu_hidden:
