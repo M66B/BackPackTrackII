@@ -14,15 +14,9 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, Intent intent) {
         Log.i(TAG, "Received " + intent);
 
-        // Reset transient values
+        // Clear last step count
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.remove(SettingsFragment.PREF_LAST_ACTIVITY);
-        editor.remove(SettingsFragment.PREF_LAST_CONFIDENCE);
-        editor.remove(SettingsFragment.PREF_LAST_ACTIVITY_TIME);
-        // editor.remove(SettingsFragment.PREF_LAST_LOCATION);
-        editor.remove(SettingsFragment.PREF_LAST_STEP_COUNT);
-        editor.apply();
+        prefs.edit().remove(SettingsFragment.PREF_LAST_STEP_COUNT).apply();
 
         // Restore proximity alerts
         try {
