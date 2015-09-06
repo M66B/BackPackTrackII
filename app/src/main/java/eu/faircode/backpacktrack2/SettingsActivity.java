@@ -83,8 +83,11 @@ public class SettingsActivity extends Activity {
                 Log.i(TAG, "Restarting application");
 
                 // Schedule start after 1 second
-                Intent restart = new Intent(this, SettingsActivity.class);
-                PendingIntent pi = PendingIntent.getActivity(this, BackgroundService.REQUEST_RESTART, restart, PendingIntent.FLAG_CANCEL_CURRENT);
+                PendingIntent pi = PendingIntent.getActivity(
+                        this,
+                        BackgroundService.REQUEST_RESTART,
+                        getIntent(),
+                        PendingIntent.FLAG_CANCEL_CURRENT);
                 AlarmManager am = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
                 am.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, pi);
 
