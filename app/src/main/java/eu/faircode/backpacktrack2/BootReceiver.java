@@ -7,8 +7,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import java.util.Date;
-
 public class BootReceiver extends BroadcastReceiver {
     private static final String TAG = "BPT2.Boot";
 
@@ -16,6 +14,7 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, Intent intent) {
         Log.i(TAG, "Received " + intent);
 
+        // Reset transient values
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = prefs.edit();
         editor.remove(SettingsFragment.PREF_LAST_ACTIVITY);
@@ -24,6 +23,13 @@ public class BootReceiver extends BroadcastReceiver {
         // editor.remove(SettingsFragment.PREF_LAST_LOCATION);
         editor.remove(SettingsFragment.PREF_LAST_STEP_COUNT);
         editor.apply();
+
+        // Restore proximity alerts
+        try {
+            Proximity.restoreAlerts(context);
+        } catch (Throwable ex) {
+            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+        }
 
         new Thread(new Runnable() {
             @Override

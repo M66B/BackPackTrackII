@@ -177,7 +177,7 @@ public class WaypointAdapter extends CursorAdapter {
 
                                                                 new AsyncTask<Object, Object, Object>() {
                                                                     protected Object doInBackground(Object... params) {
-                                                                        new DatabaseHelper(context).updateLocationTime(id, cal.getTimeInMillis()).close();
+                                                                        db.updateLocationTime(id, cal.getTimeInMillis());
                                                                         return null;
                                                                     }
 
@@ -228,7 +228,7 @@ public class WaypointAdapter extends CursorAdapter {
                                                         final String name = listAddress.get(item).name;
                                                         new AsyncTask<Object, Object, Object>() {
                                                             protected Object doInBackground(Object... params) {
-                                                                new DatabaseHelper(context).updateLocationName(id, name).close();
+                                                                db.updateLocationName(id, name);
                                                                 return null;
                                                             }
 
@@ -459,29 +459,23 @@ public class WaypointAdapter extends CursorAdapter {
                                 return true;
 
                             case R.id.menu_proximity:
-                                final AsyncTask task = new AsyncTask<Object, Object, Object>() {
-                                    protected Object doInBackground(Object... params) {
-                                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                                                context.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                                            Intent intent = new Intent(context, BackgroundService.class);
-                                            intent.setAction(BackgroundService.ACTION_PROXIMITY);
-                                            intent.putExtra(BackgroundService.EXTRA_WAYPOINT, id);
-                                            PendingIntent pi = PendingIntent.getService(context, 100 + (int) id, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                                            LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-                                            long newradius = (long) params[0];
-                                            if (newradius == 0)
-                                                lm.removeProximityAlert(pi);
-                                            else
-                                                lm.addProximityAlert(latitude, longitude, newradius, -1, pi);
-
-                                            db.setProximity(id, newradius);
+                                final AsyncTask task = new AsyncTask<Object, Object, Throwable>() {
+                                    protected Throwable doInBackground(Object... params) {
+                                        try {
+                                            Proximity.setAlert(id, latitude, longitude, (long) params[0], context);
+                                            return null;
+                                        } catch (Throwable ex) {
+                                            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                            return ex;
                                         }
-                                        return null;
                                     }
 
                                     @Override
-                                    protected void onPostExecute(Object result) {
-                                        Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
+                                    protected void onPostExecute(Throwable result) {
+                                        if (result == null)
+                                            Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
+                                        else
+                                            Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show();
                                     }
                                 };
 
