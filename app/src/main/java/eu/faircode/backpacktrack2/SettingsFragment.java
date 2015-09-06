@@ -346,13 +346,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         @Override
         public void onReceive(Context context, Intent intent) {
             boolean mounted = Util.storageMounted();
-            boolean connected = Util.isConnected(SettingsFragment.this.getActivity());
+            boolean connected = Util.isConnected(getActivity());
             Log.i(TAG, "Connectivity changed mounted=" + mounted + " connected=" + connected);
+
+            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted && connected);
 
             SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
             String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
-            findPreference(PREF_WEATHER_FORECAST).setEnabled("fio".equals(api) && Util.isConnected(getActivity()));
-            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted && connected);
+            findPreference(PREF_WEATHER_FORECAST).setEnabled("fio".equals(api) && connected);
         }
     };
 
