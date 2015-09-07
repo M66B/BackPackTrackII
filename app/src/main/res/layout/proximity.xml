@@ -7,8 +7,9 @@
 
     <EditText
         android:id="@+id/etProximity"
-        android:layout_width="100dp"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
+        android:gravity="right"
         android:inputType="number"
         android:textAppearance="?android:attr/textAppearance" />
 
