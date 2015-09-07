@@ -5,19 +5,15 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
-import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -155,411 +151,39 @@ public class WaypointAdapter extends CursorAdapter {
                                 return true;
 
                             case R.id.menu_time:
-                                final Calendar cal = GregorianCalendar.getInstance();
-                                cal.setTimeInMillis(time);
-                                final boolean ampm = android.text.format.DateFormat.is24HourFormat(context);
-
-                                new DialogFragment() {
-                                    @Override
-                                    public Dialog onCreateDialog(Bundle savedInstanceState) {
-                                        return new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-                                            @Override
-                                            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                                                cal.set(year, month, day);
-                                                new DialogFragment() {
-                                                    @Override
-                                                    public Dialog onCreateDialog(Bundle savedInstanceState) {
-                                                        return new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
-                                                            @Override
-                                                            public void onTimeSet(TimePicker view, int hour, int minute) {
-                                                                cal.set(Calendar.HOUR_OF_DAY, hour);
-                                                                cal.set(Calendar.MINUTE, minute);
-
-                                                                new AsyncTask<Object, Object, Object>() {
-                                                                    protected Object doInBackground(Object... params) {
-                                                                        db.updateLocationTime(id, cal.getTimeInMillis());
-                                                                        return null;
-                                                                    }
-
-                                                                    @Override
-                                                                    protected void onPostExecute(Object result) {
-                                                                        Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
-                                                                    }
-                                                                }.execute();
-                                                            }
-                                                        }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), ampm);
-                                                    }
-                                                }.show(getFragmentManager(), "timePicker");
-                                            }
-                                        }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
-                                    }
-                                }.show(fm, "datePicker");
-
+                                updateTime(id, name, time, context);
                                 return true;
 
                             case R.id.menu_geocode:
-                                Toast.makeText(context, context.getString(R.string.msg_rgeocoding), Toast.LENGTH_SHORT).show();
-
-                                new AsyncTask<Object, Object, Object>() {
-                                    protected Object doInBackground(Object... params) {
-                                        try {
-                                            GeocoderEx geocoder = new GeocoderEx(context);
-                                            return geocoder.getFromLocation(wpt, GEOCODER_RESULTS);
-                                        } catch (IOException ex) {
-                                            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                                            return ex;
-                                        }
-                                    }
-
-                                    @Override
-                                    protected void onPostExecute(final Object result) {
-                                        if (result instanceof Throwable)
-                                            Toast.makeText(context, ((Throwable) result).toString(), Toast.LENGTH_SHORT).show();
-                                        else {
-                                            final List<GeocoderEx.AddressEx> listAddress = (List<GeocoderEx.AddressEx>) result;
-                                            if (listAddress.size() == 0)
-                                                Toast.makeText(context, context.getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
-                                            else {
-                                                // Show address selector
-                                                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                                                alertDialogBuilder.setTitle(context.getString(R.string.title_rgeocode));
-                                                alertDialogBuilder.setItems(GeocoderEx.getNameList(listAddress), new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int item) {
-                                                        final String name = listAddress.get(item).name;
-                                                        new AsyncTask<Object, Object, Object>() {
-                                                            protected Object doInBackground(Object... params) {
-                                                                db.updateLocationName(id, name);
-                                                                return null;
-                                                            }
-
-                                                            @Override
-                                                            protected void onPostExecute(Object result) {
-                                                                Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
-                                                            }
-                                                        }.execute();
-                                                    }
-                                                });
-                                                alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                                    @Override
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        // Do nothing
-                                                    }
-                                                });
-                                                alertDialogBuilder.show();
-                                            }
-                                        }
-                                    }
-                                }.execute();
-
+                                geocodeWaypoint(id, name, wpt, context);
                                 return true;
 
                             case R.id.menu_wiki:
-                                new AsyncTask<Object, Object, Object>() {
-                                    @Override
-                                    protected void onPreExecute() {
-                                        Toast.makeText(context, context.getString(R.string.msg_requesting), Toast.LENGTH_SHORT).show();
-                                    }
-
-                                    protected Object doInBackground(Object... params) {
-                                        try {
-                                            return Wikimedia.geosearch(wpt, wiki_radius, wiki_results, context, wiki_baseurl.split(","));
-                                        } catch (Throwable ex) {
-                                            return ex;
-                                        }
-                                    }
-
-                                    @Override
-                                    protected void onPostExecute(final Object result) {
-                                        if (result instanceof Throwable) {
-                                            Log.e(TAG, result.toString() + "\n" + Log.getStackTraceString((Throwable) result));
-                                            Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            final List<Wikimedia.Page> listPage = (List<Wikimedia.Page>) result;
-
-                                            LayoutInflater inflater = LayoutInflater.from(context);
-                                            View view = inflater.inflate(R.layout.wiki_search, null);
-                                            ImageView ivGPX = (ImageView) view.findViewById(R.id.ivGPX);
-                                            final ListView lv = (ListView) view.findViewById(R.id.lvWiki);
-
-                                            ivGPX.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View view) {
-                                                    new AsyncTask<Object, Object, Object>() {
-                                                        @Override
-                                                        protected Object doInBackground(Object... objects) {
-                                                            try {
-                                                                File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "BackPackTrackII");
-                                                                folder.mkdirs();
-                                                                File target = new File(folder, "wikis_" + Util.sanitizeFileName(name) + ".gpx");
-                                                                Log.i(TAG, "Writing " + target);
-                                                                GPXFileWriter.writeWikiPages(listPage, target, context);
-
-                                                                Log.i(TAG, "Sharing " + target);
-                                                                Intent viewIntent = new Intent();
-                                                                viewIntent.setAction(Intent.ACTION_VIEW);
-                                                                viewIntent.setDataAndType(Uri.fromFile(target), "application/gpx+xml");
-                                                                viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                                context.startActivity(viewIntent);
-
-                                                                return null;
-                                                            } catch (Throwable ex) {
-                                                                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                                                                return ex;
-                                                            }
-                                                        }
-                                                    }.execute();
-                                                }
-                                            });
-
-                                            WikiAdapter adapter = new WikiAdapter(context, listPage, wpt);
-                                            lv.setAdapter(adapter);
-
-                                            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                                @Override
-                                                public void onItemClick(AdapterView<?> adapterView, View view, final int position, long iid) {
-                                                    Wikimedia.Page page = (Wikimedia.Page) lv.getItemAtPosition(position);
-                                                    try {
-                                                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(page.getPageUrl()));
-                                                        context.startActivity(browserIntent);
-                                                    } catch (Throwable ex) {
-                                                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                                                        Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
-                                                    }
-                                                }
-                                            });
-
-                                            // Show address selector
-                                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                                            alertDialogBuilder.setIcon(android.R.drawable.ic_menu_info_details);
-                                            alertDialogBuilder.setTitle(context.getString(R.string.menu_wiki));
-                                            alertDialogBuilder.setView(view);
-                                            AlertDialog alertDialog = alertDialogBuilder.create();
-                                            alertDialog.show();
-                                        }
-                                    }
-                                }.execute();
+                                showWikis(name, wpt, context);
 
                                 return true;
 
                             case R.id.menu_geoname:
-                                new AsyncTask<Object, Object, Object>() {
-                                    @Override
-                                    protected void onPreExecute() {
-                                        Toast.makeText(context, context.getString(R.string.msg_requesting), Toast.LENGTH_SHORT).show();
-                                    }
-
-                                    protected Object doInBackground(Object... params) {
-                                        try {
-                                            return Geonames.findNearby("faircode", wpt, geoname_radius, geoname_results, context);
-                                        } catch (Throwable ex) {
-                                            return ex;
-                                        }
-                                    }
-
-                                    @Override
-                                    protected void onPostExecute(final Object result) {
-                                        if (result instanceof Throwable) {
-                                            Log.e(TAG, result.toString() + "\n" + Log.getStackTraceString((Throwable) result));
-                                            Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            final List<Geonames.Geoname> listName = (List<Geonames.Geoname>) result;
-                                            final List<String> listFeature = new ArrayList<String>();
-
-                                            // Build list of feature codes
-                                            for (Geonames.Geoname name : listName)
-                                                if (name.fcode != null) {
-                                                    String feature = name.fcode + " " + name.fcodeName;
-                                                    if (!listFeature.contains(feature))
-                                                        listFeature.add(feature);
-                                                }
-                                            Collections.sort(listFeature);
-                                            listFeature.add(0, context.getString(R.string.title_all));
-
-                                            // Reference controls
-                                            LayoutInflater inflater = LayoutInflater.from(context);
-                                            View view = inflater.inflate(R.layout.geoname_search, null);
-                                            final Spinner spFeature = (Spinner) view.findViewById(R.id.spFeature);
-                                            ImageView ivGPX = (ImageView) view.findViewById(R.id.ivGPX);
-                                            final ListView lv = (ListView) view.findViewById(R.id.lvGeonames);
-
-                                            // Handle share
-                                            ivGPX.setOnClickListener(new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View view) {
-                                                    new AsyncTask<Object, Object, Object>() {
-                                                        @Override
-                                                        protected Object doInBackground(Object... objects) {
-                                                            try {
-                                                                File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "BackPackTrackII");
-                                                                folder.mkdirs();
-                                                                File target = new File(folder, "geonames_" + Util.sanitizeFileName(name) + ".gpx");
-                                                                Log.i(TAG, "Writing " + target);
-                                                                GPXFileWriter.writeGeonames(listName, target, context);
-
-                                                                Log.i(TAG, "Sharing " + target);
-                                                                Intent viewIntent = new Intent();
-                                                                viewIntent.setAction(Intent.ACTION_VIEW);
-                                                                viewIntent.setDataAndType(Uri.fromFile(target), "application/gpx+xml");
-                                                                viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                                                context.startActivity(viewIntent);
-
-                                                                return null;
-                                                            } catch (Throwable ex) {
-                                                                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                                                                return ex;
-                                                            }
-                                                        }
-                                                    }.execute();
-                                                }
-                                            });
-
-                                            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                                @Override
-                                                public void onItemClick(AdapterView<?> adapterView, View view, final int position, long iid) {
-                                                    Geonames.Geoname name = (Geonames.Geoname) lv.getItemAtPosition(position);
-                                                    Util.geoShare(name.location, name.name, context);
-                                                }
-                                            });
-
-                                            final GeonameAdapter geonamesAdapter = new GeonameAdapter(context, listName, wpt);
-                                            lv.setAdapter(geonamesAdapter);
-
-                                            ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, listFeature.toArray(new String[0]));
-                                            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                                            spFeature.setAdapter(spinnerAdapter);
-
-                                            spFeature.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                                @Override
-                                                public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
-                                                    String feature = listFeature.get(position);
-                                                    if (context.getString(R.string.title_all).equals(feature))
-                                                        feature = "";
-                                                    else
-                                                        feature = feature.split(" ")[0];
-                                                    geonamesAdapter.getFilter().filter(feature);
-                                                }
-
-                                                @Override
-                                                public void onNothingSelected(AdapterView<?> adapterView) {
-                                                    geonamesAdapter.getFilter().filter("");
-                                                }
-                                            });
-
-                                            // Show address selector
-                                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                                            alertDialogBuilder.setIcon(android.R.drawable.ic_menu_info_details);
-                                            alertDialogBuilder.setTitle(context.getString(R.string.menu_geoname));
-                                            alertDialogBuilder.setView(view);
-                                            AlertDialog alertDialog = alertDialogBuilder.create();
-                                            alertDialog.show();
-                                        }
-                                    }
-                                }.execute();
-
+                                showGeonames(name, wpt, context);
                                 return true;
 
                             case R.id.menu_proximity:
-                                final AsyncTask task = new AsyncTask<Object, Object, Throwable>() {
-                                    protected Throwable doInBackground(Object... params) {
-                                        try {
-                                            Proximity.setAlert(id, latitude, longitude, (long) params[0], context);
-                                            return null;
-                                        } catch (Throwable ex) {
-                                            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                                            return ex;
-                                        }
-                                    }
-
-                                    @Override
-                                    protected void onPostExecute(Throwable result) {
-                                        if (result == null)
-                                            Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
-                                        else
-                                            Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show();
-                                    }
-                                };
-
-                                if (radius > 0)
-                                    task.execute(0L);
-                                else {
-                                    LayoutInflater inflater = LayoutInflater.from(context);
-                                    View view = inflater.inflate(R.layout.proximity, null);
-                                    final EditText etProximity = (EditText) view.findViewById(R.id.etProximity);
-                                    etProximity.setText("50");
-
-                                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                                    alertDialogBuilder.setIcon(android.R.drawable.ic_menu_mylocation);
-                                    alertDialogBuilder.setTitle(R.string.title_radius);
-                                    alertDialogBuilder.setView(view);
-                                    alertDialogBuilder
-                                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    task.execute(Long.parseLong(etProximity.getText().toString()));
-                                                }
-                                            })
-                                            .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    // Do nothing
-                                                }
-                                            });
-                                    AlertDialog alertDialog = alertDialogBuilder.create();
-                                    alertDialog.show();
-                                }
-
+                                setProximityAlert(id, name, latitude, longitude, radius, context);
                                 return true;
 
                             case R.id.menu_hidden:
-                                new AsyncTask<Object, Object, Object>() {
-                                    protected Object doInBackground(Object... params) {
-                                        db.hideLocation(id, !hidden);
-                                        return null;
-                                    }
-
-                                    @Override
-                                    protected void onPostExecute(Object result) {
-                                        Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
-                                    }
-                                }.execute();
-
+                                hideWaypoint(id, name, hidden, context);
                                 return true;
 
                             case R.id.menu_delete:
-                                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-                                alertDialogBuilder.setTitle(context.getString(R.string.msg_delete, name));
-                                alertDialogBuilder
-                                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                new AsyncTask<Object, Object, Object>() {
-                                                    protected Object doInBackground(Object... params) {
-                                                        db.deleteLocation(id);
-                                                        return null;
-                                                    }
-
-                                                    @Override
-                                                    protected void onPostExecute(Object result) {
-                                                        Toast.makeText(context, context.getString(R.string.msg_deleted, name), Toast.LENGTH_SHORT).show();
-                                                    }
-                                                }.execute();
-                                            }
-                                        })
-                                        .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                // Do nothing
-                                            }
-                                        });
-                                AlertDialog alertDialog = alertDialogBuilder.create();
-                                alertDialog.show();
-
+                                deleteWaypoint(id, name, context);
                                 return true;
 
                             default:
                                 return false;
                         }
                     }
+
                 });
 
                 popupMenu.inflate(R.menu.waypoint);
@@ -576,19 +200,407 @@ public class WaypointAdapter extends CursorAdapter {
             @Override
             public void onClick(View view) {
                 final String newName = etName.getText().toString();
-
-                new AsyncTask<Object, Object, Object>() {
-                    protected Object doInBackground(Object... params) {
-                        db.updateLocationName(id, newName);
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Object result) {
-                        Toast.makeText(context, context.getString(R.string.msg_updated, newName), Toast.LENGTH_SHORT).show();
-                    }
-                }.execute();
+                saveWaypoint(id, newName, context);
             }
         });
+    }
+
+    private void saveWaypoint(final long id, final String newName, final Context context) {
+        new AsyncTask<Object, Object, Object>() {
+            protected Object doInBackground(Object... params) {
+                db.updateLocationName(id, newName);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Object result) {
+                Toast.makeText(context, context.getString(R.string.msg_updated, newName), Toast.LENGTH_SHORT).show();
+            }
+        }.execute();
+    }
+
+    private void updateTime(final long id, final String name, long time, final Context context) {
+        final Calendar cal = GregorianCalendar.getInstance();
+        cal.setTimeInMillis(time);
+        final boolean ampm = android.text.format.DateFormat.is24HourFormat(context);
+
+        new DialogFragment() {
+            @Override
+            public Dialog onCreateDialog(Bundle savedInstanceState) {
+                return new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                        cal.set(year, month, day);
+                        new DialogFragment() {
+                            @Override
+                            public Dialog onCreateDialog(Bundle savedInstanceState) {
+                                return new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+                                    @Override
+                                    public void onTimeSet(TimePicker view, int hour, int minute) {
+                                        cal.set(Calendar.HOUR_OF_DAY, hour);
+                                        cal.set(Calendar.MINUTE, minute);
+
+                                        new AsyncTask<Object, Object, Object>() {
+                                            protected Object doInBackground(Object... params) {
+                                                db.updateLocationTime(id, cal.getTimeInMillis());
+                                                return null;
+                                            }
+
+                                            @Override
+                                            protected void onPostExecute(Object result) {
+                                                Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
+                                            }
+                                        }.execute();
+                                    }
+                                }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), ampm);
+                            }
+                        }.show(getFragmentManager(), "timePicker");
+                    }
+                }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH));
+            }
+        }.show(fm, "datePicker");
+    }
+
+    private void geocodeWaypoint(final long id, final String name, final Location wpt, final Context context) {
+        Toast.makeText(context, context.getString(R.string.msg_rgeocoding), Toast.LENGTH_SHORT).show();
+
+        new AsyncTask<Object, Object, Object>() {
+            protected Object doInBackground(Object... params) {
+                try {
+                    GeocoderEx geocoder = new GeocoderEx(context);
+                    return geocoder.getFromLocation(wpt, GEOCODER_RESULTS);
+                } catch (IOException ex) {
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    return ex;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(final Object result) {
+                if (result instanceof Throwable)
+                    Toast.makeText(context, ((Throwable) result).toString(), Toast.LENGTH_SHORT).show();
+                else {
+                    final List<GeocoderEx.AddressEx> listAddress = (List<GeocoderEx.AddressEx>) result;
+                    if (listAddress.size() == 0)
+                        Toast.makeText(context, context.getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
+                    else {
+                        // Show address selector
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                        alertDialogBuilder.setTitle(context.getString(R.string.title_rgeocode));
+                        alertDialogBuilder.setItems(GeocoderEx.getNameList(listAddress), new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int item) {
+                                final String name = listAddress.get(item).name;
+                                saveWaypoint(id, name, context);
+                            }
+                        });
+                        alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Do nothing
+                            }
+                        });
+                        alertDialogBuilder.show();
+                    }
+                }
+            }
+        }.execute();
+    }
+
+    private void showWikis(final String name, final Location wpt, final Context context) {
+        new AsyncTask<Object, Object, Object>() {
+            @Override
+            protected void onPreExecute() {
+                Toast.makeText(context, context.getString(R.string.msg_requesting), Toast.LENGTH_SHORT).show();
+            }
+
+            protected Object doInBackground(Object... params) {
+                try {
+                    return Wikimedia.geosearch(wpt, wiki_radius, wiki_results, context, wiki_baseurl.split(","));
+                } catch (Throwable ex) {
+                    return ex;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(final Object result) {
+                if (result instanceof Throwable) {
+                    Log.e(TAG, result.toString() + "\n" + Log.getStackTraceString((Throwable) result));
+                    Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show();
+                } else {
+                    final List<Wikimedia.Page> listPage = (List<Wikimedia.Page>) result;
+
+                    LayoutInflater inflater = LayoutInflater.from(context);
+                    View view = inflater.inflate(R.layout.wiki_search, null);
+                    ImageView ivGPX = (ImageView) view.findViewById(R.id.ivGPX);
+                    final ListView lv = (ListView) view.findViewById(R.id.lvWiki);
+
+                    ivGPX.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            new AsyncTask<Object, Object, Object>() {
+                                @Override
+                                protected Object doInBackground(Object... objects) {
+                                    try {
+                                        File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "BackPackTrackII");
+                                        folder.mkdirs();
+                                        File target = new File(folder, "wikis_" + Util.sanitizeFileName(name) + ".gpx");
+                                        Log.i(TAG, "Writing " + target);
+                                        GPXFileWriter.writeWikiPages(listPage, target, context);
+
+                                        Log.i(TAG, "Sharing " + target);
+                                        Intent viewIntent = new Intent();
+                                        viewIntent.setAction(Intent.ACTION_VIEW);
+                                        viewIntent.setDataAndType(Uri.fromFile(target), "application/gpx+xml");
+                                        viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        context.startActivity(viewIntent);
+
+                                        return null;
+                                    } catch (Throwable ex) {
+                                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                        return ex;
+                                    }
+                                }
+                            }.execute();
+                        }
+                    });
+
+                    WikiAdapter adapter = new WikiAdapter(context, listPage, wpt);
+                    lv.setAdapter(adapter);
+
+                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, final int position, long iid) {
+                            Wikimedia.Page page = (Wikimedia.Page) lv.getItemAtPosition(position);
+                            try {
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(page.getPageUrl()));
+                                context.startActivity(browserIntent);
+                            } catch (Throwable ex) {
+                                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                Toast.makeText(context, ex.toString(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+
+                    // Show address selector
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                    alertDialogBuilder.setIcon(android.R.drawable.ic_menu_info_details);
+                    alertDialogBuilder.setTitle(context.getString(R.string.menu_wiki));
+                    alertDialogBuilder.setView(view);
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                }
+            }
+        }.execute();
+    }
+
+    private void showGeonames(final String name, final Location wpt, final Context context) {
+        new AsyncTask<Object, Object, Object>() {
+            @Override
+            protected void onPreExecute() {
+                Toast.makeText(context, context.getString(R.string.msg_requesting), Toast.LENGTH_SHORT).show();
+            }
+
+            protected Object doInBackground(Object... params) {
+                try {
+                    return Geonames.findNearby("faircode", wpt, geoname_radius, geoname_results, context);
+                } catch (Throwable ex) {
+                    return ex;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(final Object result) {
+                if (result instanceof Throwable) {
+                    Log.e(TAG, result.toString() + "\n" + Log.getStackTraceString((Throwable) result));
+                    Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show();
+                } else {
+                    final List<Geonames.Geoname> listName = (List<Geonames.Geoname>) result;
+                    final List<String> listFeature = new ArrayList<String>();
+
+                    // Build list of feature codes
+                    for (Geonames.Geoname name : listName)
+                        if (name.fcode != null) {
+                            String feature = name.fcode + " " + name.fcodeName;
+                            if (!listFeature.contains(feature))
+                                listFeature.add(feature);
+                        }
+                    Collections.sort(listFeature);
+                    listFeature.add(0, context.getString(R.string.title_all));
+
+                    // Reference controls
+                    LayoutInflater inflater = LayoutInflater.from(context);
+                    View view = inflater.inflate(R.layout.geoname_search, null);
+                    final Spinner spFeature = (Spinner) view.findViewById(R.id.spFeature);
+                    ImageView ivGPX = (ImageView) view.findViewById(R.id.ivGPX);
+                    final ListView lv = (ListView) view.findViewById(R.id.lvGeonames);
+
+                    // Handle share
+                    ivGPX.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            new AsyncTask<Object, Object, Object>() {
+                                @Override
+                                protected Object doInBackground(Object... objects) {
+                                    try {
+                                        File folder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "BackPackTrackII");
+                                        folder.mkdirs();
+                                        File target = new File(folder, "geonames_" + Util.sanitizeFileName(name) + ".gpx");
+                                        Log.i(TAG, "Writing " + target);
+                                        GPXFileWriter.writeGeonames(listName, target, context);
+
+                                        Log.i(TAG, "Sharing " + target);
+                                        Intent viewIntent = new Intent();
+                                        viewIntent.setAction(Intent.ACTION_VIEW);
+                                        viewIntent.setDataAndType(Uri.fromFile(target), "application/gpx+xml");
+                                        viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                        context.startActivity(viewIntent);
+
+                                        return null;
+                                    } catch (Throwable ex) {
+                                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                        return ex;
+                                    }
+                                }
+                            }.execute();
+                        }
+                    });
+
+                    lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, final int position, long iid) {
+                            Geonames.Geoname name = (Geonames.Geoname) lv.getItemAtPosition(position);
+                            Util.geoShare(name.location, name.name, context);
+                        }
+                    });
+
+                    final GeonameAdapter geonamesAdapter = new GeonameAdapter(context, listName, wpt);
+                    lv.setAdapter(geonamesAdapter);
+
+                    ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, listFeature.toArray(new String[0]));
+                    spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spFeature.setAdapter(spinnerAdapter);
+
+                    spFeature.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+                            String feature = listFeature.get(position);
+                            if (context.getString(R.string.title_all).equals(feature))
+                                feature = "";
+                            else
+                                feature = feature.split(" ")[0];
+                            geonamesAdapter.getFilter().filter(feature);
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> adapterView) {
+                            geonamesAdapter.getFilter().filter("");
+                        }
+                    });
+
+                    // Show address selector
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                    alertDialogBuilder.setIcon(android.R.drawable.ic_menu_info_details);
+                    alertDialogBuilder.setTitle(context.getString(R.string.menu_geoname));
+                    alertDialogBuilder.setView(view);
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                }
+            }
+        }.execute();
+    }
+
+    private void setProximityAlert(final long id, final String name, final double latitude, final double longitude, long radius, final Context context) {
+        final AsyncTask task = new AsyncTask<Object, Object, Throwable>() {
+            protected Throwable doInBackground(Object... params) {
+                try {
+                    Proximity.setAlert(id, latitude, longitude, (long) params[0], context);
+                    return null;
+                } catch (Throwable ex) {
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    return ex;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Throwable result) {
+                if (result == null)
+                    Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        if (radius > 0)
+            task.execute(0L);
+        else {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            View view = inflater.inflate(R.layout.proximity, null);
+            final EditText etProximity = (EditText) view.findViewById(R.id.etProximity);
+            etProximity.setText(SettingsFragment.DEFAULT_PROXIMITY_RADIUS);
+
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+            alertDialogBuilder.setIcon(android.R.drawable.ic_menu_mylocation);
+            alertDialogBuilder.setTitle(R.string.title_radius);
+            alertDialogBuilder.setView(view);
+            alertDialogBuilder
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            task.execute(Long.parseLong(etProximity.getText().toString()));
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Do nothing
+                        }
+                    });
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+        }
+    }
+
+    private void hideWaypoint(final long id, final String name, final boolean hidden, final Context context) {
+        new AsyncTask<Object, Object, Object>() {
+            protected Object doInBackground(Object... params) {
+                db.hideLocation(id, !hidden);
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Object result) {
+                Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
+            }
+        }.execute();
+    }
+
+    private void deleteWaypoint(final long id, final String name, final Context context) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        alertDialogBuilder.setTitle(context.getString(R.string.msg_delete, name));
+        alertDialogBuilder
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        new AsyncTask<Object, Object, Object>() {
+                            protected Object doInBackground(Object... params) {
+                                db.deleteLocation(id);
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Object result) {
+                                Toast.makeText(context, context.getString(R.string.msg_deleted, name), Toast.LENGTH_SHORT).show();
+                            }
+                        }.execute();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Do nothing
+                    }
+                });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 }

@@ -287,6 +287,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final boolean DEFAULT_GRAPH_UNKNOWN = true;
     public static final boolean DEFAULT_GRAPH_TOTAL = true;
 
+    public static final String DEFAULT_PROXIMITY_RADIUS = "50";
+
     // Transient values
     public static final String PREF_FIRST = "pref_first";
     public static final String PREF_STATE = "pref_state";
