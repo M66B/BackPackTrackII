@@ -108,13 +108,11 @@ public class WaypointAdapter extends CursorAdapter {
         wpt.setLongitude(longitude);
 
         // Get views
-        TextView tvId = (TextView) view.findViewById(R.id.tvId);
         final EditText etName = (EditText) view.findViewById(R.id.etName);
         ImageView ivManage = (ImageView) view.findViewById(R.id.ivManage);
         ImageView ivSave = (ImageView) view.findViewById(R.id.ivSave);
 
-        // Show waypoint ID and name
-        tvId.setText(Long.toString(id));
+        // Show waypoint name
         etName.setText(name);
 
         // Handle clear text
@@ -191,6 +189,7 @@ public class WaypointAdapter extends CursorAdapter {
                 popupMenu.getMenu().findItem(R.id.menu_proximity).setTitle(context.getString(R.string.menu_proximity, Long.toString(radius)));
                 popupMenu.getMenu().findItem(R.id.menu_proximity).setChecked(radius > 0);
                 popupMenu.getMenu().findItem(R.id.menu_hidden).setChecked(hidden);
+                popupMenu.getMenu().findItem(R.id.menu_id).setTitle("ID=" + id);
                 popupMenu.show();
             }
         });
