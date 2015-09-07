@@ -277,7 +277,7 @@ public class WaypointAdapter extends CursorAdapter {
             @Override
             protected void onPostExecute(final Object result) {
                 if (result instanceof Throwable)
-                    Toast.makeText(context, ((Throwable) result).toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, result.toString(), Toast.LENGTH_SHORT).show();
                 else {
                     final List<GeocoderEx.AddressEx> listAddress = (List<GeocoderEx.AddressEx>) result;
                     if (listAddress.size() == 0)

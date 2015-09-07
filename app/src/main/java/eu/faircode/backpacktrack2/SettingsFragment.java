@@ -427,7 +427,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         super.onResume();
 
         getView().setPadding(0, 0, 0, 0);
-        ((ListView) getView().findViewById(android.R.id.list)).setPadding(0, 0, 0, 0);
+        getView().findViewById(android.R.id.list).setPadding(0, 0, 0, 0);
 
         final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
@@ -1089,7 +1089,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             protected void onPostExecute(final Object result) {
                 if (result instanceof Throwable)
-                    Toast.makeText(getActivity(), ((Throwable) result).toString(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), result.toString(), Toast.LENGTH_SHORT).show();
                 else {
                     final List<GeocoderEx.AddressEx> listAddress = (List<GeocoderEx.AddressEx>) result;
                     if (listAddress.size() == 0)
@@ -2993,7 +2993,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         protected void onPostExecute(Object result) {
             progress.setVisibility(View.GONE);
             if (result instanceof Throwable)
-                Toast.makeText(context, ((Throwable) result).toString(), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, result.toString(), Toast.LENGTH_LONG).show();
             else if (result instanceof List) {
                 List<Weather> listWeather = (List<Weather>) result;
                 showForecastGraph(graph, listWeather, this.type == ForecastIO.TYPE_DAILY);

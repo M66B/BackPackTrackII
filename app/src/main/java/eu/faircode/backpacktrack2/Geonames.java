@@ -105,7 +105,7 @@ public class Geonames {
                 "&username=" + username);
 
         Log.i(TAG, "url=" + url);
-        HttpURLConnection urlConnection = (HttpURLConnection) new OkUrlFactory(okHttpClient).open(url);
+        HttpURLConnection urlConnection = new OkUrlFactory(okHttpClient).open(url);
         urlConnection.setConnectTimeout(cTimeOutMs);
         urlConnection.setReadTimeout(cTimeOutMs);
         urlConnection.setRequestProperty("Accept", "application/json");

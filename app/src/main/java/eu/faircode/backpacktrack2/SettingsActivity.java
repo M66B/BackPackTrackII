@@ -26,11 +26,11 @@ import java.util.List;
 public class SettingsActivity extends Activity {
     private static final String TAG = "BPT2.Settings";
 
-    public static List<String> cPermission = Arrays.asList(new String[]{
+    public static List<String> cPermission = Arrays.asList(
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
-    });
+    );
 
     @Override
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
