@@ -485,6 +485,7 @@ public class WaypointAdapter extends CursorAdapter {
                                     LayoutInflater inflater = LayoutInflater.from(context);
                                     View view = inflater.inflate(R.layout.proximity, null);
                                     final EditText etProximity = (EditText) view.findViewById(R.id.etProximity);
+                                    etProximity.setText("50");
 
                                     AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
                                     alertDialogBuilder.setIcon(android.R.drawable.ic_menu_mylocation);
