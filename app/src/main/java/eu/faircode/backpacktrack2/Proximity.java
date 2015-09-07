@@ -21,9 +21,16 @@ public class Proximity {
             PendingIntent pi = PendingIntent.getService(context, 100 + (int) id, proximity, PendingIntent.FLAG_UPDATE_CURRENT);
             LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
             Log.i(TAG, "Set proximity waypoint=" + id + " radius=" + radius);
-            if (radius == 0)
+            if (radius == 0) {
                 lm.removeProximityAlert(pi);
-            else
+
+                // Send proximity exit
+                Intent exit = new Intent(context, BackgroundService.class);
+                exit.setAction(BackgroundService.ACTION_PROXIMITY);
+                exit.putExtra(LocationManager.KEY_PROXIMITY_ENTERING, false);
+                exit.putExtra(BackgroundService.EXTRA_WAYPOINT, id);
+                context.startService(exit);
+            } else
                 lm.addProximityAlert(latitude, longitude, radius, -1, pi);
 
             new DatabaseHelper(context).setProximity(id, radius).close();
