@@ -130,7 +130,7 @@
     <string name="title_license">Lizenz</string>
 
     <string name="summary_edit">Wegpunkte benutzen, hinzufügen, ändern oder entfernen</string>
-    <string name="summary_privacy">Enable or disable location and weather updates</string>
+    <string name="summary_privacy">Position und Wetter update aktivieren oder deaktivieren</string>
     <string name="summary_share_gpx">Klicken um eine GPX Datei zu erstellen und teilen\nLetzte Teilung: %s</string>
     <string name="summary_share_kml">Klicken um eine KML Datei zu erstellen und teilen\nLetzte Teilung: %s</string>
     <string name="summary_upload_gpx">Klicken um eine GPX Dateien zu erstellen und auf ein WordPress Weblog hochzuladen\nLetzter Upload: %s</string>
