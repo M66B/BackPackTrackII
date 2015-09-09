@@ -1258,13 +1258,6 @@ public class BackgroundService extends IntentService {
         else
             am.set(AlarmManager.RTC_WAKEUP, trigger, pi);
         Log.i(TAG, "Start weather updates interval=" + interval + "m" + " next=" + SimpleDateFormat.getDateTimeInstance().format(trigger) + " wakeup=" + wakeup);
-
-        // Subscribe to weather updates
-        try {
-            GcmService.subscribeWeatherUpdates(context);
-        } catch (Throwable ex) {
-            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-        }
     }
 
     public static void stopWeatherUpdates(Context context) {
@@ -1274,13 +1267,6 @@ public class BackgroundService extends IntentService {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
         Log.i(TAG, "Stop weather updates");
-
-        // Unsubscribe to weather updates
-        try {
-            GcmService.subscribeWeatherUpdates(context);
-        } catch (Throwable ex) {
-            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-        }
 
         removeWeatherNotification(context);
         removeRainNotification(context);

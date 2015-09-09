@@ -868,8 +868,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             BackgroundService.startWeatherUpdates(getActivity());
         }
 
-        if (PREF_PRIVACY.equals(key) ||
-                PREF_WEATHER_GCM.equals(key)) {
+        if (PREF_WEATHER_GCM.equals(key)) {
             new AsyncTask<Object, Object, Throwable>() {
                 @Override
                 protected Throwable doInBackground(Object... objects) {

@@ -418,7 +418,6 @@
                 android:title="@string/title_weather_wakeup" />
             <CheckBoxPreference
                 android:defaultValue="false"
-                android:dependency="pref_weather_enabled"
                 android:key="pref_weather_gcm"
                 android:title="@string/title_weather_gcm" />
             <PreferenceCategory android:title="@string/title_weather_fio">

@@ -52,8 +52,6 @@ public class GcmService extends GcmListenerService {
     public static void subscribeWeatherUpdates(Context context) throws IOException {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String token = prefs.getString(SettingsFragment.PREF_GCM_TOKEN, null);
-        boolean privacy = prefs.getBoolean(SettingsFragment.PREF_PRIVACY, SettingsFragment.DEFAULT_PRIVACY);
-        boolean enabled = prefs.getBoolean(SettingsFragment.PREF_WEATHER_ENABLED, SettingsFragment.DEFAULT_WEATHER_ENABLED);
         boolean subscribe = prefs.getBoolean(SettingsFragment.PREF_WEATHER_GCM, false);
 
         if (token == null) {
@@ -63,7 +61,7 @@ public class GcmService extends GcmListenerService {
 
         String topic = "/topics/weather";
         GcmPubSub pubSub = GcmPubSub.getInstance(context);
-        if (enabled && subscribe && !privacy)
+        if (subscribe)
             pubSub.subscribe(token, topic, null);
         else
             pubSub.unsubscribe(token, topic);
