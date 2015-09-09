@@ -1235,6 +1235,12 @@ public class BackgroundService extends IntentService {
             return;
         }
 
+        // Display last weather report
+        String report = prefs.getString(SettingsFragment.PREF_LAST_WEATHER_REPORT, null);
+        Weather weather = (report == null ? null : Weather.deserialize(report));
+        if (weather != null && weather.isValid(context))
+            showWeatherNotification(weather, context);
+
         // Set alarm
         Intent alarmIntent = new Intent(context, BackgroundService.class);
         alarmIntent.setAction(BackgroundService.ACTION_UPDATE_WEATHER);
@@ -1253,12 +1259,6 @@ public class BackgroundService extends IntentService {
         else
             am.set(AlarmManager.RTC_WAKEUP, trigger, pi);
         Log.i(TAG, "Start weather updates interval=" + interval + "m" + " next=" + SimpleDateFormat.getDateTimeInstance().format(trigger) + " wakeup=" + wakeup);
-
-        // Display last weather report
-        String report = prefs.getString(SettingsFragment.PREF_LAST_WEATHER_REPORT, null);
-        Weather weather = (report == null ? null : Weather.deserialize(report));
-        if (weather != null && weather.isValid(context))
-            showWeatherNotification(weather, context);
     }
 
     public static void stopWeatherUpdates(Context context) {
