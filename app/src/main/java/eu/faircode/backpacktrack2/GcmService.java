@@ -53,11 +53,17 @@ public class GcmService extends GcmListenerService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String token = prefs.getString(SettingsFragment.PREF_GCM_TOKEN, null);
         boolean privacy = prefs.getBoolean(SettingsFragment.PREF_PRIVACY, SettingsFragment.DEFAULT_PRIVACY);
+        boolean enabled = prefs.getBoolean(SettingsFragment.PREF_WEATHER_ENABLED, SettingsFragment.DEFAULT_WEATHER_ENABLED);
         boolean subscribe = prefs.getBoolean(SettingsFragment.PREF_WEATHER_GCM, false);
+
+        if (token == null) {
+            Log.i(TAG, "Subscribe weather updates: no token");
+            return;
+        }
 
         String topic = "/topics/weather";
         GcmPubSub pubSub = GcmPubSub.getInstance(context);
-        if (subscribe && !privacy)
+        if (enabled && subscribe && !privacy)
             pubSub.subscribe(token, topic, null);
         else
             pubSub.unsubscribe(token, topic);
