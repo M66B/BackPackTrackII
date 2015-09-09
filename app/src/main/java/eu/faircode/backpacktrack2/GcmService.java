@@ -43,6 +43,11 @@ public class GcmService extends GcmListenerService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String token = prefs.getString(SettingsFragment.PREF_GCM_TOKEN, null);
 
+        if (token == null) {
+            Log.i(TAG, "Subscribe broadcasts: no token");
+            return;
+        }
+
         String topic = "/topics/broadcasts";
         GcmPubSub pubSub = GcmPubSub.getInstance(context);
         pubSub.subscribe(token, topic, null);
