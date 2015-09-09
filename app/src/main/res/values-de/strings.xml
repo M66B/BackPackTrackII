@@ -210,6 +210,7 @@
     <string name="title_waypoint">Wegpunkt</string>
     <string name="title_accept">Akzeptieren</string>
     <string name="title_refresh">Aktualisieren</string>
+    <string name="title_forecast">Vorhersage</string>
 
     <string name="title_track">Track Name:</string>
     <string name="title_extensions">Benutze Extensions</string>
