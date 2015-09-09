@@ -27,12 +27,16 @@ public class GcmService extends GcmListenerService {
         if (from.startsWith("/topics/")) {
             if ("/topics/broadcasts".equals(from))
                 handleBroadcast(data);
+
             else if ("/topics/weather".equals(from)) {
                 String action = data.getString("action");
-                if ("update".equals(action))
-                    handleWeatherUpdate(data);
-                else
+                if ("update".equals(action)) {
+                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+                    if (!prefs.getBoolean(SettingsFragment.PREF_PRIVACY, SettingsFragment.DEFAULT_PRIVACY))
+                        handleWeatherUpdate(data);
+                } else
                     Log.w(TAG, "Unknown GCM weather action=" + action);
+
             } else
                 Log.w(TAG, "Unknown GCM topic=" + from);
         } else
