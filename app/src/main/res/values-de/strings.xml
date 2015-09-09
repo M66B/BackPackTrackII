@@ -3,7 +3,7 @@
     <string name="app_description">Ihre Position kontinuierlich aufzeichnen, ohne Ihr Akku zu belasten</string>
 
     <string name="title_action">Aktionen</string>
-    <string name="title_privacy">Privacy mode</string>
+    <string name="title_privacy">Privat Modus</string>
     <string name="title_edit">Wegpunkte verwalten</string>
     <string name="title_share_gpx">GPX Datei teilen</string>
     <string name="title_share_kml">KML Datei teilen</string>
