@@ -121,6 +121,11 @@ BackPackTrack II can write the following GPX extension elements:
 
 Yes, you can, for example with [Tasker](http://tasker.dinglisch.net/).
 
+Enable/disable privacy mode:
+
+* *am startservice -a eu.faircode.backpacktrack2.PRIVACY --ez Enable false*
+* *am startservice -a eu.faircode.backpacktrack2.PRIVACY --ez Enable true*
+
 Enable/disable tracking:
 
 * *am startservice -a eu.faircode.backpacktrack2.TRACKING --ez Enable false*

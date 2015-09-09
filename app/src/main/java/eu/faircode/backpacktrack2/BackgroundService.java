@@ -93,6 +93,7 @@ public class BackgroundService extends IntentService {
     public static final String ACTION_SHARE_KML = "ShareKML";
     public static final String ACTION_UPLOAD_GPX = "UploadGPX";
 
+    public static final String EXPORTED_ACTION_PRIVACY = "eu.faircode.backpacktrack2.PRIVACY";
     public static final String EXPORTED_ACTION_TRACKING = "eu.faircode.backpacktrack2.TRACKING";
     public static final String EXPORTED_ACTION_TRACKPOINT = "eu.faircode.backpacktrack2.TRACKPOINT";
     public static final String EXPORTED_ACTION_WAYPOINT = "eu.faircode.backpacktrack2.WAYPOINT";
@@ -170,7 +171,10 @@ public class BackgroundService extends IntentService {
 
             Log.i(TAG, "Intent=" + intent);
 
-            if (EXPORTED_ACTION_TRACKING.equals(intent.getAction()))
+            if (EXPORTED_ACTION_PRIVACY.equals(intent.getAction()))
+                handlePrivacyEnable(intent);
+
+            else if (EXPORTED_ACTION_TRACKING.equals(intent.getAction()))
                 handleTrackingEnable(intent);
 
             else if (ACTION_ACTIVITY.equals(intent.getAction()))
@@ -262,14 +266,16 @@ public class BackgroundService extends IntentService {
 
     // Handle intents methods
 
+    private void handlePrivacyEnable(Intent intent) {
+        boolean enable = intent.getBooleanExtra(EXTRA_ENABLE, true);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.edit().putBoolean(SettingsFragment.PREF_PRIVACY, enable).apply();
+    }
+
     private void handleTrackingEnable(Intent intent) {
         boolean enable = intent.getBooleanExtra(EXTRA_ENABLE, true);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit().putBoolean(SettingsFragment.PREF_ENABLED, enable).apply();
-        if (enable)
-            startTracking(this);
-        else
-            stopTracking(this);
     }
 
     private void handleActivity(Intent intent) {
@@ -946,6 +952,10 @@ public class BackgroundService extends IntentService {
 
         // Check if enabled
         final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (prefs.getBoolean(SettingsFragment.PREF_PRIVACY, SettingsFragment.DEFAULT_PRIVACY)) {
+            Log.i(TAG, "Tracking: privacy mode");
+            return;
+        }
         if (!prefs.getBoolean(SettingsFragment.PREF_ENABLED, SettingsFragment.DEFAULT_ENABLED)) {
             Log.i(TAG, "Tracking disabled");
             return;
@@ -1216,6 +1226,10 @@ public class BackgroundService extends IntentService {
     public static void startWeatherUpdates(Context context) {
         // Check if weather updates enabled
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (prefs.getBoolean(SettingsFragment.PREF_PRIVACY, SettingsFragment.DEFAULT_PRIVACY)) {
+            Log.i(TAG, "Weather updates: privacy mode");
+            return;
+        }
         if (!prefs.getBoolean(SettingsFragment.PREF_WEATHER_ENABLED, SettingsFragment.DEFAULT_WEATHER_ENABLED)) {
             Log.i(TAG, "Weather updates disabled");
             return;
@@ -1239,6 +1253,12 @@ public class BackgroundService extends IntentService {
         else
             am.set(AlarmManager.RTC_WAKEUP, trigger, pi);
         Log.i(TAG, "Start weather updates interval=" + interval + "m" + " next=" + SimpleDateFormat.getDateTimeInstance().format(trigger) + " wakeup=" + wakeup);
+
+        // Display last weather report
+        String report = prefs.getString(SettingsFragment.PREF_LAST_WEATHER_REPORT, null);
+        Weather weather = (report == null ? null : Weather.deserialize(report));
+        if (weather != null && weather.isValid(context))
+            showWeatherNotification(weather, context);
     }
 
     public static void stopWeatherUpdates(Context context) {
@@ -1248,6 +1268,9 @@ public class BackgroundService extends IntentService {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
         Log.i(TAG, "Stop weather updates");
+
+        removeWeatherNotification(context);
+        removeRainNotification(context);
     }
 
     public static void startWeatherGuard(Context context) {
@@ -1456,6 +1479,8 @@ public class BackgroundService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         // Check if tracking enabled
+        if (prefs.getBoolean(SettingsFragment.PREF_PRIVACY, SettingsFragment.DEFAULT_PRIVACY))
+            return;
         if (!prefs.getBoolean(SettingsFragment.PREF_ENABLED, SettingsFragment.DEFAULT_ENABLED))
             return;
 
@@ -1615,7 +1640,7 @@ public class BackgroundService extends IntentService {
         nm.cancel(NOTIFICATION_LOCATION);
     }
 
-    public static void showWeatherNotification(Weather weather, Context context) {
+    private static void showWeatherNotification(Weather weather, Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         boolean notification = prefs.getBoolean(SettingsFragment.PREF_WEATHER_NOTIFICATION, SettingsFragment.DEFAULT_WEATHER_NOTIFICATION);
         if (notification) {
@@ -1812,7 +1837,7 @@ public class BackgroundService extends IntentService {
         nm.notify(NOTIFICATION_WEATHER, notification.build());
     }
 
-    public static void removeWeatherNotification(Context context) {
+    private static void removeWeatherNotification(Context context) {
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         nm.cancel(NOTIFICATION_WEATHER);
     }
@@ -1903,7 +1928,7 @@ public class BackgroundService extends IntentService {
         nm.notify(NOTIFICATION_RAIN, notification.build());
     }
 
-    public static void removeRainNotification(Context context) {
+    private static void removeRainNotification(Context context) {
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         nm.cancel(NOTIFICATION_RAIN);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);

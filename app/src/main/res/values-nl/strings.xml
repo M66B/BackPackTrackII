@@ -3,6 +3,7 @@
     <string name="app_description">Neem voortdurend uw locatie op, zonder uw battery leeg te maken</string>
 
     <string name="title_action">Acties</string>
+    <string name="title_privacy">Privacy modus</string>
     <string name="title_edit">Beheer waypoints</string>
     <string name="title_share_gpx">Deel GPX-bestand</string>
     <string name="title_share_kml">Deel KML-bestand</string>
@@ -128,6 +129,7 @@
     <string name="title_author">Auteur</string>
     <string name="title_license">Licentie</string>
 
+    <string name="summary_privacy">Enable or disable location and weather updates</string>
     <string name="summary_edit">Use, add, change or delete waypoints</string>
     <string name="summary_share_gpx">Tap to write and share a GPX file\nLast share: %s</string>
     <string name="summary_share_kml">Tap to write and share a KML file\nLast share: %s</string>

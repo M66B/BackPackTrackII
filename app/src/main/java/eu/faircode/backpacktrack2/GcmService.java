@@ -2,6 +2,7 @@ package eu.faircode.backpacktrack2;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -10,7 +11,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmListenerService;
+import com.google.android.gms.gcm.GcmPubSub;
 
+import java.io.IOException;
 import java.util.Date;
 
 public class GcmService extends GcmListenerService {
@@ -34,6 +37,31 @@ public class GcmService extends GcmListenerService {
                 Log.w(TAG, "Unknown GCM topic=" + from);
         } else
             Log.w(TAG, "Unknown GCM sender=" + from);
+    }
+
+    public static void subscribeBroadcasts(Context context) throws IOException {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String token = prefs.getString(SettingsFragment.PREF_GCM_TOKEN, null);
+
+        String topic = "/topics/broadcasts";
+        GcmPubSub pubSub = GcmPubSub.getInstance(context);
+        pubSub.subscribe(token, topic, null);
+        Log.i(TAG, "Subscribed to " + topic);
+    }
+
+    public static void subscribeWeatherUpdates(Context context) throws IOException {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String token = prefs.getString(SettingsFragment.PREF_GCM_TOKEN, null);
+        boolean privacy = prefs.getBoolean(SettingsFragment.PREF_PRIVACY, SettingsFragment.DEFAULT_PRIVACY);
+        boolean subscribe = prefs.getBoolean(SettingsFragment.PREF_WEATHER_GCM, false);
+
+        String topic = "/topics/weather";
+        GcmPubSub pubSub = GcmPubSub.getInstance(context);
+        if (subscribe && !privacy)
+            pubSub.subscribe(token, topic, null);
+        else
+            pubSub.unsubscribe(token, topic);
+        Log.i(TAG, "Subcribe " + topic + "=" + subscribe);
     }
 
     private void handleBroadcast(Bundle data) {

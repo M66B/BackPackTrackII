@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 import com.google.android.gms.iid.InstanceIDListenerService;
@@ -34,11 +33,9 @@ public class IIDService extends InstanceIDListenerService {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             prefs.edit().putString(SettingsFragment.PREF_GCM_TOKEN, token).apply();
 
-            // Subscribe to broadcasts
-            String topic = "/topics/broadcasts";
-            GcmPubSub pubSub = GcmPubSub.getInstance(context);
-            pubSub.subscribe(token, topic, null);
-            Log.i(TAG, "Subscribed to " + topic);
+            // Subscribe to topics
+            GcmService.subscribeBroadcasts(context);
+            GcmService.subscribeWeatherUpdates(context);
         } catch (IOException ex) {
             Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
         }

@@ -93,6 +93,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private static final String TAG = "BPT2.Fragment";
 
     // Preference names
+    public static final String PREF_PRIVACY = "pref_privacy";
     public static final String PREF_EDIT = "pref_edit";
     public static final String PREF_SHARE_GPX = "pref_share_gpx";
     public static final String PREF_SHARE_KML = "pref_share_kml";
@@ -203,6 +204,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_GRAPH_TOTAL = "pref_graph_total";
 
     // Preference defaults
+    public static final boolean DEFAULT_PRIVACY = false;
     public static final boolean DEFAULT_ENABLED = true;
     public static final boolean DEFAULT_USE_NETWORK = true;
     public static final boolean DEFAULT_USE_GPS = true;
@@ -800,7 +802,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             if ("".equals(prefs.getString(key, null)))
                 prefs.edit().remove(key).apply();
 
-        // Follow extern change (Tasker)
+        // Follow external changes (automation)
+        if (PREF_PRIVACY.equals(key))
+            ((CheckBoxPreference) pref).setChecked(prefs.getBoolean(key, DEFAULT_PRIVACY));
         if (PREF_ENABLED.equals(key))
             ((CheckBoxPreference) pref).setChecked(prefs.getBoolean(key, DEFAULT_ENABLED));
 
@@ -810,16 +814,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         else if (PREF_WEATHER_API.equals(key)) {
             findPreference(PREF_WEATHER_FORECAST).setEnabled("fio".equals(prefs.getString(key, DEFAULT_WEATHER_API)) && Util.isConnected(getActivity()));
-
-        } else if (PREF_WEATHER_NOTIFICATION.equals(key) ||
-                PREF_WEATHER_RAIN_WARNING.equals(key)) {
-            BackgroundService.removeWeatherNotification(getActivity());
-            BackgroundService.removeRainNotification(getActivity());
-
-            String report = prefs.getString(PREF_LAST_WEATHER_REPORT, null);
-            Weather weather = (report == null ? null : Weather.deserialize(report));
-            if (weather != null && weather.isValid(getActivity()))
-                BackgroundService.showWeatherNotification(weather, getActivity());
 
             // Update blog URL
         } else if (PREF_BLOGURL.equals(key)) {
@@ -840,7 +834,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, key);
 
         // Restart tracking if needed
-        if (PREF_ENABLED.equals(key) ||
+        if (PREF_PRIVACY.equals(key) ||
+                PREF_ENABLED.equals(key) ||
                 PREF_INTERVAL.equals(key) ||
                 PREF_TIMEOUT.equals(key) ||
                 PREF_CHECK_TIME.equals(key) ||
@@ -864,28 +859,23 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 }
             }).start();
 
-        if (PREF_WEATHER_ENABLED.equals(key) ||
+        if (PREF_PRIVACY.equals(key) ||
+                PREF_WEATHER_ENABLED.equals(key) ||
                 PREF_WEATHER_INTERVAL.equals(key) ||
-                PREF_WEATHER_WAKEUP.equals(key)) {
+                PREF_WEATHER_WAKEUP.equals(key) ||
+                PREF_WEATHER_NOTIFICATION.equals(key) ||
+                PREF_WEATHER_RAIN_WARNING.equals(key)) {
             BackgroundService.stopWeatherUpdates(getActivity());
             BackgroundService.startWeatherUpdates(getActivity());
         }
 
-        if (PREF_WEATHER_GCM.equals(key)) {
-            final String token = prefs.getString(PREF_GCM_TOKEN, null);
-            final boolean subscribe = prefs.getBoolean(PREF_WEATHER_GCM, false);
-
+        if (PREF_PRIVACY.equals(key) ||
+                PREF_WEATHER_GCM.equals(key)) {
             new AsyncTask<Object, Object, Throwable>() {
                 @Override
                 protected Throwable doInBackground(Object... objects) {
-                    String topic = "/topics/weather";
-                    GcmPubSub pubSub = GcmPubSub.getInstance(getActivity());
                     try {
-                        if (subscribe)
-                            pubSub.subscribe(token, topic, null);
-                        else
-                            pubSub.unsubscribe(token, topic);
-                        Log.i(TAG, "Subcribe " + topic + "=" + subscribe);
+                        GcmService.subscribeWeatherUpdates(getActivity());
                         return null;
                     } catch (IOException ex) {
                         Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
@@ -927,31 +917,24 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Initialize step counting
         long time = new Date().getTime();
         new DatabaseHelper(context).updateSteps(time, 0).close();
-        StepCountWidget.updateWidgets(context);
 
-        // Initialize tracking
-        BackgroundService.stopTracking(context);
-        BackgroundService.startTracking(context);
+        // Update widgets
+        StepCountWidget.updateWidgets(context);
+        WeatherWidget.updateWidgets(context);
 
         // Initialize daily alarm
         BackgroundService.stopDaily(context);
         BackgroundService.startDaily(context);
 
-        // Show last weather
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        if (prefs.getBoolean(PREF_WEATHER_NOTIFICATION, DEFAULT_WEATHER_NOTIFICATION)) {
-            String report = prefs.getString(PREF_LAST_WEATHER_REPORT, null);
-            Weather weather = (report == null ? null : Weather.deserialize(report));
-            if (weather != null && weather.isValid(context))
-                BackgroundService.showWeatherNotification(weather, context);
-        }
-        WeatherWidget.updateWidgets(context);
+        // Initialize tracking
+        BackgroundService.stopTracking(context);
+        BackgroundService.startTracking(context);
 
         // Initialize weather updates
         BackgroundService.stopWeatherUpdates(context);
         BackgroundService.startWeatherUpdates(context);
 
-        // Refresh GCM token
+        // Get GCM token
         if (Util.hasPlayServices(context))
             IIDService.getToken(context, false);
     }

@@ -160,6 +160,7 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
+                <action android:name="eu.faircode.backpacktrack2.PRIVACY" />
                 <action android:name="eu.faircode.backpacktrack2.TRACKING" />
                 <action android:name="eu.faircode.backpacktrack2.TRACKPOINT" />
                 <action android:name="eu.faircode.backpacktrack2.WAYPOINT" />

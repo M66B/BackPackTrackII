@@ -4,6 +4,12 @@
         android:layout="@layout/title"
         android:selectable="false" />
     <PreferenceCategory android:title="@string/title_action">
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:icon="@drawable/person_outline_60"
+            android:key="pref_privacy"
+            android:summary="@string/summary_privacy"
+            android:title="@string/title_privacy" />
         <Preference
             android:icon="@drawable/create_60"
             android:key="pref_edit"
