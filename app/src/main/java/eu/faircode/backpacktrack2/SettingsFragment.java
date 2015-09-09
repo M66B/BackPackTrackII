@@ -863,10 +863,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 PREF_WEATHER_INTERVAL.equals(key) ||
                 PREF_WEATHER_WAKEUP.equals(key) ||
                 PREF_WEATHER_NOTIFICATION.equals(key) ||
-                PREF_WEATHER_RAIN_WARNING.equals(key)) {
-            BackgroundService.stopWeatherUpdates(getActivity());
-            BackgroundService.startWeatherUpdates(getActivity());
-        }
+                PREF_WEATHER_RAIN_WARNING.equals(key))
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    synchronized (getActivity().getApplicationContext()) {
+                        BackgroundService.stopWeatherUpdates(getActivity());
+                        BackgroundService.startWeatherUpdates(getActivity());
+                    }
+                }
+            }).start();
 
         if (PREF_WEATHER_GCM.equals(key)) {
             new AsyncTask<Object, Object, Throwable>() {
