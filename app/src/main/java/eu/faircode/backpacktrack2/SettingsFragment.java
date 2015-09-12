@@ -347,6 +347,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private static final int GEOCODER_RESULTS = 5;
     private static final long DAY_MS = 24L * 3600L * 1000L;
 
+    private boolean running = false;
     private DatabaseHelper db = null;
     private boolean elevationBusy = false;
     private List<AlertDialog> dialogs = new ArrayList<AlertDialog>();
@@ -382,6 +383,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        running = true;
+
         addPreferencesFromResource(R.xml.preferences);
 
         db = new DatabaseHelper(getActivity());
@@ -414,6 +418,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        running = false;
 
         for (AlertDialog dialog : dialogs)
             if (dialog.isShowing())
@@ -889,8 +895,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                 @Override
                 protected void onPostExecute(Throwable ex) {
-                    if (ex != null)
-                        Toast.makeText(getActivity(), ex.toString(), Toast.LENGTH_SHORT).show();
+                    if (running)
+                        if (ex != null)
+                            Toast.makeText(getActivity(), ex.toString(), Toast.LENGTH_SHORT).show();
                 }
             }.execute();
         }
@@ -1075,65 +1082,67 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
 
             protected void onPostExecute(final Object result) {
-                if (result instanceof Throwable)
-                    Toast.makeText(getActivity(), result.toString(), Toast.LENGTH_SHORT).show();
-                else {
-                    final List<GeocoderEx.AddressEx> listAddress = (List<GeocoderEx.AddressEx>) result;
-                    if (listAddress.size() == 0)
-                        Toast.makeText(getActivity(), getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
+                if (running)
+                    if (result instanceof Throwable)
+                        Toast.makeText(getActivity(), result.toString(), Toast.LENGTH_SHORT).show();
                     else {
-                        // Show address selector
-                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-                        alertDialogBuilder.setIcon(android.R.drawable.ic_menu_add);
-                        alertDialogBuilder.setTitle(getString(R.string.title_geocode));
-                        alertDialogBuilder.setItems(GeocoderEx.getNameList(listAddress), new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int item) {
-                                // Build location
-                                final String name = listAddress.get(item).name;
-                                final Location location = listAddress.get(item).location;
+                        final List<GeocoderEx.AddressEx> listAddress = (List<GeocoderEx.AddressEx>) result;
+                        if (listAddress.size() == 0)
+                            Toast.makeText(getActivity(), getString(R.string.msg_nolocation, name), Toast.LENGTH_SHORT).show();
+                        else {
+                            // Show address selector
+                            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                            alertDialogBuilder.setIcon(android.R.drawable.ic_menu_add);
+                            alertDialogBuilder.setTitle(getString(R.string.title_geocode));
+                            alertDialogBuilder.setItems(GeocoderEx.getNameList(listAddress), new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int item) {
+                                    // Build location
+                                    final String name = listAddress.get(item).name;
+                                    final Location location = listAddress.get(item).location;
 
-                                new AsyncTask<Object, Object, Object>() {
-                                    protected Object doInBackground(Object... params) {
-                                        int altitude_type = (location.hasAltitude() ? BackgroundService.ALTITUDE_GPS : BackgroundService.ALTITUDE_NONE);
+                                    new AsyncTask<Object, Object, Object>() {
+                                        protected Object doInBackground(Object... params) {
+                                            int altitude_type = (location.hasAltitude() ? BackgroundService.ALTITUDE_GPS : BackgroundService.ALTITUDE_NONE);
 
-                                        // Add elevation data
-                                        if (!location.hasAltitude() && Util.isConnected(getActivity())) {
-                                            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                                            if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
-                                                try {
-                                                    GoogleElevationApi.getElevation(location, getActivity());
-                                                    altitude_type = BackgroundService.ALTITUDE_LOOKUP;
-                                                } catch (Throwable ex) {
-                                                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                                                }
+                                            // Add elevation data
+                                            if (!location.hasAltitude() && Util.isConnected(getActivity())) {
+                                                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                                                if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
+                                                    try {
+                                                        GoogleElevationApi.getElevation(location, getActivity());
+                                                        altitude_type = BackgroundService.ALTITUDE_LOOKUP;
+                                                    } catch (Throwable ex) {
+                                                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                                    }
+                                            }
+
+                                            if (altitude_type != BackgroundService.ALTITUDE_NONE)
+                                                altitude_type |= BackgroundService.ALTITUDE_KEEP;
+
+                                            // Persist location
+                                            new DatabaseHelper(getActivity()).insertLocation(location, altitude_type, name, -1, -1, -1).close();
+                                            return null;
                                         }
 
-                                        if (altitude_type != BackgroundService.ALTITUDE_NONE)
-                                            altitude_type |= BackgroundService.ALTITUDE_KEEP;
-
-                                        // Persist location
-                                        new DatabaseHelper(getActivity()).insertLocation(location, altitude_type, name, -1, -1, -1).close();
-                                        return null;
-                                    }
-
-                                    @Override
-                                    protected void onPostExecute(Object result) {
-                                        Toast.makeText(getActivity(), getString(R.string.msg_added, name), Toast.LENGTH_SHORT).show();
-                                    }
-                                }.execute();
-                            }
-                        });
-                        alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Do nothing
-                            }
-                        });
-                        AlertDialog alertDialog = alertDialogBuilder.create();
-                        alertDialog.show();
-                        dialogs.add(alertDialog);
+                                        @Override
+                                        protected void onPostExecute(Object result) {
+                                            if (running)
+                                                Toast.makeText(getActivity(), getString(R.string.msg_added, name), Toast.LENGTH_SHORT).show();
+                                        }
+                                    }.execute();
+                                }
+                            });
+                            alertDialogBuilder.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Do nothing
+                                }
+                            });
+                            AlertDialog alertDialog = alertDialogBuilder.create();
+                            alertDialog.show();
+                            dialogs.add(alertDialog);
+                        }
                     }
-                }
             }
         }.execute();
     }
@@ -1178,7 +1187,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                 @Override
                 protected void onPostExecute(Object result) {
-                    Toast.makeText(getActivity(), getString(R.string.msg_added, name.toString()), Toast.LENGTH_SHORT).show();
+                    if (running)
+                        Toast.makeText(getActivity(), getString(R.string.msg_added, name.toString()), Toast.LENGTH_SHORT).show();
                 }
             }.execute();
 
@@ -1481,10 +1491,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                                     @Override
                                     protected void onPostExecute(Throwable ex) {
-                                        if (ex == null)
-                                            Toast.makeText(getActivity(), getString(R.string.msg_updated, getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
-                                        else
-                                            Toast.makeText(getActivity(), ex.toString(), Toast.LENGTH_SHORT).show();
+                                        if (running)
+                                            if (ex == null)
+                                                Toast.makeText(getActivity(), getString(R.string.msg_updated, getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
+                                            else
+                                                Toast.makeText(getActivity(), ex.toString(), Toast.LENGTH_SHORT).show();
                                     }
                                 }.execute();
                                 return true;
@@ -1523,19 +1534,20 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                         } catch (final Throwable ex) {
                                             Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                                             return ex;
-                                        } finally {
-                                            synchronized (getActivity()) {
-                                                elevationBusy = false;
-                                            }
                                         }
                                     }
 
                                     @Override
                                     protected void onPostExecute(Throwable ex) {
-                                        if (ex == null)
-                                            Toast.makeText(getActivity(), getString(R.string.msg_updated, getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
-                                        else
-                                            Toast.makeText(getActivity(), ex.toString(), Toast.LENGTH_SHORT).show();
+                                        if (running) {
+                                            synchronized (getActivity()) {
+                                                elevationBusy = false;
+                                            }
+                                            if (ex == null)
+                                                Toast.makeText(getActivity(), getString(R.string.msg_updated, getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
+                                            else
+                                                Toast.makeText(getActivity(), ex.toString(), Toast.LENGTH_SHORT).show();
+                                        }
                                     }
                                 }.execute();
                                 return true;
@@ -1557,7 +1569,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                                                     @Override
                                                     protected void onPostExecute(Object result) {
-                                                        Toast.makeText(getActivity(), getString(R.string.msg_deleted, title), Toast.LENGTH_SHORT).show();
+                                                        if (running)
+                                                            Toast.makeText(getActivity(), getString(R.string.msg_deleted, title), Toast.LENGTH_SHORT).show();
                                                     }
                                                 }.execute();
                                             }
@@ -2978,16 +2991,18 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         @Override
         protected void onPostExecute(Object result) {
-            progress.setVisibility(View.GONE);
-            if (result instanceof Throwable)
-                Toast.makeText(context, result.toString(), Toast.LENGTH_LONG).show();
-            else if (result instanceof List) {
-                List<Weather> listWeather = (List<Weather>) result;
-                showForecastGraph(graph, listWeather, this.type == ForecastIO.TYPE_DAILY);
-                header.setVisibility(View.VISIBLE);
-                ForecastAdapter adapter = new ForecastAdapter(context, listWeather, type);
-                list.setAdapter(adapter);
-                list.setVisibility(View.VISIBLE);
+            if (running) {
+                progress.setVisibility(View.GONE);
+                if (result instanceof Throwable)
+                    Toast.makeText(context, result.toString(), Toast.LENGTH_LONG).show();
+                else if (result instanceof List) {
+                    List<Weather> listWeather = (List<Weather>) result;
+                    showForecastGraph(graph, listWeather, this.type == ForecastIO.TYPE_DAILY);
+                    header.setVisibility(View.VISIBLE);
+                    ForecastAdapter adapter = new ForecastAdapter(context, listWeather, type);
+                    list.setAdapter(adapter);
+                    list.setVisibility(View.VISIBLE);
+                }
             }
         }
     }
