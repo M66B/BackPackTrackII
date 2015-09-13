@@ -251,7 +251,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_WEATHER_RAIN_SOUND = "content://settings/system/notification_sound";
     public static final boolean DEFAULT_WEATHER_RAIN_LIGHT = true;
     public static final String DEFAULT_WEATHER_GUARD = "60"; // minutes
-    public static final String DEFAULT_WEATHER_CACHE = "15"; // minutes
+    public static final String DEFAULT_WEATHER_CACHE = "180"; // minutes
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
     public static final String DEFAULT_RECOGNITION_INTERVAL_STILL = "60"; // seconds
