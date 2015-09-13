@@ -113,8 +113,16 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="3dp">
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginTop="6dp"
+            android:textSize="6pt" />
 
         <TextView
             android:id="@+id/tvPoweredBy"
@@ -122,7 +130,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:layout_marginTop="3dp"
+            android:layout_marginTop="6dp"
             android:text="@string/title_weather_poweredby"
             android:textSize="6pt" />
 
@@ -141,7 +149,7 @@
             android:layout_above="@id/tvPoweredBy"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="6dip"
+            android:layout_marginTop="6dp"
             android:visibility="gone" />
     </RelativeLayout>
 </LinearLayout>

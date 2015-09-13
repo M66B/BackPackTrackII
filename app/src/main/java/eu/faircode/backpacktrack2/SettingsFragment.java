@@ -2954,6 +2954,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         private GraphView graph;
         private LinearLayout header;
         private ListView list;
+        private TextView time;
         private SharedPreferences prefs;
         private Location location;
         private boolean cache;
@@ -2965,6 +2966,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             this.graph = (GraphView) view.findViewById(R.id.gvForecast);
             this.header = (LinearLayout) view.findViewById(R.id.llHeader);
             this.list = (ListView) view.findViewById(R.id.lvWeatherForecast);
+            this.time = (TextView) view.findViewById(R.id.tvTime);
             this.prefs = getPreferenceScreen().getSharedPreferences();
             this.location = location;
             this.cache = cache;
@@ -2976,6 +2978,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             graph.setVisibility(View.GONE);
             header.setVisibility(View.GONE);
             list.setVisibility(View.GONE);
+            time.setText("");
         }
 
         @Override
@@ -2997,11 +3000,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     Toast.makeText(context, result.toString(), Toast.LENGTH_LONG).show();
                 else if (result instanceof List) {
                     List<Weather> listWeather = (List<Weather>) result;
+                    long last = prefs.getLong(PREF_FORECAST_TIME, 0);
+
                     showForecastGraph(graph, listWeather, this.type == ForecastIO.TYPE_DAILY);
                     header.setVisibility(View.VISIBLE);
+
                     ForecastAdapter adapter = new ForecastAdapter(context, listWeather, type);
                     list.setAdapter(adapter);
                     list.setVisibility(View.VISIBLE);
+
+                    time.setText(SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.SHORT, SimpleDateFormat.SHORT).format(last));
                 }
             }
         }
