@@ -3302,7 +3302,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                 return DF.format(value);
                         }
                     });
-            graph.getGridLabelRenderer().setNumHorizontalLabels(3);
+            graph.getGridLabelRenderer().setNumHorizontalLabels(2);
 
             seriesMaxTemp.setColor(Color.MAGENTA);
 
