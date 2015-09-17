@@ -1100,14 +1100,17 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                     final String name = listAddress.get(item).name;
                                     final Location location = listAddress.get(item).location;
 
+                                    // Get settings
+                                    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                                    final boolean altitude_waypoint = prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT);
+
                                     new AsyncTask<Object, Object, Object>() {
                                         protected Object doInBackground(Object... params) {
                                             int altitude_type = (location.hasAltitude() ? BackgroundService.ALTITUDE_GPS : BackgroundService.ALTITUDE_NONE);
 
                                             // Add elevation data
                                             if (!location.hasAltitude() && Util.isConnected(getActivity())) {
-                                                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                                                if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
+                                                if (altitude_waypoint)
                                                     try {
                                                         GoogleElevationApi.getElevation(location, getActivity());
                                                         altitude_type = BackgroundService.ALTITUDE_LOOKUP;
@@ -1156,10 +1159,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             if (name == null || ll == null)
                 return;
 
+            // Build location
             final Location location = new Location("place");
             location.setLatitude(ll.latitude);
             location.setLongitude(ll.longitude);
             location.setTime(System.currentTimeMillis());
+
+            // Get settings
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            final boolean altitude_waypoint = prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT);
 
             new AsyncTask<Object, Object, Object>() {
                 protected Object doInBackground(Object... params) {
@@ -1167,8 +1175,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                     // Add elevation data
                     if (!location.hasAltitude() && Util.isConnected(getActivity())) {
-                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                        if (prefs.getBoolean(PREF_ALTITUDE_WAYPOINT, DEFAULT_ALTITUDE_WAYPOINT))
+                        if (altitude_waypoint)
                             try {
                                 GoogleElevationApi.getElevation(location, getActivity());
                                 altitude_type = BackgroundService.ALTITUDE_LOOKUP;
@@ -2956,6 +2963,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         private ListView list;
         private TextView time;
         private SharedPreferences prefs;
+        private String apikey_fio;
         private Location location;
         private boolean cache;
 
@@ -2968,6 +2976,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             this.list = (ListView) view.findViewById(R.id.lvWeatherForecast);
             this.time = (TextView) view.findViewById(R.id.tvTime);
             this.prefs = getPreferenceScreen().getSharedPreferences();
+            this.apikey_fio = prefs.getString(PREF_WEATHER_APIKEY_FIO, null);
             this.location = location;
             this.cache = cache;
         }
@@ -2984,7 +2993,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         @Override
         protected Object doInBackground(Object... params) {
             try {
-                String apikey_fio = prefs.getString(PREF_WEATHER_APIKEY_FIO, null);
                 return ForecastIO.getWeatherByLocation(apikey_fio, location, type, cache, context);
             } catch (Throwable ex) {
                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
