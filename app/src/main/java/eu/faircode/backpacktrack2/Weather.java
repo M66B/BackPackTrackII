@@ -33,7 +33,6 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class Weather {
     public long time = -1;
-    public long duration = 0;
     public String provider = null;
     public long station_id = -1;
     public int station_type = -1;

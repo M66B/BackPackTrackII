@@ -28,7 +28,6 @@ import java.util.TimeZone;
 
 public class ForecastAdapter extends ArrayAdapter<Weather> {
     private int type;
-    private Location location;
     private SunriseSunsetCalculator calculator;
     private String temperature_unit;
     private String pressure_unit;
@@ -42,7 +41,6 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
     public ForecastAdapter(Context context, List<Weather> weather, int type, Location location) {
         super(context, 0, weather);
         this.type = type;
-        this.location = location;
         com.luckycatlabs.sunrisesunset.dto.Location loc = new com.luckycatlabs.sunrisesunset.dto.Location(location.getLatitude(), location.getLongitude());
         this.calculator = new SunriseSunsetCalculator(loc, TimeZone.getDefault());
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -72,18 +70,18 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
         TextView tvPressure = (TextView) convertView.findViewById(R.id.tvPressure);
         TextView tvOzone = (TextView) convertView.findViewById(R.id.tvOzone);
 
-        Calendar from = Calendar.getInstance();
-        from.setTime(new Date(weather.time));
-        Calendar to = Calendar.getInstance();
-        to.setTime(new Date(weather.time + weather.duration));
+        if (type == ForecastIO.TYPE_HOURLY) {
+            Calendar hour = Calendar.getInstance();
+            hour.setTime(new Date(weather.time + 30 * 60 * 1000L));
 
-        Calendar sunrise = calculator.getOfficialSunriseCalendarForDate(from);
-        Calendar sunset = calculator.getOfficialSunsetCalendarForDate(from);
+            Calendar sunrise = calculator.getOfficialSunriseCalendarForDate(hour);
+            Calendar sunset = calculator.getOfficialSunsetCalendarForDate(hour);
 
-        if (type == ForecastIO.TYPE_DAILY || (from.after(sunrise) && to.before(sunset)))
-            convertView.setBackgroundColor(Color.TRANSPARENT);
-        else
-            convertView.setBackgroundColor(Color.argb(0x3F, 0, 0, 0));
+            if (hour.after(sunrise) && hour.before(sunset))
+                convertView.setBackgroundColor(Color.TRANSPARENT);
+            else
+                convertView.setBackgroundColor(Color.argb(0x3F, 0, 0, 0));
+        }
 
         // Time
         tvDate.setText(SDFD.format(weather.time));
