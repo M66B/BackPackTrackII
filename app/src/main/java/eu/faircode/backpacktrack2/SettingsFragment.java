@@ -3222,6 +3222,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         LineGraphSeries<DataPoint> seriesMaxTemp = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesRain = new LineGraphSeries<DataPoint>();
         LineGraphSeries<DataPoint> seriesProbability = new LineGraphSeries<DataPoint>();
+        LineGraphSeries<DataPoint> seriesClouds = new LineGraphSeries<DataPoint>();
 
         for (Weather weather : listWeather) {
             double rain_1h = weather.rain_1h;
@@ -3234,6 +3235,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     maxRain = rain_1h;
             }
         }
+        if (maxRain == 0)
+            maxRain = 100;
 
         for (Weather weather : listWeather) {
             data = true;
@@ -3275,6 +3278,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             seriesMaxTemp.appendData(new DataPoint(new Date(weather.time), temperature_max), true, Integer.MAX_VALUE);
             seriesRain.appendData(new DataPoint(new Date(weather.time), rain_1h), true, Integer.MAX_VALUE);
             seriesProbability.appendData(new DataPoint(new Date(weather.time), weather.rain_probability * maxRain / 100), true, Integer.MAX_VALUE);
+            seriesClouds.appendData(new DataPoint(new Date(weather.time), weather.clouds * maxRain / 100), true, Integer.MAX_VALUE);
         }
 
         if (data) {
@@ -3323,6 +3327,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 }
             });
             seriesProbability.setColor(Color.GRAY);
+            seriesClouds.setColor(Color.LTGRAY);
 
             seriesMinTemp.setDrawDataPoints(true);
             seriesMinTemp.setDataPointsRadius(2);
@@ -3332,6 +3337,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             seriesRain.setDataPointsRadius(2);
             seriesProbability.setDrawDataPoints(true);
             seriesProbability.setDataPointsRadius(2);
+            seriesClouds.setDrawDataPoints(true);
+            seriesClouds.setDataPointsRadius(2);
 
             if ("c".equals(temperature_unit)) {
                 seriesMinTemp.setTitle(getString(R.string.header_celcius));
@@ -3345,6 +3352,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             else if ("in".equals(rain_unit))
                 seriesRain.setTitle(getString(R.string.header_inch));
             seriesProbability.setTitle("%");
+            seriesClouds.setTitle("%");
 
             graph.getLegendRenderer().setVisible(true);
             graph.getLegendRenderer().setAlign(LegendRenderer.LegendAlign.TOP);
@@ -3352,6 +3360,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
             graph.getSecondScale().addSeries(seriesRain);
             graph.getSecondScale().addSeries(seriesProbability);
+            graph.getSecondScale().addSeries(seriesClouds);
             graph.addSeries(seriesMinTemp);
             graph.addSeries(seriesMaxTemp);
 
