@@ -3013,7 +3013,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     showForecastGraph(graph, listWeather, this.type == ForecastIO.TYPE_DAILY);
                     header.setVisibility(View.VISIBLE);
 
-                    ForecastAdapter adapter = new ForecastAdapter(context, listWeather, type);
+                    ForecastAdapter adapter = new ForecastAdapter(context, listWeather, type, location);
                     list.setAdapter(adapter);
                     list.setVisibility(View.VISIBLE);
 

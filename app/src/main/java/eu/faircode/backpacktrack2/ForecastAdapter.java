@@ -2,7 +2,9 @@ package eu.faircode.backpacktrack2;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.location.Location;
 import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
@@ -12,15 +14,22 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
+
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 public class ForecastAdapter extends ArrayAdapter<Weather> {
     private int type;
+    private Location location;
+    private SunriseSunsetCalculator calculator;
     private String temperature_unit;
     private String pressure_unit;
     private String windspeed_unit;
@@ -30,9 +39,12 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
     private static final DateFormat SDFD = new SimpleDateFormat("d c");
     private static final DateFormat SDFT = new SimpleDateFormat("HH:mm");
 
-    public ForecastAdapter(Context context, List<Weather> weather, int type) {
+    public ForecastAdapter(Context context, List<Weather> weather, int type, Location location) {
         super(context, 0, weather);
         this.type = type;
+        this.location = location;
+        com.luckycatlabs.sunrisesunset.dto.Location loc = new com.luckycatlabs.sunrisesunset.dto.Location(location.getLatitude(), location.getLongitude());
+        this.calculator = new SunriseSunsetCalculator(loc, TimeZone.getDefault());
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         temperature_unit = prefs.getString(SettingsFragment.PREF_TEMPERATURE, SettingsFragment.DEFAULT_TEMPERATURE);
         pressure_unit = prefs.getString(SettingsFragment.PREF_PRESSURE, SettingsFragment.DEFAULT_PRESSURE);
@@ -59,6 +71,19 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
         ImageView ivWindDirection = (ImageView) convertView.findViewById(R.id.ivWindDirection);
         TextView tvPressure = (TextView) convertView.findViewById(R.id.tvPressure);
         TextView tvOzone = (TextView) convertView.findViewById(R.id.tvOzone);
+
+        Calendar from = Calendar.getInstance();
+        from.setTime(new Date(weather.time));
+        Calendar to = Calendar.getInstance();
+        to.setTime(new Date(weather.time + weather.duration));
+
+        Calendar sunrise = calculator.getOfficialSunriseCalendarForDate(from);
+        Calendar sunset = calculator.getOfficialSunsetCalendarForDate(from);
+
+        if (type == ForecastIO.TYPE_DAILY || (from.after(sunrise) && to.before(sunset)))
+            convertView.setBackgroundColor(Color.TRANSPARENT);
+        else
+            convertView.setBackgroundColor(Color.argb(0x3F, 0, 0, 0));
 
         // Time
         tvDate.setText(SDFD.format(weather.time));

@@ -155,7 +155,7 @@ public class ForecastIO {
             if (jroot.has("currently")) {
                 JSONObject current = jroot.getJSONObject("currently");
                 if (current.has("time"))
-                    result.add(decodeWeather(jroot, current));
+                    result.add(decodeWeather(jroot, current, 0));
             }
         } else if (type == TYPE_HOURLY || type == TYPE_DAILY) {
             if (jroot.has(type == TYPE_HOURLY ? "hourly" : "daily")) {
@@ -165,7 +165,7 @@ public class ForecastIO {
                     for (int i = 0; i < data.length(); i++) {
                         JSONObject period = data.getJSONObject(i);
                         if (period.has("time"))
-                            result.add(decodeWeather(jroot, period));
+                            result.add(decodeWeather(jroot, period, type == TYPE_HOURLY ? 3600 * 1000L : 24 * 3600 * 1000L));
                     }
                 }
             }
@@ -175,9 +175,10 @@ public class ForecastIO {
     }
 
     @NonNull
-    private static Weather decodeWeather(JSONObject jroot, JSONObject data) throws JSONException {
+    private static Weather decodeWeather(JSONObject jroot, JSONObject data, long duration) throws JSONException {
         Weather weather = new Weather();
         weather.time = data.getLong("time") * 1000;
+        weather.duration = duration;
         weather.provider = "fio";
         weather.station_id = -1;
         weather.station_type = -1;
