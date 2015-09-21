@@ -286,6 +286,7 @@
     <string name="menu_elevation_keep">Höhe halten</string>
     <string name="menu_elevation_loc">Höhe für Standort beziehen</string>
     <string name="menu_elevation_day">Höhe für Tag beziehen</string>
+    <string name="menu_elevation_week">Höhe für Woche beziehen</string>
     <string name="menu_time">Zeit</string>
     <string name="menu_geocode">Geocode</string>
     <string name="menu_proximity">Nähe Alarm %sm</string>

@@ -23,6 +23,9 @@
         android:id="@+id/menu_elevation_day"
         android:title="@string/menu_elevation_day" />
     <item
+        android:id="@+id/menu_elevation_week"
+        android:title="@string/menu_elevation_week" />
+    <item
         android:id="@+id/menu_delete"
         android:title="@string/menu_delete" />
 </menu>

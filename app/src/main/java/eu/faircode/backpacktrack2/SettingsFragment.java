@@ -87,6 +87,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = "BPT2.Fragment";
@@ -349,7 +350,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
     private boolean running = false;
     private DatabaseHelper db = null;
-    private boolean elevationBusy = false;
+    private AtomicBoolean elevationBusy = new AtomicBoolean();
     private List<AlertDialog> dialogs = new ArrayList<AlertDialog>();
 
     private BroadcastReceiver mConnectivityChangeReceiver = new BroadcastReceiver() {
@@ -1473,12 +1474,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                             case R.id.menu_elevation_loc:
                                 // Get elevation for location
-                                synchronized (getActivity()) {
-                                    if (elevationBusy)
-                                        return false;
-                                    else
-                                        elevationBusy = true;
-                                }
+                                elevationBusy.set(true);
 
                                 new AsyncTask<Object, Object, Throwable>() {
                                     @Override
@@ -1490,9 +1486,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                             Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                                             return ex;
                                         } finally {
-                                            synchronized (getActivity()) {
-                                                elevationBusy = false;
-                                            }
+                                            elevationBusy.set(false);
                                         }
                                     }
 
@@ -1509,12 +1503,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
                             case R.id.menu_elevation_day:
                                 // Get elevation for day
-                                synchronized (getActivity()) {
-                                    if (elevationBusy)
-                                        return false;
-                                    else
-                                        elevationBusy = true;
-                                }
+                                elevationBusy.set(true);
 
                                 new AsyncTask<Object, Object, Throwable>() {
                                     @Override
@@ -1541,20 +1530,64 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                         } catch (final Throwable ex) {
                                             Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                                             return ex;
+                                        } finally {
+                                            elevationBusy.set(false);
                                         }
                                     }
 
                                     @Override
                                     protected void onPostExecute(Throwable ex) {
-                                        if (running) {
-                                            synchronized (getActivity()) {
-                                                elevationBusy = false;
-                                            }
+                                        if (running)
                                             if (ex == null)
                                                 Toast.makeText(getActivity(), getString(R.string.msg_updated, getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
                                             else
                                                 Toast.makeText(getActivity(), ex.toString(), Toast.LENGTH_SHORT).show();
+                                    }
+                                }.execute();
+                                return true;
+
+                            case R.id.menu_elevation_week:
+                                // Get elevation for week
+                                elevationBusy.set(true);
+
+                                new AsyncTask<Object, Object, Throwable>() {
+                                    @Override
+                                    protected Throwable doInBackground(Object... objects) {
+                                        // Get range
+                                        Calendar from = Calendar.getInstance();
+                                        from.setTimeInMillis(time);
+                                        from.set(Calendar.HOUR_OF_DAY, 0);
+                                        from.set(Calendar.MINUTE, 0);
+                                        from.set(Calendar.SECOND, 0);
+                                        from.set(Calendar.MILLISECOND, 0);
+                                        from.add(Calendar.DAY_OF_YEAR, -7);
+
+                                        Calendar to = Calendar.getInstance();
+                                        to.setTimeInMillis(time);
+                                        to.set(Calendar.HOUR_OF_DAY, 23);
+                                        to.set(Calendar.MINUTE, 59);
+                                        to.set(Calendar.SECOND, 59);
+                                        to.set(Calendar.MILLISECOND, 999);
+
+                                        // Get altitudes for range
+                                        try {
+                                            BackgroundService.getAltitude(from.getTimeInMillis(), to.getTimeInMillis(), getActivity());
+                                            return null;
+                                        } catch (final Throwable ex) {
+                                            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                                            return ex;
+                                        } finally {
+                                            elevationBusy.set(false);
                                         }
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(Throwable ex) {
+                                        if (running)
+                                            if (ex == null)
+                                                Toast.makeText(getActivity(), getString(R.string.msg_updated, getString(R.string.title_altitude_settings)), Toast.LENGTH_SHORT).show();
+                                            else
+                                                Toast.makeText(getActivity(), ex.toString(), Toast.LENGTH_SHORT).show();
                                     }
                                 }.execute();
                                 return true;
@@ -1609,8 +1642,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 }
                 popupMenu.getMenu().findItem(R.id.menu_time).setTitle(SimpleDateFormat.getDateTimeInstance().format(time));
                 popupMenu.getMenu().findItem(R.id.menu_elevation_keep).setChecked(keep);
-                popupMenu.getMenu().findItem(R.id.menu_elevation_loc).setEnabled(Util.isConnected(getActivity()) && lookup);
-                popupMenu.getMenu().findItem(R.id.menu_elevation_day).setEnabled(Util.isConnected(getActivity()));
+                popupMenu.getMenu().findItem(R.id.menu_elevation_loc).setEnabled(Util.isConnected(getActivity()) && !elevationBusy.get() && lookup);
+                popupMenu.getMenu().findItem(R.id.menu_elevation_day).setEnabled(Util.isConnected(getActivity()) && !elevationBusy.get());
+                popupMenu.getMenu().findItem(R.id.menu_elevation_week).setEnabled(Util.isConnected(getActivity()) && !elevationBusy.get());
                 popupMenu.getMenu().findItem(R.id.menu_delete).setEnabled(Util.debugMode(getActivity()));
                 popupMenu.show();
             }

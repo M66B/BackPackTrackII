@@ -288,6 +288,7 @@
     <string name="menu_elevation_keep">Keep elevation</string>
     <string name="menu_elevation_loc">Fetch elevation for location</string>
     <string name="menu_elevation_day">Fetch elevations for day</string>
+    <string name="menu_elevation_week">Fetch elevations for week</string>
     <string name="menu_time">Time</string>
     <string name="menu_geocode">Geocode</string>
     <string name="menu_proximity">Proximity alert %sm</string>
