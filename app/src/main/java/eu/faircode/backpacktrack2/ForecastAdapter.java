@@ -7,14 +7,13 @@ import android.graphics.Typeface;
 import android.location.Location;
 import android.preference.PreferenceManager;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.luckycatlabs.sunrisesunset.SunriseSunsetCalculator;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;
@@ -27,12 +26,15 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class ForecastAdapter extends ArrayAdapter<Weather> {
+    private static String TAG = "BPT2.Forecast";
+
     private int type;
-    private SunriseSunsetCalculator calculator;
+    private Location location;
     private String temperature_unit;
     private String pressure_unit;
     private String windspeed_unit;
     private String rain_unit;
+
     private static final DecimalFormat DF = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ROOT));
     private static final DecimalFormat DF2 = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.ROOT));
     private static final DateFormat SDFD = new SimpleDateFormat("d c");
@@ -41,8 +43,7 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
     public ForecastAdapter(Context context, List<Weather> weather, int type, Location location) {
         super(context, 0, weather);
         this.type = type;
-        com.luckycatlabs.sunrisesunset.dto.Location loc = new com.luckycatlabs.sunrisesunset.dto.Location(location.getLatitude(), location.getLongitude());
-        this.calculator = new SunriseSunsetCalculator(loc, TimeZone.getDefault());
+        this.location = location;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         temperature_unit = prefs.getString(SettingsFragment.PREF_TEMPERATURE, SettingsFragment.DEFAULT_TEMPERATURE);
         pressure_unit = prefs.getString(SettingsFragment.PREF_PRESSURE, SettingsFragment.DEFAULT_PRESSURE);
@@ -70,18 +71,58 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
         TextView tvPressure = (TextView) convertView.findViewById(R.id.tvPressure);
         TextView tvOzone = (TextView) convertView.findViewById(R.id.tvOzone);
 
-        if (type == ForecastIO.TYPE_HOURLY) {
-            Calendar hour = Calendar.getInstance();
-            hour.setTime(new Date(weather.time + 30 * 60 * 1000L));
+        if (type == ForecastIO.TYPE_HOURLY)
+            try {
+                TimeZone utc = TimeZone.getTimeZone("UTC");
+                Calendar time = Calendar.getInstance(utc);
+                time.setTimeInMillis(weather.time);
 
-            Calendar sunrise = calculator.getOfficialSunriseCalendarForDate(hour);
-            Calendar sunset = calculator.getOfficialSunsetCalendarForDate(hour);
+                SunMoonCalculator smc = new SunMoonCalculator(
+                        time.get(Calendar.YEAR),
+                        time.get(Calendar.MONTH) + 1,
+                        time.get(Calendar.DAY_OF_MONTH),
+                        time.get(Calendar.HOUR_OF_DAY),
+                        time.get(Calendar.MINUTE),
+                        time.get(Calendar.SECOND),
+                        Math.toRadians(location.getLongitude()),
+                        Math.toRadians(location.getLatitude()));
+                smc.calcSunAndMoon();
 
-            if (hour.after(sunrise) && hour.before(sunset))
-                convertView.setBackgroundColor(Color.TRANSPARENT);
-            else
-                convertView.setBackgroundColor(Color.argb(0x3F, 0, 0, 0));
-        }
+                Calendar sunrise = Calendar.getInstance(utc);
+                int[] rise = SunMoonCalculator.getDate(smc.sunRise);
+                sunrise.set(Calendar.YEAR, rise[0]);
+                sunrise.set(Calendar.MONTH, rise[1] - 1);
+                sunrise.set(Calendar.DAY_OF_MONTH, rise[2]);
+                sunrise.set(Calendar.HOUR_OF_DAY, rise[3]);
+                sunrise.set(Calendar.MINUTE, rise[4]);
+                sunrise.set(Calendar.SECOND, rise[5]);
+                sunrise.set(Calendar.MILLISECOND, 0);
+
+                Calendar sunset = Calendar.getInstance(utc);
+                int[] set = SunMoonCalculator.getDate(smc.sunSet);
+                sunset.set(Calendar.YEAR, set[0]);
+                sunset.set(Calendar.MONTH, set[1] - 1);
+                sunset.set(Calendar.DAY_OF_MONTH, set[2]);
+                sunset.set(Calendar.HOUR_OF_DAY, set[3]);
+                sunset.set(Calendar.MINUTE, set[4]);
+                sunset.set(Calendar.SECOND, set[5]);
+                sunset.set(Calendar.MILLISECOND, 0);
+
+                time.add(Calendar.MINUTE, 30);
+
+                DateFormat df = DateFormat.getDateTimeInstance();
+                android.util.Log.i(TAG,
+                        "time=" + df.format(time.getTimeInMillis()) +
+                                " rise=" + df.format(sunrise.getTimeInMillis()) +
+                                " set=" + df.format(sunset.getTimeInMillis()));
+
+                if (time.after(sunrise) && time.before(sunset))
+                    convertView.setBackgroundColor(Color.TRANSPARENT);
+                else
+                    convertView.setBackgroundColor(Color.argb(0x3F, 0, 0, 0));
+            } catch (Exception ex) {
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
 
         // Time
         tvDate.setText(SDFD.format(weather.time));
