@@ -125,6 +125,7 @@ public class BackgroundService extends IntentService {
     private static final int LOCATION_TRACKPOINT = 1;
     private static final int LOCATION_WAYPOINT = 2;
     private static final int LOCATION_PERIODIC = 3;
+    private static final int LOCATION_AUTO = 4;
 
     public final static int ALTITUDE_NONE = 0;
     public final static int ALTITUDE_GPS = 1;
@@ -1344,7 +1345,7 @@ public class BackgroundService extends IntentService {
         // Filter nearby locations
         int pref_nearby = Integer.parseInt(prefs.getString(SettingsFragment.PREF_NEARBY, SettingsFragment.DEFAULT_NEARBY));
         Location lastLocation = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
-        if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT ||
+        if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_WAYPOINT || locationType == LOCATION_AUTO ||
                 lastLocation == null || Util.distance(lastLocation, location) >= pref_nearby ||
                 (lastLocation.hasAccuracy() ? lastLocation.getAccuracy() : Float.MAX_VALUE) >
                         (location.hasAccuracy() ? location.getAccuracy() : Float.MAX_VALUE)) {
@@ -1367,7 +1368,7 @@ public class BackgroundService extends IntentService {
             // Add elevation data
             try {
                 if (!location.hasAltitude() && Util.isConnected(this)) {
-                    if (locationType == LOCATION_WAYPOINT) {
+                    if (locationType == LOCATION_WAYPOINT || locationType == LOCATION_AUTO) {
                         if (prefs.getBoolean(SettingsFragment.PREF_ALTITUDE_WAYPOINT, SettingsFragment.DEFAULT_ALTITUDE_WAYPOINT)) {
                             GoogleElevationApi.getElevation(location, this);
                             altitude_type = ALTITUDE_LOOKUP;
@@ -1383,12 +1384,12 @@ public class BackgroundService extends IntentService {
                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
-            if (altitude_type != ALTITUDE_NONE && locationType == LOCATION_WAYPOINT)
+            if (altitude_type != ALTITUDE_NONE && (locationType == LOCATION_WAYPOINT || locationType == LOCATION_AUTO))
                 altitude_type |= ALTITUDE_KEEP;
 
             // Get waypoint name
             String waypointName = null;
-            if (locationType == LOCATION_WAYPOINT) {
+            if (locationType == LOCATION_WAYPOINT || locationType == LOCATION_AUTO) {
                 waypointName = new GeocoderEx(this).reverseGeocode(location);
                 if (waypointName == null)
                     waypointName = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
@@ -1440,7 +1441,7 @@ public class BackgroundService extends IntentService {
             if (lastStationary != null && location.getTime() - lastStationary.getTime() >= time * 60 * 1000)
                 if (!prefs.getBoolean(SettingsFragment.PREF_LAST_ISSTATIONARY, false)) {
                     prefs.edit().putBoolean(SettingsFragment.PREF_LAST_ISSTATIONARY, true);
-                    handleLocation(LOCATION_WAYPOINT, location);
+                    handleLocation(LOCATION_AUTO, location);
                 }
 
             // Move on
