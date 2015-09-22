@@ -66,6 +66,11 @@
     <string name="title_pressure_accuracy">Use when accuracy/altitude: &lt;%s %%</string>
     <string name="title_pressure_invehicle">Use reference pressure in vehicle</string>
 
+    <string name="title_auto">Auto waypoint</string>
+    <string name="title_auto_enabled">Enabled</string>
+    <string name="title_auto_time">Min. stationary time: %s minutes</string>
+    <string name="title_auto_distance">Max. stationary distance: %s meters</string>
+
     <string name="title_recognition">Activity recognition</string>
     <string name="title_recognition_enabled">Activity recognition enabled</string>
     <string name="title_recognition_interval_still">Activity recognition still: %s seconds</string>
@@ -176,6 +181,9 @@
     <string name="summary_pressure_maxdist">Use the referene pressure with the selected number of kilometers</string>
     <string name="summary_pressure_accuracy">Determine altitude from the pressure when the location accuracy is better than the selected percentage of the location altitude</string>
     <string name="summary_pressure_invehicle">Determine altitude from the pressure while in a vehicle (requires activity recognition)</string>
+
+    <string name="summary_auto_time">Automatically create a waypoint after being at the same location for the selected time</string>
+    <string name="summary_auto_distance">Automatically create a waypoint after being at the same location within the selected distance</string>
 
     <string name="summary_recognition_enabled">Recognize if you are still or moving and disable tracking when you are still</string>
     <string name="summary_recognition_interval">Recognize your activity every selected number of seconds</string>

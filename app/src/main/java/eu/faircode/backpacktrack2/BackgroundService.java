@@ -1417,8 +1417,41 @@ public class BackgroundService extends IntentService {
                 vibrator.vibrate(locationType == LOCATION_TRACKPOINT ? VIBRATE_SHORT : VIBRATE_LONG);
             } else if (Util.debugMode(this))
                 Util.toast(getString(R.string.title_trackpoint) + " " + getProviderName(location, this), Toast.LENGTH_SHORT, this);
+
+            if (locationType == LOCATION_TRACKPOINT)
+                handleStationary(location);
         } else
             Log.i(TAG, "Filtered location=" + location);
+    }
+
+    private void handleStationary(Location location) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Get preferences
+        boolean enabled = prefs.getBoolean(SettingsFragment.PREF_AUTO_ENABLED, SettingsFragment.DEFAULT_AUTO_ENABLED);
+        int time = Integer.parseInt(prefs.getString(SettingsFragment.PREF_AUTO_TIME, SettingsFragment.DEFAULT_AUTO_TIME));
+        int distance = Integer.parseInt(prefs.getString(SettingsFragment.PREF_AUTO_DISTANCE, SettingsFragment.DEFAULT_AUTO_DISTANCE));
+
+        if (enabled) {
+            // Get last position
+            Location lastStationary = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_STATIONARY, null));
+
+            // Auto waypoint
+            if (lastStationary != null && location.getTime() - lastStationary.getTime() >= time * 60 * 1000)
+                if (!prefs.getBoolean(SettingsFragment.PREF_LAST_ISSTATIONARY, false)) {
+                    prefs.edit().putBoolean(SettingsFragment.PREF_LAST_ISSTATIONARY, true);
+                    handleLocation(LOCATION_WAYPOINT, location);
+                }
+
+            // Move on
+            if (lastStationary == null || lastStationary.distanceTo(location) > distance) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.remove(SettingsFragment.PREF_LAST_ISSTATIONARY);
+                editor.putString(SettingsFragment.PREF_LAST_STATIONARY, LocationSerializer.serialize(location));
+                editor.apply();
+
+            }
+        }
     }
 
     private static void correctAltitude(Location location, Context context) {

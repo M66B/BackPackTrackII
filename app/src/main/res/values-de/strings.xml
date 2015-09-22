@@ -66,6 +66,11 @@
     <string name="title_pressure_accuracy">Nutze wenn Genauigkeit/Höhe: &lt;%s %%</string>
     <string name="title_pressure_invehicle">Nutze Druckreferenz im Fahrzeug</string>
 
+    <string name="title_auto">Auto waypoint</string>
+    <string name="title_auto_enabled">Enabled</string>
+    <string name="title_auto_time">Min. stationary time: %s minutes</string>
+    <string name="title_auto_distance">Max. stationary distance: %s meters</string>
+
     <string name="title_recognition">Aktivitätserkennung</string>
     <string name="title_recognition_enabled">Aktivitätserkennung aktiviert</string>
     <string name="title_recognition_interval_still">Aktivitätserkennung bei Stillstand: %s Sekunden</string>
@@ -174,6 +179,9 @@
     <string name="summary_pressure_maxdist">Nutze den Referenzdruck mit der ausgewählten Anzahl von Kilometer</string>
     <string name="summary_pressure_accuracy">Ermittle Höhe durch Druck wenn die Ortungsgenauigkeit besser ist als die ausgewählte Prozent der Ortungshöhe</string>
     <string name="summary_pressure_invehicle">Die Höhe im Fahrzeug durch Druck ermitteln (benötigt Aktivitätserkennung)</string>
+
+    <string name="summary_auto_time">Automatically create a waypoint after being at the same location for the selected time</string>
+    <string name="summary_auto_distance">Automatically create a waypoint after being at the same location within the selected distance</string>
 
     <string name="summary_recognition_enabled">Erkennen ob Sie sich bewegen oder stillstehen, und Tracking ausschalten wenn Sie stillstehen</string>
     <string name="summary_recognition_interval">Aktivität jede Anzahl von Sekunden ermitteln</string>

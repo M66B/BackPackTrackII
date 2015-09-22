@@ -317,6 +317,25 @@
                     android:title="@string/title_pressure_invehicle" />
             </PreferenceCategory>
         </PreferenceScreen>
+        <PreferenceScreen android:title="@string/title_auto">
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="pref_enabled"
+                android:key="pref_auto_enabled"
+                android:title="@string/title_auto_enabled" />
+            <EditTextPreference
+                android:defaultValue="30"
+                android:dependency="pref_auto_enabled"
+                android:inputType="number"
+                android:key="pref_auto_time"
+                android:summary="@string/summary_auto_time" />
+            <EditTextPreference
+                android:defaultValue="100"
+                android:dependency="pref_auto_enabled"
+                android:inputType="number"
+                android:key="pref_auto_distance"
+                android:summary="@string/summary_auto_distance" />
+        </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_recognition">
             <CheckBoxPreference
                 android:defaultValue="true"

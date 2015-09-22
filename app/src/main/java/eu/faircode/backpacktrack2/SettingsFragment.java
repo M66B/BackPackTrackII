@@ -142,6 +142,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_PRESSURE_ACCURACY = "pref_pressure_accuracy";
     public static final String PREF_PRESSURE_INVEHICLE = "pref_pressure_invehicle";
 
+    public static final String PREF_AUTO_ENABLED = "pref_auto_enabled";
+    public static final String PREF_AUTO_TIME = "pref_auto_time";
+    public static final String PREF_AUTO_DISTANCE = "pref_auto_distance";
+
     public static final String PREF_ALTITUDE_HISTORY = "pref_altitude_history";
     public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
 
@@ -240,6 +244,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_PRESSURE_ACCURACY = "10"; // percent
     public static final boolean DEFAULT_PRESSURE_INVEHICLE = false;
 
+    public static final boolean DEFAULT_AUTO_ENABLED = false;
+    public static final String DEFAULT_AUTO_TIME = "30"; // minutes
+    public static final String DEFAULT_AUTO_DISTANCE = "100"; // meters
+
     public static final String DEFAULT_ALTITUDE_HISTORY = "30"; // days
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
 
@@ -319,6 +327,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_LAST_CONFIDENCE = "pref_last_confidence";
     public static final String PREF_LAST_ACTIVITY_TIME = "pref_last_activity_time";
     public static final String PREF_LAST_LOCATION = "pref_last_location";
+    public static final String PREF_LAST_STATIONARY = "pref_last_stationary";
+    public static final String PREF_LAST_ISSTATIONARY = "pref_last_isstationary";
     public static final String PREF_LAST_STEP_COUNT = "pref_last_step";
     public static final String PREF_LAST_SHARE_GPX = "pref_last_share_gpx";
     public static final String PREF_LAST_SHARE_KML = "pref_last_share_kml";
@@ -519,6 +529,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_PRESSURE_WAIT);
         updateTitle(prefs, PREF_PRESSURE_OFFSET);
         updateTitle(prefs, PREF_PRESSURE_ACCURACY);
+
+        updateTitle(prefs, PREF_AUTO_TIME);
+        updateTitle(prefs, PREF_AUTO_DISTANCE);
 
         updateTitle(prefs, PREF_ALTITUDE_HISTORY);
         updateTitle(prefs, PREF_ALTITUDE_AVG);
@@ -864,6 +877,18 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     }
                 }
             }).start();
+
+        if (PREF_AUTO_ENABLED.equals(key)) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.remove(SettingsFragment.PREF_LAST_STATIONARY);
+            editor.remove(PREF_LAST_ISSTATIONARY);
+            if (prefs.getBoolean(key, DEFAULT_AUTO_ENABLED)) {
+                Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
+                if (lastLocation != null)
+                    editor.putString(SettingsFragment.PREF_LAST_STATIONARY, BackgroundService.LocationSerializer.serialize(lastLocation));
+            }
+            editor.apply();
+        }
 
         if (PREF_PRIVACY.equals(key) ||
                 PREF_WEATHER_ENABLED.equals(key) ||
@@ -3464,6 +3489,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref.setTitle(getString(R.string.title_pressure_maxdist, prefs.getString(key, DEFAULT_PRESSURE_MAXDIST)));
         else if (PREF_PRESSURE_ACCURACY.equals(key))
             pref.setTitle(getString(R.string.title_pressure_accuracy, prefs.getString(key, DEFAULT_PRESSURE_ACCURACY)));
+
+        else if (PREF_AUTO_TIME.equals(key))
+            pref.setTitle(getString(R.string.title_auto_time, prefs.getString(key, DEFAULT_AUTO_TIME)));
+        else if (PREF_AUTO_DISTANCE.equals(key))
+            pref.setTitle(getString(R.string.title_auto_distance, prefs.getString(key, DEFAULT_AUTO_DISTANCE)));
 
         else if (PREF_ALTITUDE_HISTORY.equals(key))
             pref.setTitle(getString(R.string.title_altitude_history, prefs.getString(key, DEFAULT_ALTITUDE_HISTORY)));
