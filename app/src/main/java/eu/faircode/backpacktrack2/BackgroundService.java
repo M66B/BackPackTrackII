@@ -1419,7 +1419,7 @@ public class BackgroundService extends IntentService {
             } else if (Util.debugMode(this))
                 Util.toast(getString(R.string.title_trackpoint) + " " + getProviderName(location, this), Toast.LENGTH_SHORT, this);
 
-            if (locationType == LOCATION_TRACKPOINT)
+            if (locationType == LOCATION_TRACKPOINT || locationType == LOCATION_PERIODIC)
                 handleStationary(location);
         } else
             Log.i(TAG, "Filtered location=" + location);
@@ -1438,9 +1438,11 @@ public class BackgroundService extends IntentService {
             Location lastStationary = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_STATIONARY, null));
 
             // Auto waypoint
-            if (lastStationary != null && location.getTime() - lastStationary.getTime() >= time * 60 * 1000)
+            if (lastStationary != null &&
+                    location.getTime() - lastStationary.getTime() >= time * 60 * 1000 &&
+                    lastStationary.distanceTo(location) <= distance)
                 if (!prefs.getBoolean(SettingsFragment.PREF_LAST_ISSTATIONARY, false)) {
-                    prefs.edit().putBoolean(SettingsFragment.PREF_LAST_ISSTATIONARY, true);
+                    prefs.edit().putBoolean(SettingsFragment.PREF_LAST_ISSTATIONARY, true).apply();
                     handleLocation(LOCATION_AUTO, location);
                 }
 
@@ -1450,7 +1452,6 @@ public class BackgroundService extends IntentService {
                 editor.remove(SettingsFragment.PREF_LAST_ISSTATIONARY);
                 editor.putString(SettingsFragment.PREF_LAST_STATIONARY, LocationSerializer.serialize(location));
                 editor.apply();
-
             }
         }
     }
