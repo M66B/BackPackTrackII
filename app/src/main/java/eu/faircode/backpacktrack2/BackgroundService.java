@@ -1446,6 +1446,7 @@ public class BackgroundService extends IntentService {
         boolean enabled = prefs.getBoolean(SettingsFragment.PREF_AUTO_ENABLED, SettingsFragment.DEFAULT_AUTO_ENABLED);
         int time = Integer.parseInt(prefs.getString(SettingsFragment.PREF_AUTO_TIME, SettingsFragment.DEFAULT_AUTO_TIME));
         int distance = Integer.parseInt(prefs.getString(SettingsFragment.PREF_AUTO_DISTANCE, SettingsFragment.DEFAULT_AUTO_DISTANCE));
+        int duplicate = Integer.parseInt(prefs.getString(SettingsFragment.PREF_AUTO_DUPLICATE, SettingsFragment.DEFAULT_AUTO_DUPLICATE));
 
         if (enabled) {
             // Get last position
@@ -1457,7 +1458,41 @@ public class BackgroundService extends IntentService {
                     lastStationary.distanceTo(location) <= distance)
                 if (!prefs.getBoolean(SettingsFragment.PREF_LAST_ISSTATIONARY, false)) {
                     prefs.edit().putBoolean(SettingsFragment.PREF_LAST_ISSTATIONARY, true).apply();
-                    handleLocation(LOCATION_AUTO, location);
+
+                    // Check if waypoint exists
+                    boolean exists = false;
+                    if (duplicate > 0) {
+                        DatabaseHelper dh = null;
+                        Cursor cursor = null;
+                        try {
+                            dh = new DatabaseHelper(this);
+                            cursor = dh.getLocations(0, Long.MAX_VALUE, false, true, false, duplicate);
+                            int colLatitude = cursor.getColumnIndex("latitude");
+                            int colLongitude = cursor.getColumnIndex("longitude");
+                            while (cursor.moveToNext()) {
+                                Location wpt = new Location("waypoint");
+                                wpt.setLatitude(cursor.getDouble(colLatitude));
+                                wpt.setLongitude(cursor.getDouble(colLongitude));
+                                if (wpt.distanceTo(location) <= distance) {
+                                    exists = true;
+                                    break;
+                                }
+                            }
+                        } finally {
+                            if (cursor != null)
+                                cursor.close();
+                            if (dh != null)
+                                dh.close();
+                        }
+                    }
+
+                    // Create waypoint
+                    if (exists)
+                        Log.i(TAG, "Waypoint exists");
+                    else {
+                        Log.i(TAG, "Waypoint automatic");
+                        handleLocation(LOCATION_AUTO, location);
+                    }
                 }
 
             // Move on
@@ -2064,8 +2099,8 @@ public class BackgroundService extends IntentService {
         Cursor wayPoints = null;
         try {
             dh = new DatabaseHelper(context);
-            trackPoints = dh.getLocations(from, to, true, false, true);
-            wayPoints = dh.getLocations(from, to, false, true, true);
+            trackPoints = dh.getLocations(from, to, true, false, true, 0);
+            wayPoints = dh.getLocations(from, to, false, true, true, 0);
             if (gpx)
                 GPXFileWriter.writeGPXFile(new File(fileName), trackName, extensions, trackPoints, wayPoints, context);
             else
@@ -2091,7 +2126,7 @@ public class BackgroundService extends IntentService {
         boolean first = true;
         try {
             dh = new DatabaseHelper(context);
-            cursor = dh.getLocations(from, to, true, true, true);
+            cursor = dh.getLocations(from, to, true, true, true, 0);
 
             int colID = cursor.getColumnIndex("ID");
             int colTime = cursor.getColumnIndex("time");

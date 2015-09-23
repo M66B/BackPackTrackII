@@ -146,6 +146,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_AUTO_TIME = "pref_auto_time";
     public static final String PREF_AUTO_DISTANCE = "pref_auto_distance";
     public static final String PREF_AUTO_STILL = "pref_auto_still";
+    public static final String PREF_AUTO_DUPLICATE = "pref_auto_duplicate";
 
     public static final String PREF_ALTITUDE_HISTORY = "pref_altitude_history";
     public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
@@ -249,6 +250,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_AUTO_TIME = "30"; // minutes
     public static final String DEFAULT_AUTO_DISTANCE = "100"; // meters
     public static final boolean DEFAULT_AUTO_STILL = false;
+    public static final String DEFAULT_AUTO_DUPLICATE = "10"; // waypoints
 
     public static final String DEFAULT_ALTITUDE_HISTORY = "30"; // days
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
@@ -534,6 +536,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         updateTitle(prefs, PREF_AUTO_TIME);
         updateTitle(prefs, PREF_AUTO_DISTANCE);
+        updateTitle(prefs, PREF_AUTO_DUPLICATE);
 
         updateTitle(prefs, PREF_ALTITUDE_HISTORY);
         updateTitle(prefs, PREF_ALTITUDE_AVG);
@@ -1043,7 +1046,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             ivPlace.setVisibility(View.GONE);
 
         // Fill list
-        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
+        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false, 0);
         final WaypointAdapter adapter = new WaypointAdapter(getActivity(), cursor, db, getFragmentManager());
         lv.setAdapter(adapter);
 
@@ -1068,7 +1071,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false);
+                        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false, 0);
                         adapter.changeCursor(cursor);
                     }
                 });
@@ -1681,7 +1684,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         showAltitudeGraph(graph);
 
         // Fill list
-        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
+        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false, 0);
         final LocationAdapter adapter = new LocationAdapter(getActivity(), cursor);
         lv.setAdapter(adapter);
 
@@ -1706,7 +1709,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false);
+                        Cursor cursor = db.getLocations(0, Long.MAX_VALUE, true, true, false, 0);
                         adapter.changeCursor(cursor);
                         adapter.init(); // Possible new last location
                         showAltitudeGraph(graph);
@@ -1747,7 +1750,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         long now = new Date().getTime();
         int history = Integer.parseInt(prefs.getString(PREF_ALTITUDE_HISTORY, DEFAULT_ALTITUDE_HISTORY));
         long viewport = prefs.getLong(PREF_LAST_LOCATION_VIEWPORT, 7 * DAY_MS);
-        Cursor cursor = db.getLocations(now - history * DAY_MS, now, true, true, true);
+        Cursor cursor = db.getLocations(now - history * DAY_MS, now, true, true, true, 0);
 
         int colTime = cursor.getColumnIndex("time");
         int colAltitude = cursor.getColumnIndex("altitude");
@@ -3496,6 +3499,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref.setTitle(getString(R.string.title_auto_time, prefs.getString(key, DEFAULT_AUTO_TIME)));
         else if (PREF_AUTO_DISTANCE.equals(key))
             pref.setTitle(getString(R.string.title_auto_distance, prefs.getString(key, DEFAULT_AUTO_DISTANCE)));
+        else if (PREF_AUTO_DUPLICATE.equals(key))
+            pref.setTitle(getString(R.string.title_auto_duplicate, prefs.getString(key, DEFAULT_AUTO_DUPLICATE)));
 
         else if (PREF_ALTITUDE_HISTORY.equals(key))
             pref.setTitle(getString(R.string.title_altitude_history, prefs.getString(key, DEFAULT_ALTITUDE_HISTORY)));

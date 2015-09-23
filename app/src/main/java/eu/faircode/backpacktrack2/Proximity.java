@@ -47,7 +47,7 @@ public class Proximity {
                 db = new DatabaseHelper(context);
                 Cursor cursor = null;
                 try {
-                    cursor = db.getLocations(0, Long.MAX_VALUE, false, true, true);
+                    cursor = db.getLocations(0, Long.MAX_VALUE, false, true, true, 0);
                     int colID = cursor.getColumnIndex("ID");
                     int colLatitude = cursor.getColumnIndex("latitude");
                     int colLongitude = cursor.getColumnIndex("longitude");

@@ -341,6 +341,12 @@
                 android:key="pref_auto_still"
                 android:summary="@string/summary_auto_still"
                 android:title="@string/title_auto_still" />
+            <EditTextPreference
+                android:defaultValue="10"
+                android:dependency="pref_auto_enabled"
+                android:inputType="number"
+                android:key="pref_auto_duplicate"
+                android:summary="@string/summary_auto_duplicate" />
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_recognition">
             <CheckBoxPreference
