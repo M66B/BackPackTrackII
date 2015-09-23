@@ -145,6 +145,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_AUTO_ENABLED = "pref_auto_enabled";
     public static final String PREF_AUTO_TIME = "pref_auto_time";
     public static final String PREF_AUTO_DISTANCE = "pref_auto_distance";
+    public static final String PREF_AUTO_STILL = "pref_auto_still";
 
     public static final String PREF_ALTITUDE_HISTORY = "pref_altitude_history";
     public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
@@ -247,6 +248,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final boolean DEFAULT_AUTO_ENABLED = false;
     public static final String DEFAULT_AUTO_TIME = "30"; // minutes
     public static final String DEFAULT_AUTO_DISTANCE = "100"; // meters
+    public static final boolean DEFAULT_AUTO_STILL = false;
 
     public static final String DEFAULT_ALTITUDE_HISTORY = "30"; // days
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples

@@ -70,6 +70,7 @@
     <string name="title_auto_enabled">Enabled</string>
     <string name="title_auto_time">Min. stationary time: %s minutes</string>
     <string name="title_auto_distance">Max. stationary distance: %s meters</string>
+    <string name="title_auto_still">Acquire location after becoming stationary</string>
 
     <string name="title_recognition">Activity recognition</string>
     <string name="title_recognition_enabled">Activity recognition enabled</string>
@@ -184,6 +185,7 @@
 
     <string name="summary_auto_time">Automatically create a waypoint after being at the same location for the selected time</string>
     <string name="summary_auto_distance">Automatically create a waypoint after being at the same location within the selected distance</string>
+    <string name="summary_auto_still">Try to acquire a location after becoming still</string>
 
     <string name="summary_recognition_enabled">Recognize if you are still or moving and disable tracking when you are still</string>
     <string name="summary_recognition_interval">Recognize your activity every selected number of seconds</string>

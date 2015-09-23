@@ -335,6 +335,12 @@
                 android:inputType="number"
                 android:key="pref_auto_distance"
                 android:summary="@string/summary_auto_distance" />
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:dependency="pref_auto_enabled"
+                android:key="pref_auto_still"
+                android:summary="@string/summary_auto_still"
+                android:title="@string/title_auto_still" />
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_recognition">
             <CheckBoxPreference

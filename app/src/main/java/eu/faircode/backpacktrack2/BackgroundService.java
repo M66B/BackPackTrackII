@@ -72,7 +72,7 @@ public class BackgroundService extends IntentService {
     private static final String TAG = "BPT2.Service";
 
     // Actions
-    public static final String ACTION_ALARM = "Alarm";
+    public static final String ACTION_PERIODIC = "Periodic";
     public static final String ACTION_DAILY = "Daily";
     public static final String ACTION_UPDATE_WEATHER = "WeatherUpdate";
     public static final String ACTION_GUARD_WEATHER = "WeatherGuard";
@@ -89,6 +89,7 @@ public class BackgroundService extends IntentService {
     public static final String ACTION_GEOPOINT = "Geopoint";
     public static final String ACTION_PROXIMITY = "Proximity";
     public static final String ACTION_SHARE_GPX = "ShareGPX";
+
     public static final String ACTION_SHARE_KML = "ShareKML";
     public static final String ACTION_UPLOAD_GPX = "UploadGPX";
 
@@ -182,7 +183,7 @@ public class BackgroundService extends IntentService {
 
             else if (ACTION_TRACKPOINT.equals(intent.getAction()) ||
                     ACTION_WAYPOINT.equals(intent.getAction()) ||
-                    ACTION_ALARM.equals(intent.getAction()))
+                    ACTION_PERIODIC.equals(intent.getAction()))
                 handleLocationRequest(intent);
 
             else if (EXPORTED_ACTION_TRACKPOINT.equals(intent.getAction())) {
@@ -386,12 +387,15 @@ public class BackgroundService extends IntentService {
             boolean onfoot = (act == DetectedActivity.ON_FOOT || act == DetectedActivity.WALKING || act == DetectedActivity.RUNNING);
             boolean pref_recognize_steps = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_STEPS, SettingsFragment.DEFAULT_RECOGNITION_STEPS);
             boolean pref_unknown_steps = prefs.getBoolean(SettingsFragment.PREF_RECOGNITION_UNKNOWN_STEPS, SettingsFragment.DEFAULT_RECOGNITION_UNKNOWN_STEPS);
+            boolean pref_auto_enabled = prefs.getBoolean(SettingsFragment.PREF_AUTO_ENABLED, SettingsFragment.DEFAULT_AUTO_ENABLED);
+            boolean pref_auto_still = prefs.getBoolean(SettingsFragment.PREF_AUTO_STILL, SettingsFragment.DEFAULT_AUTO_STILL);
             if (pref_unknown_steps && act == DetectedActivity.UNKNOWN)
                 onfoot = true;
 
             // Stop/start repeating alarm
             if (lastStill != still) {
                 Log.i(TAG, "Last still=" + lastStill + " still=" + still);
+
                 // Restart activity recognition if needed
                 int intervalStill = Integer.parseInt(prefs.getString(SettingsFragment.PREF_RECOGNITION_INTERVAL_STILL, SettingsFragment.DEFAULT_RECOGNITION_INTERVAL_STILL));
                 int intervalMoving = Integer.parseInt(prefs.getString(SettingsFragment.PREF_RECOGNITION_INTERVAL_MOVING, SettingsFragment.DEFAULT_RECOGNITION_INTERVAL_MOVING));
@@ -404,6 +408,14 @@ public class BackgroundService extends IntentService {
                 if (still) {
                     stopPeriodicLocating(this);
                     stopLocating(this);
+
+                    // Start locating after becoming still
+                    if (pref_auto_enabled && pref_auto_still) {
+                        Log.i(TAG, "Stationary locate");
+                        Intent intentAuto = new Intent(this, BackgroundService.class);
+                        intentAuto.setAction(ACTION_PERIODIC);
+                        startService(intentAuto);
+                    }
                 } else
                     startPeriodicLocating(this);
             }
@@ -428,7 +440,7 @@ public class BackgroundService extends IntentService {
             prefs.edit().putInt(SettingsFragment.PREF_LOCATION_TYPE, LOCATION_TRACKPOINT).apply();
         else if (ACTION_WAYPOINT.equals((intent.getAction())))
             prefs.edit().putInt(SettingsFragment.PREF_LOCATION_TYPE, LOCATION_WAYPOINT).apply();
-        else if (ACTION_ALARM.equals(intent.getAction()))
+        else if (ACTION_PERIODIC.equals(intent.getAction()))
             prefs.edit().putInt(SettingsFragment.PREF_LOCATION_TYPE, LOCATION_PERIODIC).apply();
 
         // Try to acquire a new location
@@ -1057,7 +1069,7 @@ public class BackgroundService extends IntentService {
     private static void startPeriodicLocating(Context context) {
         // Set repeating alarm
         Intent alarmIntent = new Intent(context, BackgroundService.class);
-        alarmIntent.setAction(BackgroundService.ACTION_ALARM);
+        alarmIntent.setAction(BackgroundService.ACTION_PERIODIC);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
@@ -1070,7 +1082,7 @@ public class BackgroundService extends IntentService {
     private static void stopPeriodicLocating(Context context) {
         // Cancel repeating alarm
         Intent alarmIntent = new Intent(context, BackgroundService.class);
-        alarmIntent.setAction(BackgroundService.ACTION_ALARM);
+        alarmIntent.setAction(BackgroundService.ACTION_PERIODIC);
         PendingIntent pi = PendingIntent.getService(context, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         am.cancel(pi);
