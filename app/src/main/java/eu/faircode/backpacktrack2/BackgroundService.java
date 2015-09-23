@@ -1405,6 +1405,8 @@ public class BackgroundService extends IntentService {
                 waypointName = new GeocoderEx(this).reverseGeocode(location);
                 if (waypointName == null)
                     waypointName = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
+                if (locationType == LOCATION_AUTO)
+                    waypointName = "* " + waypointName;
             }
 
             // Persist new location
