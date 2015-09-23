@@ -66,7 +66,7 @@
     <string name="title_pressure_accuracy">Use when accuracy/altitude: &lt;%s %%</string>
     <string name="title_pressure_invehicle">Use reference pressure in vehicle</string>
 
-    <string name="title_auto">Auto waypoint</string>
+    <string name="title_auto">Automatic waypoints</string>
     <string name="title_auto_enabled">Enabled</string>
     <string name="title_auto_time">Min. stationary time: %s minutes</string>
     <string name="title_auto_distance">Max. stationary distance: %s meters</string>
