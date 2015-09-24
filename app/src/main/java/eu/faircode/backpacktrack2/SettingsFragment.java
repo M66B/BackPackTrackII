@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -63,8 +64,11 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.ActivityRecognition;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
@@ -362,6 +366,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private static final int GEOCODER_RESULTS = 5;
     private static final long DAY_MS = 24L * 3600L * 1000L;
 
+    private static final int ACTIVITY_PLAY_SERVICES = 2;
+
     private boolean running = false;
     private DatabaseHelper db = null;
     private AtomicBoolean elevationBusy = new AtomicBoolean();
@@ -428,6 +434,29 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             else if (ACTION_FORECAST.equals(action))
                 weather_forecast();
         }
+
+        if (Util.hasPlayServices(getActivity()))
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.e(TAG, "Connecting to Play services");
+                    GoogleApiClient gac = new GoogleApiClient.Builder(getActivity()).addApi(ActivityRecognition.API).build();
+                    ConnectionResult result = gac.blockingConnect();
+                    if (result.isSuccess())
+                        Log.i(TAG, "Connected to Play services");
+                    else {
+                        Log.w(TAG, "Error connecting to Play services, error=" + result.getErrorMessage() + " resolution=" + result.hasResolution());
+                        if (result.hasResolution())
+                            try {
+                                result.startResolutionForResult(getActivity(), ACTIVITY_PLAY_SERVICES);
+                            } catch (IntentSender.SendIntentException ex) {
+                                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                            }
+                        else
+                            Util.toast(result.getErrorMessage(), Toast.LENGTH_SHORT, getActivity());
+                    }
+                }
+            }).start();
     }
 
     @Override
@@ -630,6 +659,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         pref_optimizations.setEnabled(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M);
         pref_optimizations.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
+            @TargetApi(Build.VERSION_CODES.M)
             public boolean onPreferenceClick(Preference preference) {
                 try {
                     Intent intent = new Intent();
