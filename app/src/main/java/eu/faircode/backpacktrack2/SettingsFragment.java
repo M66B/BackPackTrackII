@@ -250,7 +250,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_AUTO_TIME = "30"; // minutes
     public static final String DEFAULT_AUTO_DISTANCE = "100"; // meters
     public static final boolean DEFAULT_AUTO_STILL = false;
-    public static final String DEFAULT_AUTO_DUPLICATE = "10"; // waypoints
+    public static final String DEFAULT_AUTO_DUPLICATE = "1"; // waypoints
 
     public static final String DEFAULT_ALTITUDE_HISTORY = "30"; // days
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples

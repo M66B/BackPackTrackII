@@ -342,7 +342,7 @@
                 android:summary="@string/summary_auto_still"
                 android:title="@string/title_auto_still" />
             <EditTextPreference
-                android:defaultValue="10"
+                android:defaultValue="1"
                 android:dependency="pref_auto_enabled"
                 android:inputType="number"
                 android:key="pref_auto_duplicate"
