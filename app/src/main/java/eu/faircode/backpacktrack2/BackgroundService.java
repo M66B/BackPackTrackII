@@ -1473,7 +1473,8 @@ public class BackgroundService extends IntentService {
                                 Location wpt = new Location("waypoint");
                                 wpt.setLatitude(cursor.getDouble(colLatitude));
                                 wpt.setLongitude(cursor.getDouble(colLongitude));
-                                if (wpt.distanceTo(location) <= distance) {
+                                if (wpt.distanceTo(lastStationary) <= distance) {
+                                    Log.i(TAG, "Stationary exists name=" + cursor.getString(cursor.getColumnIndex("name")));
                                     exists = true;
                                     break;
                                 }
@@ -1491,7 +1492,7 @@ public class BackgroundService extends IntentService {
                         Log.i(TAG, "Waypoint exists");
                     else {
                         Log.i(TAG, "Waypoint automatic");
-                        handleLocation(LOCATION_AUTO, location);
+                        handleLocation(LOCATION_AUTO, lastStationary);
                     }
                 }
 
