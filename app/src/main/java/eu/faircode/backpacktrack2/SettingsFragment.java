@@ -1260,7 +1260,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 }
             }.execute();
 
-        } else
+        } else if (requestCode == ACTIVITY_PLAY_SERVICES)
+            ; // Do nothing
+
+        else
             super.onActivityResult(requestCode, resultCode, data);
     }
 
