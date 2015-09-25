@@ -280,6 +280,8 @@
     <string name="msg_updated">Updated \'%s\'</string>
     <string name="msg_delete">Delete \'%s\' ?</string>
     <string name="msg_deleted">Deleted \'%s\'</string>
+    <string name="msg_batch_delete">Delete %d waypoints ?</string>
+    <string name="msg_batch_deleted">Deleted %d waypoints</string>
     <string name="msg_uploaded">Uploaded \'%s\'</string>
     <string name="msg_nolocation">Address \'%s\' not found</string>
     <string name="msg_noaddress">No addresses found</string>

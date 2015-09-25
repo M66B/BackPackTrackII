@@ -278,6 +278,8 @@
     <string name="msg_updated">Bijgewerkt \'%s\'</string>
     <string name="msg_delete">Verwijder \'%s\' ?</string>
     <string name="msg_deleted">Verwijderd \'%s\'</string>
+    <string name="msg_batch_delete">Verwijder %d waypoints ?</string>
+    <string name="msg_batch_deleted">%d waypoints verwijderd</string>
     <string name="msg_uploaded">Uploaded \'%s\'</string>
     <string name="msg_nolocation">Adres \'%s\' niet gevonden</string>
     <string name="msg_noaddress">Geen adressen gevonden</string>

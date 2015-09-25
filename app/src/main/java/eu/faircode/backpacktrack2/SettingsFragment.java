@@ -1019,6 +1019,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Reference controls
         ImageView ivAdd = (ImageView) viewEdit.findViewById(R.id.ivAdd);
         ImageView ivPlace = (ImageView) viewEdit.findViewById(R.id.ivPlace);
+        ImageView ivDelete = (ImageView) viewEdit.findViewById(R.id.ivDelete);
         final ListView lv = (ListView) viewEdit.findViewById(R.id.lvEdit);
 
         // Handle add waypoint
@@ -1075,9 +1076,48 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else
             ivPlace.setVisibility(View.GONE);
 
+        // Handle batch delete
+        final List<Long> listDelete = new ArrayList<Long>();
+        ivDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (listDelete.size() > 0) {
+                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+                    alertDialogBuilder.setTitle(getString(R.string.msg_batch_delete, listDelete.size()));
+                    alertDialogBuilder
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    new AsyncTask<Object, Object, Object>() {
+                                        protected Object doInBackground(Object... params) {
+                                            for (Long id : listDelete)
+                                                db.deleteLocation(id);
+                                            return null;
+                                        }
+
+                                        @Override
+                                        protected void onPostExecute(Object result) {
+                                            Toast.makeText(getActivity(), getString(R.string.msg_batch_deleted, listDelete.size()), Toast.LENGTH_SHORT).show();
+                                            listDelete.clear();
+                                        }
+                                    }.execute();
+                                }
+                            })
+                            .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Do nothing
+                                }
+                            });
+                    AlertDialog alertDialog = alertDialogBuilder.create();
+                    alertDialog.show();
+                }
+            }
+        });
+
         // Fill list
         Cursor cursor = db.getLocations(0, Long.MAX_VALUE, false, true, false, 0);
-        final WaypointAdapter adapter = new WaypointAdapter(getActivity(), cursor, db, getFragmentManager());
+        final WaypointAdapter adapter = new WaypointAdapter(getActivity(), cursor, listDelete, db, getFragmentManager());
         lv.setAdapter(adapter);
 
         // Handle updates

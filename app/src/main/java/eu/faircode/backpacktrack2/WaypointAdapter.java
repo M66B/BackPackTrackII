@@ -25,6 +25,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.CursorAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -55,6 +57,8 @@ public class WaypointAdapter extends CursorAdapter {
     private int colProximity;
     private int colHidden;
 
+    private List<Long> listDelete;
+
     private String wiki_baseurl;
     public int wiki_radius;
     public int wiki_results;
@@ -66,7 +70,7 @@ public class WaypointAdapter extends CursorAdapter {
     private DatabaseHelper db;
     private FragmentManager fm;
 
-    public WaypointAdapter(Context context, Cursor cursor, DatabaseHelper db, FragmentManager fm) {
+    public WaypointAdapter(Context context, Cursor cursor, List<Long> listDelete, DatabaseHelper db, FragmentManager fm) {
         super(context, cursor, 0);
         this.db = db;
         this.fm = fm;
@@ -78,6 +82,8 @@ public class WaypointAdapter extends CursorAdapter {
         this.colName = cursor.getColumnIndex("name");
         this.colProximity = cursor.getColumnIndex("proximity");
         this.colHidden = cursor.getColumnIndex("hidden");
+
+        this.listDelete = listDelete;
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         this.wiki_baseurl = prefs.getString(SettingsFragment.PREF_WIKI_BASE_URL, SettingsFragment.DEFAULT_WIKI_BASE_URL);
@@ -108,9 +114,23 @@ public class WaypointAdapter extends CursorAdapter {
         wpt.setLongitude(longitude);
 
         // Get views
+        CheckBox chkDelete = (CheckBox) view.findViewById(R.id.chkDelete);
         final EditText etName = (EditText) view.findViewById(R.id.etName);
         ImageView ivManage = (ImageView) view.findViewById(R.id.ivManage);
         ImageView ivSave = (ImageView) view.findViewById(R.id.ivSave);
+
+        // Batch delete
+        chkDelete.setOnCheckedChangeListener(null);
+        chkDelete.setChecked(listDelete.contains(id));
+        chkDelete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                if (isChecked)
+                    listDelete.add(id);
+                else
+                    listDelete.remove(id);
+            }
+        });
 
         // Show waypoint name
         etName.setText(name);

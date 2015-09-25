@@ -24,6 +24,14 @@
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="12dp"
             android:src="@drawable/location_60" />
+
+        <ImageView
+            android:id="@+id/ivDelete"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="12dp"
+            android:src="@android:drawable/ic_menu_delete" />
     </LinearLayout>
 
     <ListView
