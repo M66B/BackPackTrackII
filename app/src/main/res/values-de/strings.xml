@@ -66,12 +66,12 @@
     <string name="title_pressure_accuracy">Nutze wenn Genauigkeit/Höhe: &lt;%s %%</string>
     <string name="title_pressure_invehicle">Nutze Druckreferenz im Fahrzeug</string>
 
-    <string name="title_auto">Automatic waypoints</string>
-    <string name="title_auto_enabled">Enabled</string>
-    <string name="title_auto_time">Min. stationary time: %s minutes</string>
-    <string name="title_auto_distance">Max. stationary distance: %s meters</string>
-    <string name="title_auto_still">Acquire location after becoming stationary</string>
-    <string name="title_auto_duplicate">Prevent duplicates: check %s waypoints</string>
+    <string name="title_auto">Automatische Wegpunkte</string>
+    <string name="title_auto_enabled">Aktiviert</string>
+    <string name="title_auto_time">Min. Stillstand Zeit: %s Minuten</string>
+    <string name="title_auto_distance">Max. Stillstand Entfernung: %s Meter</string>
+    <string name="title_auto_still">Position beim Stillstand ermitteln</string>
+    <string name="title_auto_duplicate">Duplikate verhindern: %s Wegpunkte überprüfen</string>
 
     <string name="title_recognition">Aktivitätserkennung</string>
     <string name="title_recognition_enabled">Aktivitätserkennung aktiviert</string>
@@ -278,8 +278,8 @@
     <string name="msg_updated">Aktualisiert \'%s\'</string>
     <string name="msg_delete">Löschen \'%s\' ?</string>
     <string name="msg_deleted">Gelöscht \'%s\'</string>
-    <string name="msg_batch_delete">Delete %d waypoints ?</string>
-    <string name="msg_batch_deleted">Deleted %d waypoints</string>
+    <string name="msg_batch_delete">%d Wegpunkte löschen ?</string>
+    <string name="msg_batch_deleted">%d Wegpunkte gelöscht</string>
     <string name="msg_uploaded">Hochgeladen \'%s\'</string>
     <string name="msg_nolocation">Adresse \'%s\' nicht gefunden</string>
     <string name="msg_noaddress">Keine Adressen gefunden</string>
