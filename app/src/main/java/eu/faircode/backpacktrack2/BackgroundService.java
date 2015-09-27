@@ -1449,60 +1449,60 @@ public class BackgroundService extends IntentService {
         int duplicate = Integer.parseInt(prefs.getString(SettingsFragment.PREF_AUTO_DUPLICATE, SettingsFragment.DEFAULT_AUTO_DUPLICATE));
 
         if (enabled) {
-            // Get last position
+            // Get last stationary
             Location lastStationary = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_STATIONARY, null));
 
-            // Auto waypoint
-            if (lastStationary != null &&
-                    location.getTime() - lastStationary.getTime() >= time * 60 * 1000 &&
-                    lastStationary.distanceTo(location) <= distance)
-                if (!prefs.getBoolean(SettingsFragment.PREF_LAST_ISSTATIONARY, false)) {
-                    prefs.edit().putBoolean(SettingsFragment.PREF_LAST_ISSTATIONARY, true).apply();
+            // Check if stationary
+            if (lastStationary != null && location.distanceTo(lastStationary) < distance) {
+                // Check if stationary for a time
+                if (location.getTime() - lastStationary.getTime() >= time * 60 * 1000) {
+                    // Check if not handled already
+                    if (!prefs.getBoolean(SettingsFragment.PREF_LAST_ISSTATIONARY, false)) {
+                        // Mark as being handled
+                        prefs.edit().putBoolean(SettingsFragment.PREF_LAST_ISSTATIONARY, true).apply();
 
-                    // Check if waypoint exists
-                    boolean exists = false;
-                    if (duplicate > 0) {
-                        DatabaseHelper dh = null;
-                        Cursor cursor = null;
-                        try {
-                            dh = new DatabaseHelper(this);
-                            cursor = dh.getLocations(0, Long.MAX_VALUE, false, true, false, duplicate);
-                            int colLatitude = cursor.getColumnIndex("latitude");
-                            int colLongitude = cursor.getColumnIndex("longitude");
-                            while (cursor.moveToNext()) {
-                                Location wpt = new Location("waypoint");
-                                wpt.setLatitude(cursor.getDouble(colLatitude));
-                                wpt.setLongitude(cursor.getDouble(colLongitude));
-                                if (wpt.distanceTo(lastStationary) <= distance) {
-                                    Log.i(TAG, "Stationary exists name=" + cursor.getString(cursor.getColumnIndex("name")));
-                                    exists = true;
-                                    break;
+                        // Check if nearby waypoint exists
+                        boolean exists = false;
+                        if (duplicate > 0) {
+                            DatabaseHelper dh = null;
+                            Cursor cursor = null;
+                            try {
+                                dh = new DatabaseHelper(this);
+                                cursor = dh.getLocations(0, Long.MAX_VALUE, false, true, false, duplicate);
+                                int colLatitude = cursor.getColumnIndex("latitude");
+                                int colLongitude = cursor.getColumnIndex("longitude");
+                                while (cursor.moveToNext()) {
+                                    Location wpt = new Location("waypoint");
+                                    wpt.setLatitude(cursor.getDouble(colLatitude));
+                                    wpt.setLongitude(cursor.getDouble(colLongitude));
+                                    if (wpt.distanceTo(lastStationary) <= distance) {
+                                        Log.i(TAG, "Stationary exists name=" + cursor.getString(cursor.getColumnIndex("name")));
+                                        exists = true;
+                                        break;
+                                    }
                                 }
+                            } finally {
+                                if (cursor != null)
+                                    cursor.close();
+                                if (dh != null)
+                                    dh.close();
                             }
-                        } finally {
-                            if (cursor != null)
-                                cursor.close();
-                            if (dh != null)
-                                dh.close();
                         }
+
+                        // Auto waypoint
+                        if (!exists)
+                            handleLocation(LOCATION_AUTO, lastStationary);
                     }
 
-                    // Create waypoint
-                    if (exists)
-                        Log.i(TAG, "Waypoint exists");
-                    else {
-                        Log.i(TAG, "Waypoint automatic");
-                        handleLocation(LOCATION_AUTO, lastStationary);
-                    }
+                } else {
+                    location.setTime(lastStationary.getTime());
+                    // TODO: averaging
                 }
+            } else
+                prefs.edit().remove((SettingsFragment.PREF_LAST_ISSTATIONARY)).apply();
 
             // Move on
-            if (lastStationary == null || lastStationary.distanceTo(location) > distance) {
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.remove(SettingsFragment.PREF_LAST_ISSTATIONARY);
-                editor.putString(SettingsFragment.PREF_LAST_STATIONARY, LocationSerializer.serialize(location));
-                editor.apply();
-            }
+            prefs.edit().putString(SettingsFragment.PREF_LAST_STATIONARY, LocationSerializer.serialize(location)).apply();
         }
     }
 
