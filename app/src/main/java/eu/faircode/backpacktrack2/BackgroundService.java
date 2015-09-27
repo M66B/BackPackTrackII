@@ -1451,16 +1451,9 @@ public class BackgroundService extends IntentService {
         if (enabled) {
             // Get last stationary
             Location lastStationary = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_STATIONARY, null));
-
-            // Check if stationary
-            if (lastStationary != null && location.distanceTo(lastStationary) < distance) {
-                // Check if stationary for a time
-                if (location.getTime() - lastStationary.getTime() >= time * 60 * 1000) {
-                    // Check if not handled already
-                    if (!prefs.getBoolean(SettingsFragment.PREF_LAST_ISSTATIONARY, false)) {
-                        // Mark as being handled
-                        prefs.edit().putBoolean(SettingsFragment.PREF_LAST_ISSTATIONARY, true).apply();
-
+            if (lastStationary != null)
+                if (location.distanceTo(lastStationary) > distance) {
+                    if (location.getTime() - lastStationary.getTime() >= time * 60 * 1000) {
                         // Check if nearby waypoint exists
                         boolean exists = false;
                         if (duplicate > 0) {
@@ -1493,13 +1486,10 @@ public class BackgroundService extends IntentService {
                         if (!exists)
                             handleLocation(LOCATION_AUTO, lastStationary);
                     }
-
                 } else {
                     location.setTime(lastStationary.getTime());
                     // TODO: averaging
                 }
-            } else
-                prefs.edit().remove((SettingsFragment.PREF_LAST_ISSTATIONARY)).apply();
 
             // Move on
             prefs.edit().putString(SettingsFragment.PREF_LAST_STATIONARY, LocationSerializer.serialize(location)).apply();
