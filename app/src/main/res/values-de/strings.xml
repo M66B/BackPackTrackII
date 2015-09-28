@@ -184,7 +184,7 @@
 
     <string name="summary_auto_time">Automatically create a waypoint after being at the same location for the selected time</string>
     <string name="summary_auto_distance">Automatically create a waypoint after being at the same location within the selected distance</string>
-    <string name="summary_auto_still">Try to acquire a location after becoming still</string>
+    <string name="summary_auto_still">Try to acquire a location after becoming still (benötigt Aktivitätserkennung)</string>
     <string name="summary_auto_duplicate">Check the selected number of recent waypoints to prevent duplicate waypoints</string>
 
     <string name="summary_recognition_enabled">Erkennen ob Sie sich bewegen oder stillstehen, und Tracking ausschalten wenn Sie stillstehen</string>
@@ -193,12 +193,12 @@
     <string name="summary_recognition_tilting">Behandele die Aktivität \'kippen\' als stillstehend</string>
     <string name="summary_recognition_known">Ersetze die erkannte Aktivität \'unbekannt\' mit einer möglichen bekannten Aktivität</string>
     <string name="summary_recognition_unknown">Behandele die Aktivität \'unbekannt\' als stillstehend</string>
-    <string name="summary_recognition_steps">Zähle Schritte nur wenn Aktivität Zu Fuß erkannt wurde</string>
-    <string name="summary_recognition_unknown_steps">Zähle Schritte wenn eine \'unbekannte\' Aktivität erkannt wurde</string>
 
     <string name="summary_step_delta">Schrittzähler jede Anzahl von Schritte aktualizierenn</string>
     <string name="summary_step_size">Ihre Schrittgröße in Zentimeter um die gelaufene Strecke zu ermitteln</string>
     <string name="summary_weight">Ihr Gewicht in Kilogramm um die Anzahl von verbrannten Kalorien zu ermitteln</string>
+    <string name="summary_recognition_steps">Zähle Schritte nur wenn Aktivität Zu Fuß erkannt wurde (benötigt Aktivitätserkennung)</string>
+    <string name="summary_recognition_unknown_steps">Zähle Schritte wenn eine \'unbekannte\' Aktivität erkannt wurde</string>
 
     <string name="summary_weather_interval">Wetterdaten jede Anzahl von Minuten abrufen</string>
     <string name="summary_weather_wakeup">Gerät von \'Doze\' Modus aufwachen um das Wetter zu aktualisieren (Android 6 oder später)</string>

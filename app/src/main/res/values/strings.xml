@@ -186,7 +186,7 @@
 
     <string name="summary_auto_time">Automatically create a waypoint after being at the same location for the selected time</string>
     <string name="summary_auto_distance">Automatically create a waypoint after being at the same location within the selected distance</string>
-    <string name="summary_auto_still">Try to acquire a location after becoming still</string>
+    <string name="summary_auto_still">Try to acquire a location after becoming still (requires activity recognition)</string>
     <string name="summary_auto_duplicate">Check the selected number of recent waypoints to prevent duplicate waypoints</string>
 
     <string name="summary_recognition_enabled">Recognize if you are still or moving and disable tracking when you are still</string>
@@ -195,12 +195,12 @@
     <string name="summary_recognition_tilting">Consider the recognized activity \'tilting\' not as motion</string>
     <string name="summary_recognition_known">Replace the recognized activity \'unknown\' by a likely known activity</string>
     <string name="summary_recognition_unknown">Consider the recognized activity \'unknown\' not as motion</string>
-    <string name="summary_recognition_steps">Count only steps when activity on foot has been recognized</string>
-    <string name="summary_recognition_unknown_steps">Count steps when an \'unknown\' activity has been recognized</string>
 
     <string name="summary_step_delta">Update the step counter every selected number of steps</string>
     <string name="summary_step_size">Your step size in centimeters to calculate the distance walked</string>
     <string name="summary_weight">Your weight in kilograms to calculate the number of calories burned</string>
+    <string name="summary_recognition_steps">Count only steps when activity on foot has been recognized (requires activity recognition)</string>
+    <string name="summary_recognition_unknown_steps">Count steps when an \'unknown\' activity has been recognized</string>
 
     <string name="summary_weather_interval">Fetch weather data every selected number of minutes</string>
     <string name="summary_weather_wakeup">Wakeup the device from \'doze\' mode to update the weather (Android 6 or later)</string>

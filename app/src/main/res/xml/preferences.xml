@@ -391,18 +391,6 @@
                 android:key="pref_recognition_filter_unknown"
                 android:summary="@string/summary_recognition_unknown"
                 android:title="@string/title_recognition_unknown" />
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:dependency="pref_recognition_enabled"
-                android:key="pref_recognition_steps"
-                android:summary="@string/summary_recognition_steps"
-                android:title="@string/title_recognition_steps" />
-            <CheckBoxPreference
-                android:defaultValue="true"
-                android:dependency="pref_recognition_steps"
-                android:key="pref_recognition_unknown_steps"
-                android:summary="@string/summary_recognition_unknown_steps"
-                android:title="@string/title_recognition_unknown_steps" />
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_step_counter">
             <EditTextPreference
@@ -423,6 +411,18 @@
                 android:inputType="number"
                 android:key="pref_weight"
                 android:summary="@string/summary_weight" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="pref_enabled"
+                android:key="pref_recognition_steps"
+                android:summary="@string/summary_recognition_steps"
+                android:title="@string/title_recognition_steps" />
+            <CheckBoxPreference
+                android:defaultValue="true"
+                android:dependency="pref_recognition_steps"
+                android:key="pref_recognition_unknown_steps"
+                android:summary="@string/summary_recognition_unknown_steps"
+                android:title="@string/title_recognition_unknown_steps" />
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_weather_settings">
             <CheckBoxPreference
