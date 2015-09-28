@@ -184,7 +184,7 @@
 
     <string name="summary_auto_time">Automatically create a waypoint after being at the same location for the selected time</string>
     <string name="summary_auto_distance">Automatically create a waypoint after being at the same location within the selected distance</string>
-    <string name="summary_auto_still">Try to acquire a location after becoming still (benötigt Aktivitätserkennung)</string>
+    <string name="summary_auto_still">Versuche eine Position beim Stillstand zu ermitteln (benötigt Aktivitätserkennung)</string>
     <string name="summary_auto_duplicate">Check the selected number of recent waypoints to prevent duplicate waypoints</string>
 
     <string name="summary_recognition_enabled">Erkennen ob Sie sich bewegen oder stillstehen, und Tracking ausschalten wenn Sie stillstehen</string>
