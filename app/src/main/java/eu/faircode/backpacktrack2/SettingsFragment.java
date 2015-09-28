@@ -916,6 +916,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if (PREF_AUTO_ENABLED.equals(key)) {
             SharedPreferences.Editor editor = prefs.edit();
             editor.remove(SettingsFragment.PREF_LAST_STATIONARY);
+            editor.remove(SettingsFragment.PREF_LAST_STATIONARY_AVG);
             if (prefs.getBoolean(key, DEFAULT_AUTO_ENABLED)) {
                 Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
                 if (lastLocation != null)
