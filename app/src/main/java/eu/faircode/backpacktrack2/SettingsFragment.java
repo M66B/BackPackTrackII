@@ -336,6 +336,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_LAST_ACTIVITY_TIME = "pref_last_activity_time";
     public static final String PREF_LAST_LOCATION = "pref_last_location";
     public static final String PREF_LAST_STATIONARY = "pref_last_stationary";
+    public static final String PREF_LAST_STATIONARY_AVG = "pref_last_stationary_avg";
     public static final String PREF_LAST_STEP_COUNT = "pref_last_step";
     public static final String PREF_LAST_SHARE_GPX = "pref_last_share_gpx";
     public static final String PREF_LAST_SHARE_KML = "pref_last_share_kml";

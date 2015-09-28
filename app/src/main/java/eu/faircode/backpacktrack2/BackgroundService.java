@@ -1453,8 +1453,12 @@ public class BackgroundService extends IntentService {
             Location lastStationary = LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_STATIONARY, null));
             if (lastStationary != null)
                 if (location.distanceTo(lastStationary) > distance) {
+                    // Reset averaging
+                    prefs.edit().remove(SettingsFragment.PREF_LAST_STATIONARY_AVG).apply();
+
+                    // Check stationary time
                     if (location.getTime() - lastStationary.getTime() >= time * 60 * 1000) {
-                        // Check if nearby waypoint exists
+                        // Check if nearby waypoint
                         boolean exists = false;
                         if (duplicate > 0) {
                             DatabaseHelper dh = null;
@@ -1487,8 +1491,14 @@ public class BackgroundService extends IntentService {
                             handleLocation(LOCATION_AUTO, lastStationary);
                     }
                 } else {
+                    // Stationary
                     location.setTime(lastStationary.getTime());
-                    // TODO: averaging
+
+                    // Averaging
+                    int count = prefs.getInt(SettingsFragment.PREF_LAST_STATIONARY_AVG, 1);
+                    location.setLatitude((lastStationary.getLatitude() * count + location.getLatitude()) / (count + 1));
+                    location.setLongitude((lastStationary.getLongitude() * count + location.getLongitude()) / (count + 1));
+                    prefs.edit().putInt(SettingsFragment.PREF_LAST_STATIONARY_AVG, count + 1).apply();
                 }
 
             // Move on
