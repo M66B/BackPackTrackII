@@ -64,6 +64,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import de.timroes.axmlrpc.XMLRPCClient;
 import de.timroes.axmlrpc.XMLRPCException;
@@ -1405,8 +1406,12 @@ public class BackgroundService extends IntentService {
                 waypointName = new GeocoderEx(this).reverseGeocode(location);
                 if (waypointName == null)
                     waypointName = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
-                if (locationType == LOCATION_AUTO)
-                    waypointName = "* " + waypointName;
+                if (locationType == LOCATION_AUTO) {
+                    long duration = new Date().getTime() - location.getTime();
+                    long hours = TimeUnit.MILLISECONDS.toHours(duration);
+                    long minutes = TimeUnit.MILLISECONDS.toMinutes(duration - hours * 3600 * 1000);
+                    waypointName = hours + ":" + (minutes < 10 ? "0" : "") + minutes + " " + waypointName;
+                }
             }
 
             // Persist new location
