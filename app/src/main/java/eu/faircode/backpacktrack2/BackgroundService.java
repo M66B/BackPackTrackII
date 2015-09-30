@@ -1460,6 +1460,11 @@ public class BackgroundService extends IntentService {
                 if (location.distanceTo(lastStationary) > distance) {
                     // Check stationary time
                     if (location.getTime() - lastStationary.getTime() >= time * 60 * 1000) {
+                        // Use averages
+                        lastStationary.setLatitude(prefs.getFloat(SettingsFragment.PREF_LAST_STATIONARY_LAT, (float) lastStationary.getLatitude()));
+                        lastStationary.setLongitude(prefs.getFloat(SettingsFragment.PREF_LAST_STATIONARY_LON, (float) lastStationary.getLongitude()));
+                        lastStationary.setAltitude(prefs.getFloat(SettingsFragment.PREF_LAST_STATIONARY_ALT, (float) lastStationary.getAltitude()));
+
                         // Check if nearby waypoint
                         boolean exists = false;
                         if (duplicate > 0) {
@@ -1492,8 +1497,35 @@ public class BackgroundService extends IntentService {
                         if (!exists)
                             handleLocation(LOCATION_AUTO, lastStationary);
                     }
-                } else
+
+                    // Delete average
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.remove(SettingsFragment.PREF_LAST_STATIONARY_AVG);
+                    editor.remove(SettingsFragment.PREF_LAST_STATIONARY_LAT);
+                    editor.remove(SettingsFragment.PREF_LAST_STATIONARY_LON);
+                    editor.remove(SettingsFragment.PREF_LAST_STATIONARY_ALT);
+                    editor.apply();
+                } else {
+                    int count = prefs.getInt(SettingsFragment.PREF_LAST_STATIONARY_AVG, 1);
+                    float lat = prefs.getFloat(SettingsFragment.PREF_LAST_STATIONARY_LAT, (float) lastStationary.getLatitude());
+                    float lon = prefs.getFloat(SettingsFragment.PREF_LAST_STATIONARY_LON, (float) lastStationary.getLongitude());
+                    float alt = prefs.getFloat(SettingsFragment.PREF_LAST_STATIONARY_ALT, (float) lastStationary.getAltitude());
+
+                    lat = (lat * count + (float) location.getLatitude()) / (count + 1);
+                    lon = (lon * count + (float) location.getLongitude()) / (count + 1);
+                    alt = (alt * count + (float) location.getAltitude()) / (count + 1);
+
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putInt(SettingsFragment.PREF_LAST_STATIONARY_AVG, count + 1);
+                    editor.putFloat(SettingsFragment.PREF_LAST_STATIONARY_LAT, lat);
+                    editor.putFloat(SettingsFragment.PREF_LAST_STATIONARY_LON, lon);
+                    editor.putFloat(SettingsFragment.PREF_LAST_STATIONARY_ALT, alt);
+                    editor.apply();
+
+                    location.setLatitude(lastStationary.getLatitude());
+                    location.setLongitude(lastStationary.getLongitude());
                     location.setTime(lastStationary.getTime());
+                }
 
             // Move on
             prefs.edit().putString(SettingsFragment.PREF_LAST_STATIONARY, LocationSerializer.serialize(location)).apply();
