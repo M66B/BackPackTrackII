@@ -916,16 +916,22 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 }
             }).start();
 
-        if (PREF_AUTO_ENABLED.equals(key)) {
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.remove(SettingsFragment.PREF_LAST_STATIONARY);
+        if (PREF_AUTO_ENABLED.equals(key))
             if (prefs.getBoolean(key, DEFAULT_AUTO_ENABLED)) {
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.remove(SettingsFragment.PREF_LAST_STATIONARY_AVG);
+                editor.remove(SettingsFragment.PREF_LAST_STATIONARY_LAT);
+                editor.remove(SettingsFragment.PREF_LAST_STATIONARY_LON);
+                editor.remove(SettingsFragment.PREF_LAST_STATIONARY_ALT);
+
                 Location lastLocation = BackgroundService.LocationDeserializer.deserialize(prefs.getString(SettingsFragment.PREF_LAST_LOCATION, null));
-                if (lastLocation != null)
+                if (lastLocation == null)
+                    editor.remove(SettingsFragment.PREF_LAST_STATIONARY);
+                else
                     editor.putString(SettingsFragment.PREF_LAST_STATIONARY, BackgroundService.LocationSerializer.serialize(lastLocation));
+
+                editor.apply();
             }
-            editor.apply();
-        }
 
         if (PREF_PRIVACY.equals(key) ||
                 PREF_WEATHER_ENABLED.equals(key) ||
