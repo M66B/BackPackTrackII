@@ -24,9 +24,6 @@
         android:checkable="true"
         android:title="@string/menu_hidden" />
     <item
-        android:id="@+id/menu_delete"
-        android:title="@string/menu_delete" />
-    <item
         android:id="@+id/menu_id"
         android:title="" />
 </menu>

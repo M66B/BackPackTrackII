@@ -193,10 +193,6 @@ public class WaypointAdapter extends CursorAdapter {
                                 hideWaypoint(id, name, hidden, context);
                                 return true;
 
-                            case R.id.menu_delete:
-                                deleteWaypoint(id, name, context);
-                                return true;
-
                             default:
                                 return false;
                         }
@@ -591,35 +587,5 @@ public class WaypointAdapter extends CursorAdapter {
                 Toast.makeText(context, context.getString(R.string.msg_updated, name), Toast.LENGTH_SHORT).show();
             }
         }.execute();
-    }
-
-    private void deleteWaypoint(final long id, final String name, final Context context) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-        alertDialogBuilder.setTitle(context.getString(R.string.msg_delete, name));
-        alertDialogBuilder
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        new AsyncTask<Object, Object, Object>() {
-                            protected Object doInBackground(Object... params) {
-                                db.deleteLocation(id);
-                                return null;
-                            }
-
-                            @Override
-                            protected void onPostExecute(Object result) {
-                                Toast.makeText(context, context.getString(R.string.msg_deleted, name), Toast.LENGTH_SHORT).show();
-                            }
-                        }.execute();
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Do nothing
-                    }
-                });
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.show();
     }
 }
