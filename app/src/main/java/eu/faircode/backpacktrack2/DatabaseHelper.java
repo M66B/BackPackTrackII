@@ -794,6 +794,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this;
     }
 
+    public DatabaseHelper updateSteps(long id, long time, int value) {
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            cv.put("count", value);
+            if (db.update("step", cv, "ID = ?", new String[]{Long.toString(id)}) != 1)
+                Log.e(TAG, "Update step failed");
+        }
+
+        for (StepCountChangedListener listener : mStepCountChangedListeners)
+            try {
+                listener.onStepCountUpdated(time, value);
+            } catch (Throwable ex) {
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
+
+        return this;
+    }
+
     public DatabaseHelper deleteStep(long id) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();

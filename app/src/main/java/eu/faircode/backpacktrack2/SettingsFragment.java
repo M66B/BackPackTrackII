@@ -2475,6 +2475,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     return;
 
                 final long step_id = cursor.getLong(cursor.getColumnIndex("ID"));
+                final long step_time = cursor.getLong(cursor.getColumnIndex("time"));
+                final int step_count = cursor.getInt(cursor.getColumnIndex("count"));
 
                 PopupMenu popupMenu = new PopupMenu(getActivity(), view);
 
@@ -2484,6 +2486,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         switch (item.getItemId()) {
                             case R.id.menu_delete:
                                 db.deleteStep(step_id);
+                                return true;
+
+                            case R.id.menu_plus100:
+                                db.updateSteps(step_id, step_time, step_count + 100);
+                                return true;
+
+                            case R.id.menu_min100:
+                                db.updateSteps(step_id, step_time, step_count - 100);
                                 return true;
 
                             default:
