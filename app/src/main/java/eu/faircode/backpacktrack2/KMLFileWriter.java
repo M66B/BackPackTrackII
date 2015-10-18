@@ -216,9 +216,6 @@ public class KMLFileWriter {
         int colSpeed = c.getColumnIndex("speed");
         int colBearing = c.getColumnIndex("bearing");
         int colAccuracy = c.getColumnIndex("accuracy");
-        int colActivityType = c.getColumnIndex("activity_type");
-        int colActivityConfidence = c.getColumnIndex("activity_confidence");
-        int colStepcount = c.getColumnIndex("stepcount");
 
         Element extendedData = new Element("ExtendedData", NS);
 
@@ -254,33 +251,6 @@ public class KMLFileWriter {
             data.setAttribute(new Attribute("name", "accuracy"));
             Element value = new Element("value", NS);
             value.addContent(DF.format(DF.format(c.getDouble(colAccuracy))));
-            data.addContent(value);
-            extendedData.addContent(data);
-        }
-
-        if (!c.isNull(colActivityType)) {
-            Element data = new Element("Data", NS);
-            data.setAttribute(new Attribute("name", "activity_type"));
-            Element value = new Element("value", NS);
-            value.addContent(BackgroundService.getActivityName(c.getInt(colActivityType), context));
-            data.addContent(value);
-            extendedData.addContent(data);
-        }
-
-        if (!c.isNull(colActivityConfidence)) {
-            Element data = new Element("Data", NS);
-            data.setAttribute(new Attribute("name", "activity_confidence"));
-            Element value = new Element("value", NS);
-            value.addContent(Integer.toString(c.getInt(colActivityConfidence)));
-            data.addContent(value);
-            extendedData.addContent(data);
-        }
-
-        if (!c.isNull(colStepcount)) {
-            Element data = new Element("Data", NS);
-            data.setAttribute(new Attribute("name", "stepcount"));
-            Element value = new Element("value", NS);
-            value.addContent(Integer.toString(c.getInt(colStepcount)));
             data.addContent(value);
             extendedData.addContent(data);
         }

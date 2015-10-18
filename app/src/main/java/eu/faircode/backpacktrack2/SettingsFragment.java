@@ -1232,7 +1232,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                                                 altitude_type |= BackgroundService.ALTITUDE_KEEP;
 
                                             // Persist location
-                                            new DatabaseHelper(getActivity()).insertLocation(location, altitude_type, name, -1, -1, -1).close();
+                                            new DatabaseHelper(getActivity()).insertLocation(location, altitude_type, name).close();
                                             return null;
                                         }
 
@@ -1297,7 +1297,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                         altitude_type |= BackgroundService.ALTITUDE_KEEP;
 
                     // Persist location
-                    new DatabaseHelper(getActivity()).insertLocation(location, altitude_type, name.toString(), -1, -1, -1).close();
+                    new DatabaseHelper(getActivity()).insertLocation(location, altitude_type, name.toString()).close();
                     return null;
                 }
 

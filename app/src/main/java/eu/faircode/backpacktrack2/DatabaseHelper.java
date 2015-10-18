@@ -23,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 23;
+    private static final int DB_VERSION = 24;
 
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
@@ -77,9 +77,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", bearing REAL NULL" +
                 ", accuracy REAL NULL" +
                 ", name TEXT" +
-                ", activity_type INTEGER NULL" +
-                ", activity_confidence INTEGER NULL" +
-                ", stepcount INTEGER NULL" +
                 ", proximity INTEGER NULL" +
                 ", hidden INTEGER NULL" +
                 ");");
@@ -302,6 +299,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 oldVersion = 23;
             }
 
+            if (oldVersion <= 24) {
+                db.execSQL("ALTER TABLE location RENAME TO location_orig");
+                db.execSQL("DROP INDEX idx_location_time");
+                db.execSQL("DROP INDEX idx_location_name");
+                createTableLocation(db);
+                db.execSQL("INSERT INTO location (ID, time, provider, latitude, longitude, altitude, altitude_type, speed, bearing, accuracy, name, proximity, hidden)" +
+                        " SELECT ID, time, provider, latitude, longitude, altitude, altitude_type, speed, bearing, accuracy, name, proximity, hidden FROM location_orig");
+                db.execSQL("DROP TABLE location_orig");
+                oldVersion = 24;
+            }
+
             db.setVersion(DB_VERSION);
 
             db.setTransactionSuccessful();
@@ -314,7 +322,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Location
 
-    public DatabaseHelper insertLocation(Location location, int altitude_type, String name, int activity_type, int activity_confidence, int stepcount) {
+    public DatabaseHelper insertLocation(Location location, int altitude_type, String name) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
 
@@ -350,13 +358,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cv.putNull("name");
             else
                 cv.put("name", name);
-
-            if (activity_type >= 0)
-                cv.put("activity_type", activity_type);
-            if (activity_confidence >= 0)
-                cv.put("activity_confidence", activity_confidence);
-            if (stepcount >= 0)
-                cv.put("stepcount", stepcount);
 
             if (db.insert("location", null, cv) == -1)
                 Log.e(TAG, "Insert location failed");

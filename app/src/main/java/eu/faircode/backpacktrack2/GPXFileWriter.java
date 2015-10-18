@@ -182,9 +182,6 @@ public class GPXFileWriter {
         int colSpeed = c.getColumnIndex("speed");
         int colBearing = c.getColumnIndex("bearing");
         int colAccuracy = c.getColumnIndex("accuracy");
-        int colActivityType = c.getColumnIndex("activity_type");
-        int colActivityConfidence = c.getColumnIndex("activity_confidence");
-        int colStepcount = c.getColumnIndex("stepcount");
 
         Element ext = new Element("extensions", NS);
 
@@ -196,14 +193,6 @@ public class GPXFileWriter {
             ext.addContent(new Element("bearing", bpt2).addContent(DF.format(c.getDouble(colBearing))));
         if (!c.isNull(colAccuracy))
             ext.addContent(new Element("accuracy", bpt2).addContent(DF.format(c.getDouble(colAccuracy))));
-
-        if (!c.isNull(colActivityType))
-            ext.addContent(new Element("activity_type", bpt2).addContent(BackgroundService.getActivityName(c.getInt(colActivityType), context)));
-        if (!c.isNull(colActivityConfidence))
-            ext.addContent(new Element("activity_confidence", bpt2).addContent(Integer.toString(c.getInt(colActivityConfidence))));
-
-        if (!c.isNull(colStepcount))
-            ext.addContent(new Element("stepcount", bpt2).addContent(Integer.toString(c.getInt(colStepcount))));
 
         return ext;
     }

@@ -598,10 +598,7 @@ public class BackgroundService extends IntentService {
             try {
                 dh = new DatabaseHelper(this);
                 int altitude_type = (location.hasAltitude() ? ALTITUDE_GPS : ALTITUDE_NONE);
-                int activity_type = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN);
-                int activity_confidence = prefs.getInt(SettingsFragment.PREF_LAST_CONFIDENCE, -1);
-                int stepcount = dh.getSteps(location.getTime());
-                dh.insertLocation(location, altitude_type, null, activity_type, activity_confidence, stepcount).close();
+                dh.insertLocation(location, altitude_type, null).close();
             } finally {
                 if (dh != null)
                     dh.close();
@@ -723,7 +720,7 @@ public class BackgroundService extends IntentService {
             if (name == null)
                 name = SimpleDateFormat.getDateTimeInstance(SimpleDateFormat.MEDIUM, SimpleDateFormat.MEDIUM).format(new Date());
 
-            new DatabaseHelper(this).insertLocation(location, altitude_type, name, -1, -1, -1).close();
+            new DatabaseHelper(this).insertLocation(location, altitude_type, name).close();
             Util.toast(getString(R.string.msg_added, name), Toast.LENGTH_LONG, this);
         }
     }
@@ -1419,10 +1416,7 @@ public class BackgroundService extends IntentService {
             DatabaseHelper dh = null;
             try {
                 dh = new DatabaseHelper(this);
-                int activity_type = prefs.getInt(SettingsFragment.PREF_LAST_ACTIVITY, DetectedActivity.UNKNOWN);
-                int activity_confidence = prefs.getInt(SettingsFragment.PREF_LAST_CONFIDENCE, -1);
-                int stepcount = dh.getSteps(location.getTime());
-                dh.insertLocation(location, altitude_type, waypointName, activity_type, activity_confidence, stepcount).close();
+                dh.insertLocation(location, altitude_type, waypointName).close();
             } finally {
                 if (dh != null)
                     dh.close();
