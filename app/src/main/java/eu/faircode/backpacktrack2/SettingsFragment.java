@@ -142,7 +142,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_PRESSURE_TEST = "pref_pressure_test";
     public static final String PREF_PRESSURE_MAXAGE = "pref_pressure_maxage";
     public static final String PREF_PRESSURE_MAXDIST = "pref_pressure_maxdist";
-    public static final String PREF_PRESSURE_ACCURACY = "pref_pressure_accuracy";
     public static final String PREF_PRESSURE_INVEHICLE = "pref_pressure_invehicle";
 
     public static final String PREF_AUTO_ENABLED = "pref_auto_enabled";
@@ -246,7 +245,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_PRESSURE_OFFSET = "0"; // hPa
     public static final String DEFAULT_PRESSURE_MAXAGE = "240"; // minutes
     public static final String DEFAULT_PRESSURE_MAXDIST = "50"; // kilometer
-    public static final String DEFAULT_PRESSURE_ACCURACY = "10"; // percent
     public static final boolean DEFAULT_PRESSURE_INVEHICLE = false;
 
     public static final boolean DEFAULT_AUTO_ENABLED = false;
@@ -562,7 +560,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_PRESSURE_MAXDIST);
         updateTitle(prefs, PREF_PRESSURE_WAIT);
         updateTitle(prefs, PREF_PRESSURE_OFFSET);
-        updateTitle(prefs, PREF_PRESSURE_ACCURACY);
 
         updateTitle(prefs, PREF_AUTO_TIME);
         updateTitle(prefs, PREF_AUTO_DISTANCE);
@@ -3556,8 +3553,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref.setTitle(getString(R.string.title_pressure_maxage, prefs.getString(key, DEFAULT_PRESSURE_MAXAGE)));
         else if (PREF_PRESSURE_MAXDIST.equals(key))
             pref.setTitle(getString(R.string.title_pressure_maxdist, prefs.getString(key, DEFAULT_PRESSURE_MAXDIST)));
-        else if (PREF_PRESSURE_ACCURACY.equals(key))
-            pref.setTitle(getString(R.string.title_pressure_accuracy, prefs.getString(key, DEFAULT_PRESSURE_ACCURACY)));
 
         else if (PREF_AUTO_TIME.equals(key))
             pref.setTitle(getString(R.string.title_auto_time, prefs.getString(key, DEFAULT_AUTO_TIME)));

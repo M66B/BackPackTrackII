@@ -1365,9 +1365,8 @@ public class BackgroundService extends IntentService {
             int altitude_type = (location.hasAltitude() ? ALTITUDE_GPS : ALTITUDE_NONE);
 
             // Derive altitude from pressure
-            int pref_accuracy = Integer.parseInt(prefs.getString(SettingsFragment.PREF_PRESSURE_ACCURACY, SettingsFragment.DEFAULT_PRESSURE_ACCURACY));
-            if (!location.hasAltitude() || !location.hasAccuracy() ||
-                    location.getAltitude() * pref_accuracy / 100 >= location.getAccuracy() * 1.5) {
+            boolean pressure_enabled = prefs.getBoolean(SettingsFragment.PREF_PRESSURE_ENABLED, SettingsFragment.DEFAULT_PRESSURE_ENABLED);
+            if (pressure_enabled) {
                 float altitude = PressureService.getAltitude(location, this);
                 if (!Float.isNaN(altitude)) {
                     location.setAltitude(altitude);

@@ -298,12 +298,6 @@
                     android:inputType="number"
                     android:key="pref_pressure_maxdist"
                     android:summary="@string/summary_pressure_maxdist" />
-                <EditTextPreference
-                    android:defaultValue="10"
-                    android:dependency="pref_pressure_enabled"
-                    android:inputType="number"
-                    android:key="pref_pressure_accuracy"
-                    android:summary="@string/summary_pressure_accuracy" />
                 <CheckBoxPreference
                     android:defaultValue="false"
                     android:dependency="pref_pressure_enabled"

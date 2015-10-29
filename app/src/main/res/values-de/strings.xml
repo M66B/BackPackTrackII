@@ -62,7 +62,6 @@
     <string name="title_pressure_test">Höhe für letzte Position ermitteln</string>
     <string name="title_pressure_maxage">Max. Druck Referenzalter: %s Minuten</string>
     <string name="title_pressure_maxdist">Max Druck Referenzentfernung: %s km</string>
-    <string name="title_pressure_accuracy">Nutze wenn Genauigkeit/Höhe: &lt;%s %%</string>
     <string name="title_pressure_invehicle">Nutze Druckreferenz im Fahrzeug</string>
 
     <string name="title_auto">Automatische Wegpunkte</string>
@@ -177,7 +176,6 @@
     <string name="summary_pressure_offset">Anzahl von hPa vom gemessenen Druck zu addieren oder subtrahieren</string>
     <string name="summary_pressure_maxage">Nutze den Referenzdruck für maximal die ausgewählte Anzah von Minuten</string>
     <string name="summary_pressure_maxdist">Nutze den Referenzdruck mit der ausgewählten Anzahl von Kilometer</string>
-    <string name="summary_pressure_accuracy">Ermittle Höhe durch Druck wenn die Ortungsgenauigkeit besser ist als die ausgewählte Prozent der Ortungshöhe</string>
     <string name="summary_pressure_invehicle">Die Höhe im Fahrzeug durch Druck ermitteln (benötigt Aktivitätserkennung)</string>
 
     <string name="summary_auto_time">Automatically create a waypoint after being at the same location for the selected time</string>
