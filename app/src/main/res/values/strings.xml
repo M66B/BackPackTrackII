@@ -14,7 +14,6 @@
     <string name="title_weather_history">Weather history</string>
     <string name="title_weather_forecast">Weather forecast</string>
     <string name="title_loc_settings">Location settings</string>
-    <string name="title_optimizations">Battery optimizations</string>
     <string name="title_useful_links">Useful links</string>
 
     <string name="title_geocode">Geocode address</string>
@@ -149,7 +148,6 @@
     <string name="summary_weather_history">Show local weather history</string>
     <string name="summary_weather_forecast">Show local weather forecast</string>
     <string name="summary_loc_settings">Tap to open the Android location settings</string>
-    <string name="summary_optimizations">Tap to open the Android battery optimizations settings (Android 6 or later)</string>
     <string name="summary_useful_links">Links to information relevant to travelers</string>
 
     <string name="summary_interval">Try to acquire a new location every selected number of seconds</string>

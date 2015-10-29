@@ -60,11 +60,6 @@
             android:key="pref_settings"
             android:summary="@string/summary_loc_settings"
             android:title="@string/title_loc_settings" />
-        <Preference
-            android:icon="@drawable/battery_alert_60"
-            android:key="pref_optimizations"
-            android:summary="@string/summary_optimizations"
-            android:title="@string/title_optimizations" />
         <PreferenceScreen
             android:icon="@drawable/link_60"
             android:summary="@string/summary_useful_links"

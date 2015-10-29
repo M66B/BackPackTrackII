@@ -108,7 +108,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_WEATHER_HISTORY = "pref_weather_history";
     public static final String PREF_WEATHER_FORECAST = "pref_weather_forecast";
     public static final String PREF_SETTINGS = "pref_settings";
-    public static final String PREF_OPTIMIZATIONS = "pref_optimizations";
 
     public static final String PREF_ENABLED = "pref_enabled";
     public static final String PREF_USE_NETWORK = "pref_use_network";
@@ -522,7 +521,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Preference pref_weather_history = findPreference(PREF_WEATHER_HISTORY);
         Preference pref_weather_forecast = findPreference(PREF_WEATHER_FORECAST);
         Preference pref_check = findPreference(PREF_SETTINGS);
-        Preference pref_optimizations = findPreference(PREF_OPTIMIZATIONS);
         Preference pref_version = findPreference(PREF_VERSION);
         Preference pref_logcat = findPreference(PREF_LOGCAT);
 
@@ -657,31 +655,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref_check.setIntent(locationSettingsIntent);
         else
             pref_check.setEnabled(false);
-
-        // Handle battery optimizations setting
-        pref_optimizations.setEnabled(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M);
-        pref_optimizations.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            @TargetApi(Build.VERSION_CODES.M)
-            public boolean onPreferenceClick(Preference preference) {
-                try {
-                    Intent intent = new Intent();
-                    String packageName = getActivity().getPackageName();
-                    PowerManager pm = (PowerManager) getActivity().getSystemService(Context.POWER_SERVICE);
-                    if (pm.isIgnoringBatteryOptimizations(packageName))
-                        intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-                    else {
-                        intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-                        intent.setData(Uri.parse("package:" + packageName));
-                    }
-                    getActivity().startActivity(intent);
-                } catch (Throwable ex) {
-                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-                    Toast.makeText(getActivity(), ex.toString(), Toast.LENGTH_SHORT).show();
-                }
-                return true;
-            }
-        });
 
         // Handle location history
         pref_location_history.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
