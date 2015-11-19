@@ -1747,6 +1747,9 @@ public class BackgroundService extends IntentService {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         boolean notification = prefs.getBoolean(SettingsFragment.PREF_WEATHER_NOTIFICATION, SettingsFragment.DEFAULT_WEATHER_NOTIFICATION);
         if (notification) {
+            // Start weather guard
+            startWeatherGuard(context);
+
             // Get weather location name
             String geocoded = new GeocoderEx(context).reverseGeocode(weather.station_location);
 
@@ -1759,9 +1762,6 @@ public class BackgroundService extends IntentService {
                 showRainNotification(weather, geocoded, context);
             else
                 removeRainNotification(context);
-
-            // Start weather guard
-            startWeatherGuard(context);
         }
     }
 
