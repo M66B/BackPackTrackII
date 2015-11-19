@@ -796,7 +796,7 @@ public class BackgroundService extends IntentService {
         String passWord = prefs.getString(SettingsFragment.PREF_BLOGPWD, "");
 
         // Create XML-RPC client
-        XMLRPCClient client = new XMLRPCClient(new URL(blogUrl + "xmlrpc.php"));
+        XMLRPCClient client = new XMLRPCClient(new URL(blogUrl + "xmlrpc.php"), XMLRPCClient.FLAGS_FORWARD);
 
         // Create upload parameters
         Map<String, Object> args = new HashMap<>();
