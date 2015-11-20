@@ -36,13 +36,13 @@ def setOutputFile(variant, defaultConfig) {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.google.code.gson:gson:2.4'
-    compile 'com.google.android.gms:play-services-location:8.1.0'
-    compile 'com.google.android.gms:play-services-gcm:8.1.0'
-    compile 'de.timroes:aXMLRPC:1.8.1'
-    compile 'org.jdom:jdom2:2.0.6'
-    compile 'com.jjoe64:graphview:4.0.1'
-    compile 'joda-time:joda-time:2.8.2'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.5.0'
+    compile 'com.google.android.gms:play-services-location:8.3.+'
+    compile 'com.google.android.gms:play-services-gcm:8.3.+'
+    compile 'de.timroes:aXMLRPC:1.8.+'
+    compile 'org.jdom:jdom2:2.0.+'
+    compile 'com.jjoe64:graphview:4.0.+'
+    compile 'joda-time:joda-time:2.9.+'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.5.+'
 }
 
 android {
