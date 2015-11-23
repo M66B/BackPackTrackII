@@ -3580,7 +3580,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if (PREF_WEATHER_RAIN_SOUND.equals(key)) {
             Uri uri = Uri.parse(prefs.getString(key, DEFAULT_WEATHER_RAIN_SOUND));
             Ringtone ringtone = RingtoneManager.getRingtone(getActivity(), uri);
-            pref.setSummary(ringtone.getTitle(getActivity()));
+            pref.setSummary(ringtone == null ? null : ringtone.getTitle(getActivity()));
         } else if (PREF_WEATHER_GUARD.equals(key))
             pref.setTitle(getString(R.string.title_weather_guard, prefs.getString(key, DEFAULT_WEATHER_GUARD)));
         else if (PREF_WEATHER_CACHE.equals(key))
