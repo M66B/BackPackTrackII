@@ -1781,7 +1781,7 @@ public class BackgroundService extends IntentService {
             if ("f".equals(temperature_unit))
                 temperature = temperature * 9 / 5 + 32;
 
-            sb.append(Math.round(temperature));
+            sb.append(DF1.format(temperature));
             if ("c".equals(temperature_unit))
                 sb.append(context.getString(R.string.header_celcius));
             else if ("f".equals(temperature_unit))
@@ -2074,7 +2074,8 @@ public class BackgroundService extends IntentService {
 
     private static int getTemperatureIcon(float degrees, Context context) {
         int b = Math.round(degrees);
-        int resId = context.getResources().getIdentifier("degrees_" + (degrees < 0 ? "m" : "p") + b, "drawable", context.getPackageName());
+        String name = "degrees_" + (b < 0 ? "m" : "p") + Math.abs(b);
+        int resId = context.getResources().getIdentifier(name, "drawable", context.getPackageName());
         return (resId > 0 ? resId : android.R.drawable.ic_menu_help);
     }
 
