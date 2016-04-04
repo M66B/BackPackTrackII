@@ -3,7 +3,7 @@ apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         applicationId "eu.faircode.backpacktrack2"
@@ -35,14 +35,14 @@ def setOutputFile(variant, defaultConfig) {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.google.code.gson:gson:2.4'
-    compile 'com.google.android.gms:play-services-location:8.3.+'
-    compile 'com.google.android.gms:play-services-gcm:8.3.+'
+    compile 'com.google.code.gson:gson:2.6.+'
+    compile 'com.google.android.gms:play-services-location:8.3.0'
+    compile 'com.google.android.gms:play-services-gcm:8.3.0'
     compile 'de.timroes:aXMLRPC:1.8.+'
     compile 'org.jdom:jdom2:2.0.+'
     compile 'com.jjoe64:graphview:4.0.+'
     compile 'joda-time:joda-time:2.9.+'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.5.+'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.7.+'
 }
 
 android {
