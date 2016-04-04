@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Message;
 import android.util.Log;
 
 import com.google.android.gms.location.DetectedActivity;
@@ -25,6 +28,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "BackPackTrackII";
     private static final int DB_VERSION = 24;
 
+    private static HandlerThread hthread = null;
+    private static Handler handler = null;
+
+    private final static int MSG_LOCATION_UPDATED = 1;
+
     private static List<LocationChangedListener> mLocationChangedListeners = new ArrayList<LocationChangedListener>();
     private static List<ActivityTypeChangedListener> mActivityTypeChangedListeners = new ArrayList<ActivityTypeChangedListener>();
     private static List<ActivityDurationChangedListener> mActivityDurationChangedListeners = new ArrayList<ActivityDurationChangedListener>();
@@ -33,6 +41,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static List<WeatherChangedListener> mWeatherChangedListeners = new ArrayList<WeatherChangedListener>();
 
     private Context mContext;
+
+    static {
+        hthread = new HandlerThread("DatabaseHelper");
+        hthread.start();
+        handler = new Handler(hthread.getLooper()) {
+            @Override
+            public void handleMessage(Message msg) {
+                handleChangedNotification(msg);
+            }
+        };
+    }
 
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -382,12 +401,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Log.e(TAG, "Update location failed");
         }
 
-        for (LocationChangedListener listener : mLocationChangedListeners)
-            try {
-                listener.onLocationUpdated();
-            } catch (Throwable ex) {
-                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            }
+        notifyLocationUpdated();
 
         return this;
     }
@@ -401,12 +415,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Log.e(TAG, "Update location failed");
         }
 
-        for (LocationChangedListener listener : mLocationChangedListeners)
-            try {
-                listener.onLocationUpdated();
-            } catch (Throwable ex) {
-                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            }
+        notifyLocationUpdated();
 
         return this;
     }
@@ -421,12 +430,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Log.e(TAG, "Update location altitude failed");
         }
 
-        for (LocationChangedListener listener : mLocationChangedListeners)
-            try {
-                listener.onLocationUpdated();
-            } catch (Throwable ex) {
-                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            }
+        notifyLocationUpdated();
 
         return this;
     }
@@ -462,12 +466,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Log.e(TAG, "Update location radius failed");
         }
 
-        for (LocationChangedListener listener : mLocationChangedListeners)
-            try {
-                listener.onLocationUpdated();
-            } catch (Throwable ex) {
-                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            }
+        notifyLocationUpdated();
 
         return this;
     }
@@ -1079,6 +1078,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static void removeWeatherChangedListener(WeatherChangedListener listener) {
         mWeatherChangedListeners.remove(listener);
+    }
+
+    private void notifyLocationUpdated() {
+        Message msg = handler.obtainMessage();
+        msg.what = MSG_LOCATION_UPDATED;
+        handler.sendMessage(msg);
+    }
+
+    private static void handleChangedNotification(Message msg) {
+        // Batch notifications
+        try {
+            Thread.sleep(2500);
+            if (handler.hasMessages(msg.what))
+                handler.removeMessages(msg.what);
+        } catch (InterruptedException ignored) {
+        }
+
+        // Notify listeners
+        if (msg.what == MSG_LOCATION_UPDATED) {
+            for (LocationChangedListener listener : mLocationChangedListeners)
+                try {
+                    listener.onLocationUpdated();
+                } catch (Throwable ex) {
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                }
+
+        }
     }
 
     public interface LocationChangedListener {
