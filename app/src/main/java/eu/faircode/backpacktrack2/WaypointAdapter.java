@@ -1,5 +1,6 @@
 package eu.faircode.backpacktrack2;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
@@ -234,6 +235,7 @@ public class WaypointAdapter extends CursorAdapter {
         }.execute();
     }
 
+    @SuppressLint("ValidFragment")
     private void updateTime(final long id, final String name, long time, final Context context) {
         final Calendar cal = GregorianCalendar.getInstance();
         cal.setTimeInMillis(time);
