@@ -27,12 +27,10 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
-import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.PowerManager;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
@@ -373,21 +371,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private AtomicBoolean elevationBusy = new AtomicBoolean();
     private List<AlertDialog> dialogs = new ArrayList<AlertDialog>();
 
-    private BroadcastReceiver mConnectivityChangeReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            boolean mounted = Util.storageMounted();
-            boolean connected = Util.isConnected(getActivity());
-            Log.i(TAG, "Connectivity changed mounted=" + mounted + " connected=" + connected);
-
-            findPreference(PREF_UPLOAD_GPX).setEnabled(blogConfigured() && mounted);
-
-            SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
-            String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
-            findPreference(PREF_WEATHER_FORECAST).setEnabled("fio".equals(api) && connected);
-        }
-    };
-
     private BroadcastReceiver mExternalStorageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -484,9 +467,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Listen for preference changes
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-
-        // Listen for connectivity changes
-        getActivity().registerReceiver(mConnectivityChangeReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         // Listen for storage changes
         IntentFilter storageFilter = new IntentFilter();
@@ -691,7 +671,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Handle weather forecast
         String api = prefs.getString(PREF_WEATHER_API, DEFAULT_WEATHER_API);
-        pref_weather_forecast.setEnabled("fio".equals(api) && Util.isConnected(getActivity()));
+        pref_weather_forecast.setEnabled("fio".equals(api));
         pref_weather_forecast.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -809,7 +789,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         // Stop listening for changes
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
-        getActivity().unregisterReceiver(mConnectivityChangeReceiver);
         getActivity().unregisterReceiver(mExternalStorageReceiver);
     }
 
@@ -840,7 +819,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             prefs.edit().remove(PREF_LAST_ACTIVITY).apply();
 
         else if (PREF_WEATHER_API.equals(key)) {
-            findPreference(PREF_WEATHER_FORECAST).setEnabled("fio".equals(prefs.getString(key, DEFAULT_WEATHER_API)) && Util.isConnected(getActivity()));
+            findPreference(PREF_WEATHER_FORECAST).setEnabled("fio".equals(prefs.getString(key, DEFAULT_WEATHER_API)));
 
             // Update blog URL
         } else if (PREF_BLOGURL.equals(key)) {
