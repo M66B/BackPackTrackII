@@ -1,34 +1,29 @@
 {
   "project_info": {
-    "project_id": "backpacktrack-2",
     "project_number": "552508033698",
-    "name": "BackPackTrack 2"
+    "project_id": "backpacktrack-2"
   },
   "client": [
     {
       "client_info": {
-        "client_id": "android:eu.faircode.backpacktrack2",
-        "client_type": 1,
+        "mobilesdk_app_id": "1:552508033698:android:612e0f9713a60c29",
         "android_client_info": {
           "package_name": "eu.faircode.backpacktrack2"
         }
       },
       "oauth_client": [],
-      "api_key": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6IM3Fq4IjRru2sMM9UVtY_-NAk-W0gVM"
+        }
+      ],
       "services": {
         "analytics_service": {
           "status": 1
         },
-        "cloud_messaging_service": {
-          "status": 2,
-          "apns_config": []
-        },
         "appinvite_service": {
           "status": 1,
           "other_platform_oauth_client": []
-        },
-        "google_signin_service": {
-          "status": 1
         },
         "ads_service": {
           "status": 1
@@ -36,5 +31,5 @@
       }
     }
   ],
-  "ARTIFACT_VERSION": "1"
+  "configuration_version": "1"
 }

@@ -1,14 +1,13 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 24
+    buildToolsVersion "24"
 
     defaultConfig {
         applicationId "eu.faircode.backpacktrack2"
         minSdkVersion 16
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 2016042701
         versionName "1.35"
     }
@@ -35,12 +34,13 @@ def setOutputFile(variant, defaultConfig) {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.google.code.gson:gson:2.6.+'
-    compile 'com.google.android.gms:play-services-location:8.3.0'
-    compile 'com.google.android.gms:play-services-gcm:8.3.0'
+    compile 'com.google.code.gson:gson:2.7'
+    compile 'com.google.android.gms:play-services-location:9.2.+'
+    compile 'com.google.android.gms:play-services-places:9.2.+'
+    compile 'com.google.android.gms:play-services-gcm:9.2.+'
     compile 'de.timroes:aXMLRPC:1.8.+'
     compile 'org.jdom:jdom2:2.0.+'
-    compile 'com.jjoe64:graphview:4.0.+'
+    compile 'com.jjoe64:graphview:4.1.+'
     compile 'joda-time:joda-time:2.9.+'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.7.+'
 }
@@ -51,3 +51,5 @@ android {
         exclude 'META-INF/NOTICE.txt'
     }
 }
+
+apply plugin: 'com.google.gms.google-services'
