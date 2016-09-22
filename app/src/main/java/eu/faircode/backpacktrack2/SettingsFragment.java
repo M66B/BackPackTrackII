@@ -3097,7 +3097,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         @Override
         protected Object doInBackground(Object... params) {
             try {
-                return ForecastIO.getWeatherByLocation(apikey_fio, location, type, cache, context);
+                return DarkSky.getWeatherByLocation(apikey_fio, location, type, cache, context);
             } catch (Throwable ex) {
                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                 return ex;
@@ -3114,7 +3114,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     List<Weather> listWeather = (List<Weather>) result;
                     long last = prefs.getLong(PREF_FORECAST_TIME, 0);
 
-                    showForecastGraph(graph, listWeather, this.type == ForecastIO.TYPE_DAILY);
+                    showForecastGraph(graph, listWeather, this.type == DarkSky.TYPE_DAILY);
                     header.setVisibility(View.VISIBLE);
 
                     ForecastAdapter adapter = new ForecastAdapter(context, listWeather, type, location);
@@ -3179,7 +3179,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     location.setLongitude(lastLocation.getLongitude());
                 }
 
-                int type = prefs.getInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_DAILY);
+                int type = prefs.getInt(PREF_LAST_FORECAST_TYPE, DarkSky.TYPE_DAILY);
                 new updateForecast(type, location, true, viewForecast).execute();
             }
 
@@ -3191,7 +3191,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 location.setLatitude(lastLocation.getLatitude());
                 location.setLongitude(lastLocation.getLongitude());
 
-                int type = prefs.getInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_DAILY);
+                int type = prefs.getInt(PREF_LAST_FORECAST_TYPE, DarkSky.TYPE_DAILY);
                 new updateForecast(type, location, true, viewForecast).execute();
             }
         });
@@ -3199,7 +3199,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         ivRefresh.setOnClickListener(new AdapterView.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int type = prefs.getInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_DAILY);
+                int type = prefs.getInt(PREF_LAST_FORECAST_TYPE, DarkSky.TYPE_DAILY);
                 new updateForecast(type, location, false, viewForecast).execute();
             }
         });
@@ -3208,8 +3208,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         ivViewDay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                prefs.edit().putInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_HOURLY).apply();
-                new updateForecast(ForecastIO.TYPE_HOURLY, location, true, viewForecast).execute();
+                prefs.edit().putInt(PREF_LAST_FORECAST_TYPE, DarkSky.TYPE_HOURLY).apply();
+                new updateForecast(DarkSky.TYPE_HOURLY, location, true, viewForecast).execute();
             }
         });
 
@@ -3217,8 +3217,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         ivViewWeek.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                prefs.edit().putInt(PREF_LAST_FORECAST_TYPE, ForecastIO.TYPE_DAILY).apply();
-                new updateForecast(ForecastIO.TYPE_DAILY, location, true, viewForecast).execute();
+                prefs.edit().putInt(PREF_LAST_FORECAST_TYPE, DarkSky.TYPE_DAILY).apply();
+                new updateForecast(DarkSky.TYPE_DAILY, location, true, viewForecast).execute();
             }
         });
 

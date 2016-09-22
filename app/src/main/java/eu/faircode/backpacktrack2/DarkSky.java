@@ -29,10 +29,10 @@ import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class ForecastIO {
-    private static final String TAG = "BPT2.ForecastIO";
+public class DarkSky {
+    private static final String TAG = "BPT2.DarkSky";
 
-    private static final String BASE_URL = "https://api.forecast.io/forecast";
+    private static final String BASE_URL = "https://api.darksky.net/forecast";
     private static final int cTimeOutMs = 30 * 1000;
 
     public static final int TYPE_CURRENT = 1;
@@ -44,9 +44,9 @@ public class ForecastIO {
     public static List<Weather> getWeatherByLocation(
             String apikey, final Location location, int type, boolean usecache, Context context)
             throws IOException, JSONException {
-        // https:developer.forecast.io/docs/v2
+        // https://darksky.net/dev/docs
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        File cache = new File(context.getCacheDir(), "forecastio.json");
+        File cache = new File(context.getCacheDir(), "darksky.json");
 
         // Check cache
         if (usecache && cache.exists()) {

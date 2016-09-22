@@ -93,7 +93,7 @@
     <string name="title_weather_interval">Weather fetch interval: %s minutes</string>
     <string name="title_weather_wakeup">Wakeup device to refresh</string>
     <string name="title_weather_gcm">Subscribe to weather push messages</string>
-    <string name="title_weather_fio">Forecast.io</string>
+    <string name="title_weather_fio">Dark Sky</string>
     <string name="title_weather_apikey">API key: %s</string>
     <string name="title_weather_register">Register</string>
     <string name="title_weather_notification">Show weather notification</string>
@@ -104,7 +104,7 @@
     <string name="title_weather_cache">Forecast cache: %s minutes</string>
     <string name="title_weather_tos">TOS</string>
 
-    <string name="title_weather_poweredby" translatable="false">Powered by <a href="http://forecast.io/">Forecast</a></string>
+    <string name="title_weather_poweredby" translatable="false">Powered by <a href="https://darksky.net/poweredby/">Dark Sky</a></string>
 
     <string name="title_blog">WordPress weblog</string>
     <string name="title_blogurl">URL: %s</string>

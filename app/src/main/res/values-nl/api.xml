@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="listAPIName">
-        <item>Forecast.io</item>
+        <item>Dark Sky</item>
     </string-array>
     <!-- do not translate values -->
     <string-array name="listAPIValue">

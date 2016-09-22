@@ -451,7 +451,7 @@
                     android:title="@string/title_weather_register">
                     <intent
                         android:action="android.intent.action.VIEW"
-                        android:data="https://developer.forecast.io/register" />
+                        android:data="https://darksky.net/dev/" />
                 </Preference>
                 <CheckBoxPreference
                     android:defaultValue="true"
@@ -496,7 +496,7 @@
                     android:title="@string/title_weather_tos">
                     <intent
                         android:action="android.intent.action.VIEW"
-                        android:data="https://developer.forecast.io/terms_of_use.txt" />
+                        android:data="https://darksky.net/dev/docs/terms" />
                 </Preference>
             </PreferenceCategory>
         </PreferenceScreen>

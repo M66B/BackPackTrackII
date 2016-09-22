@@ -20,7 +20,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -71,7 +70,7 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
         TextView tvPressure = (TextView) convertView.findViewById(R.id.tvPressure);
         TextView tvOzone = (TextView) convertView.findViewById(R.id.tvOzone);
 
-        if (type == ForecastIO.TYPE_HOURLY)
+        if (type == DarkSky.TYPE_HOURLY)
             try {
                 TimeZone utc = TimeZone.getTimeZone("UTC");
                 Calendar time = Calendar.getInstance(utc);
@@ -127,17 +126,17 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
         // Time
         tvDate.setText(SDFD.format(weather.time));
         tvTime.setText(SDFT.format(weather.time));
-        tvDate.setVisibility(type == ForecastIO.TYPE_HOURLY && DateUtils.isToday(weather.time) ? View.GONE : View.VISIBLE);
-        tvTime.setVisibility(type == ForecastIO.TYPE_HOURLY ? View.VISIBLE : View.GONE);
-        tvDate.setTypeface(null, type == ForecastIO.TYPE_HOURLY ? Typeface.NORMAL : Typeface.BOLD);
-        tvTime.setTypeface(null, type == ForecastIO.TYPE_HOURLY ? Typeface.BOLD : Typeface.NORMAL);
+        tvDate.setVisibility(type == DarkSky.TYPE_HOURLY && DateUtils.isToday(weather.time) ? View.GONE : View.VISIBLE);
+        tvTime.setVisibility(type == DarkSky.TYPE_HOURLY ? View.VISIBLE : View.GONE);
+        tvDate.setTypeface(null, type == DarkSky.TYPE_HOURLY ? Typeface.NORMAL : Typeface.BOLD);
+        tvTime.setTypeface(null, type == DarkSky.TYPE_HOURLY ? Typeface.BOLD : Typeface.NORMAL);
 
         // Icon
         int resId = (weather.icon == null ? -1 : getContext().getResources().getIdentifier(weather.icon.replace("-", "_") + "_60", "drawable", getContext().getPackageName()));
         ivWeather.setImageResource(resId > 0 ? resId : android.R.drawable.ic_menu_help);
 
         // Temperature
-        if (type == ForecastIO.TYPE_HOURLY) {
+        if (type == DarkSky.TYPE_HOURLY) {
             if (Double.isNaN(weather.temperature))
                 tvTemperatureMin.setText("");
             else {
@@ -193,7 +192,7 @@ public class ForecastAdapter extends ArrayAdapter<Weather> {
             tvPrecipitation.setText("");
         else {
             double rain_1h = weather.rain_1h;
-            if (type == ForecastIO.TYPE_DAILY)
+            if (type == DarkSky.TYPE_DAILY)
                 rain_1h *= 24;
             if ("in".equals(rain_unit)) {
                 rain_1h = rain_1h / 25.4f;

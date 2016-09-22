@@ -900,10 +900,10 @@ public class BackgroundService extends IntentService {
             // Fetch weather
             List<Weather> listWeather = new ArrayList<Weather>();
             if ("fio".equals(api)) {
-                // Forecast.io
+                // Dark Sky
                 if (apikey_fio == null)
-                    throw new Throwable("Forecast.io API key not set");
-                listWeather = ForecastIO.getWeatherByLocation(apikey_fio, lastLocation, ForecastIO.TYPE_CURRENT, false, this);
+                    throw new Throwable("Dark Sky API key not set");
+                listWeather = DarkSky.getWeatherByLocation(apikey_fio, lastLocation, DarkSky.TYPE_CURRENT, false, this);
             } else
                 throw new Throwable("Unknown weather provider");
 
@@ -2080,7 +2080,7 @@ public class BackgroundService extends IntentService {
     }
 
     public static String getRainIntensity(double rain_1h, Context context) {
-        // https://developer.forecast.io/docs/v2
+        // https://darksky.net/dev/docs
         double rain_1h_in = rain_1h / 25.4f;
         if (rain_1h_in >= 0.4)
             return context.getString(R.string.rain_heavy);
