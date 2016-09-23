@@ -1,5 +1,6 @@
 package eu.faircode.backpacktrack2;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -1264,6 +1265,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @SuppressLint("ValidFragment")
     private void export(final Intent intent, int resTitle, int resIcon) {
         final SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
 
