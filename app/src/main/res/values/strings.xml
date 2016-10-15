@@ -113,6 +113,13 @@
     <string name="title_blogpwd">Password: %s</string>
     <string name="title_plugin">Plugin</string>
 
+    <string name="title_lifeline">Lifeline</string>
+    <string name="title_lifeline_enabled">Enabled</string>
+    <string name="title_lifeline_interval">Metered update interval: %s minutes</string>
+    <string name="title_lifeline_private_page">Private page</string>
+    <string name="title_lifeline_public_page">Public page</string>
+    <string name="title_lifeline_state" formatted="false">Unsent: %d Last: %s</string>
+
     <string name="title_units">Units</string>
     <string name="title_temperature">Temperature: %s</string>
     <string name="title_pressure">Pressure: %s</string>
@@ -126,6 +133,7 @@
     <string name="title_geoname_radius">Geoname radius: %s km</string>
     <string name="title_geoname_results">Geoname results: %s</string>
     <string name="title_search_cache">Search cache: %s days</string>
+    <string name="title_connectivity_check_interval">Check connectivity interval: %s minutes</string>
     <string name="title_debug">Debug mode</string>
     <string name="title_logcat">Send logcat</string>
 
@@ -213,6 +221,10 @@
     <string name="summary_bloguser">WordPress user name</string>
     <string name="summary_blogpwd">WordPress password</string>
     <string name="summary_plugin">Tap to open the WordPress plugin page (will start the browser)</string>
+
+    <string name="summary_lifeline_interval">Maximum latency on metered connection</string>
+
+    <string name="summary_connectivity_check_interval">Enter zero to disable waiting for connectivity</string>
 
     <string name="summary_support">Tap to go to the support forum to report issues, request features or ask questions (will start the browser)</string>
     <string name="summary_author">Marcel Bokhorst (M66B)\nTap for details (will start the browser)</string>

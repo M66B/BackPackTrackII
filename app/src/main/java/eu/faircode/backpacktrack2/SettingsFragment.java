@@ -8,10 +8,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.TimePickerDialog;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -90,6 +87,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -152,19 +150,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_ALTITUDE_HISTORY = "pref_altitude_history";
     public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
 
-    public static final String PREF_WEATHER_ENABLED = "pref_weather_enabled";
-    public static final String PREF_WEATHER_API = "pref_weather_api";
-    public static final String PREF_WEATHER_INTERVAL = "pref_weather_interval";
-    public static final String PREF_WEATHER_WAKEUP = "pref_weather_wakeup";
-    public static final String PREF_WEATHER_GCM = "pref_weather_gcm";
-    public static final String PREF_WEATHER_APIKEY_FIO = "pref_weather_apikey_fio";
-    public static final String PREF_WEATHER_NOTIFICATION = "pref_weather_notification";
-    public static final String PREF_WEATHER_RAIN_WARNING = "pref_weather_rain_warning";
-    public static final String PREF_WEATHER_RAIN_SOUND = "pref_weather_rain_sound";
-    public static final String PREF_WEATHER_RAIN_LIGHT = "pref_weather_rain_light";
-    public static final String PREF_WEATHER_GUARD = "pref_weather_guard";
-    public static final String PREF_WEATHER_CACHE = "pref_weather_cache";
-
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
     public static final String PREF_RECOGNITION_INTERVAL_STILL = "pref_recognition_interval_still";
     public static final String PREF_RECOGNITION_INTERVAL_MOVING = "pref_recognition_interval_moving";
@@ -181,10 +166,29 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_STEP_SIZE = "pref_step_size";
     public static final String PREF_WEIGHT = "pref_weight";
 
+    public static final String PREF_WEATHER_ENABLED = "pref_weather_enabled";
+    public static final String PREF_WEATHER_API = "pref_weather_api";
+    public static final String PREF_WEATHER_INTERVAL = "pref_weather_interval";
+    public static final String PREF_WEATHER_WAKEUP = "pref_weather_wakeup";
+    public static final String PREF_WEATHER_GCM = "pref_weather_gcm";
+    public static final String PREF_WEATHER_APIKEY_FIO = "pref_weather_apikey_fio";
+    public static final String PREF_WEATHER_NOTIFICATION = "pref_weather_notification";
+    public static final String PREF_WEATHER_RAIN_WARNING = "pref_weather_rain_warning";
+    public static final String PREF_WEATHER_RAIN_SOUND = "pref_weather_rain_sound";
+    public static final String PREF_WEATHER_RAIN_LIGHT = "pref_weather_rain_light";
+    public static final String PREF_WEATHER_GUARD = "pref_weather_guard";
+    public static final String PREF_WEATHER_CACHE = "pref_weather_cache";
+
     public static final String PREF_BLOGURL = "pref_blogurl";
     public static final String PREF_BLOGID = "pref_blogid";
     public static final String PREF_BLOGUSER = "pref_bloguser";
     public static final String PREF_BLOGPWD = "pref_blogpwd";
+
+    public static final String PREF_LIFELINE_ENABLED = "pref_lifeline_enabled";
+    public static final String PREF_LIFELINE_METERED_INTERVAL = "pref_lifeline_metered_interval";
+    public static final String PREF_LIFELINE_PRIVATE_PAGE = "pref_lifeline_private_page";
+    public static final String PREF_LIFELINE_PUBLIC_PAGE = "pref_lifeline_public_page";
+    public static final String PREF_LIFELINE_STATE = "pref_lifeline_state";
 
     public static final String PREF_TEMPERATURE = "pref_temperature";
     public static final String PREF_PRESSURE = "pref_pressure";
@@ -197,6 +201,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_GEONAME_RADIUS = "pref_geoname_radius";
     public static final String PREF_GEONAME_RESULTS = "pref_geoname_results";
     public static final String PREF_SEARCH_CACHE = "pref_search_cache";
+    public static final String PREF_CONNECTIVITY_CHECK_INTERVAL = "pref_connectivity_check_interval";
     public static final String PREF_DEBUG = "pref_debug";
     public static final String PREF_LOGCAT = "pref_logcat";
 
@@ -255,17 +260,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_ALTITUDE_HISTORY = "30"; // days
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
 
-    public static final boolean DEFAULT_WEATHER_ENABLED = true;
-    public static final String DEFAULT_WEATHER_API = "fio";
-    public static final String DEFAULT_WEATHER_INTERVAL = "30"; // minutes
-    public static final boolean DEFAULT_WEATHER_WAKEUP = false;
-    public static final boolean DEFAULT_WEATHER_NOTIFICATION = true;
-    public static final String DEFAULT_WEATHER_RAIN_WARNING = "50"; // percent
-    public static final String DEFAULT_WEATHER_RAIN_SOUND = "content://settings/system/notification_sound";
-    public static final boolean DEFAULT_WEATHER_RAIN_LIGHT = true;
-    public static final String DEFAULT_WEATHER_GUARD = "60"; // minutes
-    public static final String DEFAULT_WEATHER_CACHE = "180"; // minutes
-
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
     public static final String DEFAULT_RECOGNITION_INTERVAL_STILL = "60"; // seconds
     public static final String DEFAULT_RECOGNITION_INTERVAL_MOVING = "60"; // seconds
@@ -281,6 +275,20 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_STEP_SIZE = "75"; // centimeters
     public static final String DEFAULT_WEIGHT = "75"; // kilograms
 
+    public static final boolean DEFAULT_WEATHER_ENABLED = true;
+    public static final String DEFAULT_WEATHER_API = "fio";
+    public static final String DEFAULT_WEATHER_INTERVAL = "30"; // minutes
+    public static final boolean DEFAULT_WEATHER_WAKEUP = false;
+    public static final boolean DEFAULT_WEATHER_NOTIFICATION = true;
+    public static final String DEFAULT_WEATHER_RAIN_WARNING = "50"; // percent
+    public static final String DEFAULT_WEATHER_RAIN_SOUND = "content://settings/system/notification_sound";
+    public static final boolean DEFAULT_WEATHER_RAIN_LIGHT = true;
+    public static final String DEFAULT_WEATHER_GUARD = "60"; // minutes
+    public static final String DEFAULT_WEATHER_CACHE = "180"; // minutes
+
+    public static final boolean DEFAULT_LIFELINE_ENABLED = false;
+    public static final String DEFAULT_LIFELINE_METERED_INTERVAL = "60"; // minutes
+
     public static final String DEFAULT_TEMPERATURE = "c";
     public static final String DEFAULT_PRESSURE = "hpa";
     public static final String DEFAULT_WINDSPEED = "bft";
@@ -292,6 +300,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_GEONAME_RADIUS = "10"; // km
     public static final String DEFAULT_GEONAME_RESULTS = "100";
     public static final String DEFAULT_SEARCH_CACHE = "7"; // days
+    public static final String DEFAULT_CONNECTIVITY_CHECK_INTERVAL = "10"; // minutes
 
     public static final boolean DEFAULT_GRAPH_STILL = false;
     public static final boolean DEFAULT_GRAPH_WALKING = true;
@@ -353,6 +362,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_LAST_EXTENSIONS = "pref_last_extensions";
     public static final String PREF_LAST_FROM = "pref_last_from";
     public static final String PREF_LAST_TO = "pref_last_to";
+
+    public static final String PREF_LIFELINE_ID = "pref_lifeline_id";
+    public static final String PREF_LIFELINE_LAST = "pref_lifeline_last";
 
     // Constants
     public static final String EXTRA_ACTION = "Action";
@@ -513,6 +525,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Preference pref_wakeup = findPreference(PREF_WEATHER_WAKEUP);
         Preference pref_gcm = findPreference(PREF_WEATHER_GCM);
 
+        Preference pref_lifeline_private = findPreference(PREF_LIFELINE_PRIVATE_PAGE);
+        Preference pref_lifeline_public = findPreference(PREF_LIFELINE_PUBLIC_PAGE);
+        Preference pref_lifeline_state = findPreference(PREF_LIFELINE_STATE);
+
         // Set titles/summaries
         updateTitle(prefs, PREF_SHARE_GPX);
         updateTitle(prefs, PREF_SHARE_KML);
@@ -570,6 +586,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_BLOGUSER);
         updateTitle(prefs, PREF_BLOGPWD);
 
+        updateTitle(prefs, PREF_LIFELINE_METERED_INTERVAL);
+        updateTitle(prefs, PREF_LIFELINE_STATE);
+
         updateTitle(prefs, PREF_TEMPERATURE);
         updateTitle(prefs, PREF_PRESSURE);
         updateTitle(prefs, PREF_WINDSPEED);
@@ -581,6 +600,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_GEONAME_RADIUS);
         updateTitle(prefs, PREF_GEONAME_RESULTS);
         updateTitle(prefs, PREF_SEARCH_CACHE);
+        updateTitle(prefs, PREF_CONNECTIVITY_CHECK_INTERVAL);
 
         // Handle waypoint_edit waypoints
         pref_edit.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
@@ -752,6 +772,32 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Weather wakeups
         pref_wakeup.setEnabled((Build.VERSION.SDK_INT >= Build.VERSION_CODES.M));
         pref_gcm.setEnabled(prefs.getString(PREF_GCM_TOKEN, null) != null);
+
+        // Handle lifeline
+        long llid = prefs.getLong(SettingsFragment.PREF_LIFELINE_ID, 0);
+        while (llid == 0) {
+            llid = UUID.randomUUID().getLeastSignificantBits();
+            prefs.edit().putLong(SettingsFragment.PREF_LIFELINE_ID, llid).apply();
+        }
+        try {
+            Intent privateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(BackgroundService.LIFELINE_BASEURL + "map?token=" + Util.sha256(Long.toString(llid))));
+            if (privateIntent.resolveActivity(getActivity().getPackageManager()) != null)
+                pref_lifeline_private.setIntent(privateIntent);
+            Intent publicIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(BackgroundService.LIFELINE_BASEURL + "map?token=" + Util.sha256(Util.sha256(Long.toString(llid)))));
+            if (publicIntent.resolveActivity(getActivity().getPackageManager()) != null)
+                pref_lifeline_public.setIntent(publicIntent);
+        } catch (Throwable ex) {
+            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+        }
+        pref_lifeline_state.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Intent updateIntent = new Intent(getActivity(), BackgroundService.class);
+                updateIntent.setAction(BackgroundService.ACTION_CONNECTIVITY);
+                getActivity().startService(updateIntent);
+                return true;
+            }
+        });
 
         // Handle Play store link
         Intent playStoreIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getActivity().getPackageName()));
@@ -967,6 +1013,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         // Get GCM token
         if (Util.hasPlayServices(context))
             IIDService.getToken(context, false);
+
+        // Connectivity
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            JobExecutionService.schedule(JobExecutionService.JOB_CONNECTIVITY, null, context);
     }
 
     private void edit_waypoints() {
@@ -1446,21 +1496,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             getActivity().startService(intent);
         } else {
             intent.putExtra(BackgroundService.EXTRA_JOB, true);
-
-            ComponentName component = new ComponentName(getActivity(), JobExecutionService.class);
-            JobInfo.Builder builder = new JobInfo.Builder(100, component);
-            builder.setExtras(Util.getPersistableBundle(intent.getExtras()));
-            builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
-            builder.setRequiresCharging(false);
-            builder.setRequiresDeviceIdle(false);
-            builder.setMinimumLatency(0);
-            builder.setBackoffCriteria(10 * 1000, JobInfo.BACKOFF_POLICY_LINEAR);
-            builder.setOverrideDeadline(2 * 3600 * 1000L);
-            builder.setPersisted(false);
-            JobScheduler js = (JobScheduler) getActivity().getSystemService(Context.JOB_SCHEDULER_SERVICE);
-            JobInfo job = builder.build();
-            Log.i(TAG, "Scheduling intent=" + intent + " job=" + job);
-            js.schedule(job);
+            JobExecutionService.schedule(JobExecutionService.JOB_UPLOAD_GPX, intent.getExtras(), getActivity());
             Toast.makeText(getActivity(), R.string.msg_scheduled, Toast.LENGTH_SHORT).show();
         }
     }
@@ -3593,7 +3629,18 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             else
                 pref.setTitle(getString(R.string.title_blogpwd, "********"));
 
-        else if (PREF_TEMPERATURE.equals(key)) {
+        else if (PREF_LIFELINE_METERED_INTERVAL.equals(key))
+            pref.setTitle(getString(R.string.title_lifeline_interval, prefs.getString(key, DEFAULT_LIFELINE_METERED_INTERVAL)));
+        else if (PREF_LIFELINE_STATE.equals(key) || PREF_LIFELINE_LAST.equals(key)) {
+            DatabaseHelper dh = new DatabaseHelper(getActivity());
+            int unsent = dh.getUnsentLocationCount();
+            dh.close();
+            long last = prefs.getLong(PREF_LIFELINE_LAST, 0);
+            String time = (last == 0 ? "-" : SimpleDateFormat.getDateTimeInstance().format(last));
+            pref = findPreference(PREF_LIFELINE_STATE);
+            pref.setTitle(getString(R.string.title_lifeline_state, unsent, time));
+
+        } else if (PREF_TEMPERATURE.equals(key)) {
             String temperature_unit = prefs.getString(key, DEFAULT_TEMPERATURE);
             if ("c".equals(temperature_unit))
                 temperature_unit = getString(R.string.header_celcius);
@@ -3636,6 +3683,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             pref.setTitle(getString(R.string.title_geoname_results, prefs.getString(key, DEFAULT_GEONAME_RESULTS)));
         else if (PREF_SEARCH_CACHE.equals(key))
             pref.setTitle(getString(R.string.title_search_cache, prefs.getString(key, DEFAULT_SEARCH_CACHE)));
+        else if (PREF_CONNECTIVITY_CHECK_INTERVAL.equals(key))
+            pref.setTitle(getString(R.string.title_connectivity_check_interval, prefs.getString(key, DEFAULT_CONNECTIVITY_CHECK_INTERVAL)));
     }
 
     private boolean blogConfigured() {

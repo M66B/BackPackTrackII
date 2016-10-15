@@ -22,6 +22,7 @@ import android.os.Looper;
 import android.os.PersistableBundle;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
+import android.support.v4.net.ConnectivityManagerCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -35,6 +36,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -91,6 +95,11 @@ public class Util {
         return (activeNetwork != null && activeNetwork.isConnected());
     }
 
+    public static boolean isMeteredNetwork(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return (cm != null && ConnectivityManagerCompat.isActiveNetworkMetered(cm));
+    }
+
     public static boolean storageMounted() {
         return Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState());
     }
@@ -102,6 +111,16 @@ public class Util {
                 Toast.makeText(context, text, length).show();
             }
         });
+    }
+
+    public static String sha256(String text) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+        messageDigest.update(text.getBytes("UTF-8"));
+        byte[] bytes = messageDigest.digest();
+        StringBuilder buffer = new StringBuilder();
+        for (byte b : bytes)
+            buffer.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
+        return buffer.toString();
     }
 
     public static void sendLogcat(final Context context) {

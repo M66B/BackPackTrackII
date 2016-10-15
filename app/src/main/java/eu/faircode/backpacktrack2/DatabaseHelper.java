@@ -2,6 +2,7 @@ package eu.faircode.backpacktrack2;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -26,7 +27,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 24;
+    private static final int DB_VERSION = 26;
 
     private static HandlerThread hthread = null;
     private static Handler handler = null;
@@ -98,9 +99,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", name TEXT" +
                 ", proximity INTEGER NULL" +
                 ", hidden INTEGER NULL" +
+                ", sent INTEGER NULL" +
                 ");");
         db.execSQL("CREATE INDEX idx_location_time ON location(time)");
         db.execSQL("CREATE INDEX idx_location_name ON location(name)");
+        db.execSQL("CREATE INDEX idx_location_sent ON location(sent)");
     }
 
     private void createTableActivityType(SQLiteDatabase db) {
@@ -329,6 +332,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 oldVersion = 24;
             }
 
+            if (oldVersion < 25) {
+                db.execSQL("ALTER TABLE location ADD COLUMN sent INTEGER NULL");
+                oldVersion = 25;
+            }
+
+            if (oldVersion < 26) {
+                db.execSQL("CREATE INDEX idx_location_sent ON location(sent)");
+                oldVersion = 26;
+            }
+
             db.setVersion(DB_VERSION);
 
             db.setTransactionSuccessful();
@@ -342,6 +355,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Location
 
     public DatabaseHelper insertLocation(Location location, int altitude_type, String name) {
+        long id;
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
 
@@ -378,16 +392,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             else
                 cv.put("name", name);
 
-            if (db.insert("location", null, cv) == -1)
+            id = db.insert("location", null, cv);
+            if (id == -1)
                 Log.e(TAG, "Insert location failed");
         }
 
-        for (LocationChangedListener listener : mLocationChangedListeners)
-            try {
-                listener.onLocationAdded(location);
-            } catch (Throwable ex) {
-                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            }
+        if (id != -1) {
+            Intent lifeline = new Intent(mContext, BackgroundService.class);
+            lifeline.setAction(BackgroundService.ACTION_LIFELINE);
+            lifeline.putExtra(BackgroundService.EXTRA_ID, id);
+            mContext.startService(lifeline);
+
+            for (LocationChangedListener listener : mLocationChangedListeners)
+                try {
+                    listener.onLocationAdded(location);
+                } catch (Throwable ex) {
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                }
+        }
 
         return this;
     }
@@ -401,7 +423,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Log.e(TAG, "Update location failed");
         }
 
-        notifyLocationUpdated();
+        notifyLocationUpdated(id);
 
         return this;
     }
@@ -415,7 +437,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Log.e(TAG, "Update location failed");
         }
 
-        notifyLocationUpdated();
+        notifyLocationUpdated(id);
 
         return this;
     }
@@ -430,7 +452,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Log.e(TAG, "Update location altitude failed");
         }
 
-        notifyLocationUpdated();
+        notifyLocationUpdated(id);
 
         return this;
     }
@@ -442,6 +464,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cv.put("hidden", hidden ? 1 : 0);
             if (db.update("location", cv, "ID = ?", new String[]{Long.toString(id)}) != 1)
                 Log.e(TAG, "Update location hidden failed");
+        }
+
+        for (LocationChangedListener listener : mLocationChangedListeners)
+            try {
+                listener.onLocationUpdated();
+            } catch (Throwable ex) {
+                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
+
+        return this;
+    }
+
+    public DatabaseHelper sentLocation(long id, boolean sent) {
+        synchronized (mContext.getApplicationContext()) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues cv = new ContentValues();
+            cv.put("sent", sent ? 1 : 0);
+            if (db.update("location", cv, "ID = ?", new String[]{Long.toString(id)}) != 1)
+                Log.e(TAG, "Update location sent failed");
         }
 
         for (LocationChangedListener listener : mLocationChangedListeners)
@@ -466,7 +507,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Log.e(TAG, "Update location radius failed");
         }
 
-        notifyLocationUpdated();
+        notifyLocationUpdated(id);
 
         return this;
     }
@@ -529,6 +570,64 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         query += " WHERE NOT name IS NULL AND (hidden IS NULL OR hidden = 0)";
         query += " ORDER BY name";
         return db.rawQuery(query, new String[0]);
+    }
+
+    public Cursor getUnsentLocations() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM location";
+        query += " WHERE sent IS NULL";
+        query += " ORDER BY time DESC";
+        return db.rawQuery(query, new String[]{});
+    }
+
+    public int getUnsentLocationCount() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT COUNT(*) FROM location";
+        query += " WHERE sent IS NULL";
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(query, new String[]{});
+            if (cursor.moveToNext())
+                return cursor.getInt(0);
+            else
+                return 0;
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+    }
+
+    public Location getLocation(long id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM location";
+        query += " WHERE ID = " + id;
+
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery(query, new String[0]);
+            if (cursor.moveToNext()) {
+                int colTime = cursor.getColumnIndex("time");
+                int colLatitude = cursor.getColumnIndex("latitude");
+                int colLongitude = cursor.getColumnIndex("longitude");
+                int colAltitude = cursor.getColumnIndex("altitude");
+                int colAccuracy = cursor.getColumnIndex("accuracy");
+                int colName = cursor.getColumnIndex("name");
+
+                Location location = new Location(cursor.getString(colName)); // hack
+                location.setTime(cursor.getLong(colTime));
+                location.setLatitude(cursor.getDouble(colLatitude));
+                location.setLongitude(cursor.getDouble(colLongitude));
+                if (!cursor.isNull(colAltitude))
+                    location.setAltitude(cursor.getDouble(colAltitude));
+                if (!cursor.isNull(colAccuracy))
+                    location.setAccuracy(cursor.getFloat(colAccuracy));
+                return location;
+            } else
+                return null;
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
     }
 
     // Activity
@@ -1080,10 +1179,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         mWeatherChangedListeners.remove(listener);
     }
 
-    private void notifyLocationUpdated() {
+    private void notifyLocationUpdated(long id) {
         Message msg = handler.obtainMessage();
         msg.what = MSG_LOCATION_UPDATED;
+        msg.obj = (Long) id;
         handler.sendMessage(msg);
+
+        Intent lifeline = new Intent(mContext, BackgroundService.class);
+        lifeline.setAction(BackgroundService.ACTION_LIFELINE);
+        lifeline.putExtra(BackgroundService.EXTRA_ID, id);
+        mContext.startService(lifeline);
     }
 
     private static void handleChangedNotification(Message msg) {

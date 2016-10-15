@@ -43,16 +43,22 @@ import com.google.gson.JsonSerializer;
 
 import org.joda.time.DateTime;
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -64,7 +70,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import de.timroes.axmlrpc.XMLRPCClient;
 import de.timroes.axmlrpc.XMLRPCException;
@@ -94,6 +104,9 @@ public class BackgroundService extends IntentService {
     public static final String ACTION_SHARE_KML = "ShareKML";
     public static final String ACTION_UPLOAD_GPX = "UploadGPX";
 
+    public static final String ACTION_LIFELINE = "Lifeline";
+    public static final String ACTION_CONNECTIVITY = "Connectivity";
+
     public static final String EXPORTED_ACTION_PRIVACY = "eu.faircode.backpacktrack2.PRIVACY";
     public static final String EXPORTED_ACTION_TRACKING = "eu.faircode.backpacktrack2.TRACKING";
     public static final String EXPORTED_ACTION_TRACKPOINT = "eu.faircode.backpacktrack2.TRACKPOINT";
@@ -116,6 +129,7 @@ public class BackgroundService extends IntentService {
     public static final String EXTRA_JOB = "Job";
     public static final String EXTRA_WAYPOINT = "Waypoint";
     public static final String EXTRA_GEOURI = "Geopoint";
+    public static final String EXTRA_ID = "RowID";
 
     public static final String DEFAULT_TRACK_NAME = "BackPackTrack";
 
@@ -155,6 +169,9 @@ public class BackgroundService extends IntentService {
     public static final int REQUEST_RAIN = 9;
     public static final int REQUEST_STEPS = 10;
     public static final int REQUEST_RESTART = 11;
+
+    private static final int LIFELINE_TIMEOUT = 20 * 1000;
+    public static final String LIFELINE_BASEURL = "https://lifeline.faircode.eu/";
 
     private static int mEGM96Pointer = -1;
     private static int mEGM96Offset;
@@ -254,6 +271,12 @@ public class BackgroundService extends IntentService {
 
             else if (ACTION_GUARD_WEATHER.equals(intent.getAction()))
                 handleWeatherGuard(intent);
+
+            else if (ACTION_LIFELINE.equals(intent.getAction()))
+                handleLifeline(intent);
+
+            else if (ACTION_CONNECTIVITY.equals(intent.getAction()))
+                handleConnectivity(intent);
 
             else
                 Log.i(TAG, "Unknown action");
@@ -885,8 +908,10 @@ public class BackgroundService extends IntentService {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
             // Check connectivity
-            if (!Util.isConnected(this))
+            if (!Util.isConnected(this)) {
+                JobExecutionService.schedule(JobExecutionService.JOB_CONNECTIVITY, null, this);
                 throw new Throwable("No connectivity");
+            }
 
             // Get API key
             String api = prefs.getString(SettingsFragment.PREF_WEATHER_API, SettingsFragment.DEFAULT_WEATHER_API);
@@ -953,6 +978,165 @@ public class BackgroundService extends IntentService {
         removeWeatherNotification(this);
         removeRainNotification(this);
         WeatherWidget.updateWidgets(this);
+    }
+
+    private void handleLifeline(Intent intent) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if (prefs.getBoolean(SettingsFragment.PREF_LIFELINE_ENABLED, SettingsFragment.DEFAULT_LIFELINE_ENABLED))
+            if (Util.isConnected(this)) {
+                long last = prefs.getLong(SettingsFragment.PREF_LIFELINE_LAST, 0);
+                int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_LIFELINE_METERED_INTERVAL, SettingsFragment.DEFAULT_LIFELINE_METERED_INTERVAL));
+                if (!Util.isMeteredNetwork(this) || last + 60 * 1000L * interval < new Date().getTime()) {
+                    DatabaseHelper dh = null;
+                    try {
+                        long id = intent.getLongExtra(EXTRA_ID, -1);
+                        dh = new DatabaseHelper(this);
+                        Location location = dh.getLocation(id);
+                        postLocation(id, location, location.getProvider());
+                    } catch (Throwable ex) {
+                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    } finally {
+                        if (dh != null)
+                            dh.close();
+                    }
+                } else if (Util.isMeteredNetwork(this))
+                    JobExecutionService.schedule(JobExecutionService.JOB_CONNECTIVITY, null, this);
+            } else
+                JobExecutionService.schedule(JobExecutionService.JOB_CONNECTIVITY, null, this);
+
+        DatabaseHelper dh = new DatabaseHelper(this);
+        prefs.edit().putInt(SettingsFragment.PREF_LIFELINE_STATE, dh.getUnsentLocationCount()).apply();
+        dh.close();
+    }
+
+    private void handleConnectivity(Intent intent) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        // Update weather/pressure
+        long ref_time = prefs.getLong(SettingsFragment.PREF_PRESSURE_REF_TIME, 0);
+        int weatherInterval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_INTERVAL, SettingsFragment.DEFAULT_WEATHER_INTERVAL));
+
+        if (ref_time + 60 * 1000L * weatherInterval < new Date().getTime()) {
+            Intent intentWeather = new Intent(this, BackgroundService.class);
+            intentWeather.setAction(BackgroundService.ACTION_UPDATE_WEATHER);
+            startService(intentWeather);
+        }
+
+        long last = prefs.getLong(SettingsFragment.PREF_LIFELINE_LAST, 0);
+        int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_LIFELINE_METERED_INTERVAL, SettingsFragment.DEFAULT_LIFELINE_METERED_INTERVAL));
+        boolean metered = Util.isMeteredNetwork(this);
+        if (!metered || last + 60 * 1000L * interval < new Date().getTime()) {
+            Log.i(TAG, "Lifeline update metered=" + metered);
+
+            // Update lifeline
+            if (prefs.getBoolean(SettingsFragment.PREF_LIFELINE_ENABLED, SettingsFragment.DEFAULT_LIFELINE_ENABLED))
+                try {
+                    DatabaseHelper dh = null;
+                    Cursor cursor = null;
+                    try {
+                        dh = new DatabaseHelper(this);
+                        cursor = dh.getUnsentLocations();
+
+                        int colID = cursor.getColumnIndex("ID");
+                        int colTime = cursor.getColumnIndex("time");
+                        int colProvider = cursor.getColumnIndex("provider");
+                        int colLatitude = cursor.getColumnIndex("latitude");
+                        int colLongitude = cursor.getColumnIndex("longitude");
+                        int colAltitude = cursor.getColumnIndex("altitude");
+                        int colAccuracy = cursor.getColumnIndex("accuracy");
+                        int colName = cursor.getColumnIndex("name");
+
+                        while (Util.isConnected(this) && !Util.isMeteredNetwork(this) && cursor.moveToNext()) {
+                            long id = cursor.getLong(colID);
+                            String name = cursor.getString(colName);
+
+                            Location location = new Location(cursor.getString(colProvider));
+                            location.setTime(cursor.getLong(colTime));
+                            location.setLatitude(cursor.getDouble(colLatitude));
+                            location.setLongitude(cursor.getDouble(colLongitude));
+                            if (!cursor.isNull(colAltitude))
+                                location.setAltitude(cursor.getDouble(colAltitude));
+                            if (!cursor.isNull(colAccuracy))
+                                location.setAccuracy(cursor.getFloat(colAccuracy));
+
+                            postLocation(id, location, name);
+                        }
+                        Log.i(TAG, "All locations sent=" + cursor.isAfterLast());
+                    } finally {
+                        if (cursor != null)
+                            cursor.close();
+                        if (dh != null)
+                            dh.close();
+                    }
+                } catch (Throwable ex) {
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                }
+        }
+    }
+
+    private void postLocation(long id, Location location, String name) throws IOException, NoSuchAlgorithmException, JSONException {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        HttpsURLConnection urlConnection = null;
+        try {
+            long llid = prefs.getLong(SettingsFragment.PREF_LIFELINE_ID, 0);
+            while (llid == 0) {
+                llid = UUID.randomUUID().getLeastSignificantBits();
+                prefs.edit().putLong(SettingsFragment.PREF_LIFELINE_ID, llid).apply();
+            }
+
+            JSONObject jlocation = new JSONObject();
+            jlocation.put("name", name);
+            jlocation.put("lat", location.getLatitude());
+            jlocation.put("lon", location.getLongitude());
+            if (location.hasAltitude())
+                jlocation.put("alt", Math.round(location.getAltitude()));
+            if (location.hasAccuracy())
+                jlocation.put("acc", Math.round(location.getAccuracy()));
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+            JSONObject json = new JSONObject();
+            json.put("token", Util.sha256(Long.toString(llid)));
+            json.put("type", "location");
+            json.put("time", sdf.format(location.getTime()));
+            json.put("data", jlocation.toString());
+
+            URL url = new URL(LIFELINE_BASEURL + "v1/event");
+            urlConnection = (HttpsURLConnection) url.openConnection();
+            urlConnection.setConnectTimeout(LIFELINE_TIMEOUT);
+            urlConnection.setReadTimeout(LIFELINE_TIMEOUT);
+            urlConnection.setRequestProperty("Accept", "application/json; charset=UTF-8");
+            urlConnection.setRequestProperty("Content-type", "application/json; charset=UTF-8");
+            urlConnection.setRequestMethod("POST");
+            urlConnection.setDoInput(true);
+            urlConnection.setDoOutput(true);
+
+            OutputStream out = new BufferedOutputStream(urlConnection.getOutputStream());
+            out.write(json.toString().getBytes()); // UTF-8
+            out.flush();
+
+            // Check for errors
+            int code = urlConnection.getResponseCode();
+            if (code != HttpsURLConnection.HTTP_OK) {
+                // Get error message
+                BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getErrorStream()));
+                String errorMessage = "HTTP " + urlConnection.getResponseCode() + " "
+                        + urlConnection.getResponseMessage() + " " + br.readLine();
+                throw new IOException(errorMessage);
+            }
+
+            prefs.edit().putLong(SettingsFragment.PREF_LIFELINE_LAST, location.getTime()).apply();
+
+            new DatabaseHelper(this).sentLocation(id, true).close();
+
+            Log.i(TAG, "Posted location=" + location);
+        } finally {
+            if (urlConnection != null)
+                urlConnection.disconnect();
+        }
     }
 
     // Start/stop methods
@@ -1292,7 +1476,7 @@ public class BackgroundService extends IntentService {
         am.cancel(pi);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_WEATHER_GUARD, SettingsFragment.DEFAULT_WEATHER_GUARD));
-        long trigger = new Date().getTime() + 60 * 1000 * interval;
+        long trigger = new Date().getTime() + 60 * 1000L * interval;
         am.set(AlarmManager.RTC_WAKEUP, trigger, pi);
         Log.i(TAG, "Set weather guard interval=" + interval + "m" + " trigger=" + SimpleDateFormat.getDateTimeInstance().format(trigger));
     }

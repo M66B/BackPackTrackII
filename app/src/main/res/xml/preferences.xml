@@ -526,6 +526,24 @@
                     android:data="https://wordpress.org/plugins/backpacktrack-for-android/" />
             </Preference>
         </PreferenceScreen>
+        <PreferenceScreen android:title="@string/title_lifeline">
+            <CheckBoxPreference
+                android:defaultValue="false"
+                android:key="pref_lifeline_enabled"
+                android:title="@string/title_lifeline_enabled" />
+            <EditTextPreference
+                android:defaultValue="60"
+                android:inputType="number"
+                android:key="pref_lifeline_metered_interval"
+                android:summary="@string/summary_lifeline_interval" />
+            <Preference
+                android:key="pref_lifeline_private_page"
+                android:title="@string/title_lifeline_private_page" />
+            <Preference
+                android:key="pref_lifeline_public_page"
+                android:title="@string/title_lifeline_public_page" />
+            <Preference android:key="pref_lifeline_state" />
+        </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_units">
             <ListPreference
                 android:defaultValue="c"
@@ -574,6 +592,11 @@
                 android:defaultValue="7"
                 android:inputType="number"
                 android:key="pref_search_cache" />
+            <EditTextPreference
+                android:defaultValue="10"
+                android:inputType="number"
+                android:key="pref_connectivity_check_interval"
+                android:summary="@string/summary_connectivity_check_interval" />
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="pref_debug"
@@ -583,6 +606,8 @@
                 android:key="pref_logcat"
                 android:title="@string/title_logcat" />
         </PreferenceScreen>
+
+
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_info">
         <PreferenceScreen android:title="@string/title_legend">
