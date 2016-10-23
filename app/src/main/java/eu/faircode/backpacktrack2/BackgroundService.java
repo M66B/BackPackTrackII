@@ -1128,9 +1128,9 @@ public class BackgroundService extends IntentService {
                 throw new IOException(errorMessage);
             }
 
-            prefs.edit().putLong(SettingsFragment.PREF_LIFELINE_LAST, location.getTime()).apply();
-
             new DatabaseHelper(this).sentLocation(id, true).close();
+
+            prefs.edit().putLong(SettingsFragment.PREF_LIFELINE_LAST, location.getTime()).apply();
 
             Log.i(TAG, "Posted location=" + location);
         } finally {
