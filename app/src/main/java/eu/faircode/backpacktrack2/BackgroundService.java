@@ -1101,6 +1101,7 @@ public class BackgroundService extends IntentService {
             JSONObject json = new JSONObject();
             json.put("token", Util.sha256(Long.toString(llid)));
             json.put("type", "location");
+            json.put("extid", Long.toString((id)));
             json.put("time", sdf.format(location.getTime()));
             json.put("data", jlocation.toString());
 
