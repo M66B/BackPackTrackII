@@ -987,7 +987,7 @@ public class BackgroundService extends IntentService {
             if (Util.isConnected(this)) {
                 long last = prefs.getLong(SettingsFragment.PREF_LIFELINE_LAST, 0);
                 int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_LIFELINE_METERED_INTERVAL, SettingsFragment.DEFAULT_LIFELINE_METERED_INTERVAL));
-                if (!Util.isMeteredNetwork(this) || last + 60 * 1000L * interval < new Date().getTime()) {
+                if (!Util.isMeteredNetwork(this) || interval == 0 || last + 60 * 1000L * interval < new Date().getTime()) {
                     DatabaseHelper dh = null;
                     try {
                         long id = intent.getLongExtra(EXTRA_ID, -1);
@@ -1023,11 +1023,11 @@ public class BackgroundService extends IntentService {
             startService(intentWeather);
         }
 
+        boolean metered = Util.isMeteredNetwork(this);
         long last = prefs.getLong(SettingsFragment.PREF_LIFELINE_LAST, 0);
         int interval = Integer.parseInt(prefs.getString(SettingsFragment.PREF_LIFELINE_METERED_INTERVAL, SettingsFragment.DEFAULT_LIFELINE_METERED_INTERVAL));
-        boolean metered = Util.isMeteredNetwork(this);
-        if (!metered || last + 60 * 1000L * interval < new Date().getTime()) {
-            Log.i(TAG, "Lifeline update metered=" + metered);
+        if (!metered || interval == 0 || last + 60 * 1000L * interval < new Date().getTime()) {
+            Log.i(TAG, "Lifeline update metered=" + metered + " interval=" + interval);
 
             // Update lifeline
             if (prefs.getBoolean(SettingsFragment.PREF_LIFELINE_ENABLED, SettingsFragment.DEFAULT_LIFELINE_ENABLED))
@@ -1047,7 +1047,7 @@ public class BackgroundService extends IntentService {
                         int colAccuracy = cursor.getColumnIndex("accuracy");
                         int colName = cursor.getColumnIndex("name");
 
-                        while (Util.isConnected(this) && !Util.isMeteredNetwork(this) && cursor.moveToNext()) {
+                        while (Util.isConnected(this) && (!Util.isMeteredNetwork(this) || interval == 0) && cursor.moveToNext()) {
                             long id = cursor.getLong(colID);
                             String name = cursor.getString(colName);
 
