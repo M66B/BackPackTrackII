@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -24,6 +25,7 @@ import android.os.Environment;
 import android.os.PowerManager;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.support.v4.content.FileProvider;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -784,13 +786,26 @@ public class BackgroundService extends IntentService {
 
         // View file
         if (ACTION_SHARE_GPX.equals(intent.getAction()) || ACTION_SHARE_KML.equals(intent.getAction())) {
+            Uri fileUri;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+                fileUri = FileProvider.getUriForFile(this, getPackageName() + ".provider", new File(fileName));
+            else
+                fileUri = Uri.fromFile(new File(fileName));
+
             Intent viewIntent = new Intent();
             viewIntent.setAction(Intent.ACTION_VIEW);
-            if (gpx)
-                viewIntent.setDataAndType(Uri.fromFile(new File(fileName)), "application/gpx+xml");
-            else
-                viewIntent.setDataAndType(Uri.fromFile(new File(fileName)), "application/vnd.google-earth.kml+xml");
+            viewIntent.setDataAndType(fileUri, gpx ? "application/gpx+xml" : "application/vnd.google-earth.kml+xml");
             viewIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                List<ResolveInfo> ria = getPackageManager().queryIntentActivities(viewIntent, PackageManager.MATCH_DEFAULT_ONLY);
+                for (ResolveInfo resolvedIntentInfo : ria)
+                    grantUriPermission(
+                            resolvedIntentInfo.activityInfo.packageName,
+                            fileUri,
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+
             startActivity(viewIntent);
         }
     }
