@@ -1146,7 +1146,7 @@ public class BackgroundService extends IntentService {
 
             new DatabaseHelper(this).sentLocation(id, true).close();
 
-            prefs.edit().putLong(SettingsFragment.PREF_LIFELINE_LAST, location.getTime()).apply();
+            prefs.edit().putLong(SettingsFragment.PREF_LIFELINE_LAST, new Date().getTime()).apply();
 
             Log.i(TAG, "Posted location=" + location);
         } finally {
