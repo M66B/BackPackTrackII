@@ -480,7 +480,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues cv = new ContentValues();
-            cv.put("sent", sent ? 1 : 0);
+            if (sent)
+                cv.put("sent", 1);
+            else
+                cv.putNull("sent");
             if (db.update("location", cv, "ID = ?", new String[]{Long.toString(id)}) != 1)
                 Log.e(TAG, "Update location sent failed");
         }
