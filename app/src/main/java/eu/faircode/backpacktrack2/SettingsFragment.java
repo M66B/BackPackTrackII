@@ -1262,7 +1262,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == ACTIVITY_PICKPLACE && resultCode == Activity.RESULT_OK) {
-            Place place = PlacePicker.getPlace(data, getActivity());
+            Place place = PlacePicker.getPlace(getActivity(), data);
             final CharSequence name = place.getName();
             LatLng ll = place.getLatLng();
             if (name == null || ll == null)
@@ -1349,6 +1349,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         defaultFrom.set(Calendar.DAY_OF_MONTH, 1);
         defaultFrom.set(Calendar.HOUR_OF_DAY, 0);
         defaultFrom.set(Calendar.MINUTE, 0);
+        defaultFrom.set(Calendar.SECOND, 0);
+        defaultFrom.set(Calendar.MILLISECOND, 0);
 
         // Get default to
         Calendar defaultTo = Calendar.getInstance();
@@ -1357,6 +1359,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         defaultTo.set(Calendar.DAY_OF_MONTH, 1);
         defaultTo.set(Calendar.HOUR_OF_DAY, 0);
         defaultTo.set(Calendar.MINUTE, 0);
+        defaultTo.set(Calendar.SECOND, 0);
+        defaultTo.set(Calendar.MILLISECOND, 0);
 
         // Get range
         final Calendar from = GregorianCalendar.getInstance();
@@ -1405,6 +1409,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             public void onTimeSet(TimePicker view, int hour, int minute) {
                                 from.set(Calendar.HOUR_OF_DAY, hour);
                                 from.set(Calendar.MINUTE, minute);
+                                from.set(Calendar.SECOND, 0);
+                                from.set(Calendar.MILLISECOND, 0);
                                 tvTimeFrom.setText(timeFormat.format(from.getTime()));
                             }
                         }, from.get(Calendar.HOUR_OF_DAY), from.get(Calendar.MINUTE), ampm);
@@ -1444,6 +1450,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                             public void onTimeSet(TimePicker view, int hour, int minute) {
                                 to.set(Calendar.HOUR_OF_DAY, hour);
                                 to.set(Calendar.MINUTE, minute);
+                                to.set(Calendar.SECOND, 0);
+                                to.set(Calendar.MILLISECOND, 0);
                                 tvTimeTo.setText(timeFormat.format(to.getTime()));
                             }
                         }, to.get(Calendar.HOUR_OF_DAY), to.get(Calendar.MINUTE), ampm);
