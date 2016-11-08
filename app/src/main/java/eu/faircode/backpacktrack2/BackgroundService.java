@@ -1005,10 +1005,15 @@ public class BackgroundService extends IntentService {
                 if (!Util.isMeteredNetwork(this) || interval == 0 || last + 60 * 1000L * interval < new Date().getTime()) {
                     DatabaseHelper dh = null;
                     try {
-                        long id = intent.getLongExtra(EXTRA_ID, -1);
-                        dh = new DatabaseHelper(this);
-                        Location location = dh.getLocation(id);
-                        postLocation(id, location, location.getProvider());
+                        long id = intent.getLongExtra(EXTRA_ID, 0);
+                        if (id != 0) {
+                            Location location = null;
+                            if (id > 0) {
+                                dh = new DatabaseHelper(this);
+                                location = dh.getLocation(id);
+                            }
+                            postLocation(id, location, location == null ? null : location.getProvider());
+                        }
                     } catch (Throwable ex) {
                         Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
                     } finally {
@@ -1101,14 +1106,17 @@ public class BackgroundService extends IntentService {
                 prefs.edit().putLong(SettingsFragment.PREF_LIFELINE_ID, llid).apply();
             }
 
-            JSONObject jlocation = new JSONObject();
-            jlocation.put("name", name);
-            jlocation.put("lat", location.getLatitude());
-            jlocation.put("lon", location.getLongitude());
-            if (location.hasAltitude())
-                jlocation.put("alt", Math.round(location.getAltitude()));
-            if (location.hasAccuracy())
-                jlocation.put("acc", Math.round(location.getAccuracy()));
+            JSONObject jlocation = null;
+            if (location != null) {
+                jlocation = new JSONObject();
+                jlocation.put("name", name);
+                jlocation.put("lat", location.getLatitude());
+                jlocation.put("lon", location.getLongitude());
+                if (location.hasAltitude())
+                    jlocation.put("alt", Math.round(location.getAltitude()));
+                if (location.hasAccuracy())
+                    jlocation.put("acc", Math.round(location.getAccuracy()));
+            }
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -1116,9 +1124,11 @@ public class BackgroundService extends IntentService {
             JSONObject json = new JSONObject();
             json.put("token", Util.sha256(Long.toString(llid)));
             json.put("type", "location");
-            json.put("extid", Long.toString((id)));
-            json.put("time", sdf.format(location.getTime()));
-            json.put("data", jlocation.toString());
+            json.put("extid", Long.toString(Math.abs(id)));
+            if (location != null)
+                json.put("time", sdf.format(location.getTime()));
+            if (jlocation != null)
+                json.put("data", jlocation.toString());
 
             URL url = new URL(LIFELINE_BASEURL + "v1/event");
             urlConnection = (HttpsURLConnection) url.openConnection();
@@ -1126,7 +1136,7 @@ public class BackgroundService extends IntentService {
             urlConnection.setReadTimeout(LIFELINE_TIMEOUT);
             urlConnection.setRequestProperty("Accept", "application/json; charset=UTF-8");
             urlConnection.setRequestProperty("Content-type", "application/json; charset=UTF-8");
-            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestMethod(id > 0 ? "POST" : "DELETE");
             urlConnection.setDoInput(true);
             urlConnection.setDoOutput(true);
 
@@ -1144,11 +1154,12 @@ public class BackgroundService extends IntentService {
                 throw new IOException(errorMessage);
             }
 
-            new DatabaseHelper(this).sentLocation(id, true).close();
+            if (location != null)
+                new DatabaseHelper(this).sentLocation(id, true).close();
 
             prefs.edit().putLong(SettingsFragment.PREF_LIFELINE_LAST, new Date().getTime()).apply();
 
-            Log.i(TAG, "Posted location=" + location);
+            Log.i(TAG, "Posted id=" + id + " location=" + location);
         } finally {
             if (urlConnection != null)
                 urlConnection.disconnect();

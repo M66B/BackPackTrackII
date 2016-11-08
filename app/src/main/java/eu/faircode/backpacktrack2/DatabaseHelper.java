@@ -526,6 +526,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
 
+        Intent lifeline = new Intent(mContext, BackgroundService.class);
+        lifeline.setAction(BackgroundService.ACTION_LIFELINE);
+        lifeline.putExtra(BackgroundService.EXTRA_ID, -id);
+        mContext.startService(lifeline);
+
         return this;
     }
 
