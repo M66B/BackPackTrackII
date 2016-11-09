@@ -240,17 +240,17 @@ The weather history shows the time of the weather reports (not the time of fetch
 When fetching:
 
 * elevation data, your location will be sent securely to maps.googleapis.com
-* weather data, your location will be sent securely to api.forecast.io
+* weather data, your location will be sent securely to api.darksky.net
 * geonames, your location will be sent insecurely to api.geonames.org
 * wiki items, your location will be sent securely to en.wikipedia.org and en.wikivoyage.org
 
 Location = your last latitude and longitude
 
 <a name="FAQ12"></a>
-**(12) How can I use forecast.io weather info?**
+**(12) How can I use darksky.net weather info?**
 
-In order to use Forecast.io weather information you will need to register for a developer account [here](https://developer.forecast.io/)
-and to enter the Forecast.io API key into the weather settings. Without API key you will get 'Forbidden'.
+In order to use darksky.net weather information you will need to register for a developer account [here](https://darksky.net/dev/)
+and to enter the darksky.net API key into the weather settings. Without API key you will get 'Forbidden'.
 
 Android permissions
 -------------------
