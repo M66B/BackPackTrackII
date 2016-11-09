@@ -181,6 +181,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE INDEX idx_weather_station_id ON weather(station_id)");
     }
 
+    private boolean columnExists(SQLiteDatabase db, String table, String column) {
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("SELECT * FROM " + table + " LIMIT 0", null);
+            return (cursor.getColumnIndex(column) >= 0);
+        } catch (Throwable ex) {
+            Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+            return false;
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.i(TAG, "Upgrading from version " + oldVersion + " to " + newVersion);
@@ -321,7 +335,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 oldVersion = 23;
             }
 
-            if (oldVersion <= 24) {
+            if (oldVersion < 24) {
                 db.execSQL("ALTER TABLE location RENAME TO location_orig");
                 db.execSQL("DROP INDEX idx_location_time");
                 db.execSQL("DROP INDEX idx_location_name");
@@ -332,13 +346,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 oldVersion = 24;
             }
 
-            if (oldVersion < 25) {
-                db.execSQL("ALTER TABLE location ADD COLUMN sent INTEGER NULL");
-                oldVersion = 25;
-            }
-
             if (oldVersion < 26) {
-                db.execSQL("CREATE INDEX idx_location_sent ON location(sent)");
+                if (!columnExists(db, "location", "sent")) {
+                    db.execSQL("ALTER TABLE location ADD COLUMN sent INTEGER NULL");
+                    db.execSQL("CREATE INDEX idx_location_sent ON location(sent)");
+                }
                 oldVersion = 26;
             }
 
