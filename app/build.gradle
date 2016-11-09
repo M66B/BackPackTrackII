@@ -8,8 +8,8 @@ android {
         applicationId "eu.faircode.backpacktrack2"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 2016092301
-        versionName "1.36"
+        versionCode 2016110901
+        versionName "1.37"
     }
     buildTypes {
         release {
@@ -19,6 +19,9 @@ android {
                 setOutputFile(variant, defaultConfig)
             }
         }
+    }
+    lintOptions {
+        abortOnError false
     }
 }
 
