@@ -26,16 +26,11 @@ import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import okhttp3.OkHttpClient;
-import okhttp3.OkUrlFactory;
-
 public class Geonames {
     private static final String TAG = "BPT2.Geonames";
 
     private static final int cTimeOutMs = 30 * 1000;
     public static final String BASE_URL = "http://api.geonames.org";
-
-    private static OkHttpClient okHttpClient = new OkHttpClient();
 
     private static File getCacheFolder(Context context) {
         File folder = new File(context.getCacheDir(), "geonames");
@@ -105,7 +100,7 @@ public class Geonames {
                 "&username=" + username);
 
         Log.i(TAG, "url=" + url);
-        HttpURLConnection urlConnection = new OkUrlFactory(okHttpClient).open(url);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setConnectTimeout(cTimeOutMs);
         urlConnection.setReadTimeout(cTimeOutMs);
         urlConnection.setRequestProperty("Accept", "application/json");

@@ -26,9 +26,6 @@ import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import okhttp3.OkHttpClient;
-import okhttp3.OkUrlFactory;
-
 public class DarkSky {
     private static final String TAG = "BPT2.DarkSky";
 
@@ -38,8 +35,6 @@ public class DarkSky {
     public static final int TYPE_CURRENT = 1;
     public static final int TYPE_HOURLY = 2;
     public static final int TYPE_DAILY = 3;
-
-    private static OkHttpClient okHttpClient = new OkHttpClient();
 
     public static List<Weather> getWeatherByLocation(
             String apikey, final Location location, int type, boolean usecache, Context context)
@@ -89,7 +84,7 @@ public class DarkSky {
                 "&lang=" + Locale.getDefault().getLanguage());
 
         Log.i(TAG, "url=" + url);
-        HttpURLConnection urlConnection = new OkUrlFactory(okHttpClient).open(url);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setConnectTimeout(cTimeOutMs);
         urlConnection.setReadTimeout(cTimeOutMs);
         urlConnection.setRequestProperty("Accept", "application/json");

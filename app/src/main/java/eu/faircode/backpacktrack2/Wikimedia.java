@@ -26,19 +26,13 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import javax.net.ssl.HttpsURLConnection;
-
-import okhttp3.OkHttpClient;
-import okhttp3.OkUrlFactory;
 
 public class Wikimedia {
     private static final String TAG = "BPT2.Wikimedia";
 
     private static final int cTimeOutMs = 30 * 1000;
-
-    private static OkHttpClient okHttpClient = new OkHttpClient();
 
     public static List<Page> geosearch(final Location location, int radius, int limit, Context context, String[] baseurls) throws IOException, JSONException {
         if (radius > 10)
@@ -124,7 +118,7 @@ public class Wikimedia {
                 "&format=json");
 
         Log.i(TAG, "url=" + url);
-        HttpURLConnection urlConnection = new OkUrlFactory(okHttpClient).open(url);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setConnectTimeout(cTimeOutMs);
         urlConnection.setReadTimeout(cTimeOutMs);
         urlConnection.setRequestProperty("Accept", "application/json");

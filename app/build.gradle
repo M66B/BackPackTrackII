@@ -8,8 +8,8 @@ android {
         applicationId "eu.faircode.backpacktrack2"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 2016110901
-        versionName "1.37"
+        versionCode 2017021901
+        versionName "1.38"
     }
     buildTypes {
         release {
@@ -57,9 +57,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/joda-time/joda-time
     compile 'joda-time:joda-time:2.9.+'
-
-    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp-urlconnection
-    compile 'com.squareup.okhttp3:okhttp-urlconnection:3.6.+'
 }
 
 android {
