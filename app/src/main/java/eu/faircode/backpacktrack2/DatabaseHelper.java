@@ -27,7 +27,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "BPT2.Database";
 
     private static final String DB_NAME = "BackPackTrackII";
-    private static final int DB_VERSION = 26;
+    private static final int DB_VERSION = 27;
 
     private static HandlerThread hthread = null;
     private static Handler handler = null;
@@ -99,6 +99,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 ", name TEXT" +
                 ", proximity INTEGER NULL" +
                 ", hidden INTEGER NULL" +
+                ", deleted INTEGER NULL" +
                 ", sent INTEGER NULL" +
                 ");");
         db.execSQL("CREATE INDEX idx_location_time ON location(time)");
@@ -354,6 +355,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 oldVersion = 26;
             }
 
+            if (oldVersion < 27) {
+                if (!columnExists(db, "location", "deleted"))
+                    db.execSQL("ALTER TABLE location ADD COLUMN deleted INTEGER NULL");
+                oldVersion = 27;
+            }
+
             db.setVersion(DB_VERSION);
 
             db.setTransactionSuccessful();
@@ -431,6 +438,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues cv = new ContentValues();
             cv.put("name", name);
+            cv.putNull("sent");
             if (db.update("location", cv, "ID = ?", new String[]{Long.toString(id)}) != 1)
                 Log.e(TAG, "Update location failed");
         }
@@ -445,6 +453,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             SQLiteDatabase db = this.getWritableDatabase();
             ContentValues cv = new ContentValues();
             cv.put("time", time);
+            cv.putNull("sent");
             if (db.update("location", cv, "ID = ?", new String[]{Long.toString(id)}) != 1)
                 Log.e(TAG, "Update location failed");
         }
@@ -460,6 +469,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             ContentValues cv = new ContentValues();
             cv.put("altitude", altitude);
             cv.put("altitude_type", altitude_type);
+            cv.putNull("sent");
             if (db.update("location", cv, "ID = ?", new String[]{Long.toString(id)}) != 1)
                 Log.e(TAG, "Update location altitude failed");
         }
@@ -530,8 +540,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public DatabaseHelper deleteLocation(long id) {
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
-            if (db.delete("location", "ID = ?", new String[]{Long.toString(id)}) != 1)
-                Log.e(TAG, "Delete location failed");
+            ContentValues cv = new ContentValues();
+            cv.put("deleted", 1);
+            cv.putNull("sent");
+            if (db.update("location", cv, "ID = ?", new String[]{Long.toString(id)}) != 1)
+                Log.e(TAG, "Update location deleted failed");
         }
 
         for (LocationChangedListener listener : mLocationChangedListeners)
@@ -543,7 +556,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         Intent lifeline = new Intent(mContext, BackgroundService.class);
         lifeline.setAction(BackgroundService.ACTION_LIFELINE);
-        lifeline.putExtra(BackgroundService.EXTRA_ID, -id);
+        lifeline.putExtra(BackgroundService.EXTRA_ID, id);
         mContext.startService(lifeline);
 
         return this;
@@ -570,7 +583,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getLocations(long from, long to, boolean trackpoints, boolean waypoints, boolean asc, int limit) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT *, ID AS _id FROM location";
-        query += " WHERE time >= ? AND time <= ?";
+        query += " WHERE time >= ? AND time <= ? AND deleted IS NULL";
         if (trackpoints && !waypoints)
             query += " AND name IS NULL";
         if (!trackpoints && waypoints)
@@ -587,7 +600,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT ID AS _id, latitude, longitude, name";
         query += " FROM location";
-        query += " WHERE NOT name IS NULL AND (hidden IS NULL OR hidden = 0)";
+        query += " WHERE NOT name IS NULL AND (hidden IS NULL OR hidden = 0) AND deleted IS NULL";
         query += " ORDER BY name";
         return db.rawQuery(query, new String[0]);
     }
@@ -632,9 +645,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 int colAltitude = cursor.getColumnIndex("altitude");
                 int colAccuracy = cursor.getColumnIndex("accuracy");
                 int colName = cursor.getColumnIndex("name");
+                int colDeleted = cursor.getColumnIndex("deleted");
 
                 Location location = new Location(cursor.getString(colName)); // hack
-                location.setTime(cursor.getLong(colTime));
+                location.setTime(cursor.isNull(colDeleted) ? cursor.getLong(colTime) : Long.MAX_VALUE);
                 location.setLatitude(cursor.getDouble(colLatitude));
                 location.setLongitude(cursor.getDouble(colLongitude));
                 if (!cursor.isNull(colAltitude))

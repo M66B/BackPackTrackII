@@ -1007,12 +1007,9 @@ public class BackgroundService extends IntentService {
                     try {
                         long id = intent.getLongExtra(EXTRA_ID, 0);
                         if (id != 0) {
-                            Location location = null;
-                            if (id > 0) {
-                                dh = new DatabaseHelper(this);
-                                location = dh.getLocation(id);
-                            }
-                            postLocation(id, location, location == null ? null : location.getProvider());
+                            dh = new DatabaseHelper(this);
+                            Location location = dh.getLocation(id);
+                            postLocation(id, location, location.getProvider());
                         }
                     } catch (Throwable ex) {
                         Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
@@ -1066,13 +1063,14 @@ public class BackgroundService extends IntentService {
                         int colAltitude = cursor.getColumnIndex("altitude");
                         int colAccuracy = cursor.getColumnIndex("accuracy");
                         int colName = cursor.getColumnIndex("name");
+                        int colDeleted = cursor.getColumnIndex("deleted");
 
                         while (Util.isConnected(this) && (!Util.isMeteredNetwork(this) || interval == 0) && cursor.moveToNext()) {
                             long id = cursor.getLong(colID);
                             String name = cursor.getString(colName);
 
                             Location location = new Location(cursor.getString(colProvider));
-                            location.setTime(cursor.getLong(colTime));
+                            location.setTime(cursor.isNull(colDeleted) ? cursor.getLong(colTime) : Long.MAX_VALUE);
                             location.setLatitude(cursor.getDouble(colLatitude));
                             location.setLongitude(cursor.getDouble(colLongitude));
                             if (!cursor.isNull(colAltitude))
@@ -1107,7 +1105,7 @@ public class BackgroundService extends IntentService {
             }
 
             JSONObject jlocation = null;
-            if (location != null) {
+            if (location.getTime() != Long.MAX_VALUE) {
                 jlocation = new JSONObject();
                 jlocation.put("name", name);
                 jlocation.put("lat", location.getLatitude());
@@ -1124,8 +1122,8 @@ public class BackgroundService extends IntentService {
             JSONObject json = new JSONObject();
             json.put("token", Util.sha256(Long.toString(llid)));
             json.put("type", "location");
-            json.put("extid", Long.toString(Math.abs(id)));
-            if (location != null)
+            json.put("extid", Long.toString(id));
+            if (location.getTime() != Long.MAX_VALUE)
                 json.put("time", sdf.format(location.getTime()));
             if (jlocation != null)
                 json.put("data", jlocation.toString());
@@ -1136,7 +1134,7 @@ public class BackgroundService extends IntentService {
             urlConnection.setReadTimeout(LIFELINE_TIMEOUT);
             urlConnection.setRequestProperty("Accept", "application/json; charset=UTF-8");
             urlConnection.setRequestProperty("Content-type", "application/json; charset=UTF-8");
-            urlConnection.setRequestMethod(id > 0 ? "POST" : "DELETE");
+            urlConnection.setRequestMethod(location.getTime() == Long.MAX_VALUE ? "DELETE" : "POST");
             urlConnection.setDoInput(true);
             urlConnection.setDoOutput(true);
 
