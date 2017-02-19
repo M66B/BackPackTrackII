@@ -24,7 +24,8 @@ public class GoogleElevationApi {
         // https://developers.google.com/maps/documentation/elevation/
         URL url = new URL("https://maps.googleapis.com/maps/api/elevation/json?locations=" +
                 String.valueOf(location.getLatitude()) + "," +
-                String.valueOf(location.getLongitude()));
+                String.valueOf(location.getLongitude()) +
+                "&key=AIzaSyAp0gtiT6AqaSUSlqwXSyoFCA6SCzMyr6w");
         Log.d(TAG, "url=" + url);
         HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
 
