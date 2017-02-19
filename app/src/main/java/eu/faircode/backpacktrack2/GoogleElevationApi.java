@@ -4,9 +4,6 @@ import android.content.Context;
 import android.location.Location;
 import android.util.Log;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.OkUrlFactory;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +14,9 @@ import java.io.InputStreamReader;
 import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
+
+import okhttp3.OkHttpClient;
+import okhttp3.OkUrlFactory;
 
 public class GoogleElevationApi {
     private static final String TAG = "BPT2.GoogleElevation";
