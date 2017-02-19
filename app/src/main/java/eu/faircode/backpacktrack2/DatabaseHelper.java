@@ -3,6 +3,7 @@ package eu.faircode.backpacktrack2;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -10,6 +11,7 @@ import android.location.Location;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.location.DetectedActivity;
@@ -417,6 +419,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
 
         if (id != -1) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+            prefs.edit().putLong(SettingsFragment.PREF_LIFELINE_LAST, new Date().getTime()).apply();
+
             Intent lifeline = new Intent(mContext, BackgroundService.class);
             lifeline.setAction(BackgroundService.ACTION_LIFELINE);
             lifeline.putExtra(BackgroundService.EXTRA_ID, id);
@@ -553,6 +558,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } catch (Throwable ex) {
                 Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
             }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        prefs.edit().putLong(SettingsFragment.PREF_LIFELINE_LAST, new Date().getTime()).apply();
 
         Intent lifeline = new Intent(mContext, BackgroundService.class);
         lifeline.setAction(BackgroundService.ACTION_LIFELINE);
@@ -1218,6 +1226,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         msg.what = MSG_LOCATION_UPDATED;
         msg.obj = (Long) id;
         handler.sendMessage(msg);
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        prefs.edit().putLong(SettingsFragment.PREF_LIFELINE_LAST, new Date().getTime()).apply();
 
         Intent lifeline = new Intent(mContext, BackgroundService.class);
         lifeline.setAction(BackgroundService.ACTION_LIFELINE);
