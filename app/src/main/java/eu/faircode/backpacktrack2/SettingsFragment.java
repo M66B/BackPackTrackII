@@ -435,7 +435,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Log.e(TAG, "Connecting to Play services");
+                    Log.i(TAG, "Connecting to Play services");
                     GoogleApiClient gac = new GoogleApiClient.Builder(getActivity()).addApi(ActivityRecognition.API).build();
                     ConnectionResult result = gac.blockingConnect();
                     if (result.isSuccess())
