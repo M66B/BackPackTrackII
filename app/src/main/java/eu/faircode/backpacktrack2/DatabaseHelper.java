@@ -872,10 +872,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getActivityDurations(long from, long to, boolean asc) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT *, ID AS _id FROM activityduration";
+        query += " WHERE time >= ? AND time <= ?";
         query += " ORDER BY time";
         if (!asc)
             query += " DESC";
-        return db.rawQuery(query, new String[]{});
+        return db.rawQuery(query, new String[]{Long.toString(from), Long.toString(to)});
     }
 
     public Cursor getActivityLog(long from, long to, boolean asc) {
@@ -971,13 +972,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this;
     }
 
-    public Cursor getSteps(boolean asc) {
+    public Cursor getSteps(long from, long to, boolean asc) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT *, ID AS _id FROM step";
+        query += " WHERE time >= ? AND time <= ?";
         query += " ORDER BY time";
         if (!asc)
             query += " DESC";
-        return db.rawQuery(query, new String[]{});
+        return db.rawQuery(query, new String[]{Long.toString(from), Long.toString(to)});
     }
 
     public int getSteps(long time) {
@@ -1141,13 +1143,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return this;
     }
 
-    public Cursor getWeather(boolean asc) {
+    public Cursor getWeather(long from, long to, boolean asc) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT *, ID AS _id FROM weather";
+        query += " WHERE time >= ? AND time <= ?";
         query += " ORDER BY time";
         if (!asc)
             query += " DESC";
-        return db.rawQuery(query, new String[]{});
+        return db.rawQuery(query, new String[]{Long.toString(from), Long.toString(to)});
     }
 
     // Utility

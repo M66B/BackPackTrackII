@@ -2,64 +2,64 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <Preference
         android:layout="@layout/title"
-        android:selectable="false" />
+        android:selectable="false"/>
     <PreferenceCategory android:title="@string/title_action">
         <CheckBoxPreference
             android:defaultValue="false"
             android:icon="@drawable/person_outline_60"
             android:key="pref_privacy"
             android:summary="@string/summary_privacy"
-            android:title="@string/title_privacy" />
+            android:title="@string/title_privacy"/>
         <Preference
             android:icon="@drawable/create_60"
             android:key="pref_edit"
             android:summary="@string/summary_edit"
-            android:title="@string/title_edit" />
+            android:title="@string/title_edit"/>
         <Preference
             android:icon="@drawable/send_60"
             android:key="pref_share_gpx"
             android:summary="@string/summary_share_gpx"
-            android:title="@string/title_share_gpx" />
+            android:title="@string/title_share_gpx"/>
         <Preference
             android:icon="@drawable/language_60"
             android:key="pref_share_kml"
             android:summary="@string/summary_share_kml"
-            android:title="@string/title_share_kml" />
+            android:title="@string/title_share_kml"/>
         <Preference
             android:icon="@drawable/backup_60"
             android:key="pref_upload_gpx"
             android:summary="@string/summary_upload_gpx"
-            android:title="@string/title_upload_gpx" />
+            android:title="@string/title_upload_gpx"/>
         <Preference
             android:icon="@drawable/location_60"
             android:key="pref_location_history"
             android:summary="@string/summary_location_history"
-            android:title="@string/title_location_history" />
+            android:title="@string/title_location_history"/>
         <Preference
             android:icon="@drawable/history_60"
             android:key="pref_activity_history"
             android:summary="@string/summary_activity_history"
-            android:title="@string/title_activity_history" />
+            android:title="@string/title_activity_history"/>
         <Preference
             android:icon="@drawable/walk_60"
             android:key="pref_step_history"
             android:summary="@string/summary_step_history"
-            android:title="@string/title_step_history" />
+            android:title="@string/title_step_history"/>
         <Preference
             android:icon="@drawable/sunny_60"
             android:key="pref_weather_history"
             android:summary="@string/summary_weather_history"
-            android:title="@string/title_weather_history" />
+            android:title="@string/title_weather_history"/>
         <Preference
             android:icon="@drawable/trending_up_60"
             android:key="pref_weather_forecast"
             android:summary="@string/summary_weather_forecast"
-            android:title="@string/title_weather_forecast" />
+            android:title="@string/title_weather_forecast"/>
         <Preference
             android:icon="@drawable/gpsfixed_60"
             android:key="pref_settings"
             android:summary="@string/summary_loc_settings"
-            android:title="@string/title_loc_settings" />
+            android:title="@string/title_loc_settings"/>
         <PreferenceScreen
             android:icon="@drawable/link_60"
             android:summary="@string/summary_useful_links"
@@ -69,21 +69,21 @@
                 android:title="Travel Independent">
                 <intent
                     android:action="android.intent.action.VIEW"
-                    android:data="http://www.travelindependent.info/" />
+                    android:data="http://www.travelindependent.info/"/>
             </Preference>
             <Preference
                 android:summary="Plug &amp; socket types"
                 android:title="World Standards: Electricy">
                 <intent
                     android:action="android.intent.action.VIEW"
-                    android:data="http://www.worldstandards.eu/electricity/plugs-and-sockets/" />
+                    android:data="http://www.worldstandards.eu/electricity/plugs-and-sockets/"/>
             </Preference>
             <Preference
                 android:summary="Wiki about prepaid mobile phone plans from all over the world"
                 android:title="Prepaid Data SIM Card Wiki">
                 <intent
                     android:action="android.intent.action.VIEW"
-                    android:data="http://prepaid-data-sim-card.wikia.com" />
+                    android:data="http://prepaid-data-sim-card.wikia.com"/>
             </Preference>
         </PreferenceScreen>
     </PreferenceCategory>
@@ -92,83 +92,83 @@
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:key="pref_enabled"
-                android:title="@string/title_enabled" />
+                android:title="@string/title_enabled"/>
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="pref_enabled"
                 android:key="pref_use_network"
-                android:title="@string/title_use_network" />
+                android:title="@string/title_use_network"/>
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="pref_enabled"
                 android:key="pref_use_gps"
-                android:title="@string/title_use_gps" />
+                android:title="@string/title_use_gps"/>
             <EditTextPreference
                 android:defaultValue="180"
                 android:dependency="pref_enabled"
                 android:inputType="number"
                 android:key="pref_interval"
-                android:summary="@string/summary_interval" />
+                android:summary="@string/summary_interval"/>
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="pref_enabled"
                 android:key="pref_altitude"
                 android:summary="@string/summary_altitude"
-                android:title="@string/title_altitude" />
+                android:title="@string/title_altitude"/>
             <EditTextPreference
                 android:defaultValue="20"
                 android:dependency="pref_enabled"
                 android:inputType="number"
                 android:key="pref_accuracy"
-                android:summary="@string/summary_accuracy" />
+                android:summary="@string/summary_accuracy"/>
             <EditTextPreference
                 android:defaultValue="10"
                 android:dependency="pref_enabled"
                 android:inputType="number"
                 android:key="pref_wp_accuracy"
-                android:summary="@string/summary_accuracy" />
+                android:summary="@string/summary_accuracy"/>
             <EditTextPreference
                 android:defaultValue="60"
                 android:dependency="pref_enabled"
                 android:inputType="number"
                 android:key="pref_timeout"
-                android:summary="@string/summary_timeout" />
+                android:summary="@string/summary_timeout"/>
             <EditTextPreference
                 android:defaultValue="30"
                 android:dependency="pref_enabled"
                 android:inputType="number"
                 android:key="pref_check_time"
-                android:summary="@string/summary_check_time" />
+                android:summary="@string/summary_check_time"/>
             <EditTextPreference
                 android:defaultValue="1"
                 android:dependency="pref_enabled"
                 android:inputType="number"
                 android:key="pref_check_sat"
-                android:summary="@string/summary_check_sat" />
+                android:summary="@string/summary_check_sat"/>
             <EditTextPreference
                 android:defaultValue="100"
                 android:dependency="pref_enabled"
                 android:inputType="number"
                 android:key="pref_inaccurate"
-                android:summary="@string/summary_inaccurate" />
+                android:summary="@string/summary_inaccurate"/>
             <EditTextPreference
                 android:defaultValue="100"
                 android:dependency="pref_enabled"
                 android:inputType="number"
                 android:key="pref_nearby"
-                android:summary="@string/summary_nearby" />
+                android:summary="@string/summary_nearby"/>
             <EditTextPreference
                 android:defaultValue="1"
                 android:dependency="pref_enabled"
                 android:inputType="number"
                 android:key="pref_mintime"
-                android:summary="@string/summary_mintime" />
+                android:summary="@string/summary_mintime"/>
             <EditTextPreference
                 android:defaultValue="0"
                 android:dependency="pref_enabled"
                 android:inputType="number"
                 android:key="pref_mindist"
-                android:summary="@string/summary_mindist" />
+                android:summary="@string/summary_mindist"/>
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_passive">
             <CheckBoxPreference
@@ -176,69 +176,64 @@
                 android:dependency="pref_enabled"
                 android:key="pref_passive_enabled"
                 android:summary="@string/summary_passive_enabled"
-                android:title="@string/title_passive_enabled" />
+                android:title="@string/title_passive_enabled"/>
             <EditTextPreference
                 android:defaultValue="30"
                 android:dependency="pref_passive_enabled"
                 android:inputType="number"
                 android:key="pref_passive_bearing"
-                android:summary="@string/summary_passive_bearing" />
+                android:summary="@string/summary_passive_bearing"/>
             <EditTextPreference
                 android:defaultValue="20"
                 android:dependency="pref_passive_enabled"
                 android:inputType="number"
                 android:key="pref_passive_altitude"
-                android:summary="@string/summary_passive_altitude" />
+                android:summary="@string/summary_passive_altitude"/>
             <EditTextPreference
                 android:defaultValue="10"
                 android:dependency="pref_passive_enabled"
                 android:inputType="number"
                 android:key="pref_passive_inaccurate"
-                android:summary="@string/summary_inaccurate" />
+                android:summary="@string/summary_inaccurate"/>
             <EditTextPreference
                 android:defaultValue="20"
                 android:dependency="pref_passive_enabled"
                 android:inputType="number"
                 android:key="pref_passive_nearby"
-                android:summary="@string/summary_nearby" />
+                android:summary="@string/summary_nearby"/>
             <EditTextPreference
                 android:defaultValue="1"
                 android:dependency="pref_passive_enabled"
                 android:inputType="number"
                 android:key="pref_passive_mintime"
-                android:summary="@string/summary_mintime" />
+                android:summary="@string/summary_mintime"/>
             <EditTextPreference
                 android:defaultValue="0"
                 android:dependency="pref_passive_enabled"
                 android:inputType="number"
                 android:key="pref_passive_mindist"
-                android:summary="@string/summary_mindist" />
+                android:summary="@string/summary_mindist"/>
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_altitude_settings">
-            <EditTextPreference
-                android:defaultValue="30"
-                android:inputType="number"
-                android:key="pref_altitude_history"
-                android:summary="@string/summary_altitude_history" />
             <EditTextPreference
                 android:defaultValue="5"
                 android:inputType="number"
                 android:key="pref_altitude_avg"
-                android:summary="@string/summary_altitude_avg" />
+                android:summary="@string/summary_altitude_avg"/>
             <PreferenceCategory android:title="@string/title_correction_header">
                 <CheckBoxPreference
                     android:defaultValue="true"
                     android:dependency="pref_enabled"
                     android:key="pref_correction_enabled"
                     android:summary="@string/summary_correction_enabled"
-                    android:title="@string/title_correction_enabled" />
+                    android:title="@string/title_correction_enabled"/>
                 <Preference
                     android:dependency="pref_correction_enabled"
                     android:summary="@string/summary_correction_egm96"
                     android:title="@string/title_correction_egm96">
                     <intent
                         android:action="android.intent.action.VIEW"
-                        android:data="http://worldwind.arc.nasa.gov/worldwind-nosa-1.3.html" />
+                        android:data="http://worldwind.arc.nasa.gov/worldwind-nosa-1.3.html"/>
                 </Preference>
             </PreferenceCategory>
             <PreferenceCategory android:title="@string/title_altitude_header">
@@ -247,20 +242,20 @@
                     android:dependency="pref_enabled"
                     android:key="pref_altitude_waypoint"
                     android:summary="@string/summary_altitude_google"
-                    android:title="@string/title_altitude_waypoint" />
+                    android:title="@string/title_altitude_waypoint"/>
                 <CheckBoxPreference
                     android:defaultValue="false"
                     android:dependency="pref_enabled"
                     android:key="pref_altitude_trackpoint"
                     android:summary="@string/summary_altitude_google"
-                    android:title="@string/title_altitude_trackpoint" />
+                    android:title="@string/title_altitude_trackpoint"/>
                 <Preference
                     android:dependency="pref_enabled"
                     android:summary="@string/summary_altitude_google_terms"
                     android:title="@string/title_altitude_google_terms">
                     <intent
                         android:action="android.intent.action.VIEW"
-                        android:data="https://developers.google.com/maps/terms" />
+                        android:data="https://developers.google.com/maps/terms"/>
                 </Preference>
             </PreferenceCategory>
             <PreferenceCategory android:title="@string/title_pressure_header">
@@ -269,41 +264,41 @@
                     android:dependency="pref_weather_enabled"
                     android:key="pref_pressure_enabled"
                     android:summary="@string/summary_pressure_enabled"
-                    android:title="@string/title_pressure_enabled" />
+                    android:title="@string/title_pressure_enabled"/>
                 <EditTextPreference
                     android:defaultValue="3"
                     android:dependency="pref_pressure_enabled"
                     android:inputType="number"
                     android:key="pref_pressure_wait"
-                    android:summary="@string/summary_pressure_wait" />
+                    android:summary="@string/summary_pressure_wait"/>
                 <EditTextPreference
                     android:defaultValue="0"
                     android:dependency="pref_pressure_enabled"
                     android:inputType="numberSigned|numberDecimal"
                     android:key="pref_pressure_offset"
-                    android:summary="@string/summary_pressure_offset" />
+                    android:summary="@string/summary_pressure_offset"/>
                 <Preference
                     android:dependency="pref_pressure_enabled"
                     android:key="pref_pressure_test"
-                    android:title="@string/title_pressure_test" />
+                    android:title="@string/title_pressure_test"/>
                 <EditTextPreference
                     android:defaultValue="240"
                     android:dependency="pref_pressure_enabled"
                     android:inputType="number"
                     android:key="pref_pressure_maxage"
-                    android:summary="@string/summary_pressure_maxage" />
+                    android:summary="@string/summary_pressure_maxage"/>
                 <EditTextPreference
                     android:defaultValue="50"
                     android:dependency="pref_pressure_enabled"
                     android:inputType="number"
                     android:key="pref_pressure_maxdist"
-                    android:summary="@string/summary_pressure_maxdist" />
+                    android:summary="@string/summary_pressure_maxdist"/>
                 <CheckBoxPreference
                     android:defaultValue="false"
                     android:dependency="pref_pressure_enabled"
                     android:key="pref_pressure_invehicle"
                     android:summary="@string/summary_pressure_invehicle"
-                    android:title="@string/title_pressure_invehicle" />
+                    android:title="@string/title_pressure_invehicle"/>
             </PreferenceCategory>
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_auto">
@@ -311,31 +306,31 @@
                 android:defaultValue="false"
                 android:dependency="pref_enabled"
                 android:key="pref_auto_enabled"
-                android:title="@string/title_auto_enabled" />
+                android:title="@string/title_auto_enabled"/>
             <EditTextPreference
                 android:defaultValue="30"
                 android:dependency="pref_auto_enabled"
                 android:inputType="number"
                 android:key="pref_auto_time"
-                android:summary="@string/summary_auto_time" />
+                android:summary="@string/summary_auto_time"/>
             <EditTextPreference
                 android:defaultValue="100"
                 android:dependency="pref_auto_enabled"
                 android:inputType="number"
                 android:key="pref_auto_distance"
-                android:summary="@string/summary_auto_distance" />
+                android:summary="@string/summary_auto_distance"/>
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:dependency="pref_auto_enabled"
                 android:key="pref_auto_still"
                 android:summary="@string/summary_auto_still"
-                android:title="@string/title_auto_still" />
+                android:title="@string/title_auto_still"/>
             <EditTextPreference
                 android:defaultValue="1"
                 android:dependency="pref_auto_enabled"
                 android:inputType="number"
                 android:key="pref_auto_duplicate"
-                android:summary="@string/summary_auto_duplicate" />
+                android:summary="@string/summary_auto_duplicate"/>
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_recognition">
             <CheckBoxPreference
@@ -343,43 +338,43 @@
                 android:dependency="pref_enabled"
                 android:key="pref_recognition_enabled"
                 android:summary="@string/summary_recognition_enabled"
-                android:title="@string/title_recognition_enabled" />
+                android:title="@string/title_recognition_enabled"/>
             <EditTextPreference
                 android:defaultValue="60"
                 android:dependency="pref_recognition_enabled"
                 android:inputType="number"
                 android:key="pref_recognition_interval_still"
-                android:summary="@string/summary_recognition_interval" />
+                android:summary="@string/summary_recognition_interval"/>
             <EditTextPreference
                 android:defaultValue="60"
                 android:dependency="pref_recognition_enabled"
                 android:inputType="number"
                 android:key="pref_recognition_interval_moving"
-                android:summary="@string/summary_recognition_interval" />
+                android:summary="@string/summary_recognition_interval"/>
             <EditTextPreference
                 android:defaultValue="50"
                 android:dependency="pref_recognition_enabled"
                 android:inputType="number"
                 android:key="pref_recognition_confidence"
-                android:summary="@string/summary_recognition_confidence" />
+                android:summary="@string/summary_recognition_confidence"/>
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="pref_recognition_enabled"
                 android:key="pref_recognition_filter_tilting"
                 android:summary="@string/summary_recognition_tilting"
-                android:title="@string/title_recognition_tilting" />
+                android:title="@string/title_recognition_tilting"/>
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="pref_recognition_enabled"
                 android:key="pref_recognition_replace_unknown"
                 android:summary="@string/summary_recognition_known"
-                android:title="@string/title_recognition_known" />
+                android:title="@string/title_recognition_known"/>
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:dependency="pref_recognition_enabled"
                 android:key="pref_recognition_filter_unknown"
                 android:summary="@string/summary_recognition_unknown"
-                android:title="@string/title_recognition_unknown" />
+                android:title="@string/title_recognition_unknown"/>
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_step_counter">
             <EditTextPreference
@@ -387,83 +382,83 @@
                 android:dependency="pref_enabled"
                 android:inputType="number"
                 android:key="pref_step_delta"
-                android:summary="@string/summary_step_delta" />
+                android:summary="@string/summary_step_delta"/>
             <EditTextPreference
                 android:defaultValue="75"
                 android:dependency="pref_enabled"
                 android:inputType="number"
                 android:key="pref_step_size"
-                android:summary="@string/summary_step_size" />
+                android:summary="@string/summary_step_size"/>
             <EditTextPreference
                 android:defaultValue="75"
                 android:dependency="pref_enabled"
                 android:inputType="number"
                 android:key="pref_weight"
-                android:summary="@string/summary_weight" />
+                android:summary="@string/summary_weight"/>
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="pref_enabled"
                 android:key="pref_recognition_steps"
                 android:summary="@string/summary_recognition_steps"
-                android:title="@string/title_recognition_steps" />
+                android:title="@string/title_recognition_steps"/>
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:dependency="pref_recognition_steps"
                 android:key="pref_recognition_unknown_steps"
                 android:summary="@string/summary_recognition_unknown_steps"
-                android:title="@string/title_recognition_unknown_steps" />
+                android:title="@string/title_recognition_unknown_steps"/>
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_weather_settings">
             <CheckBoxPreference
                 android:defaultValue="true"
                 android:key="pref_weather_enabled"
-                android:title="@string/title_weather_enabled" />
+                android:title="@string/title_weather_enabled"/>
             <ListPreference
                 android:defaultValue="fio"
                 android:dependency="pref_weather_enabled"
                 android:entries="@array/listAPIName"
                 android:entryValues="@array/listAPIValue"
-                android:key="pref_weather_api" />
+                android:key="pref_weather_api"/>
             <EditTextPreference
                 android:defaultValue="30"
                 android:dependency="pref_weather_enabled"
                 android:inputType="number"
                 android:key="pref_weather_interval"
-                android:summary="@string/summary_weather_interval" />
+                android:summary="@string/summary_weather_interval"/>
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:dependency="pref_weather_enabled"
                 android:key="pref_weather_wakeup"
                 android:summary="@string/summary_weather_wakeup"
-                android:title="@string/title_weather_wakeup" />
+                android:title="@string/title_weather_wakeup"/>
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="pref_weather_gcm"
-                android:title="@string/title_weather_gcm" />
+                android:title="@string/title_weather_gcm"/>
             <PreferenceCategory android:title="@string/title_weather_fio">
                 <EditTextPreference
                     android:dependency="pref_weather_enabled"
                     android:key="pref_weather_apikey_fio"
-                    android:summary="@string/summary_weather_mandatory" />
+                    android:summary="@string/summary_weather_mandatory"/>
                 <Preference
                     android:dependency="pref_weather_enabled"
                     android:summary="@string/summary_weather_register"
                     android:title="@string/title_weather_register">
                     <intent
                         android:action="android.intent.action.VIEW"
-                        android:data="https://darksky.net/dev/" />
+                        android:data="https://darksky.net/dev/"/>
                 </Preference>
                 <CheckBoxPreference
                     android:defaultValue="true"
                     android:dependency="pref_weather_apikey_fio"
                     android:key="pref_weather_notification"
-                    android:title="@string/title_weather_notification" />
+                    android:title="@string/title_weather_notification"/>
                 <EditTextPreference
                     android:defaultValue="50"
                     android:dependency="pref_weather_notification"
                     android:inputType="number"
                     android:key="pref_weather_rain_warning"
-                    android:summary="@string/summary_weather_rain_warning" />
+                    android:summary="@string/summary_weather_rain_warning"/>
                 <RingtonePreference
                     android:defaultValue="content://settings/system/notification_sound"
                     android:dependency="pref_weather_rain_warning"
@@ -471,140 +466,145 @@
                     android:ringtoneType="notification"
                     android:showDefault="true"
                     android:showSilent="true"
-                    android:title="@string/title_weather_rain_sound" />
+                    android:title="@string/title_weather_rain_sound"/>
                 <CheckBoxPreference
                     android:defaultValue="true"
                     android:dependency="pref_weather_rain_warning"
                     android:key="pref_weather_rain_light"
                     android:summary="@string/summary_weather_rain_light"
-                    android:title="@string/title_weather_rain_light" />
+                    android:title="@string/title_weather_rain_light"/>
                 <EditTextPreference
                     android:defaultValue="60"
                     android:dependency="pref_weather_notification"
                     android:inputType="number"
                     android:key="pref_weather_guard"
-                    android:summary="@string/summary_weather_guard" />
+                    android:summary="@string/summary_weather_guard"/>
                 <EditTextPreference
                     android:defaultValue="15"
                     android:dependency="pref_weather_apikey_fio"
                     android:inputType="number"
                     android:key="pref_weather_cache"
-                    android:summary="@string/summary_weather_cache" />
+                    android:summary="@string/summary_weather_cache"/>
                 <Preference
                     android:dependency="pref_weather_enabled"
                     android:summary="@string/summary_weather_tos"
                     android:title="@string/title_weather_tos">
                     <intent
                         android:action="android.intent.action.VIEW"
-                        android:data="https://darksky.net/dev/docs/terms" />
+                        android:data="https://darksky.net/dev/docs/terms"/>
                 </Preference>
             </PreferenceCategory>
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_blog">
             <EditTextPreference
                 android:key="pref_blogurl"
-                android:summary="@string/summary_blogurl" />
+                android:summary="@string/summary_blogurl"/>
             <EditTextPreference
                 android:dependency="pref_blogurl"
                 android:inputType="number"
                 android:key="pref_blogid"
-                android:summary="@string/summary_blogid" />
+                android:summary="@string/summary_blogid"/>
             <EditTextPreference
                 android:dependency="pref_blogurl"
                 android:key="pref_bloguser"
-                android:summary="@string/summary_bloguser" />
+                android:summary="@string/summary_bloguser"/>
             <EditTextPreference
                 android:dependency="pref_blogurl"
                 android:inputType="textPassword"
                 android:key="pref_blogpwd"
-                android:summary="@string/summary_blogpwd" />
+                android:summary="@string/summary_blogpwd"/>
             <Preference
                 android:summary="@string/summary_plugin"
                 android:title="@string/title_plugin">
                 <intent
                     android:action="android.intent.action.VIEW"
-                    android:data="https://wordpress.org/plugins/backpacktrack-for-android/" />
+                    android:data="https://wordpress.org/plugins/backpacktrack-for-android/"/>
             </Preference>
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_lifeline">
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="pref_lifeline_enabled"
-                android:title="@string/title_lifeline_enabled" />
+                android:title="@string/title_lifeline_enabled"/>
             <EditTextPreference
                 android:defaultValue="60"
                 android:inputType="number"
                 android:key="pref_lifeline_metered_interval"
-                android:summary="@string/summary_lifeline_interval" />
+                android:summary="@string/summary_lifeline_interval"/>
             <Preference
                 android:key="pref_lifeline_private_page"
-                android:title="@string/title_lifeline_private_page" />
+                android:title="@string/title_lifeline_private_page"/>
             <Preference
                 android:key="pref_lifeline_public_page"
-                android:title="@string/title_lifeline_public_page" />
-            <Preference android:key="pref_lifeline_state" />
+                android:title="@string/title_lifeline_public_page"/>
+            <Preference android:key="pref_lifeline_state"/>
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_units">
             <ListPreference
                 android:defaultValue="c"
                 android:entries="@array/listTemperatureName"
                 android:entryValues="@array/listTemperatureValue"
-                android:key="pref_temperature" />
+                android:key="pref_temperature"/>
             <ListPreference
                 android:defaultValue="bft"
                 android:entries="@array/listWindSpeedName"
                 android:entryValues="@array/listWindSpeedValue"
-                android:key="pref_windspeed" />
+                android:key="pref_windspeed"/>
             <ListPreference
                 android:defaultValue="hpa"
                 android:entries="@array/listPressureName"
                 android:entryValues="@array/listPressureValue"
-                android:key="pref_pressure" />
+                android:key="pref_pressure"/>
             <ListPreference
                 android:defaultValue="mm"
                 android:entries="@array/listPrecipitationName"
                 android:entryValues="@array/listPrecipitationValue"
-                android:key="pref_precipitation" />
+                android:key="pref_precipitation"/>
         </PreferenceScreen>
         <PreferenceScreen android:title="@string/title_misc">
+            <EditTextPreference
+                android:defaultValue="30"
+                android:inputType="number"
+                android:key="pref_graph_history"
+                android:summary="@string/summary_graph_history"/>
             <EditTextPreference
                 android:defaultValue="https://en.wikipedia.org,https://en.wikivoyage.org"
                 android:inputType="textUri"
                 android:key="pref_wiki_base_url"
-                android:title="@string/title_wiki_baseurl" />
+                android:title="@string/title_wiki_baseurl"/>
             <EditTextPreference
                 android:defaultValue="10"
                 android:inputType="number"
-                android:key="pref_wiki_radius" />
+                android:key="pref_wiki_radius"/>
             <EditTextPreference
                 android:defaultValue="25"
                 android:inputType="number"
-                android:key="pref_wiki_results" />
+                android:key="pref_wiki_results"/>
             <EditTextPreference
                 android:defaultValue="10"
                 android:inputType="number"
-                android:key="pref_geoname_radius" />
+                android:key="pref_geoname_radius"/>
             <EditTextPreference
                 android:defaultValue="100"
                 android:inputType="number"
-                android:key="pref_geoname_results" />
+                android:key="pref_geoname_results"/>
             <EditTextPreference
                 android:defaultValue="7"
                 android:inputType="number"
-                android:key="pref_search_cache" />
+                android:key="pref_search_cache"/>
             <EditTextPreference
                 android:defaultValue="10"
                 android:inputType="number"
                 android:key="pref_connectivity_check_interval"
-                android:summary="@string/summary_connectivity_check_interval" />
+                android:summary="@string/summary_connectivity_check_interval"/>
             <CheckBoxPreference
                 android:defaultValue="false"
                 android:key="pref_debug"
-                android:title="@string/title_debug" />
+                android:title="@string/title_debug"/>
             <Preference
                 android:dependency="pref_debug"
                 android:key="pref_logcat"
-                android:title="@string/title_logcat" />
+                android:title="@string/title_logcat"/>
         </PreferenceScreen>
 
 
@@ -614,80 +614,80 @@
             <PreferenceCategory android:title="@string/title_recognition">
                 <Preference
                     android:icon="@drawable/pause"
-                    android:title="@string/still" />
+                    android:title="@string/still"/>
                 <Preference
                     android:icon="@drawable/walk"
-                    android:title="@string/on_foot" />
+                    android:title="@string/on_foot"/>
                 <Preference
                     android:icon="@drawable/run"
-                    android:title="@string/running" />
+                    android:title="@string/running"/>
                 <Preference
                     android:icon="@drawable/bike"
-                    android:title="@string/on_bicycle" />
+                    android:title="@string/on_bicycle"/>
                 <Preference
                     android:icon="@drawable/car"
-                    android:title="@string/in_vehicle" />
+                    android:title="@string/in_vehicle"/>
                 <Preference
                     android:icon="@drawable/explore"
-                    android:title="@string/unknown" />
+                    android:title="@string/unknown"/>
             </PreferenceCategory>
             <PreferenceCategory android:title="@string/title_weather_settings">
                 <Preference
                     android:icon="@drawable/clear_day_white"
-                    android:title="@string/weather_clear_day" />
+                    android:title="@string/weather_clear_day"/>
                 <Preference
                     android:icon="@drawable/clear_night_white"
-                    android:title="@string/weather_clear_night" />
+                    android:title="@string/weather_clear_night"/>
                 <Preference
                     android:icon="@drawable/partly_cloudy_day_white"
-                    android:title="@string/weather_partly_cloudy_day" />
+                    android:title="@string/weather_partly_cloudy_day"/>
                 <Preference
                     android:icon="@drawable/partly_cloudy_night_white"
-                    android:title="@string/weather_partly_cloudy_night" />
+                    android:title="@string/weather_partly_cloudy_night"/>
                 <Preference
                     android:icon="@drawable/cloudy_white"
-                    android:title="@string/weather_cloudy" />
+                    android:title="@string/weather_cloudy"/>
                 <Preference
                     android:icon="@drawable/fog_white"
-                    android:title="@string/weather_fog" />
+                    android:title="@string/weather_fog"/>
                 <Preference
                     android:icon="@drawable/rain_white"
-                    android:title="@string/weather_rain" />
+                    android:title="@string/weather_rain"/>
                 <Preference
                     android:icon="@drawable/snow_white"
-                    android:title="@string/weather_snow" />
+                    android:title="@string/weather_snow"/>
                 <Preference
                     android:icon="@drawable/sleet_white"
-                    android:title="@string/weather_sleet" />
+                    android:title="@string/weather_sleet"/>
                 <Preference
                     android:icon="@drawable/wind_white"
-                    android:title="@string/weather_wind" />
+                    android:title="@string/weather_wind"/>
             </PreferenceCategory>
         </PreferenceScreen>
         <Preference
             android:key="pref_version"
-            android:title="@string/title_version" />
+            android:title="@string/title_version"/>
         <Preference
             android:key="pref_support"
             android:summary="@string/summary_support"
             android:title="@string/title_support">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="http://forum.xda-developers.com/showthread.php?t=3123682" />
+                android:data="http://forum.xda-developers.com/showthread.php?t=3123682"/>
         </Preference>
         <Preference
             android:summary="@string/summary_author"
             android:title="@string/title_author">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="http://www.faircode.eu/" />
+                android:data="http://www.faircode.eu/"/>
         </Preference>
         <Preference
             android:summary="@string/summary_license"
             android:title="@string/title_license">
             <intent
                 android:action="android.intent.action.VIEW"
-                android:data="http://www.gnu.org/licenses/gpl.txt" />
+                android:data="http://www.gnu.org/licenses/gpl.txt"/>
         </Preference>
     </PreferenceCategory>
 </PreferenceScreen>

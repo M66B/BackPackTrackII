@@ -43,7 +43,6 @@
     <string name="title_passive_altitude">Höhenveränderung: %s Meter</string>
 
     <string name="title_altitude_settings">Höhe</string>
-    <string name="title_altitude_history">Diagramm Historie: %s Tage</string>
     <string name="title_altitude_avg">Gleitender Mittelwert: %s Proben</string>
 
     <string name="title_correction_header">EGM96 Korrektur</string>
@@ -118,6 +117,7 @@
     <string name="title_precipitation">Niederschlag: %s</string>
 
     <string name="title_misc">Sonstiges</string>
+    <string name="title_graph_history">Diagramm Historie: %s Tage</string>
     <string name="title_wiki_baseurl">Wiki basis URLs</string>
     <string name="title_wiki_radius">Wiki Radius: %s km</string>
     <string name="title_wiki_results">Wiki Ergebnisse: %s</string>
@@ -162,7 +162,6 @@
     <string name="summary_passive_bearing">Benutze passive Standortabfragen wen sich die Richtung um mehr als die ausgewählte Gradzahl ändert</string>
     <string name="summary_passive_altitude">Benutze passive Standortabfragen wen sich die Höhe um mehr als die ausgewählte Anzahl von Meter ändert</string>
 
-    <string name="summary_altitude_history">Zeige das Höhendiagramm für Standorte für die ausgewählte Anzahl von Tagen</string>
     <string name="summary_altitude_avg">Filtern des Rauschens der GPS-Höhe unter Verwendung eines gleitenden Mittelwerts der ausgewählten Anzahl von Proben</string>
 
     <string name="summary_correction_enabled">Höhenkorrektur mittels EGM96</string>
@@ -211,6 +210,9 @@
     <string name="summary_bloguser">WordPress Benutzername</string>
     <string name="summary_blogpwd">WordPress Passwort</string>
     <string name="summary_plugin">Klicken um die WordPress Plugin Seite zu öffnen (Öffnet im Browser)</string>
+
+    <string name="summary_graph_history">Show graph data of the selected number of days</string>
+    <string name="summary_connectivity_check_interval">Enter zero to disable waiting for connectivity</string>
 
     <string name="summary_support">Klicken um das Support Forum zu öffnen um Fehler zu berichten, neue Features zu beantragen oder Fragen zu stellen (Öffnet im Browser)</string>
     <string name="summary_author">Marcel Bokhorst (M66B)\nKlicken für Details (Öffnet im Browser)</string>

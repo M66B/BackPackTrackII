@@ -147,7 +147,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_AUTO_STILL = "pref_auto_still";
     public static final String PREF_AUTO_DUPLICATE = "pref_auto_duplicate";
 
-    public static final String PREF_ALTITUDE_HISTORY = "pref_altitude_history";
     public static final String PREF_ALTITUDE_AVG = "pref_altitude_avg";
 
     public static final String PREF_RECOGNITION_ENABLED = "pref_recognition_enabled";
@@ -194,6 +193,8 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String PREF_PRESSURE = "pref_pressure";
     public static final String PREF_WINDSPEED = "pref_windspeed";
     public static final String PREF_PRECIPITATION = "pref_precipitation";
+
+    public static final String PREF_GRAPH_HISTORY = "pref_graph_history";
 
     public static final String PREF_WIKI_BASE_URL = "pref_wiki_base_url";
     public static final String PREF_WIKI_RADIUS = "pref_wiki_radius";
@@ -257,7 +258,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final boolean DEFAULT_AUTO_STILL = false;
     public static final String DEFAULT_AUTO_DUPLICATE = "1"; // waypoints
 
-    public static final String DEFAULT_ALTITUDE_HISTORY = "30"; // days
     public static final String DEFAULT_ALTITUDE_AVG = "5"; // samples
 
     public static final boolean DEFAULT_RECOGNITION_ENABLED = true;
@@ -294,6 +294,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     public static final String DEFAULT_WINDSPEED = "bft";
     public static final String DEFAULT_PRECIPITATION = "mm";
 
+    public static final String DEFAULT_GRAPH_HISTORY = "30"; // days
     public static final String DEFAULT_WIKI_BASE_URL = "https://en.wikipedia.org,https://en.wikivoyage.org";
     public static final String DEFAULT_WIKI_RADIUS = "10"; // km
     public static final String DEFAULT_WIKI_RESULTS = "25";
@@ -562,7 +563,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_AUTO_DISTANCE);
         updateTitle(prefs, PREF_AUTO_DUPLICATE);
 
-        updateTitle(prefs, PREF_ALTITUDE_HISTORY);
         updateTitle(prefs, PREF_ALTITUDE_AVG);
 
         updateTitle(prefs, PREF_WEATHER_API);
@@ -594,6 +594,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_WINDSPEED);
         updateTitle(prefs, PREF_PRECIPITATION);
 
+        updateTitle(prefs, PREF_GRAPH_HISTORY);
         updateTitle(prefs, PREF_WIKI_BASE_URL);
         updateTitle(prefs, PREF_WIKI_RADIUS);
         updateTitle(prefs, PREF_WIKI_RESULTS);
@@ -1824,7 +1825,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         int n = 0;
 
         long now = new Date().getTime();
-        int history = Integer.parseInt(prefs.getString(PREF_ALTITUDE_HISTORY, DEFAULT_ALTITUDE_HISTORY));
+        int history = Integer.parseInt(prefs.getString(PREF_GRAPH_HISTORY, DEFAULT_GRAPH_HISTORY));
         long viewport = prefs.getLong(PREF_LAST_LOCATION_VIEWPORT, 7 * DAY_MS);
         Cursor cursor = db.getLocations(now - history * DAY_MS, now, true, true, true, 0);
 
@@ -2138,7 +2139,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         if (showUnknown)
             graphs++;
 
-        Cursor cursor = db.getActivityDurations(0, Long.MAX_VALUE, true);
+        long now = new Date().getTime();
+        int history = Integer.parseInt(prefs.getString(PREF_GRAPH_HISTORY, DEFAULT_GRAPH_HISTORY));
+        Cursor cursor = db.getActivityDurations(now - history * DAY_MS, now, true);
 
         int colTime = cursor.getColumnIndex("time");
         int colStill = cursor.getColumnIndex("still");
@@ -2507,7 +2510,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         showStepGraph(graph);
 
         // Fill list
-        Cursor cursor = db.getSteps(false);
+        Cursor cursor = db.getSteps(0, Long.MAX_VALUE, false);
         final StepCountAdapter adapter = new StepCountAdapter(getActivity(), cursor);
         lv.setAdapter(adapter);
 
@@ -2531,7 +2534,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Cursor cursor = db.getSteps(false);
+                        Cursor cursor = db.getSteps(0, Long.MAX_VALUE, false);
                         adapter.changeCursor(cursor);
                         lv.setAdapter(adapter);
                         showStepGraph(graph);
@@ -2558,11 +2561,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     private void showStepGraph(GraphView graph) {
+        SharedPreferences prefs = getPreferenceScreen().getSharedPreferences();
+
         boolean data = false;
         long maxTime = 0;
         int maxSteps = 10000;
 
-        Cursor cursor = db.getSteps(true);
+        long now = new Date().getTime();
+        int history = Integer.parseInt(prefs.getString(PREF_GRAPH_HISTORY, DEFAULT_GRAPH_HISTORY));
+        Cursor cursor = db.getSteps(now - history * DAY_MS, now, true);
 
         int colTime = cursor.getColumnIndex("time");
         int colCount = cursor.getColumnIndex("count");
@@ -2763,7 +2770,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         });
 
         // Fill list
-        Cursor cursor = db.getWeather(false);
+        Cursor cursor = db.getWeather(0, Long.MAX_VALUE, false);
         final WeatherAdapter adapter = new WeatherAdapter(getActivity(), cursor);
         lv.setAdapter(adapter);
 
@@ -2784,7 +2791,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Cursor cursor = db.getWeather(false);
+                        Cursor cursor = db.getWeather(0, Long.MAX_VALUE, false);
                         adapter.changeCursor(cursor);
                         lv.setAdapter(adapter);
                         showWeatherGraph(graph);
@@ -2852,7 +2859,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         String speed_unit = prefs.getString(PREF_WINDSPEED, DEFAULT_WINDSPEED);
         String rain_unit = prefs.getString(PREF_PRECIPITATION, DEFAULT_PRECIPITATION);
 
-        Cursor cursor = db.getWeather(true);
+        long now = new Date().getTime();
+        int history = Integer.parseInt(prefs.getString(PREF_GRAPH_HISTORY, DEFAULT_GRAPH_HISTORY));
+        Cursor cursor = db.getWeather(now - history * DAY_MS, now, true);
 
         int colTime = cursor.getColumnIndex("time");
         int colValue = cursor.getColumnIndex(column);
@@ -3586,8 +3595,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         else if (PREF_AUTO_DUPLICATE.equals(key))
             pref.setTitle(getString(R.string.title_auto_duplicate, prefs.getString(key, DEFAULT_AUTO_DUPLICATE)));
 
-        else if (PREF_ALTITUDE_HISTORY.equals(key))
-            pref.setTitle(getString(R.string.title_altitude_history, prefs.getString(key, DEFAULT_ALTITUDE_HISTORY)));
         else if (PREF_ALTITUDE_AVG.equals(key))
             pref.setTitle(getString(R.string.title_altitude_avg, prefs.getString(key, DEFAULT_ALTITUDE_AVG)));
 
@@ -3679,7 +3686,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 rain_unit = getString(R.string.header_inch);
             pref.setTitle(getString(R.string.title_precipitation, rain_unit));
 
-        } else if (PREF_WIKI_BASE_URL.equals(key))
+        } else if (PREF_GRAPH_HISTORY.equals(key))
+            pref.setTitle(getString(R.string.title_graph_history, prefs.getString(key, DEFAULT_GRAPH_HISTORY)));
+        else if (PREF_WIKI_BASE_URL.equals(key))
             pref.setSummary(prefs.getString(key, DEFAULT_WIKI_BASE_URL));
         else if (PREF_WIKI_RADIUS.equals(key))
             pref.setTitle(getString(R.string.title_wiki_radius, prefs.getString(key, DEFAULT_WIKI_RADIUS)));
