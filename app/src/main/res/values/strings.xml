@@ -99,6 +99,8 @@
     <string name="title_weather_rain_warning">Show rain warning notification: %s%%</string>
     <string name="title_weather_rain_sound">Rain warning ringtone</string>
     <string name="title_weather_rain_light">Rain warning lights</string>
+    <string name="title_weather_alerts">Show weather alerts</string>
+    <string name="title_weather_alerts_sound">Weather alerts sound</string>
     <string name="title_weather_guard">Weather notifications valid: %s minutes</string>
     <string name="title_weather_cache">Forecast cache: %s minutes</string>
     <string name="title_weather_tos">TOS</string>

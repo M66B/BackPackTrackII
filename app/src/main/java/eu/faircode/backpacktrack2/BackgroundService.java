@@ -159,6 +159,7 @@ public class BackgroundService extends IntentService {
     private static final int NOTIFICATION_LOCATION = 0;
     private static final int NOTIFICATION_WEATHER = 1;
     private static final int NOTIFICATION_RAIN = 2;
+    public static final int NOTIFICATION_ALERT = 100;
 
     public static final int REQUEST_LOCATION = 1;
     public static final int REQUEST_TRACKPOINT = 2;
@@ -171,6 +172,8 @@ public class BackgroundService extends IntentService {
     public static final int REQUEST_RAIN = 9;
     public static final int REQUEST_STEPS = 10;
     public static final int REQUEST_RESTART = 11;
+
+    public static final int REQUEST_ALERT = 100;
 
     private static final int LIFELINE_TIMEOUT = 20 * 1000;
     public static final String LIFELINE_BASEURL = "https://lifeline.faircode.eu/";
@@ -1874,6 +1877,7 @@ public class BackgroundService extends IntentService {
 
         notificationBuilder.setContentTitle(title);
         notificationBuilder.setContentText(text);
+        notificationBuilder.setStyle(new Notification.BigTextStyle().bigText(text));
         notificationBuilder.setContentIntent(piMain);
         notificationBuilder.setUsesChronometer(lastLocation != null);
         notificationBuilder.setWhen(lastLocation == null ? System.currentTimeMillis() : lastLocation.getTime());
@@ -1942,9 +1946,7 @@ public class BackgroundService extends IntentService {
         }
 
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        Notification.BigTextStyle notification = new Notification.BigTextStyle(notificationBuilder);
-        notification.bigText(text);
-        nm.notify(NOTIFICATION_LOCATION, notification.build());
+        nm.notify(NOTIFICATION_LOCATION, notificationBuilder.build());
     }
 
     private static void removeStateNotification(Context context) {
@@ -2107,6 +2109,12 @@ public class BackgroundService extends IntentService {
 
         notificationBuilder.setContentText(sb.toString());
 
+        Notification.BigTextStyle bts = new Notification.BigTextStyle();
+        bts.bigText(sb.toString());
+        if (geocoded != null)
+            bts.setSummaryText(geocoded);
+        notificationBuilder.setStyle(bts);
+
         // Build main intent
         Intent riMain = new Intent(context, SettingsActivity.class);
         riMain.putExtra(SettingsFragment.EXTRA_ACTION, SettingsFragment.ACTION_WEATHER);
@@ -2142,11 +2150,7 @@ public class BackgroundService extends IntentService {
         }
 
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        Notification.BigTextStyle notification = new Notification.BigTextStyle(notificationBuilder);
-        notification.bigText(sb.toString());
-        if (geocoded != null)
-            notification.setSummaryText(geocoded);
-        nm.notify(NOTIFICATION_WEATHER, notification.build());
+        nm.notify(NOTIFICATION_WEATHER, notificationBuilder.build());
     }
 
     private static void removeWeatherNotification(Context context) {
@@ -2156,6 +2160,7 @@ public class BackgroundService extends IntentService {
 
     private static void showRainNotification(Weather weather, String geocoded, Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Uri sound = Uri.parse(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_SOUND, SettingsFragment.DEFAULT_WEATHER_RAIN_SOUND));
         boolean light = prefs.getBoolean(SettingsFragment.PREF_WEATHER_RAIN_LIGHT, SettingsFragment.DEFAULT_WEATHER_RAIN_LIGHT);
         DecimalFormat DF1 = new DecimalFormat("0.0", new DecimalFormatSymbols(Locale.ROOT));
         DecimalFormat DF2 = new DecimalFormat("0.00", new DecimalFormatSymbols(Locale.ROOT));
@@ -2188,9 +2193,17 @@ public class BackgroundService extends IntentService {
             notificationBuilder.setColor(context.getResources().getColor(R.color.color_teal_600));
 
         notificationBuilder.setContentTitle(context.getString(R.string.msg_rain_warning, Math.round(weather.rain_probability)));
-        if (content != null)
+        if (content != null) {
             notificationBuilder.setContentText(content);
-        notificationBuilder.setSound(Uri.parse(prefs.getString(SettingsFragment.PREF_WEATHER_RAIN_SOUND, SettingsFragment.DEFAULT_WEATHER_RAIN_SOUND)));
+
+            Notification.BigTextStyle bts = new Notification.BigTextStyle();
+            bts.bigText(content);
+            if (geocoded != null)
+                bts.setSummaryText(geocoded);
+            notificationBuilder.setStyle(bts);
+        }
+
+        notificationBuilder.setSound(sound);
         if (light)
             notificationBuilder.setLights(Color.YELLOW, 1000, 1000);
         if (weather.rain_probability < last_probability * 1.5)
@@ -2232,12 +2245,7 @@ public class BackgroundService extends IntentService {
         }
 
         NotificationManager nm = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        Notification.BigTextStyle notification = new Notification.BigTextStyle(notificationBuilder);
-        if (content != null)
-            notification.bigText(content);
-        if (geocoded != null)
-            notification.setSummaryText(geocoded);
-        nm.notify(NOTIFICATION_RAIN, notification.build());
+        nm.notify(NOTIFICATION_RAIN, notificationBuilder.build());
     }
 
     private static void removeRainNotification(Context context) {

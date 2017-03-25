@@ -1,8 +1,17 @@
 package eu.faircode.backpacktrack2;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.location.Location;
+import android.net.Uri;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -60,7 +69,7 @@ public class DarkSky {
                     byte[] buffer = new byte[fis.available()];
                     fis.read(buffer);
                     String json = new String(buffer);
-                    return decodeResult(type, json);
+                    return decodeResult(type, json, context);
                 } finally {
                     if (fis != null)
                         fis.close();
@@ -68,7 +77,7 @@ public class DarkSky {
             }
         }
 
-        String exclude = "currently,minutely,hourly,daily,alerts,flags";
+        String exclude = "currently,minutely,hourly,daily,flags";
         if (type == TYPE_CURRENT)
             exclude = exclude.replace("currently,", "");
         else if (type == TYPE_HOURLY || type == TYPE_DAILY) {
@@ -112,7 +121,7 @@ public class DarkSky {
             Log.d(TAG, json.toString());
 
             // Decode result
-            List<Weather> listWeather = decodeResult(type, json.toString());
+            List<Weather> listWeather = decodeResult(type, json.toString(), context);
 
             // Cache result
             if (usecache) {
@@ -139,7 +148,7 @@ public class DarkSky {
         }
     }
 
-    private static List<Weather> decodeResult(int type, String json) throws JSONException {
+    private static List<Weather> decodeResult(int type, String json, Context context) throws JSONException {
         List<Weather> result = new ArrayList<Weather>();
 
         JSONObject jroot = new JSONObject(json);
@@ -164,6 +173,24 @@ public class DarkSky {
                     }
                 }
             }
+        }
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean alerts = prefs.getBoolean(SettingsFragment.PREF_WEATHER_ALERTS, SettingsFragment.DEFAULT_WEATHER_ALERTS);
+        if (alerts && jroot.has("alerts"))
+            checkAlerts(jroot.getJSONArray("alerts"), context);
+        else {
+            String test = "{\"alerts\": [\n" +
+                    "    {\n" +
+                    "      \"title\": \"Flood Watch for Mason, WA\",\n" +
+                    "      \"time\": 1453375020,\n" +
+                    "      \"expires\": 1453407300,\n" +
+                    "      \"regions\": \"Washington\",\n" +
+                    "      \"severity\": \"warning\",\n" +
+                    "      \"description\": \"...FLOOD WATCH REMAINS IN EFFECT THROUGH LATE FRIDAY NIGHT...\\nTHE FLOOD WATCH CONTINUES FOR\\n* A PORTION OF NORTHWEST WASHINGTON...INCLUDING THE FOLLOWING\\nCOUNTY...MASON.\\n* THROUGH LATE FRIDAY NIGHT\\n* A STRONG WARM FRONT WILL BRING HEAVY RAIN TO THE OLYMPICS\\nTONIGHT THROUGH THURSDAY NIGHT. THE HEAVY RAIN WILL PUSH THE\\nSKOKOMISH RIVER ABOVE FLOOD STAGE TODAY...AND MAJOR FLOODING IS\\nPOSSIBLE.\\n* A FLOOD WARNING IS IN EFFECT FOR THE SKOKOMISH RIVER. THE FLOOD\\nWATCH REMAINS IN EFFECT FOR MASON COUNTY FOR THE POSSIBILITY OF\\nAREAL FLOODING ASSOCIATED WITH A MAJOR FLOOD.\\n\",\n" +
+                    "      \"uri\": \"http://alerts.weather.gov/cap/wwacapget.php?x=WA1255E4DB8494.FloodWatch.1255E4DCE35CWA.SEWFFASEW.38e78ec64613478bb70fc6ed9c87f6e6\"\n" +
+                    "    }]}";
+            checkAlerts(new JSONObject(test).getJSONArray("alerts"), context);
         }
 
         return result;
@@ -203,5 +230,67 @@ public class DarkSky {
         weather.rawData = data.toString();
 
         return weather;
+    }
+
+    private static void checkAlerts(JSONArray alerts, Context context) throws JSONException {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        Uri sound = Uri.parse(prefs.getString(SettingsFragment.PREF_WEATHER_ALERTS_SOUND, SettingsFragment.DEFAULT_WEATHER_ALERTS_SOUND));
+
+        for (int i = 0; i < alerts.length(); i++) {
+            JSONObject alert = alerts.getJSONObject(i);
+            if (alert.has("title") && alert.has("description")) {
+                String title = alert.getString("title");
+                String text = alert.getString("description");
+
+                Notification.Builder notificationBuilder = new Notification.Builder(context);
+                notificationBuilder.setSmallIcon(android.R.drawable.ic_dialog_alert);
+
+                notificationBuilder.setSound(sound);
+                notificationBuilder.setLights(Color.RED, 1000, 1000);
+                notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+
+                notificationBuilder.setContentTitle(title);
+                notificationBuilder.setContentText(text);
+                notificationBuilder.setStyle(new Notification.BigTextStyle().bigText(text));
+
+                if (alert.has("time")) {
+                    notificationBuilder.setWhen(alert.getLong("time") * 1000);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+                        notificationBuilder.setShowWhen(true);
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    if (alert.has("severity")) {
+                        String severity = alert.getString("severity");
+                        if ("advisory".equals(severity))
+                            notificationBuilder.setColor(Color.BLUE);
+                        else if ("watch".equals(severity))
+                            notificationBuilder.setColor(Color.YELLOW);
+                        else if ("warning".equals(severity))
+                            notificationBuilder.setColor(Color.RED);
+                    }
+
+                if (alert.has("uri"))
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(alert.getString("uri")));
+                        PendingIntent pi = PendingIntent.getActivity(context, BackgroundService.REQUEST_ALERT + i, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+                        notificationBuilder.setContentIntent(pi);
+                    } catch (Throwable ex) {
+                        Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                    }
+
+                notificationBuilder.setAutoCancel(true);
+                notificationBuilder.setOngoing(false);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    notificationBuilder.setCategory(Notification.CATEGORY_STATUS);
+                    notificationBuilder.setVisibility(Notification.VISIBILITY_PUBLIC);
+                }
+
+                NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+                nm.notify(BackgroundService.NOTIFICATION_ALERT + i, notificationBuilder.build());
+            }
+        }
     }
 }
