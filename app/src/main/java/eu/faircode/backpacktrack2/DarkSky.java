@@ -179,7 +179,7 @@ public class DarkSky {
         boolean alerts = prefs.getBoolean(SettingsFragment.PREF_WEATHER_ALERTS, SettingsFragment.DEFAULT_WEATHER_ALERTS);
         if (alerts && jroot.has("alerts"))
             checkAlerts(jroot.getJSONArray("alerts"), context);
-        else {
+        /*else {
             String test = "{\"alerts\": [\n" +
                     "    {\n" +
                     "      \"title\": \"Flood Watch for Mason, WA\",\n" +
@@ -191,7 +191,7 @@ public class DarkSky {
                     "      \"uri\": \"http://alerts.weather.gov/cap/wwacapget.php?x=WA1255E4DB8494.FloodWatch.1255E4DCE35CWA.SEWFFASEW.38e78ec64613478bb70fc6ed9c87f6e6\"\n" +
                     "    }]}";
             checkAlerts(new JSONObject(test).getJSONArray("alerts"), context);
-        }
+        }*/
 
         return result;
     }
