@@ -1,5 +1,6 @@
 package eu.faircode.backpacktrack2;
 
+import android.content.ContentProviderClient;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
@@ -15,6 +17,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.google.android.gms.location.DetectedActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -375,6 +380,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Location
 
+    private ContentValues getLifelineLocation(long id, String name, Location location) throws JSONException {
+        JSONObject jloc = new JSONObject();
+        if (name != null)
+            jloc.put("name", name);
+        jloc.put("lat", location.getLatitude());
+        jloc.put("lon", location.getLongitude());
+        if (location.hasAltitude())
+            jloc.put("alt", Math.round(location.getAltitude()));
+        if (location.hasAccuracy())
+            jloc.put("acc", Math.round(location.getAccuracy()));
+
+        ContentValues cv = new ContentValues();
+        cv.put("time", location.getTime());
+        cv.put("source", mContext.getPackageName());
+        cv.put("type", name == null ? "trackpoint" : "waypoint");
+        cv.put("data", jloc.toString());
+        cv.put("reference", Long.toString(id));
+        return cv;
+    }
+
     public DatabaseHelper insertLocation(Location location, int altitude_type, String name) {
         long id;
         synchronized (mContext.getApplicationContext()) {
@@ -426,6 +451,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             lifeline.setAction(BackgroundService.ACTION_LIFELINE);
             lifeline.putExtra(BackgroundService.EXTRA_ID, id);
             mContext.startService(lifeline);
+
+            try {
+                Uri uri = Uri.parse("content://eu.faircode.lifeline/event");
+                ContentProviderClient cclient = mContext.getContentResolver().acquireContentProviderClient(uri);
+                if (cclient != null) {
+                    Uri row = cclient.insert(uri, getLifelineLocation(id, name, location));
+                    cclient.release();
+                    Log.i(TAG, "Inserted uri=" + row);
+                }
+            } catch (Throwable ex) {
+                Log.e(TAG, "Lifeline: " + ex.toString() + "\n" + Log.getStackTraceString(ex));
+            }
 
             for (LocationChangedListener listener : mLocationChangedListeners)
                 try {
@@ -552,6 +589,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Log.e(TAG, "Update location deleted failed");
         }
 
+        try {
+            Uri uri = Uri.parse("content://eu.faircode.lifeline/event");
+            ContentProviderClient cclient = mContext.getContentResolver().acquireContentProviderClient(uri);
+            if (cclient != null) {
+                int rows = cclient.delete(uri, "reference = ?", new String[]{Long.toString(id)});
+                cclient.release();
+                Log.i(TAG, "Delete uri=" + uri + " rows=" + rows);
+            }
+        } catch (Throwable ex) {
+            Log.e(TAG, "Lifeline: " + ex.toString() + "\n" + Log.getStackTraceString(ex));
+        }
+
         for (LocationChangedListener listener : mLocationChangedListeners)
             try {
                 listener.onLocationDeleted(id);
@@ -675,6 +724,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Activity
 
     public DatabaseHelper insertActivityType(long time, int activity, int confidence) {
+        long id = -1;
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
 
@@ -683,16 +733,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             cv.put("activity", activity);
             cv.put("confidence", confidence);
 
-            if (db.insert("activitytype", null, cv) == -1)
+            id = db.insert("activitytype", null, cv);
+            if (id == -1)
                 Log.e(TAG, "Insert activity type failed");
         }
 
-        for (ActivityTypeChangedListener listener : mActivityTypeChangedListeners)
-            try {
-                listener.onActivityAdded(time, activity, confidence);
-            } catch (Throwable ex) {
-                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            }
+        if (id != -1)
+            for (ActivityTypeChangedListener listener : mActivityTypeChangedListeners)
+                try {
+                    listener.onActivityAdded(time, activity, confidence);
+                } catch (Throwable ex) {
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                }
 
         return this;
     }
@@ -727,10 +779,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Activity duration
         int prev = -1;
         long day = getDay(time);
+
+        String column;
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
 
-            String column;
             switch (activity) {
                 case DetectedActivity.STILL:
                     column = "still";
@@ -815,8 +868,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 if (c != null)
                     c.close();
             }
-
-            DateFormat df = SimpleDateFormat.getTimeInstance();
 
             if (start < 0) {
                 ContentValues cv = new ContentValues();
@@ -1001,6 +1052,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Weather
 
     public boolean insertWeather(Weather weather, Location location) {
+        long id = -1;
         synchronized (mContext.getApplicationContext()) {
             SQLiteDatabase db = this.getWritableDatabase();
 
@@ -1110,18 +1162,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
             cv.put("created", new Date().getTime());
 
-            if (db.insert("weather", null, cv) == -1)
+            id = db.insert("weather", null, cv);
+            if (id == -1)
                 Log.e(TAG, "Insert weather failed");
             else
                 Log.i(TAG, "Stored " + weather);
         }
 
-        for (WeatherChangedListener listener : mWeatherChangedListeners)
-            try {
-                listener.onWeatherAdded(weather.time, weather.station_id);
-            } catch (Throwable ex) {
-                Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
-            }
+        if (id != -1) {
+            if (location != null && "fio".equals(weather.provider))
+                try {
+                    ContentValues cv = new ContentValues();
+                    cv.put("time", weather.time);
+                    cv.put("source", mContext.getPackageName());
+                    cv.put("type", "darksky");
+                    cv.put("data", weather.rawData);
+                    cv.put("reference", Long.toString(id));
+
+                    Uri uri = Uri.parse("content://eu.faircode.lifeline/event");
+                    ContentProviderClient cclient = mContext.getContentResolver().acquireContentProviderClient(uri);
+                    if (cclient != null) {
+                        Uri row = cclient.insert(uri, cv);
+                        cclient.release();
+                        Log.i(TAG, "Inserted uri=" + row);
+                    }
+                } catch (Throwable ex) {
+                    Log.e(TAG, "Lifeline: " + ex.toString() + "\n" + Log.getStackTraceString(ex));
+                }
+
+            for (WeatherChangedListener listener : mWeatherChangedListeners)
+                try {
+                    listener.onWeatherAdded(weather.time, weather.station_id);
+                } catch (Throwable ex) {
+                    Log.e(TAG, ex.toString() + "\n" + Log.getStackTraceString(ex));
+                }
+        }
 
         return true;
     }
@@ -1237,6 +1312,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         lifeline.setAction(BackgroundService.ACTION_LIFELINE);
         lifeline.putExtra(BackgroundService.EXTRA_ID, id);
         mContext.startService(lifeline);
+
+        try {
+            Uri uri = Uri.parse("content://eu.faircode.lifeline/event");
+            ContentProviderClient cclient = mContext.getContentResolver().acquireContentProviderClient(uri);
+            if (cclient != null) {
+                Location location = getLocation(id);
+                Uri row = cclient.insert(uri, getLifelineLocation(id, location.getProvider(), location));
+                cclient.release();
+                Log.i(TAG, "Updated uri=" + row);
+            }
+        } catch (Throwable ex) {
+            Log.e(TAG, "Lifeline: " + ex.toString() + "\n" + Log.getStackTraceString(ex));
+        }
     }
 
     private static void handleChangedNotification(Message msg) {

@@ -1,42 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="eu.faircode.backpacktrack2">
+          package="eu.faircode.backpacktrack2">
 
     <uses-feature
         android:name="android.hardware.location"
-        android:required="true" />
+        android:required="true"/>
     <uses-feature
         android:name="android.hardware.location.gps"
-        android:required="false" />
+        android:required="false"/>
     <uses-feature
         android:name="android.hardware.location.network"
-        android:required="false" />
+        android:required="false"/>
     <uses-feature
         android:name="android.hardware.sensor.stepcounter"
-        android:required="false" />
+        android:required="false"/>
     <uses-feature
         android:name="android.software.app_widgets"
-        android:required="false" />
+        android:required="false"/>
 
     <!-- https://developer.android.com/preview/features/runtime-permissions.html#normal -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION"/>
 
     <!-- https://developer.android.com/preview/features/runtime-permissions.html#testing -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <!-- https://developers.google.com/cloud-messaging/android/client -->
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE"/>
     <permission
         android:name="eu.faircode.backpacktrack2.permission.C2D_MESSAGE"
-        android:protectionLevel="signature" />
-    <uses-permission android:name="eu.faircode.backpacktrack2.permission.C2D_MESSAGE" />
+        android:protectionLevel="signature"/>
+
+    <uses-permission android:name="eu.faircode.backpacktrack2.permission.C2D_MESSAGE"/>
+
+    <uses-permission android:name="eu.faircode.lifeline.WRITE_PROVIDER"/>
 
     <application
         android:allowBackup="false"
@@ -44,12 +47,16 @@
         android:description="@string/app_description"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name">
+
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+            android:value="@integer/google_play_services_version"/>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAhHRogRuNQ2R2RiK6v3XUmRVG0odwhTQg" />
+            android:value="AIzaSyAhHRogRuNQ2R2RiK6v3XUmRVG0odwhTQg"/>
+        <meta-data
+            android:name="lifeline_type"
+            android:value="agent"/>
 
         <activity
             android:name=".SettingsActivity"
@@ -58,17 +65,17 @@
             android:label="@string/app_name"
             android:launchMode="singleTop">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.VIEW"/>
 
-                <data android:scheme="geo" />
+                <data android:scheme="geo"/>
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
             </intent-filter>
         </activity>
 
@@ -79,35 +86,35 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths" />
+                android:resource="@xml/provider_paths"/>
         </provider>
 
         <receiver
             android:name=".BootReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
         <receiver
             android:name=".ShutdownReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="android.intent.action.ACTION_SHUTDOWN" />
+                <action android:name="android.intent.action.ACTION_SHUTDOWN"/>
             </intent-filter>
         </receiver>
         <receiver
             android:name=".MyPackageChangedReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
             </intent-filter>
         </receiver>
         <receiver
             android:name=".ProvidersChangedReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="android.location.PROVIDERS_CHANGED" />
+                <action android:name="android.location.PROVIDERS_CHANGED"/>
             </intent-filter>
         </receiver>
         <receiver
@@ -115,35 +122,35 @@
             android:enabled="true"
             android:label="@string/title_step_counter">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/step_widget_info" />
+                android:resource="@xml/step_widget_info"/>
         </receiver>
         <receiver
             android:name=".WeatherWidget"
             android:enabled="true"
             android:label="@string/title_weather_settings">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/weather_widget_info" />
+                android:resource="@xml/weather_widget_info"/>
         </receiver>
         <receiver
             android:name=".ConnectivityChangedReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
             </intent-filter>
         </receiver>
         <receiver
             android:name=".TimezoneChangedReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
             </intent-filter>
         </receiver>
         <receiver
@@ -152,15 +159,15 @@
             android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
-                <category android:name="eu.faircode.backpacktrack2" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
+                <category android:name="eu.faircode.backpacktrack2"/>
             </intent-filter>
         </receiver>
         <receiver
             android:name=".PowerSaveModeChangedReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="android.os.action.POWER_SAVE_MODE_CHANGED" />
+                <action android:name="android.os.action.POWER_SAVE_MODE_CHANGED"/>
             </intent-filter>
         </receiver>
 
@@ -169,35 +176,35 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="eu.faircode.backpacktrack2.PRIVACY" />
-                <action android:name="eu.faircode.backpacktrack2.TRACKING" />
-                <action android:name="eu.faircode.backpacktrack2.TRACKPOINT" />
-                <action android:name="eu.faircode.backpacktrack2.WAYPOINT" />
-                <action android:name="eu.faircode.backpacktrack2.WRITE_GPX" />
-                <action android:name="eu.faircode.backpacktrack2.WRITE_KML" />
-                <action android:name="eu.faircode.backpacktrack2.UPLOAD_GPX" />
-                <action android:name="eu.faircode.backpacktrack2.GET_ALTITUDE" />
-                <action android:name="eu.faircode.backpacktrack2.UPDATE_WEATHER" />
+                <action android:name="eu.faircode.backpacktrack2.PRIVACY"/>
+                <action android:name="eu.faircode.backpacktrack2.TRACKING"/>
+                <action android:name="eu.faircode.backpacktrack2.TRACKPOINT"/>
+                <action android:name="eu.faircode.backpacktrack2.WAYPOINT"/>
+                <action android:name="eu.faircode.backpacktrack2.WRITE_GPX"/>
+                <action android:name="eu.faircode.backpacktrack2.WRITE_KML"/>
+                <action android:name="eu.faircode.backpacktrack2.UPLOAD_GPX"/>
+                <action android:name="eu.faircode.backpacktrack2.GET_ALTITUDE"/>
+                <action android:name="eu.faircode.backpacktrack2.UPDATE_WEATHER"/>
             </intent-filter>
         </service>
         <service
             android:name=".GpsStatusService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"/>
         <service
             android:name=".StepCounterService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"/>
         <service
             android:name=".PressureService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"/>
         <service
             android:name=".GcmService"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
             </intent-filter>
         </service>
         <service
@@ -205,13 +212,13 @@
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.android.gms.iid.InstanceID" />
+                <action android:name="com.google.android.gms.iid.InstanceID"/>
             </intent-filter>
         </service>
         <service
             android:name=".JobExecutionService"
             android:enabled="true"
             android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
     </application>
 </manifest>

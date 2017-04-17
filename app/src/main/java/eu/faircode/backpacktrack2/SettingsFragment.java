@@ -591,6 +591,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         updateTitle(prefs, PREF_BLOGUSER);
         updateTitle(prefs, PREF_BLOGPWD);
 
+        updateTitle(prefs, PREF_LIFELINE_ENABLED);
         updateTitle(prefs, PREF_LIFELINE_METERED_INTERVAL);
         updateTitle(prefs, PREF_LIFELINE_STATE);
 
@@ -3653,7 +3654,11 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             else
                 pref.setTitle(getString(R.string.title_blogpwd, "********"));
 
-        else if (PREF_LIFELINE_METERED_INTERVAL.equals(key))
+        else if (PREF_LIFELINE_ENABLED.equals(key)) {
+            long llid = prefs.getLong(SettingsFragment.PREF_LIFELINE_ID, 0);
+            pref.setSummary(Long.toHexString(llid));
+            Log.i(TAG, "Lifeline id=" + pref.getSummary());
+        } else if (PREF_LIFELINE_METERED_INTERVAL.equals(key))
             pref.setTitle(getString(R.string.title_lifeline_interval, prefs.getString(key, DEFAULT_LIFELINE_METERED_INTERVAL)));
         else if (PREF_LIFELINE_STATE.equals(key) || PREF_LIFELINE_LAST.equals(key)) {
             DatabaseHelper dh = new DatabaseHelper(getActivity());
